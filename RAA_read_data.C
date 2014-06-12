@@ -353,34 +353,34 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
     pbpb65[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet65_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&neutralMax/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
     pbpb55[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet55_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&neutralMax/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
 
-    hpbpb1[i] = new TH1F(Form("hpbpb1_%d",i),Form("spectra from Jet 80 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb1[i] = new TH1F(Form("hpbpb1_cent%d",i),Form("spectra from Jet 80 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     //hpbpb1[i]->Print("base");
-    hpbpb2[i] = new TH1F(Form("hpbpb2_%d",i),Form("spectra from jet 65 & !jet 80 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
-    hpbpb3[i] = new TH1F(Form("hpbpb3_%d",i),Form("spectra from jet 55 & !jet 65 & !jet 80 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
-    hpbpbComb[i] = new TH1F(Form("hpbpbComb_%d",i),Form("Spectra Combined using 12003 method %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb2[i] = new TH1F(Form("hpbpb2_cent%d",i),Form("spectra from jet 65 & !jet 80 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb3[i] = new TH1F(Form("hpbpb3_cent%d",i),Form("spectra from jet 55 & !jet 65 & !jet 80 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpbComb[i] = new TH1F(Form("hpbpbComb_cent%d",i),Form("Spectra Combined using 12003 method %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 
-    hpbpb_80[i] = new TH1F(Form("hpbpb_80_%d",i),Form("Spectra from Jet80 trigger alone %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
-    hpbpb_65[i] = new TH1F(Form("hpbpb_65_%d",i),Form("Spectra from Jet65 trigger alone %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
-    hpbpb_55[i] = new TH1F(Form("hpbpb_55_%d",i),Form("Spectra from Jet55 trigger alone %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_80[i] = new TH1F(Form("hpbpb_80_cent%d",i),Form("Spectra from Jet80 trigger alone %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_65[i] = new TH1F(Form("hpbpb_65_cent%d",i),Form("Spectra from Jet65 trigger alone %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_55[i] = new TH1F(Form("hpbpb_55_cent%d",i),Form("Spectra from Jet55 trigger alone %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 
-    jetpbpb2->Project(Form("hpbpb1_%d",i),"jtpt",pbpb1[i]);
+    jetpbpb2->Project(Form("hpbpb1_cent%d",i),"jtpt",pbpb1[i]);
     hpbpb1[i]->Print("base");
     //divideBinWidth(hpbpb1);
     
-    jetpbpb1->Project(Form("hpbpb2_%d",i),"jtpt",pbpb2[i]);
+    jetpbpb1->Project(Form("hpbpb2_cent%d",i),"jtpt",pbpb2[i]);
     hpbpb2[i]->Print("base");
     //divideBinWidth(hpbpb2);
     
-    jetpbpb1->Project(Form("hpbpb3_%d",i),"jtpt","HLT_HIJet55_v1_Prescl"*pbpb3[i]);
+    jetpbpb1->Project(Form("hpbpb3_cent%d",i),"jtpt","HLT_HIJet55_v1_Prescl"*pbpb3[i]);
     //jetpbpb1->Project("hpbpb3","jtpt","2.34995"*pbpb3);
     hpbpb3[i]->Print("base");
     //divideBinWidth(hpbpb3);
 
-    jetpbpb2->Project(Form("hpbpb_80_%d",i),"jtpt","HLT_HIJet80_v1_Prescl"*pbpb80[i]);
+    jetpbpb2->Project(Form("hpbpb_80_cent%d",i),"jtpt","HLT_HIJet80_v1_Prescl"*pbpb80[i]);
     hpbpb_80[i]->Print("base");
-    jetpbpb1->Project(Form("hpbpb_65_%d",i),"jtpt","HLT_HIJet65_v1_Prescl"*pbpb65[i]);
+    jetpbpb1->Project(Form("hpbpb_65_cent%d",i),"jtpt","HLT_HIJet65_v1_Prescl"*pbpb65[i]);
     hpbpb_65[i]->Print("base");
-    jetpbpb1->Project(Form("hpbpb_55_%d",i),"jtpt","HLT_HIJet55_v1_Prescl"*pbpb55[i]);
+    jetpbpb1->Project(Form("hpbpb_55_cent%d",i),"jtpt","HLT_HIJet55_v1_Prescl"*pbpb55[i]);
     hpbpb_55[i]->Print("base");
 
     //scale the PbPb histograms before adding them
@@ -420,10 +420,10 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
     hpbpbComb[i]->Add(hpbpb3[i]);
     hpbpbComb[i]->Print("base");
 
-    hpbpbComb[i] = (TH1F*)hpbpbComb[i]->Rebin(nbins_pt,Form("hpbpbComb_%d",i),boundaries_pt);
-    hpbpb3[i] = (TH1F*)hpbpb3[i]->Rebin(nbins_pt,Form("hpbpb3_%d",i),boundaries_pt);
-    hpbpb2[i] = (TH1F*)hpbpb2[i]->Rebin(nbins_pt,Form("hpbpb2_%d",i),boundaries_pt);
-    hpbpb1[i] = (TH1F*)hpbpb1[i]->Rebin(nbins_pt,Form("hpbpb1_%d",i),boundaries_pt);
+    hpbpbComb[i] = (TH1F*)hpbpbComb[i]->Rebin(nbins_pt,Form("hpbpbComb_cent%d",i),boundaries_pt);
+    hpbpb3[i] = (TH1F*)hpbpb3[i]->Rebin(nbins_pt,Form("hpbpb3_cent%d",i),boundaries_pt);
+    hpbpb2[i] = (TH1F*)hpbpb2[i]->Rebin(nbins_pt,Form("hpbpb2_cent%d",i),boundaries_pt);
+    hpbpb1[i] = (TH1F*)hpbpb1[i]->Rebin(nbins_pt,Form("hpbpb1_cent%d",i),boundaries_pt);
 
     divideBinWidth(hpbpbComb[i]);
     divideBinWidth(hpbpb3[i]);
@@ -442,35 +442,35 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
   pbpb65[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet65_v1&&(chargedMax/jtpt>0.01";
   pbpb55[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet55_v1&&(chargedMax/jtpt)>0.01";
 
-  hpbpb1[nbins_cent] = new TH1F(Form("hpbpb1_%d",nbins_cent),"Spectra from Jet80 0-200 cent",1000,0,1000);
+  hpbpb1[nbins_cent] = new TH1F(Form("hpbpb1_cent%d",nbins_cent),"Spectra from Jet80 0-200 cent",1000,0,1000);
   //hpbpb1[i]->Print("base");
-  hpbpb2[nbins_cent] = new TH1F(Form("hpbpb2_%d",nbins_cent),"Spectra from Jet 65 & !Jet80 0-200 cent",1000,0,1000);
-  hpbpb3[nbins_cent] = new TH1F(Form("hpbpb3_%d",nbins_cent),"Spectra from Jet 55 & !Jet65 & !Jet80 0-200 cent",1000,0,1000);
-  hpbpbComb[nbins_cent] = new TH1F(Form("hpbpbComb_%d",nbins_cent),"Combined Jet spectra 12003 method 0-200 cent",1000,0,1000);
+  hpbpb2[nbins_cent] = new TH1F(Form("hpbpb2_cent%d",nbins_cent),"Spectra from Jet 65 & !Jet80 0-200 cent",1000,0,1000);
+  hpbpb3[nbins_cent] = new TH1F(Form("hpbpb3_cent%d",nbins_cent),"Spectra from Jet 55 & !Jet65 & !Jet80 0-200 cent",1000,0,1000);
+  hpbpbComb[nbins_cent] = new TH1F(Form("hpbpbComb_cent%d",nbins_cent),"Combined Jet spectra 12003 method 0-200 cent",1000,0,1000);
   
-  hpbpb_80[nbins_cent] = new TH1F(Form("hpbpb_80_%d",nbins_cent),"Spectra from Jet 80 alone 0-200 cent",1000,0,1000);
-  hpbpb_65[nbins_cent] = new TH1F(Form("hpbpb_65_%d",nbins_cent),"Spectra from Jet 65 alone 0-200 cent",1000,0,1000);
-  hpbpb_55[nbins_cent] = new TH1F(Form("hpbpb_55_%d",nbins_cent),"Spectra from Jet 55 alone 0-200 cent",1000,0,1000);
+  hpbpb_80[nbins_cent] = new TH1F(Form("hpbpb_80_cent%d",nbins_cent),"Spectra from Jet 80 alone 0-200 cent",1000,0,1000);
+  hpbpb_65[nbins_cent] = new TH1F(Form("hpbpb_65_cent%d",nbins_cent),"Spectra from Jet 65 alone 0-200 cent",1000,0,1000);
+  hpbpb_55[nbins_cent] = new TH1F(Form("hpbpb_55_cent%d",nbins_cent),"Spectra from Jet 55 alone 0-200 cent",1000,0,1000);
   
-  jetpbpb2->Project(Form("hpbpb1_%d",nbins_cent),"jtpt",pbpb1[nbins_cent]);
+  jetpbpb2->Project(Form("hpbpb1_cent%d",nbins_cent),"jtpt",pbpb1[nbins_cent]);
   hpbpb1[nbins_cent]->Print("base");
   //divideBinWidth(hpbpb1);
     
-  jetpbpb1->Project(Form("hpbpb2_%d",nbins_cent),"jtpt",pbpb2[nbins_cent]);
+  jetpbpb1->Project(Form("hpbpb2_cent%d",nbins_cent),"jtpt",pbpb2[nbins_cent]);
   hpbpb2[nbins_cent]->Print("base");
   //divideBinWidth(hpbpb2);
   
-  jetpbpb1->Project(Form("hpbpb3_%d",nbins_cent),"jtpt","HLT_HIJet55_v1_Prescl"*pbpb3[nbins_cent]);
+  jetpbpb1->Project(Form("hpbpb3_cent%d",nbins_cent),"jtpt","HLT_HIJet55_v1_Prescl"*pbpb3[nbins_cent]);
   //jetpbpb1->Project("hpbpb3","jtpt","2.34995"*pbpb3);
   hpbpb3[nbins_cent]->Print("base");
   //divideBinWidth(hpbpb3);
   
   //following histograms are for the trigger turnon curve. no cuts apart from the trigger selection. 
-  jetpbpb2->Project(Form("hpbpb_80_%d",nbins_cent),"jtpt","HLT_HIJet80_v1_Prescl*HLT_HIJet80_v1");
+  jetpbpb2->Project(Form("hpbpb_80_cent%d",nbins_cent),"jtpt","HLT_HIJet80_v1_Prescl*HLT_HIJet80_v1");
   hpbpb_80[nbins_cent]->Print("base");
-  jetpbpb1->Project(Form("hpbpb_65_%d",nbins_cent),"jtpt","HLT_HIJet65_v1_Prescl*HLT_HIJet65_v1");
+  jetpbpb1->Project(Form("hpbpb_65_cent%d",nbins_cent),"jtpt","HLT_HIJet65_v1_Prescl*HLT_HIJet65_v1");
   hpbpb_65[nbins_cent]->Print("base");
-  jetpbpb1->Project(Form("hpbpb_55_%d",nbins_cent),"jtpt","HLT_HIJet55_v1_Prescl*HLT_HIJet55_v1");
+  jetpbpb1->Project(Form("hpbpb_55_cent%d",nbins_cent),"jtpt","HLT_HIJet55_v1_Prescl*HLT_HIJet55_v1");
   hpbpb_55[nbins_cent]->Print("base");
   
   //scale the PbPb histograms before adding them
@@ -502,10 +502,10 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
   hpbpbComb[nbins_cent]->Add(hpbpb3[nbins_cent]);
   hpbpbComb[nbins_cent]->Print("base");
   
-  hpbpbComb[nbins_cent] = (TH1F*)hpbpbComb[nbins_cent]->Rebin(nbins_pt,Form("hpbpbComb_%d",nbins_cent),boundaries_pt);
-  hpbpb3[nbins_cent] = (TH1F*)hpbpb3[nbins_cent]->Rebin(nbins_pt,Form("hpbpb3_%d",nbins_cent),boundaries_pt);
-  hpbpb2[nbins_cent] = (TH1F*)hpbpb2[nbins_cent]->Rebin(nbins_pt,Form("hpbpb2_%d",nbins_cent),boundaries_pt);
-  hpbpb1[nbins_cent] = (TH1F*)hpbpb1[nbins_cent]->Rebin(nbins_pt,Form("hpbpb1_%d",nbins_cent),boundaries_pt);
+  hpbpbComb[nbins_cent] = (TH1F*)hpbpbComb[nbins_cent]->Rebin(nbins_pt,Form("hpbpbComb_cent%d",nbins_cent),boundaries_pt);
+  hpbpb3[nbins_cent] = (TH1F*)hpbpb3[nbins_cent]->Rebin(nbins_pt,Form("hpbpb3_cent%d",nbins_cent),boundaries_pt);
+  hpbpb2[nbins_cent] = (TH1F*)hpbpb2[nbins_cent]->Rebin(nbins_pt,Form("hpbpb2_cent%d",nbins_cent),boundaries_pt);
+  hpbpb1[nbins_cent] = (TH1F*)hpbpb1[nbins_cent]->Rebin(nbins_pt,Form("hpbpb1_cent%d",nbins_cent),boundaries_pt);
   
   divideBinWidth(hpbpbComb[nbins_cent]);
   divideBinWidth(hpbpb3[nbins_cent]);
@@ -875,11 +875,11 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 
   for(int i = 0;i<nbins_cent;i++){
 
-    hpbpb_TrgObj80[i] = new TH1F(Form("hpbpb_TrgObj80_%d",i),Form("Spectra from Trig Object > 80 and Jet 80 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
-    hpbpb_TrgObj65[i] = new TH1F(Form("hpbpb_TrgObj65_%d",i),Form("Spectra from Trig Object > 65 and < 80 and Jet 65 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
-    hpbpb_TrgObj55[i] = new TH1F(Form("hpbpb_TrgObj55_%d",i),Form("Spectra from Trig Object > 55 and < 65 and Jet 55 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
-    hpbpb_TrgObjMB[i] = new TH1F(Form("hpbpb_TrgObjMB_%d",i),"",1000,0,1000);
-    hpbpb_TrgObjComb[i] = new TH1F(Form("hpbpb_TrgObjComb_%d",i),Form("Trig Combined Spectra using 14007 method %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_TrgObj80[i] = new TH1F(Form("hpbpb_TrgObj80_cent%d",i),Form("Spectra from Trig Object > 80 and Jet 80 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_TrgObj65[i] = new TH1F(Form("hpbpb_TrgObj65_cent%d",i),Form("Spectra from Trig Object > 65 and < 80 and Jet 65 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_TrgObj55[i] = new TH1F(Form("hpbpb_TrgObj55_cent%d",i),Form("Spectra from Trig Object > 55 and < 65 and Jet 55 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_TrgObjMB[i] = new TH1F(Form("hpbpb_TrgObjMB_cent%d",i),"",1000,0,1000);
+    hpbpb_TrgObjComb[i] = new TH1F(Form("hpbpb_TrgObjComb_cent%d",i),Form("Trig Combined Spectra using 14007 method %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 
   }
 
@@ -1260,10 +1260,10 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
     hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj65[i]);
     hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj55[i]);
 
-    hpbpb_TrgObjComb[i] = (TH1F*)hpbpb_TrgObjComb[i]->Rebin(nbins_pt,Form("hpbpb_TrgObjComb_%d",i),boundaries_pt);
-    hpbpb_TrgObj80[i] = (TH1F*)hpbpb_TrgObj80[i]->Rebin(nbins_pt,Form("hpbpb_TrfObj80_%d",i),boundaries_pt);
-    hpbpb_TrgObj65[i] = (TH1F*)hpbpb_TrgObj65[i]->Rebin(nbins_pt,Form("hpbpb_TrgObj65_%d",i),boundaries_pt);
-    hpbpb_TrgObj55[i] = (TH1F*)hpbpb_TrgObj55[i]->Rebin(nbins_pt,Form("hpbpb_TrgObj55_%d",i),boundaries_pt);
+    hpbpb_TrgObjComb[i] = (TH1F*)hpbpb_TrgObjComb[i]->Rebin(nbins_pt,Form("hpbpb_TrgObjComb_cent%d",i),boundaries_pt);
+    hpbpb_TrgObj80[i] = (TH1F*)hpbpb_TrgObj80[i]->Rebin(nbins_pt,Form("hpbpb_TrfObj80_cent%d",i),boundaries_pt);
+    hpbpb_TrgObj65[i] = (TH1F*)hpbpb_TrgObj65[i]->Rebin(nbins_pt,Form("hpbpb_TrgObj65_cent%d",i),boundaries_pt);
+    hpbpb_TrgObj55[i] = (TH1F*)hpbpb_TrgObj55[i]->Rebin(nbins_pt,Form("hpbpb_TrgObj55_cent%d",i),boundaries_pt);
 
     divideBinWidth(hpbpbComb[i]);
     divideBinWidth(hpbpb3[i]);
@@ -1283,7 +1283,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
   TDatime date;
 
   //declare the output file
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_pp_data_ak%d_%s_%d_chMax_12003cut.root",radius,algo,date.GetDate()),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_pp_data_ak%d_%s_cent%d_chMax_12003cut.root",radius,algo,date.GetDate()),"RECREATE");
   
   f.cd();
   
