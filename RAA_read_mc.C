@@ -102,12 +102,16 @@ public:
 
 using namespace std;
 
-void RAA_read_mc(int radius = 3, char *algo = "Pu"){
+void RAA_read_mc(int radius = 3, char *algo = "Vs"){
+   
+  TStopwatch timer;
+  timer.Start();
 
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
   gStyle->SetOptStat(0);
+ 
 
   const int nbins_pthat = 5;
   Double_t boundaries_pthat[nbins_pthat+1];
@@ -212,17 +216,18 @@ void RAA_read_mc(int radius = 3, char *algo = "Pu"){
 
   for(int i = 0;i<nbins_cent;i++){
 
-    hpbpb_gen[i] = new TH1F(Form("hpbpb_gen_%d",i),Form("Gen refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
-    hpbpb_reco[i] = new TH1F(Form("hpbpb_reco_%d",i),Form("Reco jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
-    hpbpb_matrix[i] = new TH2F(Form("hpbpb_matrix_%d",i),Form("Matrix refpt jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
-    //hpbpb_response[i] = new TH2F(Form("hpbpb_response_%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+    hpbpb_gen[i] = new TH1F(Form("hpbpb_gen_cent%d",i),Form("Gen refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_reco[i] = new TH1F(Form("hpbpb_reco_cent%d",i),Form("Reco jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_matrix[i] = new TH2F(Form("hpbpb_matrix_cent%d",i),Form("Matrix refpt jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+    //hpbpb_response[i] = new TH2F(Form("hpbpb_response_cent%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
   }
   
-  hpbpb_gen[nbins_cent] = new TH1F(Form("hpbpb_gen_%d",nbins_cent),"Gen refpt 0-200 cent",1000,0,1000);
-  hpbpb_reco[nbins_cent] = new TH1F(Form("hpbpb_reco_%d",nbins_cent),"Reco jtpt 0-200 cent",1000,0,1000);
-  hpbpb_matrix[nbins_cent] = new TH2F(Form("hpbpb_matrix_%d",nbins_cent),"Matrix refpt jtpt 0-200 cent",1000,0,1000,1000,0,1000);
-  //hpbpb_response[nbins_cent] = new TH2F(Form("hpbpb_response_%d",nbins_cent),"response jtpt refpt 0-200 cent",1000,0,1000,1000,0,1000);
+  hpbpb_gen[nbins_cent] = new TH1F(Form("hpbpb_gen_cent%d",nbins_cent),"Gen refpt 0-200 cent",1000,0,1000);
+  hpbpb_reco[nbins_cent] = new TH1F(Form("hpbpb_reco_cent%d",nbins_cent),"Reco jtpt 0-200 cent",1000,0,1000);
+  hpbpb_matrix[nbins_cent] = new TH2F(Form("hpbpb_matrix_cent%d",nbins_cent),"Matrix refpt jtpt 0-200 cent",1000,0,1000,1000,0,1000);
+  //hpbpb_response[nbins_cent] = new TH2F(Form("hpbpb_response_cent%d",nbins_cent),"response jtpt refpt 0-200 cent",1000,0,1000,1000,0,1000);
   
+
   TH1F* hpp_gen = new TH1F("hpp_gen","gen refpt",1000,0,1000);
   TH1F* hpp_reco = new TH1F("hpp_reco","reco jtpt",1000,0,1000);
   TH2F* hpp_matrix = new TH2F("hpp_matrix","matrix refpt jtpt",1000,0,1000,1000,0,1000);
@@ -383,13 +388,12 @@ void RAA_read_mc(int radius = 3, char *algo = "Pu"){
     }//nentry loop
     
   }//ptbins loop
-
-
-
- // Vertex reweighting for pp
+  
+  
+  // Vertex reweighting for pp
   TF1 *fVzPP = new TF1("fVzPP","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
   fVzPP->SetParameters(8.41684e-01,-2.58609e-02,4.86550e-03,-3.10581e-04,2.07918e-05);
-
+  
   // fill pp MC
   for (int i=0;i<nbinsPP_pthat;i++) {
     if (xsectionPP[i]==0) continue;
@@ -399,7 +403,7 @@ void RAA_read_mc(int radius = 3, char *algo = "Pu"){
 	 << Form(" pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[i],boundariesPP_pthat[i+1])<<endl;
     //cout<<""<<endl;
     for (Long64_t jentry2=0; jentry2<dataPP[i]->tJet->GetEntries();jentry2++) {
-    //for (Long64_t jentry2=0; jentry2<10;jentry2++) {
+      //for (Long64_t jentry2=0; jentry2<10;jentry2++) {
       dataPP[i]->tEvt->GetEntry(jentry2);
       dataPP[i]->tJet->GetEntry(jentry2);
       //dataPP[i]->tGenJet->GetEntry(jentry2);
@@ -412,7 +416,7 @@ void RAA_read_mc(int radius = 3, char *algo = "Pu"){
       double weight_pt=1;
       double weight_vz=1;
       if(!dataPP[i]->pPAcollisionEventSelectionPA || !dataPP[i]->pHBHENoiseFilter) continue;
-
+      
       weight_vz = fVzPP->Eval(dataPP[i]->vz);
       //if (weight_vz>5||weight_vz<0.5) cout <<dataPP[i]->vz<<" "<<weight_vz<<endl;
       //weight_vz = 1;
@@ -426,7 +430,7 @@ void RAA_read_mc(int radius = 3, char *algo = "Pu"){
 	hasLeadingJet = 1;
 	}
 	break;
-				 
+	
 	}
 	if (hasLeadingJet == 0) continue;
       */
@@ -437,7 +441,7 @@ void RAA_read_mc(int radius = 3, char *algo = "Pu"){
 	if ( dataPP[i]->jteta[k]  > 2. || dataPP[i]->jteta[k] < -2. ) continue;
 	if ( dataPP[i]->chargedMax[k]/dataPP[i]->jtpt[k]<0.01) continue;
 	if ( dataPP[i]->neutralMax[k]/TMath::Max(dataPP[i]->chargedSum[k],dataPP[i]->neutralSum[k]) < 0.975)continue;
-	
+	//if ( dataPP[i]->neu)
 
 	//if (uhist[nbins_cent]->hMeasMatch!=0) {
 	//   int ptBinNumber = uhist[nbins_cent]->hMeasMatch->FindBin(dataPP[i]->jtpt[k]);
@@ -470,8 +474,8 @@ void RAA_read_mc(int radius = 3, char *algo = "Pu"){
 
   for(int i = 0;i<=nbins_cent;i++){
     
-    hpbpb_gen[i] = (TH1F*)hpbpb_gen[i]->Rebin(nbins_pt,Form("hpbpb_gen_%d",i),boundaries_pt);
-    hpbpb_reco[i] = (TH1F*)hpbpb_reco[i]->Rebin(nbins_pt,Form("hpbpb_reco_%d",i),boundaries_pt);
+    hpbpb_gen[i] = (TH1F*)hpbpb_gen[i]->Rebin(nbins_pt,Form("hpbpb_gen_cent%d",i),boundaries_pt);
+    hpbpb_reco[i] = (TH1F*)hpbpb_reco[i]->Rebin(nbins_pt,Form("hpbpb_reco_cent%d",i),boundaries_pt);
     //hpbpb_matrix[i] = (TH2F*)hpbpb_matrix[i]->Rebin(nbins_pt,Form("Matrix  refpt jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),boundaries_pt);
     //hpbpb_response[i] = (TH2F*)hpbpb_response[i]->Rebin(nbins_pt,Form("Response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),boundaries_pt);
 
@@ -497,8 +501,14 @@ void RAA_read_mc(int radius = 3, char *algo = "Pu"){
   hpp_matrix->Print("base");
   //hpp_response->Write();
   //hpp_response->Print("base");
-
+  
   f.Write();
   f.Close();
-
+  
+  
+  timer.Stop();
+  cout<<"Macro finished: "<<endl;
+  cout<<"CPU time (min)  = "<<timer.CpuTime()<<endl;
+  cout<<"Real time (min) = "<<timer.RealTime()<<endl;
+  
 }

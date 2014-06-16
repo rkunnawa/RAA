@@ -95,6 +95,9 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
   TH1::SetDefaultSumw2();
   gStyle->SetOptStat(0);
 
+  TStopwatch timer;
+  timer.Start();
+
   // number convension:
   // 0 - MB
   // 1 - 55 or 65
@@ -1277,13 +1280,10 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 
   }
 
-
- 
-
   TDatime date;
 
   //declare the output file
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_pp_data_ak%d_%s_cent%d_chMax_12003cut.root",radius,algo,date.GetDate()),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_pp_data_ak%d_%s_%d_chMax_12003cut.root",radius,algo,date.GetDate()),"RECREATE");
   
   f.cd();
   
@@ -1311,6 +1311,10 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
   f.Close();
 
 
-
+  timer.Stop();
+  cout<<"Macro finished: "<<endl;
+  cout<<"CPU time (min)  = "<<timer.CpuTime()<<endl;
+  cout<<"Real time (min) = "<<timer.RealTime()<<endl;
+  
 
 }
