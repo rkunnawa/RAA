@@ -24,3 +24,13 @@ So here is the analysis setup.(in terms of the directory)
 like i mentioned before we will have the three macros followed by the root logon file. 
 Please include the comments for each file (as you have been doing quite well so far) and good luck!!!  
 
+June 12th
+  Finished adding the read macros for data and mc. almost done with the unfolding/analysis macros. 
+
+June 18th
+  Ive added a macro fakeCheck.C which looks at the fake jets. it runs on cordor and you have to run it like so 
+  $ source condor_submit.sh Nfiles nfilesperjob
+  finished the analysis macro. Only have to check it with the corresponding plots which are freaking numerous to make.  
+  I still need to add the plotting macro. 
+
+

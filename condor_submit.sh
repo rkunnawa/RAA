@@ -47,7 +47,6 @@ Executable     = condor_run.sh
 +AccountingGroup = "group_cmshi.rkunnawa"
 #+IsMadgraph = 1
 
-
 Arguments      = $startfile $endfile $destination \$(Process)
 # input files. in this case, there are none.
 Input          = /dev/null

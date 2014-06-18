@@ -2,7 +2,7 @@
 export SCRAM_ARCH=slc5_amd64_gcc462
 source /osg/app/cmssoft/cms/cmsset_default.sh
 #source /apps/02/cmssoft/cms/cmsset_default.sh
-source /osg/app/glite/etc/profile.d/grid_env.sh
+#source /osg/app/glite/etc/profile.d/grid_env.sh
 
 echo ""
 echo "----------------------------------------------------"
@@ -12,7 +12,7 @@ echo "Job is running on `uname -a`"
 cd /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/
 #eval `scram list CMSSW`
 eval `scramv1 runtime -sh`
-cd /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/
+cd /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Macros/RAA/
 
 echo "root directory: $ROOTSYS"
 
