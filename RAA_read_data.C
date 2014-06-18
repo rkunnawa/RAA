@@ -98,6 +98,8 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
   TStopwatch timer;
   timer.Start();
 
+  cout<<"Running for Radius = "<<radius<<" and Algo = "<<algo<<endl;
+
   // number convension:
   // 0 - MB
   // 1 - 55 or 65
@@ -111,7 +113,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
   TFile *fpbpb0_old = TFile::Open("/mnt/hadoop/cms/store/user/velicanu/HIMinBias2011_GR_R_53_LV6_CMSSW_5_3_16_lumi2_FOREST_TRY2merged/0.root");
 
   TFile *fpbpb1_old = TFile::Open("/mnt/hadoop/cms/store/user/velicanu/hiForest_Jet55or65_GR_R_53_LV6_12Mar2014_0000CET_Track8_Jet21/0.root");
-  TFile *fpbpb1 = TFile::Open("/mnt/hadoop/cms/store/user/velicanu/hiForest_Jet55or65_GR_R_53_LV6_25Mar2014_0200CET_Track8_Jet26_TRY2_full/0.root");
+  //TFile *fpbpb1 = TFile::Open("/mnt/hadoop/cms/store/user/velicanu/hiForest_Jet55or65_GR_R_53_LV6_25Mar2014_0200CET_Track8_Jet26_TRY2_full/0.root");
 
   TFile *fpbpb2_old = TFile::Open("/mnt/hadoop/cms/store/user/velicanu/hiForest_Jet80or95_GR_R_53_LV6_12Mar2014_0000CET_Track8_Jet21/0.root");
   TFile *fpbpb2 = TFile::Open("/mnt/hadoop/cms/store/user/velicanu/hiForest_Jet80or95_GR_R_53_LV6_25Mar2014_0200CET_Track8_Jet26_full/0.root");
@@ -120,33 +122,55 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
   TFile *fpp1_v2 = TFile::Open("/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/data/ntuple_2013_JEC_applied_ppJet80_v2.root");
   TFile *fpp2_v2 = TFile::Open("/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/data/ntuple_2013_JEC_applied_ppJet40_v2.root");
 
+  // data files for PbPb Jet55or66 are a list. So we need to TChain them first and then we should be able to use those chaing to get the events. they will have the same names as we used here. 
+
+  TChain *jetpbpb1 = new TChain(Form("ak%s%dPFJetAnalyzer/t",algo,radius));
+  TChain *evtpbpb1 = new TChain("hiEvtAnalyzer/HiTree");
+  TChain *hltpbpb1 = new TChain("hltanalysis/HltTree");
+  TChain *skmpbpb1 = new TChain("skimanalysis/HltTree");
+  TChain *hltobjpbpb1 = new TChain("hltobject/jetObjTree");
+
+  // file list - are all named like this: /mnt/hadoop/cms/store/user/dgulhan/HIMC/Jet55or65/HIRun2011-14Mar2014-v2-6lumi-jet55or65-forest-v9/merged/HiForest_Pythia_Hydjet_Jet80_Track8_Jet19_STARTHI53_LV1_merged_forest_##.root
+  // where ## goes from 0-11
+
+  for(int i = 0;i<=11;i++){
+
+    jetpbpb1->Add(Form("/mnt/hadoop/cms/store/user/dgulhan/HIMC/Jet55or65/HIRun2011-14Mar2014-v2-6lumi-jet55or65-forest-v9/merged/HiForest_Pythia_Hydjet_Jet80_Track8_Jet19_STARTHI53_LV1_merged_forest_%d.root",i));
+    hltpbpb1->Add(Form("/mnt/hadoop/cms/store/user/dgulhan/HIMC/Jet55or65/HIRun2011-14Mar2014-v2-6lumi-jet55or65-forest-v9/merged/HiForest_Pythia_Hydjet_Jet80_Track8_Jet19_STARTHI53_LV1_merged_forest_%d.root",i));
+    skmpbpb1->Add(Form("/mnt/hadoop/cms/store/user/dgulhan/HIMC/Jet55or65/HIRun2011-14Mar2014-v2-6lumi-jet55or65-forest-v9/merged/HiForest_Pythia_Hydjet_Jet80_Track8_Jet19_STARTHI53_LV1_merged_forest_%d.root",i));
+    evtpbpb1->Add(Form("/mnt/hadoop/cms/store/user/dgulhan/HIMC/Jet55or65/HIRun2011-14Mar2014-v2-6lumi-jet55or65-forest-v9/merged/HiForest_Pythia_Hydjet_Jet80_Track8_Jet19_STARTHI53_LV1_merged_forest_%d.root",i));
+    hltobjpbpb1->Add(Form("/mnt/hadoop/cms/store/user/dgulhan/HIMC/Jet55or65/HIRun2011-14Mar2014-v2-6lumi-jet55or65-forest-v9/merged/HiForest_Pythia_Hydjet_Jet80_Track8_Jet19_STARTHI53_LV1_merged_forest_%d.root",i));
+  
+  }
+
+
   // grab the trees from the data files. 
   TTree *jetpbpb0_old = (TTree*)fpbpb0_old->Get(Form("ak%s%dPFJetAnalyzer/t",algo,radius));
-  TTree *jetpbpb1 = (TTree*)fpbpb1->Get(Form("ak%s%dPFJetAnalyzer/t",algo,radius));
+  //TTree *jetpbpb1 = (TTree*)fpbpb1->Get(Form("ak%s%dPFJetAnalyzer/t",algo,radius));
   TTree *jetpbpb1_old = (TTree*)fpbpb1_old->Get(Form("ak%s%dPFJetAnalyzer/t",algo,radius));
   TTree *jetpbpb2 = (TTree*)fpbpb2->Get(Form("ak%s%dPFJetAnalyzer/t",algo,radius));
   TTree *jetpbpb2_old = (TTree*)fpbpb2_old->Get(Form("ak%s%dPFJetAnalyzer/t",algo,radius));
 
   TTree *evtpbpb0_old = (TTree*)fpbpb0_old->Get("hiEvtAnalyzer/HiTree");
-  TTree *evtpbpb1 = (TTree*)fpbpb1->Get("hiEvtAnalyzer/HiTree");
+  //TTree *evtpbpb1 = (TTree*)fpbpb1->Get("hiEvtAnalyzer/HiTree");
   TTree *evtpbpb1_old = (TTree*)fpbpb1_old->Get("hiEvtAnalyzer/HiTree");
   TTree *evtpbpb2 = (TTree*)fpbpb2->Get("hiEvtAnalyzer/HiTree");  
   TTree *evtpbpb2_old = (TTree*)fpbpb2_old->Get("hiEvtAnalyzer/HiTree");
 
   TTree* hltpbpb0_old = (TTree*)fpbpb0_old->Get("hltanalysis/HltTree");
-  TTree* hltpbpb1 = (TTree*)fpbpb1->Get("hltanalysis/HltTree");
+  //TTree* hltpbpb1 = (TTree*)fpbpb1->Get("hltanalysis/HltTree");
   TTree* hltpbpb1_old = (TTree*)fpbpb1_old->Get("hltanalysis/HltTree");
   TTree* hltpbpb2 = (TTree*)fpbpb2->Get("hltanalysis/HltTree");
   TTree* hltpbpb2_old = (TTree*)fpbpb2_old->Get("hltanalysis/HltTree");
 
   TTree* skmpbpb0_old = (TTree*)fpbpb0_old->Get("skimanalysis/HltTree");
-  TTree* skmpbpb1 = (TTree*)fpbpb1->Get("skimanalysis/HltTree");
+  //TTree* skmpbpb1 = (TTree*)fpbpb1->Get("skimanalysis/HltTree");
   TTree* skmpbpb1_old = (TTree*)fpbpb1_old->Get("skimanalysis/HltTree");
   TTree* skmpbpb2 = (TTree*)fpbpb2->Get("skimanalysis/HltTree");
   TTree* skmpbpb2_old = (TTree*)fpbpb2_old->Get("skimanalysis/HltTree");
 
   TTree* hltobjpbpb0_old = (TTree*)fpbpb0_old->Get("hltobject/jetObjTree");
-  TTree* hltobjpbpb1 = (TTree*)fpbpb1->Get("hltobject/jetObjTree");
+  //TTree* hltobjpbpb1 = (TTree*)fpbpb1->Get("hltobject/jetObjTree");
   TTree* hltobjpbpb1_old = (TTree*)fpbpb1_old->Get("hltobject/jetObjTree");
   TTree* hltobjpbpb2 = (TTree*)fpbpb2->Get("hltobject/jetObjTree");
   TTree* hltobjpbpb2_old = (TTree*)fpbpb2_old->Get("hltobject/jetObjTree");
@@ -886,11 +910,11 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 
   }
 
-  hpbpb_TrgObj80[nbins_cent] = new TH1F("hpbpb_TrgObj80_6","Spectra from Trig Object > 80 and Jet 80 0-200 cent",1000,0,1000);
-  hpbpb_TrgObj65[nbins_cent] = new TH1F("hpbpb_TrgObj65_6","Spectra from Trig Object > 65 and < 80 and Jet 65 0-200 cent",1000,0,1000);
-  hpbpb_TrgObj55[nbins_cent] = new TH1F("hpbpb_TrgObj55_6","Spectra from Trig Object > 55 and < 65 and Jet 55 0-200 cent",1000,0,1000);
-  hpbpb_TrgObjMB[nbins_cent] = new TH1F("hpbpb_TrgObjMB_6","",1000,0,1000);
-  hpbpb_TrgObjComb[nbins_cent] = new TH1F("hpbpb_TrgObjComb_6","Trig combined spectra using 14007 method 0-200 cent",1000,0,1000);
+  hpbpb_TrgObj80[nbins_cent] = new TH1F("hpbpb_TrgObj80_cent6","Spectra from Trig Object > 80 and Jet 80 0-200 cent",1000,0,1000);
+  hpbpb_TrgObj65[nbins_cent] = new TH1F("hpbpb_TrgObj65_cent6","Spectra from Trig Object > 65 and < 80 and Jet 65 0-200 cent",1000,0,1000);
+  hpbpb_TrgObj55[nbins_cent] = new TH1F("hpbpb_TrgObj55_cent6","Spectra from Trig Object > 55 and < 65 and Jet 55 0-200 cent",1000,0,1000);
+  hpbpb_TrgObjMB[nbins_cent] = new TH1F("hpbpb_TrgObjMB_cent6","",1000,0,1000);
+  hpbpb_TrgObjComb[nbins_cent] = new TH1F("hpbpb_TrgObjComb_cent6","Trig combined spectra using 14007 method 0-200 cent",1000,0,1000);
     
   
   // loop for the jetpbpb1 tree 
@@ -1264,14 +1288,14 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
     hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj55[i]);
 
     hpbpb_TrgObjComb[i] = (TH1F*)hpbpb_TrgObjComb[i]->Rebin(nbins_pt,Form("hpbpb_TrgObjComb_cent%d",i),boundaries_pt);
-    hpbpb_TrgObj80[i] = (TH1F*)hpbpb_TrgObj80[i]->Rebin(nbins_pt,Form("hpbpb_TrfObj80_cent%d",i),boundaries_pt);
+    hpbpb_TrgObj80[i] = (TH1F*)hpbpb_TrgObj80[i]->Rebin(nbins_pt,Form("hpbpb_TrgObj80_cent%d",i),boundaries_pt);
     hpbpb_TrgObj65[i] = (TH1F*)hpbpb_TrgObj65[i]->Rebin(nbins_pt,Form("hpbpb_TrgObj65_cent%d",i),boundaries_pt);
     hpbpb_TrgObj55[i] = (TH1F*)hpbpb_TrgObj55[i]->Rebin(nbins_pt,Form("hpbpb_TrgObj55_cent%d",i),boundaries_pt);
 
-    divideBinWidth(hpbpbComb[i]);
-    divideBinWidth(hpbpb3[i]);
-    divideBinWidth(hpbpb2[i]);
-    divideBinWidth(hpbpb1[i]);
+    divideBinWidth(hpbpb_TrgObjComb[i]);
+    divideBinWidth(hpbpb_TrgObj80[i]);
+    divideBinWidth(hpbpb_TrgObj65[i]);
+    divideBinWidth(hpbpb_TrgObj55[i]);
     
     hpbpb_TrgObjComb[i]->Print("base");
     hpbpb_TrgObj80[i]->Print("base");

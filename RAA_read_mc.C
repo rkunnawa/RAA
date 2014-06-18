@@ -102,7 +102,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc(int radius = 3, char *algo = "Vs"){
+void RAA_read_mc(int radius = 3, char *algo = "Pu"){
    
   TStopwatch timer;
   timer.Start();
@@ -111,6 +111,8 @@ void RAA_read_mc(int radius = 3, char *algo = "Vs"){
   TH2::SetDefaultSumw2();
 
   gStyle->SetOptStat(0);
+
+  cout<<"Running for Radius = "<< radius<<" and Algorithm is "<<algo<<endl;
  
 
   const int nbins_pthat = 5;
@@ -211,27 +213,32 @@ void RAA_read_mc(int radius = 3, char *algo = "Vs"){
   //now we have to multiply by 5, since centrality goes from 0-200. 
   Double_t ncoll[nbins_cent] = { 1660, 1310, 745, 251, 62.8, 10.8 };
 
-  TH1F* hpbpb_gen[nbins_cent+1],*hpbpb_reco[nbins_cent+1];
-  TH2F* hpbpb_matrix[nbins_cent+1],*hpbpb_response[nbins_cent+1];
+  TH1F *hpbpb_gen[nbins_cent+1],*hpbpb_reco[nbins_cent+1];
+  TH2F *hpbpb_matrix[nbins_cent+1];
+  //TH2F *hpbpb_response[nbins_cent+1];
+  TH1F *hpbpb_mcclosure_data[nbins_cent+1];
 
   for(int i = 0;i<nbins_cent;i++){
 
-    hpbpb_gen[i] = new TH1F(Form("hpbpb_gen_cent%d",i),Form("Gen refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
-    hpbpb_reco[i] = new TH1F(Form("hpbpb_reco_cent%d",i),Form("Reco jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_gen[i] = new TH1F(Form("hpbpb_gen_cent%d",i),Form("Gen refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
+    hpbpb_reco[i] = new TH1F(Form("hpbpb_reco_cent%d",i),Form("Reco jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
     hpbpb_matrix[i] = new TH2F(Form("hpbpb_matrix_cent%d",i),Form("Matrix refpt jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+    hpbpb_mcclosure_data[i] = new TH1F(Form("hpbpb_mcclosure_data_cent%d",i),Form("data for unfolding mc closure test %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
     //hpbpb_response[i] = new TH2F(Form("hpbpb_response_cent%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
   }
   
-  hpbpb_gen[nbins_cent] = new TH1F(Form("hpbpb_gen_cent%d",nbins_cent),"Gen refpt 0-200 cent",1000,0,1000);
-  hpbpb_reco[nbins_cent] = new TH1F(Form("hpbpb_reco_cent%d",nbins_cent),"Reco jtpt 0-200 cent",1000,0,1000);
-  hpbpb_matrix[nbins_cent] = new TH2F(Form("hpbpb_matrix_cent%d",nbins_cent),"Matrix refpt jtpt 0-200 cent",1000,0,1000,1000,0,1000);
+  hpbpb_gen[nbins_cent] = new TH1F(Form("hpbpb_gen_cent%d",nbins_cent),"Gen refpt 0-200 cent",nbins_pt,boundaries_pt);
+  hpbpb_reco[nbins_cent] = new TH1F(Form("hpbpb_reco_cent%d",nbins_cent),"Reco jtpt 0-200 cent",nbins_pt,boundaries_pt);
+  hpbpb_matrix[nbins_cent] = new TH2F(Form("hpbpb_matrix_cent%d",nbins_cent),"Matrix refpt jtpt 0-200 cent",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+  hpbpb_mcclosure_data[nbins_cent] = new TH1F(Form("hpbpb_mcclosure_data_cent%d",nbins_cent),"data for unfolding mc closure test 0-200 cent",nbins_pt,boundaries_pt);
   //hpbpb_response[nbins_cent] = new TH2F(Form("hpbpb_response_cent%d",nbins_cent),"response jtpt refpt 0-200 cent",1000,0,1000,1000,0,1000);
   
 
-  TH1F* hpp_gen = new TH1F("hpp_gen","gen refpt",1000,0,1000);
-  TH1F* hpp_reco = new TH1F("hpp_reco","reco jtpt",1000,0,1000);
-  TH2F* hpp_matrix = new TH2F("hpp_matrix","matrix refpt jtpt",1000,0,1000,1000,0,1000);
+  TH1F* hpp_gen = new TH1F("hpp_gen","gen refpt",nbins_pt,boundaries_pt);
+  TH1F* hpp_reco = new TH1F("hpp_reco","reco jtpt",nbins_pt,boundaries_pt);
+  TH2F* hpp_matrix = new TH2F("hpp_matrix","matrix refpt jtpt",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
   //TH2F* hpp_response = new TH2F("hpp_response","response jtpt refpt",1000,0,1000,1000,0,1000);
+  TH1F* hpp_mcclosure_data = new TH1F("hpp_mcclosure_data","data for unfolding mc closure test pp",nbins_pt,boundaries_pt);
 
   TH1F *hCent = new TH1F("hCent","",nbins_cent,boundaries_cent);
   TH1F *hCentData = new TH1F("hCentData","",40,0,40);
@@ -375,7 +382,10 @@ void RAA_read_mc(int radius = 3, char *algo = "Vs"){
 	hpbpb_gen[nbins_cent]->Fill(data[i]->refpt[k],scale*weight_vz);
 	hpbpb_reco[nbins_cent]->Fill(data[i]->jtpt[k],scale*weight_vz);
 
-	//if (isMC&&jentry2>data[i]->tJet->GetEntries()/2.) {
+	if (jentry2>data[i]->tJet->GetEntries()/2.) {
+	  hpbpb_mcclosure_data[cBin]->Fill(data[i]->jtpt[k],scale*weight_vz);
+	  hpbpb_mcclosure_data[nbins_cent]->Fill(data[i]->jtpt[k],scale*weight_vz);
+	}
 	//  uhist[cBin]-> hGen->Fill(data[i]->refpt[k],scale*weight_vz);   
 	//  uhist[cBin]-> hMeas->Fill(data[i]->jtpt[k],scale*weight_vz);  	 
 	//uhist[cBin]-> hMeasJECSys->Fill(data[i]->jtpt[k]*(1.+0.02/nbins_cent*(nbins_cent-i)),scale*weight_cent*weight_pt*weight_vz); 
@@ -457,7 +467,8 @@ void RAA_read_mc(int radius = 3, char *algo = "Vs"){
 	hpp_reco->Fill(dataPP[i]->jtpt[k],scalepp*weight_vz);
 	
 	//}	  
-	//if (isMC&&jentry2>dataPP[i]->tJet->GetEntries()/2.) {
+	if (jentry2>dataPP[i]->tJet->GetEntries()/2.)
+	  hpp_mcclosure_data->Fill(dataPP[i]->jtpt[k],scale*weight_vz);
 	
 	//uhist[nbins_cent]-> hGen->Fill(dataPP[i]->refpt[k],scale*weight_vz);   
 	//uhist[nbins_cent]-> hMeas->Fill(dataPP[i]->jtpt[k],scale*weight_vz); 
@@ -474,12 +485,23 @@ void RAA_read_mc(int radius = 3, char *algo = "Vs"){
 
   for(int i = 0;i<=nbins_cent;i++){
     
-    hpbpb_gen[i] = (TH1F*)hpbpb_gen[i]->Rebin(nbins_pt,Form("hpbpb_gen_cent%d",i),boundaries_pt);
-    hpbpb_reco[i] = (TH1F*)hpbpb_reco[i]->Rebin(nbins_pt,Form("hpbpb_reco_cent%d",i),boundaries_pt);
+    //hpbpb_gen[i] = (TH1F*)hpbpb_gen[i]->Rebin(nbins_pt,Form("hpbpb_gen_cent%d",i),boundaries_pt);
+    divideBinWidth(hpbpb_gen[i]);
+    //hpbpb_reco[i] = (TH1F*)hpbpb_reco[i]->Rebin(nbins_pt,Form("hpbpb_reco_cent%d",i),boundaries_pt);
+    divideBinWidth(hpbpb_reco[i]);
+
+    divideBinWidth(hpbpb_mcclosure_data[i]);
+
     //hpbpb_matrix[i] = (TH2F*)hpbpb_matrix[i]->Rebin(nbins_pt,Form("Matrix  refpt jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),boundaries_pt);
     //hpbpb_response[i] = (TH2F*)hpbpb_response[i]->Rebin(nbins_pt,Form("Response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),boundaries_pt);
 
   }
+
+  divideBinWidth(hpp_gen);
+  divideBinWidth(hpp_reco);
+  divideBinWidth(hpp_mcclosure_data);
+
+  
 
   for(int i = 0;i<=nbins_cent;i++){
     
@@ -489,6 +511,8 @@ void RAA_read_mc(int radius = 3, char *algo = "Vs"){
     hpbpb_reco[i]->Print("base");
     hpbpb_matrix[i]->Write();
     hpbpb_matrix[i]->Print("base");
+    hpbpb_mcclosure_data[i]->Write();
+    hpbpb_mcclosure_data[i]->Print("base");
     //hpbpb_response[i]->Write();
     //hpbpb_response[i]->Print("base");
   }
@@ -499,6 +523,8 @@ void RAA_read_mc(int radius = 3, char *algo = "Vs"){
   hpp_reco->Print("base");
   hpp_matrix->Write();
   hpp_matrix->Print("base");
+  hpp_mcclosure_data->Write();
+  hpp_mcclosure_data->Print("base");
   //hpp_response->Write();
   //hpp_response->Print("base");
   
