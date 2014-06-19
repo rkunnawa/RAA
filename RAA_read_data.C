@@ -7,7 +7,12 @@
 // 
 // most of this macro is taken from the merge_pbpb_pp_HLT.C inside WORK/CMSSW_6_0_0/src/RAA/
 
+// june 18th - check the TMath::Max(chargedMax ,neutralMax) / TMath::Max(chargedSum, neutralSum) should be LESS than 0.975
 
+// june 19th - would have to make this macro run on condor scripts by utilizing multiple files for Jet55or65 and here it gets tricky for the other MB and Jet80 datasets since they are only one file. 
+// would have to somehow split them up interms of the number of events in the event loop (which would be the easiest of the lot to implement), or can do it interms of run, or lumi etc.. need to study this. 
+
+// also now that we have the new Jet55or65 dataset, need the lumimask to find out what lumi that particular trigger saw which is necessary when adding the triggers. 
 
 #include <iostream>
 #include <stdio.h>
@@ -134,7 +139,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
   // where ## goes from 0-11
 
   for(int i = 0;i<=11;i++){
-
+    if(i==9)continue;
     jetpbpb1->Add(Form("/mnt/hadoop/cms/store/user/dgulhan/HIMC/Jet55or65/HIRun2011-14Mar2014-v2-6lumi-jet55or65-forest-v9/merged/HiForest_Pythia_Hydjet_Jet80_Track8_Jet19_STARTHI53_LV1_merged_forest_%d.root",i));
     hltpbpb1->Add(Form("/mnt/hadoop/cms/store/user/dgulhan/HIMC/Jet55or65/HIRun2011-14Mar2014-v2-6lumi-jet55or65-forest-v9/merged/HiForest_Pythia_Hydjet_Jet80_Track8_Jet19_STARTHI53_LV1_merged_forest_%d.root",i));
     skmpbpb1->Add(Form("/mnt/hadoop/cms/store/user/dgulhan/HIMC/Jet55or65/HIRun2011-14Mar2014-v2-6lumi-jet55or65-forest-v9/merged/HiForest_Pythia_Hydjet_Jet80_Track8_Jet19_STARTHI53_LV1_merged_forest_%d.root",i));
@@ -212,7 +217,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 
 
   //get all the pp spectra here: 
-  TCut pp3 = "abs(eta)<2&&jet40&&!jet60&&!jet80&&(chMax/pt)>0.01&&(neMax/TMath::Max(chSum,neSum))>=0.975";
+  TCut pp3 = "abs(eta)<2&&jet40&&!jet60&&!jet80&&(chMax/pt)>0.01&&(TMath::Max(neMax,chMax)/TMath::Max(chSum,neSum))>=0.975";
   
   TH1F *hpp1 = new TH1F("hpp1","Spectra from Jet 80",1000,0,1000);
   TH1F *hpp2 = new TH1F("hpp2","Spectra from Jet 60 & !Jet80",1000,0,1000);
@@ -233,10 +238,10 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 
   // because whatever cut we use in PbPb, we have to use in pp. 
 
-  jetpp1_v2->Project("hpp1","pt","abs(eta)<2&&jet80&&(chMax/pt)>0.01&&(neMax/TMath::Max(chSum,neSum))>=0.975");
+  jetpp1_v2->Project("hpp1","pt","abs(eta)<2&&jet80&&(chMax/pt)>0.01&&(TMath::Max(chMax,neMax)/TMath::Max(chSum,neSum))>=0.975");
   hpp1->Print("base");
  
-  jetpp2_v2->Project("hpp2","pt","abs(eta)<2&&jet60&&!jet80&&(chMax/pt)>0.01&&(neMax/TMath::Max(chSum,neSum))>=0.975");
+  jetpp2_v2->Project("hpp2","pt","abs(eta)<2&&jet60&&!jet80&&(chMax/pt)>0.01&&(TMath::Max(chMax,neMax)/TMath::Max(chSum,neSum))>=0.975");
   hpp2->Print("base");
 
   jetpp2_v2->Project("hpp3","pt","9.25038"*pp3);
@@ -366,19 +371,19 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
     //list of cuts we are using to remove all the fake jets. 
     // chMax/jtpt>0.01 - studied
     // neMax/jtpt>0.01 - just what im trying out now - needs to be studied
-    // neutralMax/TMath::Max(chargedSum,neutralSum)<0.975 used by kurt in 12003. 
+    // TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975 used by kurt in 14007 and in 12003 as well.  
     // 
 
     // lets talk about the actual events/jets which are irritating here. the so called supernova events. 
     // they come from smaller jet triggers but still have larger jet pt. 
 
-    pbpb1[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&neutralMax/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
-    pbpb2[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet65_v1&&!HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&neutralMax/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
-    pbpb3[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&neutralMax/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
+    pbpb1[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
+    pbpb2[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet65_v1&&!HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
+    pbpb3[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
 
-    pbpb80[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&neutralMax/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
-    pbpb65[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet65_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&neutralMax/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
-    pbpb55[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet55_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&neutralMax/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
+    pbpb80[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
+    pbpb65[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet65_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
+    pbpb55[i] = Form("abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet55_v1&&(chargedMax/jtpt)>0.01&&hiBin>=%2.0f&&hiBin<%2.0f&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975",5*boundaries_cent[i],5*boundaries_cent[i+1]);
 
     hpbpb1[i] = new TH1F(Form("hpbpb1_cent%d",i),Form("spectra from Jet 80 %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     //hpbpb1[i]->Print("base");
@@ -461,13 +466,13 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 
   // doing it the 0-200 centrality bin 
 
-  pbpb1[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01";
-  pbpb2[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet65_v1&&!HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01";
-  pbpb3[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01";
+  pbpb1[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975";
+  pbpb2[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet65_v1&&!HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975";
+  pbpb3[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1&&(chargedMax/jtpt)>0.01&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975";
   
-  pbpb80[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet80_v1&&(chargedMax/jtpt>0.01)";
-  pbpb65[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet65_v1&&(chargedMax/jtpt>0.01";
-  pbpb55[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet55_v1&&(chargedMax/jtpt)>0.01";
+  pbpb80[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet80_v1&&(chargedMax/jtpt>0.01)&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975";
+  pbpb65[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet65_v1&&(chargedMax/jtpt>0.01&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975";
+  pbpb55[nbins_cent] = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIJet55_v1&&(chargedMax/jtpt)>0.01&&TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975";
 
   hpbpb1[nbins_cent] = new TH1F(Form("hpbpb1_cent%d",nbins_cent),"Spectra from Jet80 0-200 cent",1000,0,1000);
   //hpbpb1[i]->Print("base");
@@ -894,7 +899,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
   // ok the cut mentioned above is not the one we are using for the analysis now. We have to check if that cut actually removes a lot of the fake events for us to have a meaningful combined jet spectra. 
   
 
-  //neutralMax/TMath::Max(chargedSum,neutralSum)<0.975 im going to add this from Kurt used in 12003 here to see if it sort of helps. 
+  // TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975 im going to add this from Kurt used in 12003 here to see if it sort of helps. he also used this in 14007 analysis. 
 
 
   //declare the histograms needed for the hpbpb_TrigObj80, hpbpb_TrigObj65, hpbpb_TrigObj55, hpbpb_TrigObjMB, hpbpb_TrigComb;
@@ -951,7 +956,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	if(fabs(eta_1[j])>2) continue;
 	  
 	if(chMax_1[j]/pt_1[j]<0.01) continue;	
-	if(neMax/TMath::Max(chSum,neSum)>=0.975) continue;
+	if(TMath::Max(chMax_1[j],neMax_1[j])/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
 	  
 	if(jet55_1&&trgObj_pt_1>=55&&trgObj_pt_1<65){ hpbpb_TrgObj55[nbins_cent-1]->Fill(pt_1[j],jet55_p_1);
 	  //fHLT_55<<run_1<<" "<<evt_1<<" "<<lumi_1<<" "<<trgObj_pt_1<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<hiBin_1<<" "<<pt_1[j]<<" "<<eta_1[j]<<" "<<phi_1[j]<<endl;
@@ -977,7 +982,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	  
 	  if(chMax_1[j]/pt_1[j]<0.01) continue;	
 	  //here is where we have to change the cuts to remove the fake jets. here and above where we combined triggers using the 12003 method. 
-	  if(neMax_1[j]/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
+	  if(TMath::Max(chMax_1[j],neMax_1[j])/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
 
 
 	  if(jet55_1&&trgObj_pt_1>=55&&trgObj_pt_1<65){ 
@@ -1002,7 +1007,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	  
 	  if(chMax_1[j]/pt_1[j]<0.01) continue;
 
-	  if(neMax_1[j]/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
+	  if(TMath::Max(chMax_1[j],neMax_1[j])/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
 	  
 	  if(jet55_1&&trgObj_pt_1>=55&&trgObj_pt_1<65){ hpbpb_TrgObj55[1]->Fill(pt_1[j],jet55_p_1);
 	    //fHLT_55<<run_1<<" "<<evt_1<<" "<<lumi_1<<" "<<trgObj_pt_1<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<hiBin_1<<" "<<pt_1[j]<<" "<<eta_1[j]<<" "<<phi_1[j]<<endl;
@@ -1023,7 +1028,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	  
 	  if(chMax_1[j]/pt_1[j]<0.01) continue;
 
-	  if(neMax_1[j]/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
+	  if(TMath::Max(chMax_1[j],neMax_1[j])/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
 	  
 	  if(jet55_1&&trgObj_pt_1>=55&&trgObj_pt_1<65){ hpbpb_TrgObj55[2]->Fill(pt_1[j],jet55_p_1);
 	    //fHLT_55<<run_1<<" "<<evt_1<<" "<<lumi_1<<" "<<trgObj_pt_1<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<hiBin_1<<" "<<pt_1[j]<<" "<<eta_1[j]<<" "<<phi_1[j]<<endl;
@@ -1044,7 +1049,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	
 	  if(chMax_1[j]/pt_1[j]<0.01) continue;
 
-	  if(neMax_1[j]/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
+	  if(TMath::Max(chMax_1[j],neMax_1[j])/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
 		
 	  if(jet55_1 && trgObj_pt_1>=55 && trgObj_pt_1<65){ hpbpb_TrgObj55[3]->Fill(pt_1[j],jet55_p_1);
 	    //fHLT_55<<run_1<<" "<<evt_1<<" "<<lumi_1<<" "<<trgObj_pt_1<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<hiBin_1<<" "<<pt_1[j]<<" "<<eta_1[j]<<" "<<phi_1[j]<<endl;
@@ -1064,7 +1069,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	  if(fabs(eta_1[j])>2) continue;	
 	  if(chMax_1[j]/pt_1[j]<0.01) continue;
 
-	  if(neMax_1[j]/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
+	  if(TMath::Max(chMax_1[j],neMax_1[j])/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
 		
 	  if(jet55_1 && trgObj_pt_1>=55 && trgObj_pt_1<65){ hpbpb_TrgObj55[4]->Fill(pt_1[j],jet55_p_1);
 	    //fHLT_55<<run_1<<" "<<evt_1<<" "<<lumi_1<<" "<<trgObj_pt_1<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<hiBin_1<<" "<<pt_1[j]<<" "<<eta_1[j]<<" "<<phi_1[j]<<endl;
@@ -1085,7 +1090,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	
 	  if(chMax_1[j]/pt_1[j]<0.01) continue;
 
-	  if(neMax_1[j]/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
+	  if(TMath::Max(chMax_1[j],neMax_1[j])/TMath::Max(chSum_1[j],neSum_1[j])>=0.975) continue;
 		
 	  if(jet55_1 && trgObj_pt_1>=55 && trgObj_pt_1<65){ hpbpb_TrgObj55[5]->Fill(pt_1[j],jet55_p_1);
 	    //fHLT_55<<run_1<<" "<<evt_1<<" "<<lumi_1<<" "<<trgObj_pt_1<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<hiBin_1<<" "<<pt_1[j]<<" "<<eta_1[j]<<" "<<phi_1[j]<<endl;
@@ -1134,7 +1139,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	
 	if(chMax_2[j]/pt_2[j]<0.01) continue;
 
-	if(neMax_2[j]/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
+	if(TMath::Max(chMax_2[j],neMax_2[j])/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
 
 	
 	if(jet80_2 && trgObj_pt_2>=80){ hpbpb_TrgObj80[nbins_cent-1]->Fill(pt_2[j],jet80_p_2);
@@ -1157,7 +1162,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	  
 	  if(chMax_2[j]/pt_2[j]<0.01) continue;
 
-	  if(neMax_2[j]/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
+	  if(TMath::Max(chMax_2[j],neMax_2[j])/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
 	
 	  if(jet80_2 && trgObj_pt_2>=80){ hpbpb_TrgObj80[0]->Fill(pt_2[j],jet80_p_2);
 	    //fHLT_80<<run_2<<" "<<evt_2<<" "<<lumi_2<<" "<<trgObj_pt_2<<" "<<trgObj_eta_2<<" "<<trgObj_phi_2<<" "<<hiBin_2<<" "<<pt_2[j]<<" "<<eta_2[j]<<" "<<phi_2[j]<<endl;
@@ -1174,7 +1179,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	
 	  if(chMax_2[j]/pt_2[j]<0.01) continue;
 
-	  if(neMax_2[j]/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
+	  if(TMath::Max(chMax_2[j],neMax_2[j])/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
 	       	
 	  if(jet80_2 && trgObj_pt_2>=80){ hpbpb_TrgObj80[1]->Fill(pt_2[j],jet80_p_2);
 	    //fHLT_80<<run_2<<" "<<evt_2<<" "<<lumi_2<<" "<<trgObj_pt_2<<" "<<trgObj_eta_2<<" "<<trgObj_phi_2<<" "<<hiBin_2<<" "<<pt_2[j]<<" "<<eta_2[j]<<" "<<phi_2[j]<<endl;
@@ -1191,7 +1196,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	
 	  if(chMax_2[j]/pt_2[j]<0.01) continue;
 
-	  if(neMax_2[j]/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
+	  if(TMath::Max(chMax_2[j],neMax_2[j])/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
 	       	
 	  if(jet80_2 && trgObj_pt_2>=80){ hpbpb_TrgObj80[2]->Fill(pt_2[j],jet80_p_2);
 	    //fHLT_80<<run_2<<" "<<evt_2<<" "<<lumi_2<<" "<<trgObj_pt_2<<" "<<trgObj_eta_2<<" "<<trgObj_phi_2<<" "<<hiBin_2<<" "<<pt_2[j]<<" "<<eta_2[j]<<" "<<phi_2[j]<<endl;
@@ -1208,7 +1213,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	
 	  if(chMax_2[j]/pt_2[j]<0.01) continue;
 
-	  if(neMax_2[j]/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
+	  if(TMath::Max(chMax_2[j],neMax_2[j])/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
 	       	
 	  if(jet80_2 && trgObj_pt_2>=80){ hpbpb_TrgObj80[3]->Fill(pt_2[j],jet80_p_2);
 	    //fHLT_80<<run_2<<" "<<evt_2<<" "<<lumi_2<<" "<<trgObj_pt_2<<" "<<trgObj_eta_2<<" "<<trgObj_phi_2<<" "<<hiBin_2<<" "<<pt_2[j]<<" "<<eta_2[j]<<" "<<phi_2[j]<<endl;
@@ -1225,7 +1230,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	
 	  if(chMax_2[j]/pt_2[j]<0.01) continue;
 
-	  if(neMax_2[j]/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
+	  if(TMath::Max(chMax_2[j],neMax_2[j])/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
 	       	
 	  if(jet80_2 && trgObj_pt_2>=80){ hpbpb_TrgObj80[4]->Fill(pt_2[j],jet80_p_2);
 	    //fHLT_80<<run_2<<" "<<evt_2<<" "<<lumi_2<<" "<<trgObj_pt_2<<" "<<trgObj_eta_2<<" "<<trgObj_phi_2<<" "<<hiBin_2<<" "<<pt_2[j]<<" "<<eta_2[j]<<" "<<phi_2[j]<<endl;
@@ -1242,7 +1247,7 @@ void RAA_read_data(int radius = 3, char *algo = "Vs"){
 	
 	  if(chMax_2[j]/pt_2[j]<0.01) continue;
 
-	  if(neMax_2[j]/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
+	  if(TMath::Max(chMax_2[j],neMax_2[j])/TMath::Max(chSum_2[j],neSum_2[j])>=0.975) continue;
 	       	
 	  if(jet80_2 && trgObj_pt_2>=80){ hpbpb_TrgObj80[5]->Fill(pt_2[j],jet80_p_2);
 	    //fHLT_80<<run_2<<" "<<evt_2<<" "<<lumi_2<<" "<<trgObj_pt_2<<" "<<trgObj_eta_2<<" "<<trgObj_phi_2<<" "<<hiBin_2<<" "<<pt_2[j]<<" "<<eta_2[j]<<" "<<phi_2[j]<<endl;

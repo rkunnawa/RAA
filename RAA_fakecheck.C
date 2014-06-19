@@ -8,10 +8,14 @@
 // This macro will look at specific jet quality cuts (or if possible track cuts) aimed at understanding where these crazy jets come from and help to remove them. 
 // list of cuts: 
 // 1) chargedMax / jtpt > 0.01
-// 2) neutral Max / Max(charged Sum, neutral Sum) >= 0.975 - from 12003 
+// 2) TMath::Max(charged Max, neutral Max) / TMath::Max(charged Sum, neutral Sum) < 0.975 - from 12003 and 14007
 // 3) 
 
-// Modify the script to run on condor! for each file. otherwise it takes forever to run on all those files in TChain. 
+// Modify the script to run on condor! for each file. otherwise it takes forever to run on all those files in TChain.
+// - Done 
+
+// better question:  should i include the duplicate event calculation here? since it requires the loop structure. 
+// naa i'll add it in a separate macro. 
 
 
 
@@ -196,16 +200,15 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   //cout<<"testing if HLT tree knows that branch, no of entries there = "<<hltpbpb1->GetEntries("HLT_HIJet55_v1")<<endl;
   cout<<"# of events which satisfy Jet55 but fail Jet65 and Jet80 = "<<ch[2]->GetEntries("HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1")<<endl;
 
-
   // declare the output file here: 
   TFile fout(Form("pbpb_ak%d_%s_fakejet_histos_%d.root",radius,algo,endfile),"RECREATE");
   fout.cd();
 
-
   //histogram from the HLT_HIJet55 trigger alone
-  TH1F *hJet55 = new TH1F("hJet55","Jets pt which are selected by HLT_HIJet55 trigger",1000,0,1000);
+  TH1F *hJet55 = new TH1F("hJet55","Jets pt which are selected by HLT_HIJet55 trigger (along with eventsel)",1000,0,1000);
   TH1F *hJet55_QA1 = new TH1F("hJet55_QA1","HLT_HIJet55 jets with chMax/jtpt>0.01 (along with eventsel)",1000,0,1000);
-  TH1F *hJet55_QA2 = new TH1F("hJet55_QA2","HLT_HIJet55 jets with neutralMax/Max(chargedSum,neutralSum) (along with eventsel)",1000,0,1000);
+  TH1F *hJet55_QA2 = new TH1F("hJet55_QA2","HLT_HIJet55 jets with Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 (along with eventsel)",1000,0,1000);
+  TH1F *hJet55_QA1_2 = new TH1F("hJet55_QA1_2","HLT_HIJet55 jets withchMax/jtpt>0.01 and Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 (along with eventsel)",1000,0,1000);
   //TH1F *hJet55_QA3 = new TH1F("hJet55_QA3","HLT_HIJet55 jets with  (along with eventsel)",1000,0,1000);
   //TH1F *hJet55_QA4 = new TH1F("hJet55_QA4","HLT_HIJet55 jets with chMax/jtpt>0.01 (along with eventsel)",1000,0,1000);
   TH3F *hJet55_3D = new TH3F("hJet55_3D","3D lego histogram of jets with Jet55 trigger, pt vs eta vs phi",60,-2.5,2.5,60,-3,3,1000,0,1000);
@@ -217,7 +220,7 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   TCut jet80 = "HLT_HIJet80_v1";
   TCut evtSel = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2";
   TCut qalCut1 = "chargedMax/jtpt>0.01";
-  TCut qalCut2 = "neutralMax/TMath::Max(chargedSum,neutralSum)>=0.975";
+  TCut qalCut2 = "TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975";
   //TCut qalCut3 = "";
   //TCut qalCut4 = "";
   TCut fakeJet = "HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1&&jtpt>80";
@@ -237,6 +240,8 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   hJet55_QA1->Print("base");
   ch[2]->Project("hJet55_QA2","jtpt",evtSel&&jet55&&qalCut2);
   hJet55_QA2->Print("base");
+  ch[2]->Project("hJet55_QA1_2","jtpt",evtSel&&jet55&&qalCut1&&qalCut2);
+  hJet55_QA1_2->Print("base");
   ch[2]->Project("hJet55Fake","jtpt",evtSel&&fakeJet);
   hJet55Fake->Print("base");
 
