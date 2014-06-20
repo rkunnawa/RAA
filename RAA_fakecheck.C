@@ -9,7 +9,7 @@
 // list of cuts: 
 // 1) chargedMax / jtpt > 0.01
 // 2) TMath::Max(charged Max, neutral Max) / TMath::Max(charged Sum, neutral Sum) < 0.975 - from 12003 and 14007
-// 3) 
+// 3) jtpt/trgObj_pt < 2. this should also remove all weird jets with much greater pt than the triggered object. 
 
 // Modify the script to run on condor! for each file. otherwise it takes forever to run on all those files in TChain.
 // - Done 
@@ -195,46 +195,54 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
 
   //jetpbpb1->AddFriend(hltpbpb1);
   
-  cout<<"# of events which satisfy the Jet55 criteria = "<<ch[2]->GetEntries("HLT_HIJet55_v1")<<endl;
-  cout<<"# of events which satisfy the Jet65 criteria = "<<ch[2]->GetEntries("HLT_HIJet65_v1")<<endl;
+  //cout<<"# of events which satisfy the Jet55 criteria = "<<ch[2]->GetEntries("HLT_HIJet55_v1")<<endl;
+  //cout<<"# of events which satisfy the Jet65 criteria = "<<ch[2]->GetEntries("HLT_HIJet65_v1")<<endl;
   //cout<<"testing if HLT tree knows that branch, no of entries there = "<<hltpbpb1->GetEntries("HLT_HIJet55_v1")<<endl;
-  cout<<"# of events which satisfy Jet55 but fail Jet65 and Jet80 = "<<ch[2]->GetEntries("HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1")<<endl;
-
+  //cout<<"# of events which satisfy Jet55 but fail Jet65 and Jet80 = "<<ch[2]->GetEntries("HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1")<<endl;
+  
   // declare the output file here: 
   TFile fout(Form("pbpb_ak%d_%s_fakejet_histos_%d.root",radius,algo,endfile),"RECREATE");
   fout.cd();
-
+  
   //histogram from the HLT_HIJet55 trigger alone
   TH1F *hJet55 = new TH1F("hJet55","Jets pt which are selected by HLT_HIJet55 trigger (along with eventsel)",1000,0,1000);
   TH1F *hJet55_QA1 = new TH1F("hJet55_QA1","HLT_HIJet55 jets with chMax/jtpt>0.01 (along with eventsel)",1000,0,1000);
   TH1F *hJet55_QA2 = new TH1F("hJet55_QA2","HLT_HIJet55 jets with Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 (along with eventsel)",1000,0,1000);
-  TH1F *hJet55_QA1_2 = new TH1F("hJet55_QA1_2","HLT_HIJet55 jets withchMax/jtpt>0.01 and Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 (along with eventsel)",1000,0,1000);
-  //TH1F *hJet55_QA3 = new TH1F("hJet55_QA3","HLT_HIJet55 jets with  (along with eventsel)",1000,0,1000);
+  TH1F *hJet55_QA1_2 = new TH1F("hJet55_QA1_2","HLT_HIJet55 jets with chMax/jtpt>0.01 and Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 (along with eventsel)",1000,0,1000);
+  TH1F *hJet55_QA3 = new TH1F("hJet55_QA3","HLT_HIJet55 jets with jtpt/trgobjpt<3 (along with eventsel)",1000,0,1000);
   //TH1F *hJet55_QA4 = new TH1F("hJet55_QA4","HLT_HIJet55 jets with chMax/jtpt>0.01 (along with eventsel)",1000,0,1000);
   TH3F *hJet55_3D = new TH3F("hJet55_3D","3D lego histogram of jets with Jet55 trigger, pt vs eta vs phi",60,-2.5,2.5,60,-3,3,1000,0,1000);
   TH1F *hJet55Fake = new TH1F("hJet55Fake","jets with pt>80 which pass Jet55 and fail higher triggers",1000,0,1000);
   // the above one is just to get a feel for all the jets in the Jet55 trigger. 
 
+  TH1F *hJet55_trg = new TH1F("hJet55_trg","HLT_HIJet55 and trgpt>55 and <65 along with eventsel",1000,0,1000);
+  TH1F *hJet55_trg_QA1 = new TH1F("hJet55_trg_QA1","HLT_HI_Jet55 and trgpt>55 and <65 eventsel and chMax/jtpt>0.01",1000,0,1000);
+  TH1F *hJet55_trg_QA2 = new TH1F("hJet55_trg_QA2","HLT_HI_Jet55 and trgpt>55 and <65 eventsel and  Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975",1000,0,1000);
+  TH1F *hJet55_trg_QA1_2 = new TH1F("hJet55_trg_QA1_2","HLT_HI_Jet55 and trgpt>55 and <65 eventsel and  Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 and chMax/jtpt>0.01",1000,0,1000);
+  TH1F *hJet55_trg_QA3 = new TH1F("hJet55_trg_QA3","HLT_HI_Jet55 and trgpt>55 and <65 eventsel and jtpt/trgobjpt<3",1000,0,1000);
+ 
   TCut jet55 = "HLT_HIJet55_v1";
   TCut jet65 = "HLT_HIJet65_v1";
   TCut jet80 = "HLT_HIJet80_v1";
   TCut evtSel = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2";
   TCut qalCut1 = "chargedMax/jtpt>0.01";
   TCut qalCut2 = "TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975";
-  //TCut qalCut3 = "";
+  TCut qalCut3 = "jtpt/pt<3";
   //TCut qalCut4 = "";
   TCut fakeJet = "HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1&&jtpt>80";
+  TCut trg55 = "pt>=55&&pt<65";
 
-  cout<<"jet55"<<" = "<<ch[2]->GetEntries(jet55)<<endl;
-  cout<<"jet65"<<" = "<<ch[2]->GetEntries(jet65)<<endl;
-  cout<<"jet80"<<" = "<<ch[2]->GetEntries(jet80)<<endl;
-  cout<<"jet55 && evtSel"<<" = "<<ch[2]->GetEntries(jet55&&evtSel)<<endl;
-  cout<<"jet55 && evtSel && qalCut1"<<" = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut1)<<endl;
-  cout<<"jet55 && evtSel && qalCut2"<<" = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut2)<<endl;
-  cout<<"fakeJet && evtSel"<<" = "<<ch[2]->GetEntries(evtSel&&fakeJet)<<endl;
+  //cout<<"jet55"<<" = "<<ch[2]->GetEntries(jet55)<<endl;
+  //cout<<"jet65"<<" = "<<ch[2]->GetEntries(jet65)<<endl;
+  //cout<<"jet80"<<" = "<<ch[2]->GetEntries(jet80)<<endl;
+  //cout<<"jet55 && evtSel"<<" = "<<ch[2]->GetEntries(jet55&&evtSel)<<endl;
+  //cout<<"jet55 && evtSel && qalCut1"<<" = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut1)<<endl;
+  //cout<<"jet55 && evtSel && qalCut2"<<" = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut2)<<endl;
+  //cout<<"jet55 && evtSel && qalCut3"<<" = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut3)<<endl;
+  //cout<<"fakeJet && evtSel"<<" = "<<ch[2]->GetEntries(evtSel&&fakeJet)<<endl;
+  //cout<<"fakeJet && evtSel"<<" = "<<ch[2]->GetEntries(evtSel&&fakeJet)<<endl;
 
-
-  ch[2]->Project("hJet55","jtpt",jet55);
+  ch[2]->Project("hJet55","jtpt",jet55&&evtSel);
   hJet55->Print("base");
   ch[2]->Project("hJet55_QA1","jtpt",evtSel&&jet55&&qalCut1);
   hJet55_QA1->Print("base");
@@ -242,11 +250,28 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   hJet55_QA2->Print("base");
   ch[2]->Project("hJet55_QA1_2","jtpt",evtSel&&jet55&&qalCut1&&qalCut2);
   hJet55_QA1_2->Print("base");
+  ch[2]->Project("hJet55_QA3","jtpt",evtSel&&jet55&&qalCut3);
+  hJet55_QA2->Print("base");
   ch[2]->Project("hJet55Fake","jtpt",evtSel&&fakeJet);
   hJet55Fake->Print("base");
 
   ch[2]->Project("hJet55_3D","jteta:jtphi:jtpt",evtSel&&fakeJet);
   hJet55_3D->Print("base");
+
+  ch[2]->Project("hJet55_trg","jtpt",evtSel&&jet55&&trg55);
+  hJet55_trg->Print("base");
+  
+  ch[2]->Project("hJet55_trg_QA1","jtpt",evtSel&&jet55&&trg55&&qalCut1);
+  hJet55_trg_QA1->Print("base");
+
+  ch[2]->Project("hJet55_trg_QA2","jtpt",evtSel&&jet55&&trg55&&qalCut2);
+  hJet55_trg_QA2->Print("base");
+
+  ch[2]->Project("hJet55_trg_QA1_2","jtpt",evtSel&&jet55&&trg55&&qalCut1&&qalCut2);
+  hJet55_trg_QA1_2->Print("base");
+
+  ch[2]->Project("hJet55_trg_QA3","jtpt",evtSel&&jet55&&trg55&&qalCut3);
+  hJet55_trg_QA3->Print("base");
   
   fout.Write();
   fout.Close();

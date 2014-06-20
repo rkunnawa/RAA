@@ -26,8 +26,10 @@ process=$4
 echo "Processing..."
 
 root -b -q RAA_fakecheck.C\+\($startfile,$endfile\)
-
 mv *.root ../../Output/.
+
+#root -b -q RAA_duplicateEventsCheck.C\+\($startfile,$endfile\)
+#mv pbpb_jet55or65_duplicate_events_loop_run_lumi_event_$endfile.txt ../../Output/.
 
 echo "Done!"
 
