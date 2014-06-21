@@ -210,17 +210,33 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   TH1F *hJet55_QA2 = new TH1F("hJet55_QA2","HLT_HIJet55 jets with Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 (along with eventsel)",1000,0,1000);
   TH1F *hJet55_QA1_2 = new TH1F("hJet55_QA1_2","HLT_HIJet55 jets with chMax/jtpt>0.01 and Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 (along with eventsel)",1000,0,1000);
   TH1F *hJet55_QA3 = new TH1F("hJet55_QA3","HLT_HIJet55 jets with jtpt/trgobjpt<3 (along with eventsel)",1000,0,1000);
+
+  TH1F *hJet65 = new TH1F("hJet65","Jets pt which are selected by HLT_HIJet65 trigger (along with eventsel)",1000,0,1000);
+  TH1F *hJet65_QA1 = new TH1F("hJet65_QA1","HLT_HIJet65 jets with chMax/jtpt>0.01 (along with eventsel)",1000,0,1000);
+  TH1F *hJet65_QA2 = new TH1F("hJet65_QA2","HLT_HIJet65 jets with Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 (along with eventsel)",1000,0,1000);
+  TH1F *hJet65_QA1_2 = new TH1F("hJet65_QA1_2","HLT_HIJet65 jets with chMax/jtpt>0.01 and Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 (along with eventsel)",1000,0,1000);
+  TH1F *hJet65_QA3 = new TH1F("hJet65_QA3","HLT_HIJet65 jets with jtpt/trgobjpt<3 (along with eventsel)",1000,0,1000);
+
   //TH1F *hJet55_QA4 = new TH1F("hJet55_QA4","HLT_HIJet55 jets with chMax/jtpt>0.01 (along with eventsel)",1000,0,1000);
   TH3F *hJet55_3D = new TH3F("hJet55_3D","3D lego histogram of jets with Jet55 trigger, pt vs eta vs phi",60,-2.5,2.5,60,-3,3,1000,0,1000);
   TH1F *hJet55Fake = new TH1F("hJet55Fake","jets with pt>80 which pass Jet55 and fail higher triggers",1000,0,1000);
   // the above one is just to get a feel for all the jets in the Jet55 trigger. 
 
-  TH1F *hJet55_trg = new TH1F("hJet55_trg","HLT_HIJet55 and trgpt>55 and <65 along with eventsel",1000,0,1000);
-  TH1F *hJet55_trg_QA1 = new TH1F("hJet55_trg_QA1","HLT_HI_Jet55 and trgpt>55 and <65 eventsel and chMax/jtpt>0.01",1000,0,1000);
-  TH1F *hJet55_trg_QA2 = new TH1F("hJet55_trg_QA2","HLT_HI_Jet55 and trgpt>55 and <65 eventsel and  Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975",1000,0,1000);
-  TH1F *hJet55_trg_QA1_2 = new TH1F("hJet55_trg_QA1_2","HLT_HI_Jet55 and trgpt>55 and <65 eventsel and  Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 and chMax/jtpt>0.01",1000,0,1000);
-  TH1F *hJet55_trg_QA3 = new TH1F("hJet55_trg_QA3","HLT_HI_Jet55 and trgpt>55 and <65 eventsel and jtpt/trgobjpt<3",1000,0,1000);
+  TH1F *hJet55_trg = new TH1F("hJet55_trg","HLT_HIJet55 and trgpt>=55 and <65 along with eventsel",1000,0,1000);
+  TH1F *hJet55_trg_QA1 = new TH1F("hJet55_trg_QA1","HLT_HI_Jet55 and trgpt>=55 and <65 eventsel and chMax/jtpt>0.01",1000,0,1000);
+  TH1F *hJet55_trg_QA2 = new TH1F("hJet55_trg_QA2","HLT_HI_Jet55 and trgpt>=55 and <65 eventsel and  Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975",1000,0,1000);
+  TH1F *hJet55_trg_QA1_2 = new TH1F("hJet55_trg_QA1_2","HLT_HI_Jet55 and trgpt>=55 and <65 eventsel and  Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 and chMax/jtpt>0.01",1000,0,1000);
+  TH1F *hJet55_trg_QA3 = new TH1F("hJet55_trg_QA3","HLT_HI_Jet55 and trgpt>=55 and <65 eventsel and jtpt/trgobjpt<3",1000,0,1000);
+  TH1F *hJet55_only = new TH1F("hJet55_only","HLT_HIJet55 jets with no HLT_HIJet65 and no 80 along with eventsel",1000,0,1000);
  
+  TH1F *hJet65_only = new TH1F("hJet65_only","HLT_HIJet65 jets with no HLT_HIJet80 along with eventsel",1000,0,1000);
+  TH1F *hJet65_trg = new TH1F("hJet65_trg","HLT_HIJet65 and trgpt>=65 and <80 along with eventsel",1000,0,1000);
+  TH1F *hJet65_trg_QA1 = new TH1F("hJet65_trg_QA1","HLT_HIJet65 and trgpt>=65 and <80 with chMax/jtpt>0.01 and with eventsel",1000,0,1000);
+  TH1F *hJet65_trg_QA2 = new TH1F("hJet65_trg_QA2","HLT_HIJet65 and trgpt>=65 and <80 with evetsel and  Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975",1000,0,1000);
+  TH1F *hJet65_trg_QA1_2 =  new TH1F("hJet65_trg_QA1_2","HLT_HI_Jet65 and trgpt>=65 and <80 eventsel and  Max(neutralMax,chargedMax)/Max(chargedSum,neutralSum)<0.975 and chMax/jtpt>0.01",1000,0,1000);
+  TH1F *hJet65_trg_QA3 = new TH1F("hJet65_trg_QA3","HLT_HIJet 65 and trgpt>=65 and <80 with jtpt/trgobjpt<3 and eventsel",1000,0,1000);
+  
+
   TCut jet55 = "HLT_HIJet55_v1";
   TCut jet65 = "HLT_HIJet65_v1";
   TCut jet80 = "HLT_HIJet80_v1";
@@ -229,8 +245,11 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   TCut qalCut2 = "TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975";
   TCut qalCut3 = "jtpt/pt<3";
   //TCut qalCut4 = "";
-  TCut fakeJet = "HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1&&jtpt>80";
+  TCut jet55only = "HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1";
+  TCut jet65only = "HLT_HIJet65_v1&&!HLT_HIJet80_v1";
+  TCut largejetpt = "jtpt>80";
   TCut trg55 = "pt>=55&&pt<65";
+  TCut trg65 = "pt>=65&&pt<80";
 
   //cout<<"jet55"<<" = "<<ch[2]->GetEntries(jet55)<<endl;
   //cout<<"jet65"<<" = "<<ch[2]->GetEntries(jet65)<<endl;
@@ -251,28 +270,102 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   ch[2]->Project("hJet55_QA1_2","jtpt",evtSel&&jet55&&qalCut1&&qalCut2);
   hJet55_QA1_2->Print("base");
   ch[2]->Project("hJet55_QA3","jtpt",evtSel&&jet55&&qalCut3);
-  hJet55_QA2->Print("base");
-  ch[2]->Project("hJet55Fake","jtpt",evtSel&&fakeJet);
+  hJet55_QA3->Print("base");
+  ch[2]->Project("hJet55Fake","jtpt",evtSel&&jet55only&&largejetpt);
   hJet55Fake->Print("base");
+  ch[2]->Project("hJet55_only","jtpt",jet55only&&evtSel);
+  hJet55_only->Print("base");
 
-  ch[2]->Project("hJet55_3D","jteta:jtphi:jtpt",evtSel&&fakeJet);
+  ch[2]->Project("hJet55_3D","jteta:jtphi:jtpt",evtSel&&jet55only&&largejetpt);
   hJet55_3D->Print("base");
 
   ch[2]->Project("hJet55_trg","jtpt",evtSel&&jet55&&trg55);
   hJet55_trg->Print("base");
-  
   ch[2]->Project("hJet55_trg_QA1","jtpt",evtSel&&jet55&&trg55&&qalCut1);
   hJet55_trg_QA1->Print("base");
-
   ch[2]->Project("hJet55_trg_QA2","jtpt",evtSel&&jet55&&trg55&&qalCut2);
   hJet55_trg_QA2->Print("base");
-
   ch[2]->Project("hJet55_trg_QA1_2","jtpt",evtSel&&jet55&&trg55&&qalCut1&&qalCut2);
   hJet55_trg_QA1_2->Print("base");
-
   ch[2]->Project("hJet55_trg_QA3","jtpt",evtSel&&jet55&&trg55&&qalCut3);
   hJet55_trg_QA3->Print("base");
+
+  ch[2]->Project("hJet65","jtpt",jet65&&evtSel);
+  hJet65->Print("base");
+  ch[2]->Project("hJet65_QA1","jtpt",evtSel&&jet65&&qalCut1);
+  hJet65_QA1->Print("base");
+  ch[2]->Project("hJet65_QA2","jtpt",evtSel&&jet65&&qalCut2);
+  hJet65_QA2->Print("base");
+  ch[2]->Project("hJet65_QA1_2","jtpt",evtSel&&jet65&&qalCut1&&qalCut2);
+  hJet65_QA1_2->Print("base");
+  ch[2]->Project("hJet65_QA3","jtpt",evtSel&&jet65&&qalCut3);
+  hJet65_QA3->Print("base");
+
+  ch[2]->Project("hJet65_only","jtpt",evtSel&&jet65only);
+  hJet65_only->Print("base");
+  ch[2]->Project("hJet65_trg","jtpt",evtSel&&jet65&&trg65);
+  hJet65_trg->Print("base");
+  ch[2]->Project("hJet65_trg_QA1","jtpt",evtSel&&jet65&&trg65&&qalCut1);
+  hJet65_trg_QA1->Print("base");
+  ch[2]->Project("hJet65_trg_QA2","jtpt",evtSel&&jet65&&trg65&&qalCut2);
+  hJet65_trg_QA2->Print("base");
+  ch[2]->Project("hJet65_trg_QA3","jtpt",evtSel&&jet65&&trg65&&qalCut3);
+  hJet65_trg_QA3->Print("base");
+  ch[2]->Project("hJet65_trg_QA1_2","jtpt",evtSel&&jet65&&trg65&&qalCut1&&qalCut2);
+  hJet65_trg_QA1_2->Print("base");
   
+  hJet55 = (TH1F*)hJet55->Rebin(nbins_pt,"hJet55",boundaries_pt);
+  divideBinWidth(hJet55);
+  hJet55_QA1 = (TH1F*)hJet55_QA1->Rebin(nbins_pt,"hJet55_QA1",boundaries_pt);
+  divideBinWidth(hJet55_QA1);
+  hJet55_QA2 = (TH1F*)hJet55_QA2->Rebin(nbins_pt,"hJet55_QA2",boundaries_pt);
+  divideBinWidth(hJet55_QA2);
+  hJet55_QA1_2 = (TH1F*)hJet55_QA1_2->Rebin(nbins_pt,"hJet55_QA1_2",boundaries_pt);
+  divideBinWidth(hJet55_QA1_2);
+  hJet55_QA3 = (TH1F*)hJet55_QA3->Rebin(nbins_pt,"hJet55_QA3",boundaries_pt);
+  divideBinWidth(hJet55_QA3);
+  hJet55_only = (TH1F*)hJet55_only->Rebin(nbins_pt,"hJet55_only",boundaries_pt);
+  divideBinWidth(hJet55_only);
+  hJet55Fake = (TH1F*)hJet55Fake->Rebin(nbins_pt,"hJet55Fake",boundaries_pt);
+  divideBinWidth(hJet55Fake);
+  hJet55_trg = (TH1F*)hJet55_trg->Rebin(nbins_pt,"hJet55_trg",boundaries_pt);
+  divideBinWidth(hJet55_trg);
+  hJet55_trg_QA1 = (TH1F*)hJet55_trg_QA1->Rebin(nbins_pt,"hJet55_trg_QA1",boundaries_pt);
+  divideBinWidth(hJet55_trg_QA1);
+  hJet55_trg_QA2 = (TH1F*)hJet55_trg_QA2->Rebin(nbins_pt,"hJet55_trg_QA2",boundaries_pt);
+  divideBinWidth(hJet55_trg_QA2);
+  hJet55_trg_QA1_2 = (TH1F*)hJet55_trg_QA1_2->Rebin(nbins_pt,"hJet55_trg_QA1_2",boundaries_pt);
+  divideBinWidth(hJet55_trg_QA1_2);
+  hJet55_trg_QA3 = (TH1F*)hJet55_trg_QA3->Rebin(nbins_pt,"hJet55_trg_QA3",boundaries_pt);
+  divideBinWidth(hJet55_trg_QA3);
+
+  hJet65 = (TH1F*)hJet65->Rebin(nbins_pt,"hJet65",boundaries_pt);
+  divideBinWidth(hJet65);
+  hJet65_QA1 = (TH1F*)hJet65_QA1->Rebin(nbins_pt,"hJet65_QA1",boundaries_pt);
+  divideBinWidth(hJet65_QA1);
+  hJet65_QA2 = (TH1F*)hJet65_QA2->Rebin(nbins_pt,"hJet65_QA2",boundaries_pt);
+  divideBinWidth(hJet65_QA2);
+  hJet65_QA1_2 = (TH1F*)hJet65_QA1_2->Rebin(nbins_pt,"hJet65_QA1_2",boundaries_pt);
+  divideBinWidth(hJet65_QA1_2);
+  hJet65_QA3 = (TH1F*)hJet65_QA3->Rebin(nbins_pt,"hJet65_QA3",boundaries_pt);
+  divideBinWidth(hJet65_QA3);
+  hJet65_only = (TH1F*)hJet65_only->Rebin(nbins_pt,"hJet65_only",boundaries_pt);
+  divideBinWidth(hJet65_only);
+  //hJet65_fake = (TH1F*)hJet65_fake->Rebin(nbins_pt,"hJet65_fake",boundaries_pt);
+  //divideBinWidth(hJet65_fake);
+  hJet65_trg = (TH1F*)hJet65_trg->Rebin(nbins_pt,"hJet65_trg",boundaries_pt);
+  divideBinWidth(hJet65_trg);
+  hJet65_trg_QA1 = (TH1F*)hJet65_trg_QA1->Rebin(nbins_pt,"hJet65_trg_QA1",boundaries_pt);
+  divideBinWidth(hJet65_trg_QA1);
+  hJet65_trg_QA2 = (TH1F*)hJet65_trg_QA2->Rebin(nbins_pt,"hJet65_trg_QA2",boundaries_pt);
+  divideBinWidth(hJet65_trg_QA2);
+  hJet65_trg_QA1_2 = (TH1F*)hJet65_trg_QA1_2->Rebin(nbins_pt,"hJet65_trg_QA1_2",boundaries_pt);
+  divideBinWidth(hJet65_trg_QA1_2);
+  hJet65_trg_QA3 = (TH1F*)hJet65_trg_QA3->Rebin(nbins_pt,"hJet65_trg_QA3",boundaries_pt);
+  divideBinWidth(hJet65_trg_QA3);
+
+
+
   fout.Write();
   fout.Close();
   
