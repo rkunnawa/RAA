@@ -15,7 +15,7 @@
 // - Done 
 
 // better question:  should i include the duplicate event calculation here? since it requires the loop structure. 
-// naa i'll add it in a separate macro. 
+// naa i'll add it in a separate include. 
 
 
 
@@ -54,6 +54,10 @@ using namespace std;
   
 static const int nbins_pt = 29;
 static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
+
+
+
+//static const double boundaries_run_job[job_no+1] = {};
 
 // divide by bin width
 void divideBinWidth(TH1 *h)
@@ -237,6 +241,15 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   TH1F *hJet65_trg_QA3 = new TH1F("hJet65_trg_QA3","HLT_HIJet 65 and trgpt>=65 and <80 with jtpt/trgobjpt<3 and eventsel",1000,0,1000);
   
 
+  // should i make one with QA1 and QA3? since QA2 wont work in R=0.2 
+  
+  TH1F *hJet55_trg_QA1_3 = new TH1F("hJet55_trg_QA1_3","HLT_HIJet55 jets with trgpt>=55 and <65 with eventsel and QA1 and QA3",1000,0,1000);
+  TH1F *hJet65_trg_QA1_3 = new TH1F("hJet65_trg_QA1_3","HLT_HIJet65 jets with trgpt>=65 and <80 with eventsel and QA1 and QA3",1000,0,1000);
+
+  TH1F *hJet55_QA1_3 = new TH1F("hJet55_QA1_3","HLT_HIJet55 jets with eventsel and QA1 and QA3",1000,0,1000);
+  TH1F *hJet65_QA1_3 = new TH1F("hJet65_QA1_3","HLT_HIJet65 jets with eventsel and QA1 and QA3",1000,0,1000);
+
+  
   TCut jet55 = "HLT_HIJet55_v1";
   TCut jet65 = "HLT_HIJet65_v1";
   TCut jet80 = "HLT_HIJet80_v1";
@@ -260,6 +273,15 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   //cout<<"jet55 && evtSel && qalCut3"<<" = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut3)<<endl;
   //cout<<"fakeJet && evtSel"<<" = "<<ch[2]->GetEntries(evtSel&&fakeJet)<<endl;
   //cout<<"fakeJet && evtSel"<<" = "<<ch[2]->GetEntries(evtSel&&fakeJet)<<endl;
+
+  ch[2]->Project("hJet55_trg_QA1_3","jtpt",jet55&&trg55&&evtSel&&qalCut1&&qalCut3);
+  hJet55_trg_QA1_3->Print("base");
+  ch[2]->Project("hJet65_trg_QA1_3","jtpt",jet65&&trg65&&evtSel&&qalCut1&&qalCut3);
+  hJet65_trg_QA1_3->Print("base");
+  ch[2]->Project("hJet55_QA1_3","jtpt",jet55&&evtSel&&qalCut1&&qalCut3);
+  hJet55_QA1_3->Print("base");
+  ch[2]->Project("hJet65_QA1_3","jtpt",jet65&&evtSel&&qalCut1&&qalCut3);
+  hJet65_QA1_3->Print("base");
 
   ch[2]->Project("hJet55","jtpt",jet55&&evtSel);
   hJet55->Print("base");
@@ -314,6 +336,7 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   ch[2]->Project("hJet65_trg_QA1_2","jtpt",evtSel&&jet65&&trg65&&qalCut1&&qalCut2);
   hJet65_trg_QA1_2->Print("base");
   
+
   hJet55 = (TH1F*)hJet55->Rebin(nbins_pt,"hJet55",boundaries_pt);
   divideBinWidth(hJet55);
   hJet55_QA1 = (TH1F*)hJet55_QA1->Rebin(nbins_pt,"hJet55_QA1",boundaries_pt);
@@ -364,6 +387,14 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   hJet65_trg_QA3 = (TH1F*)hJet65_trg_QA3->Rebin(nbins_pt,"hJet65_trg_QA3",boundaries_pt);
   divideBinWidth(hJet65_trg_QA3);
 
+  hJet55_trg_QA1_3 = (TH1F*)hJet55_trg_QA1_3->Rebin(nbins_pt,"hJet55_trg_QA1_3",boundaries_pt);
+  divideBinWidth(hJet55_trg_QA1_3);
+  hJet65_trg_QA1_3 = (TH1F*)hJet65_trg_QA1_3->Rebin(nbins_pt,"hJet65_trg_QA1_3",boundaries_pt);
+  divideBinWidth(hJet65_trg_QA1_3);
+  hJet55_QA1_3 = (TH1F*)hJet55_QA1_3->Rebin(nbins_pt,"hJet55_QA1_3",boundaries_pt);
+  divideBinWidth(hJet55_QA1_3);
+  hJet65_QA1_3 = (TH1F*)hJet65_QA1_3->Rebin(nbins_pt,"hJet65_QA1_3",boundaries_pt);
+  divideBinWidth(hJet65_QA1_3);
 
 
   fout.Write();
