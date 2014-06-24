@@ -158,7 +158,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   gStyle->SetOptStat(0);
 
   // get the file
-  TFile *fin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_Jet55or65_ak%d_%s_fakejet_histos_combined_v6.root",radius,algo));
+  TFile *fin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_Jet55or65_ak%d_%s_fakejet_histos_combined_v7.root",radius,algo));
 
   TH1F *Jet55 = (TH1F*)fin->Get("hJet55");
   TH1F *Jet55_QA1 = (TH1F*)fin->Get("hJet55_QA1");
@@ -176,17 +176,20 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   
   TH1F *Jet55_trg = (TH1F*)fin->Get("hJet55_trg");
   TH1F *Jet55_trg_QA1 = (TH1F*)fin->Get("hJet55_trg_QA1");
-  TH1F *Jet55_trg_QA2 = (TH1F*)fin->Get("hJet55_trg_QA1");
-  TH1F *Jet55_trg_QA3 = (TH1F*)fin->Get("hJet55_trg_QA1");
-  TH1F *Jet55_trg_QA1_2 = (TH1F*)fin->Get("hJet55_trg_QA1");
+  TH1F *Jet55_trg_QA2 = (TH1F*)fin->Get("hJet55_trg_QA2");
+  TH1F *Jet55_trg_QA3 = (TH1F*)fin->Get("hJet55_trg_QA3");
+  TH1F *Jet55_trg_QA1_2 = (TH1F*)fin->Get("hJet55_trg_QA1_2");
   TH1F *Jet65_trg = (TH1F*)fin->Get("hJet65_trg_QA1");
   TH1F *Jet65_trg_QA1 = (TH1F*)fin->Get("hJet65_trg_QA1");
-  TH1F *Jet65_trg_QA2 = (TH1F*)fin->Get("hJet65_trg_QA1");
-  TH1F *Jet65_trg_QA3 = (TH1F*)fin->Get("hJet65_trg_QA1");
-  TH1F *Jet65_trg_QA1_2 = (TH1F*)fin->Get("hJet65_trg_QA1");
+  TH1F *Jet65_trg_QA2 = (TH1F*)fin->Get("hJet65_trg_QA2");
+  TH1F *Jet65_trg_QA3 = (TH1F*)fin->Get("hJet65_trg_QA3");
+  TH1F *Jet65_trg_QA1_2 = (TH1F*)fin->Get("hJet65_trg_QA1_2");
 
   TH1F *Jet55_trg_QA1_3 = (TH1F*)fin->Get("hJet55_trg_QA1_3"); 
-  TH1F *Jet65_trg_QA1_3 = (TH1F*)fin->Get("hJet65_trg_QA1_3"); 
+  TH1F *Jet65_trg_QA1_3 = (TH1F*)fin->Get("hJet65_trg_QA1_3");
+
+  //TH1F *Jet55_trg_QA2_3 = (TH1F*)fin
+ 
   TH1F *Jet55_QA1_3 = (TH1F*)fin->Get("hJet55_QA1_3"); 
   TH1F *Jet65_QA1_3 = (TH1F*)fin->Get("hJet65_QA1_3");
 
@@ -209,6 +212,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   Jet55->SetTitle(" ");
   Jet55->SetXTitle("Jet p_{T} (GeV/c)");
   Jet55->SetYTitle("counts/(pt width)");
+  //Jet55->SetAxisRange(10,630,"X");
   
   Jet55->Draw();
 
@@ -228,7 +232,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   title1->SetTextSize(0.03);
   title1->Draw();
 
-  c1->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_HLT_HIJet65_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  c1->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_HLT_HIJet55_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
 
 
   //plot 2
@@ -240,6 +244,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   Jet65->SetTitle(" "); 
   Jet65->SetXTitle("Jet p_{T} (GeV/c)");
   Jet65->SetYTitle("counts/(pt width)");
+  //Jet65->SetAxisRange(10,630,"X");
   
   Jet65->Draw();
   
@@ -266,31 +271,31 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   c3->SetLogy();
   
   Jet55->SetMarkerColor(kBlack);
-  Jet55->SetMarkerStyle(20);
+  Jet55->SetMarkerStyle(31);
   Jet55->SetTitle(" ");
   Jet55->SetXTitle("Jet p_{T} (GeV/c)");
   Jet55->SetYTitle("counts/(pt width)");
-  
+  //Jet55->SetAxisRange(10,630,"X");
   Jet55->Draw();
 
   Jet55_QA1->SetMarkerColor(2);
-  Jet55_QA1->SetMarkerStyle(20);
+  Jet55_QA1->SetMarkerStyle(24);
   Jet55_QA1->Draw("same");
 
   Jet55_QA2->SetMarkerColor(3);
-  Jet55_QA2->SetMarkerStyle(20);
+  Jet55_QA2->SetMarkerStyle(25);
   Jet55_QA2->Draw("same");
 
   Jet55_QA3->SetMarkerColor(4);
-  Jet55_QA3->SetMarkerStyle(20);
+  Jet55_QA3->SetMarkerStyle(27);
   Jet55_QA3->Draw("same");
 
   Jet55_QA1_2->SetMarkerColor(5);
-  Jet55_QA1_2->SetMarkerStyle(20);
+  Jet55_QA1_2->SetMarkerStyle(28);
   Jet55_QA1_2->Draw("same");
 
   Jet55_QA1_3->SetMarkerColor(6);
-  Jet55_QA1_3->SetMarkerStyle(20);
+  Jet55_QA1_3->SetMarkerStyle(30);
   Jet55_QA1_3->Draw("same");
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
@@ -299,7 +304,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
 
   putCMSPrel();
 
-  TLegend *title3 = myLegend(0.3,0.3,0.85,0.8);
+  TLegend *title3 = myLegend(0.45,0.3,0.85,0.8);
   title3->AddEntry(Jet55,"NO QA","pl");
   title3->AddEntry(Jet55_QA1,"QA1 = #frac{chMax}{jtpt}>0.01","pl");
   title3->AddEntry(Jet55_QA2,"QA2 = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
@@ -317,31 +322,31 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   c4->SetLogy();
   
   Jet65->SetMarkerColor(kBlack);
-  Jet65->SetMarkerStyle(20);
+  Jet65->SetMarkerStyle(31);
   Jet65->SetTitle(" ");
   Jet65->SetXTitle("Jet p_{T} (GeV/c)");
   Jet65->SetYTitle("counts/(pt width)");
-  
+  //Jet65->SetAxisRange(10,630,"X");
   Jet65->Draw();
 
   Jet65_QA1->SetMarkerColor(2);
-  Jet65_QA1->SetMarkerStyle(20);
+  Jet65_QA1->SetMarkerStyle(24);
   Jet65_QA1->Draw("same");
 
   Jet65_QA2->SetMarkerColor(3);
-  Jet65_QA2->SetMarkerStyle(20);
+  Jet65_QA2->SetMarkerStyle(25);
   Jet65_QA2->Draw("same");
 
   Jet65_QA3->SetMarkerColor(4);
-  Jet65_QA3->SetMarkerStyle(20);
+  Jet65_QA3->SetMarkerStyle(27);
   Jet65_QA3->Draw("same");
 
   Jet65_QA1_2->SetMarkerColor(5);
-  Jet65_QA1_2->SetMarkerStyle(20);
+  Jet65_QA1_2->SetMarkerStyle(28);
   Jet65_QA1_2->Draw("same");
 
   Jet65_QA1_3->SetMarkerColor(6);
-  Jet65_QA1_3->SetMarkerStyle(20);
+  Jet65_QA1_3->SetMarkerStyle(30);
   Jet65_QA1_3->Draw("same");
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
@@ -350,7 +355,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
 
   putCMSPrel();
 
-  TLegend *title4 = myLegend(0.3,0.3,0.85,0.8);
+  TLegend *title4 = myLegend(0.45,0.3,0.85,0.8);
   title4->AddEntry(Jet65,"NO QA","pl");
   title4->AddEntry(Jet65_QA1,"QA1 = #frac{chMax}{jtpt}>0.01","pl");
   title4->AddEntry(Jet65_QA2,"QA2 = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
@@ -368,31 +373,31 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   c5->SetLogy();
   
   Jet55_trg->SetMarkerColor(kBlack);
-  Jet55_trg->SetMarkerStyle(20);
+  Jet55_trg->SetMarkerStyle(31);
   Jet55_trg->SetTitle(" ");
   Jet55_trg->SetXTitle("Jet p_{T} (GeV/c)");
   Jet55_trg->SetYTitle("counts/(pt width)");
-  
+  //Jet55_trg->SetAxisRange(10,630,"X");
   Jet55_trg->Draw();
 
   Jet55_trg_QA1->SetMarkerColor(2);
-  Jet55_trg_QA1->SetMarkerStyle(20);
+  Jet55_trg_QA1->SetMarkerStyle(24);
   Jet55_trg_QA1->Draw("same");
 
   Jet55_trg_QA2->SetMarkerColor(3);
-  Jet55_trg_QA2->SetMarkerStyle(20);
+  Jet55_trg_QA2->SetMarkerStyle(25);
   Jet55_trg_QA2->Draw("same");
 
   Jet55_trg_QA3->SetMarkerColor(4);
-  Jet55_trg_QA3->SetMarkerStyle(20);
+  Jet55_trg_QA3->SetMarkerStyle(27);
   Jet55_trg_QA3->Draw("same");
 
   Jet55_trg_QA1_2->SetMarkerColor(5);
-  Jet55_trg_QA1_2->SetMarkerStyle(20);
+  Jet55_trg_QA1_2->SetMarkerStyle(28);
   Jet55_trg_QA1_2->Draw("same");
 
   Jet55_trg_QA1_3->SetMarkerColor(6);
-  Jet55_trg_QA1_3->SetMarkerStyle(20);
+  Jet55_trg_QA1_3->SetMarkerStyle(30);
   Jet55_trg_QA1_3->Draw("same");
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
@@ -401,7 +406,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
 
   putCMSPrel();
 
-  TLegend *title5 = myLegend(0.3,0.3,0.85,0.8);
+  TLegend *title5 = myLegend(0.45,0.3,0.85,0.8);
   title5->AddEntry(Jet55_trg,"NO QA","pl");
   title5->AddEntry(Jet55_trg_QA1,"QA1 = #frac{chMax}{jtpt}>0.01","pl");
   title5->AddEntry(Jet55_trg_QA2,"QA2 = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
@@ -419,32 +424,38 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   c6->SetLogy();
   
   Jet65_trg->SetMarkerColor(kBlack);
-  Jet65_trg->SetMarkerStyle(20);
+  Jet65_trg->SetMarkerStyle(31);
   Jet65_trg->SetTitle(" ");
   Jet65_trg->SetXTitle("Jet p_{T} (GeV/c)");
   Jet65_trg->SetYTitle("counts/(pt width)");
-  
+  //Jet65_trg->SetAxisRange(10,630,"X");
   Jet65_trg->Draw();
+  Jet65_trg->Print("base");
 
   Jet65_trg_QA1->SetMarkerColor(2);
-  Jet65_trg_QA1->SetMarkerStyle(20);
+  Jet65_trg_QA1->SetMarkerStyle(24);
   Jet65_trg_QA1->Draw("same");
+  Jet65_trg_QA1->Print("base");
 
   Jet65_trg_QA2->SetMarkerColor(3);
-  Jet65_trg_QA2->SetMarkerStyle(20);
+  Jet65_trg_QA2->SetMarkerStyle(25);
   Jet65_trg_QA2->Draw("same");
+  Jet65_trg_QA2->Print("base");
 
   Jet65_trg_QA3->SetMarkerColor(4);
-  Jet65_trg_QA3->SetMarkerStyle(20);
+  Jet65_trg_QA3->SetMarkerStyle(27);
   Jet65_trg_QA3->Draw("same");
+  Jet65_trg_QA3->Print("base");
 
   Jet65_trg_QA1_2->SetMarkerColor(5);
-  Jet65_trg_QA1_2->SetMarkerStyle(20);
+  Jet65_trg_QA1_2->SetMarkerStyle(28);
   Jet65_trg_QA1_2->Draw("same");
+  Jet65_trg_QA1_2->Print("base");
 
   Jet65_trg_QA1_3->SetMarkerColor(6);
-  Jet65_trg_QA1_3->SetMarkerStyle(20);
+  Jet65_trg_QA1_3->SetMarkerStyle(30);
   Jet65_trg_QA1_3->Draw("same");
+  Jet65_trg_QA1_3->Print("base");
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
   drawText("HLT_HIJet65_v1, 65<= trigObj p_{T} <80",0.3,0.85,16);
@@ -452,7 +463,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
 
   putCMSPrel();
 
-  TLegend *title6 = myLegend(0.3,0.3,0.85,0.8);
+  TLegend *title6 = myLegend(0.45,0.3,0.85,0.8);
   title6->AddEntry(Jet65_trg,"NO QA","pl");
   title6->AddEntry(Jet65_trg_QA1,"QA1 = #frac{chMax}{jtpt}>0.01","pl");
   title6->AddEntry(Jet65_trg_QA2,"QA2 = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
@@ -463,5 +474,26 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   title6->Draw();
 
   c6->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet65_trg_diff_QAcuts_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+
+
+  //plot 7
+  TCanvas *c7 = new TCanvas("c7","",800,600);
+  c7->SetLogy();
+
+  Jet55Fake->SetMarkerStyle(20);
+  Jet55Fake->SetMarkerColor(kBlack);
+  Jet55Fake->SetXTitle("Jet p_{T} (GeV/c)");
+  Jet55Fake->SetYTitle("counts/(pt width)");
+  Jet55Fake->SetTitle(" ");
+
+  Jet55Fake->Draw();
+
+  drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
+  drawText("HLT_HIJet55_v1 && !HLT_HIJet65_v1 && !HLT_HIJet80, Jet p_{T} > 80",0.2,0.85,16);
+  drawText(Form("ak%s%dPF Jets",algo,radius),0.7,0.9,16);
+
+  putCMSPrel();
+
+  c7->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_only_large_pt_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
 
 }

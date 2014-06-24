@@ -76,7 +76,7 @@ void divideBinWidth(TH1 *h)
 	h->GetYaxis()->CenterTitle();
 }
 
-void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *algo = "Pu"){
+void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *algo = "Vs"){
 
   TH1::SetDefaultSumw2();
   TStopwatch timer;
@@ -193,6 +193,10 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   ch[2]->AddFriend(ch[3]);
   ch[2]->AddFriend(ch[4]);
 
+  ch[3]->AddFriend(ch[0]);
+  ch[3]->AddFriend(ch[1]);
+  ch[3]->AddFriend(ch[2]);
+  ch[3]->AddFriend(ch[4]);
 
   Float_t nEntries = (Float_t)ch[2]->GetEntries();
   cout<<"Total number of entries = "<<nEntries<<endl;
@@ -293,102 +297,121 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   TCut trg65 = "pt>=65&&pt<80";
   TCut trg80 = "pt>=80";
 
+  //TH1F total,evtSel,jet55,jet55_evtsel,jet55only_ectsel,jet55_evtSel_QA1,jet55_evtSel_QA2,jet55_evtSel_QA3,jet55_evtSel_QA1_2,jet55_evtSel_QA1_3,jet55_evtSel_QA3_2;
+  //TH1F jet55_trg55,jet55_trg_evtSel,jet55only_trg55_evtSel,jet55_trg55_evtSel_QA1,jet55_trg55_evtSel_QA2,jet55_trg55_evtSel_QA3,jet55_trg55_evtSel_qalCut1_qalCut2,jet55_trg55_evtSel_qalCut1_qalCut3,jet55_trg55_evtSel_qalCut3_qalCut2;
+  //TH1F jet65,jet65_evtSel,jet65only_evtSel,jet65_evtSel_qalCut1,jet65_evtSel_qalCut3,jet65_evtSel_qalCut3,jet65_evtSel_qalCut1_qalCut3,jet65_evtSel_qalCut1_qalCut2,jet65_evtSel_qalCut3_qalCut2;
+  //TH1F jet65_
+
   
-  cout<<"total # of entries = "<<ch[2]->GetEntries()<<endl;
-  //ch[2]->Project("total","hiBin");
+  //cout<<"total # of entries = "<<ch[2]->GetEntries()<<endl;
   /*
+  cout<<"total # of entries = "<<ch[2]->GetEntries()<<endl;
+  ch[3]->Draw("hiBin>>total");
+  cout<<"with evtSel added  = "<<ch[2]->GetEntries(evtSel)<<endl;
+  //ch[2]->Draw("evtSel","hiBin",);
+  cout<<"with evtSel added  = "<<ch[2]->GetEntries(evtSel)<<endl;
+  ch[3]->Draw("hiBin>>evtSel",evtSel);
+  cout<<"with jet55"<<" = "<<ch[2]->GetEntries(jet55)<<endl;
+  ch[3]->Draw("hiBin>>jet55",jet55);
+  cout<<"with evtSel and Jet55 added = "<<ch[2]->GetEntries(jet55&&evtSel)<<endl;
+  ch[3]->Draw("hiBin>>jet55_evtsel",jet55&&evtSel);
+  cout<<"with Jet55_only and evtSel added = "<<ch[2]->GetEntries(jet55only&&evtSel)<<endl;
+  ch[3]->Draw("hiBin>>jet55only_evtsel",jet55only&&evtSel);
+  */
+  //ch[2]->Project("total","hiBin");
+  
   cout<<"with evtSel added  = "<<ch[2]->GetEntries(evtSel)<<endl;
   //ch[2]->Project("evtSel","hiBin",);
   cout<<"with evtSel added  = "<<ch[2]->GetEntries(evtSel)<<endl;
-  ch[2]->Project("evtSel","hiBin",evtSel);
+  //ch[2]->Project("evtSel","hiBin",evtSel);
   cout<<"with jet55"<<" = "<<ch[2]->GetEntries(jet55)<<endl;
-  ch[2]->Project("jet55","hiBin",jet55);
+  //ch[2]->Project("jet55","hiBin",jet55);
   cout<<"with evtSel and Jet55 added = "<<ch[2]->GetEntries(jet55&&evtSel)<<endl;
-  ch[2]->Project("jet55_evtsel","hiBin",jet55&&evtSel);
+  //ch[2]->Project("jet55_evtsel","hiBin",jet55&&evtSel);
   cout<<"with Jet55_only and evtSel added = "<<ch[2]->GetEntries(jet55only&&evtSel)<<endl;
-  ch[2]->Project("jet55only_evtsel","hiBin",jet55only&&evtSel);
+  //ch[2]->Project("jet55only_evtsel","hiBin",jet55only&&evtSel);
 
   cout<<"jet55 && evtSel && qalCut1"<<" = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut1)<<endl;
-  ch[2]->Project("jet55_evtSel_QA1","hiBin",jet55&&evtSel&&qalCut1);
+  //ch[2]->Project("jet55_evtSel_QA1","hiBin",jet55&&evtSel&&qalCut1);
   cout<<"jet55 && evtSel && qalCut2"<<" = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut2)<<endl;
-  ch[2]->Project("jet55_evtSel_QA2","hiBin",jet55&&evtSel&&qalCut2);
+  //ch[2]->Project("jet55_evtSel_QA2","hiBin",jet55&&evtSel&&qalCut2);
   cout<<"jet55 && evtSel && qalCut3"<<" = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut3)<<endl;
-  ch[2]->Project("jet55_evtSel_QA3","hiBin",jet55&&evtSel&&qalCut3);
+  //ch[2]->Project("jet55_evtSel_QA3","hiBin",jet55&&evtSel&&qalCut3);
 
   cout<<"jet55 and evtSel and QA1_2 = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut1&&qalCut2)<<endl;
-  ch[2]->Project("jet55_evtSel_QA1_QA2","hiBin",jet55&&evtSel&&qalCut1&&qalCut2);
+  //ch[2]->Project("jet55_evtSel_QA1_QA2","hiBin",jet55&&evtSel&&qalCut1&&qalCut2);
   cout<<"jet55 and evtSel and QA1_3 = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut1&&qalCut3)<<endl;
-  ch[2]->Project("jet55_evtSel_QA1_QA3","hiBin",jet55&&evtSel&&qalCut1&&qalCut3);
+  //ch[2]->Project("jet55_evtSel_QA1_QA3","hiBin",jet55&&evtSel&&qalCut1&&qalCut3);
   cout<<"jet55 and evtSel and QA2_3 = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut2&&qalCut3)<<endl;
-  ch[2]->Project("jet55_evtSel_QA3_QA2","hiBin",jet55&&evtSel&&qalCut3&&qalCut2);
+  //ch[2]->Project("jet55_evtSel_QA3_QA2","hiBin",jet55&&evtSel&&qalCut3&&qalCut2);
 
 
   cout<<"with jet55 and trgObjpt selection"<<" = "<<ch[2]->GetEntries(jet55&&trg55)<<endl;
-  ch[2]->Project("jet55_trg55","hiBin",jet55&&trg55);
+  //ch[2]->Project("jet55_trg55","hiBin",jet55&&trg55);
   cout<<"with evtSel and Jet55 and trgobjpt added = "<<ch[2]->GetEntries(jet55&&trg55&&evtSel)<<endl;
-  ch[2]->Project("jet55_trg55_evtSel","hiBin",jet55&&trg55&&evtSel);
+  //ch[2]->Project("jet55_trg55_evtSel","hiBin",jet55&&trg55&&evtSel);
   cout<<"with Jet55_only and trgObjpt and evtSel added = "<<ch[2]->GetEntries(jet55only&&trg55&&evtSel)<<endl;
-  ch[2]->Project("jet55only_trg55_evtSel","hiBin",jet55only&&trg55&&evtSel);
+  //ch[2]->Project("jet55only_trg55_evtSel","hiBin",jet55only&&trg55&&evtSel);
 
   cout<<"jet55 and trgObjpt && evtSel && qalCut1"<<" = "<<ch[2]->GetEntries(jet55&&trg55&&evtSel&&qalCut1)<<endl;
-  ch[2]->Project("jet55_trg55_evtSel_QA1","hiBin",jet55&&trg55&&evtSel&&qalCut1);
+  //ch[2]->Project("jet55_trg55_evtSel_QA1","hiBin",jet55&&trg55&&evtSel&&qalCut1);
   cout<<"jet55 and trgObjpt && evtSel && qalCut2"<<" = "<<ch[2]->GetEntries(jet55&&trg55&&evtSel&&qalCut2)<<endl;
-  ch[2]->Project("jet55_trg55_evtSel_QA2","hiBin",jet55&&trg55&&evtSel&&qalCut2);
+  //ch[2]->Project("jet55_trg55_evtSel_QA2","hiBin",jet55&&trg55&&evtSel&&qalCut2);
   cout<<"jet55 and trgObjpt && evtSel && qalCut3"<<" = "<<ch[2]->GetEntries(jet55&&trg55&&evtSel&&qalCut3)<<endl;
-  ch[2]->Project("jet55_trg55_evtSel_QA3","hiBin",jet55&&trg55&&evtSel&&qalCut3);
+  //ch[2]->Project("jet55_trg55_evtSel_QA3","hiBin",jet55&&trg55&&evtSel&&qalCut3);
 
   cout<<"jet55 and trgObjpt and evtSel and QA1_2 = "<<ch[2]->GetEntries(jet55&&trg55&&evtSel&&qalCut1&&qalCut2)<<endl;
-  ch[2]->Project("jet55_trg55_evtSel_qalCut1_qalCut2","hiBin",jet55&&trg55&&evtSel&&qalCut1&&qalCut2);
+  //ch[2]->Project("jet55_trg55_evtSel_qalCut1_qalCut2","hiBin",jet55&&trg55&&evtSel&&qalCut1&&qalCut2);
   cout<<"jet55 and trgObjpt and evtSel and QA1_3 = "<<ch[2]->GetEntries(jet55&&trg55&&evtSel&&qalCut1&&qalCut3)<<endl;
-  ch[2]->Project("jet55_trg55_evtSel_qalCut1_qalCut3","hiBin",jet55&&trg55&&evtSel&&qalCut1&&qalCut3);
+  //ch[2]->Project("jet55_trg55_evtSel_qalCut1_qalCut3","hiBin",jet55&&trg55&&evtSel&&qalCut1&&qalCut3);
   cout<<"jet55 and trgObjpt and evtSel and QA2_3 = "<<ch[2]->GetEntries(jet55&&trg55&&evtSel&&qalCut2&&qalCut3)<<endl;
-  ch[2]->Project("jet55_trg55_evtSel_qalCut1_qa3Cut2","hiBin",jet55&&trg55&&evtSel&&qalCut3&&qalCut2);
+  //ch[2]->Project("jet55_trg55_evtSel_qalCut1_qa3Cut2","hiBin",jet55&&trg55&&evtSel&&qalCut3&&qalCut2);
 
 
   cout<<"with jet65"<<" = "<<ch[2]->GetEntries(jet65)<<endl;
-  ch[2]->Project("jet65","hiBin",jet65);
+  //ch[2]->Project("jet65","hiBin",jet65);
   cout<<"with evtSel and Jet65 added = "<<ch[2]->GetEntries(jet65&&evtSel)<<endl;
-  ch[2]->Project("jet65_evtSel","hiBin",jet65&&evtSel);
+  //ch[2]->Project("jet65_evtSel","hiBin",jet65&&evtSel);
   cout<<"with Jet65_only and evtSel added = "<<ch[2]->GetEntries(jet65only&&evtSel)<<endl;
-  ch[2]->Project("jet65only_evtSel","hiBin",jet65only&&evtSel);
+  //ch[2]->Project("jet65only_evtSel","hiBin",jet65only&&evtSel);
 
   cout<<"jet65 && evtSel && qalCut1"<<" = "<<ch[2]->GetEntries(jet65&&evtSel&&qalCut1)<<endl;
-  ch[2]->Project("jet65_evtSel_qalCut1","hiBin",jet65&&evtSel&&qalCut1);
+  //ch[2]->Project("jet65_evtSel_qalCut1","hiBin",jet65&&evtSel&&qalCut1);
   cout<<"jet65 && evtSel && qalCut2"<<" = "<<ch[2]->GetEntries(jet65&&evtSel&&qalCut2)<<endl;
-  ch[2]->Project("jet65_evtSel_qalCut2","hiBin",jet65&&evtSel&&qalCut2);
+  //ch[2]->Project("jet65_evtSel_qalCut2","hiBin",jet65&&evtSel&&qalCut2);
   cout<<"jet65 && evtSel && qalCut3"<<" = "<<ch[2]->GetEntries(jet65&&evtSel&&qalCut3)<<endl;
-  ch[2]->Project("jet65_evtSel_qalCut3","hiBin",jet65&&evtSel&&qalCut3);
+  //ch[2]->Project("jet65_evtSel_qalCut3","hiBin",jet65&&evtSel&&qalCut3);
 
   cout<<"jet65 and evtSel and QA1_2 = "<<ch[2]->GetEntries(jet65&&evtSel&&qalCut1&&qalCut2)<<endl;
-  ch[2]->Project("jet65_evtSel_qalCut1_qalCut2","hiBin",jet65&&evtSel&&qalCut1&&qalCut2);
+  //ch[2]->Project("jet65_evtSel_qalCut1_qalCut2","hiBin",jet65&&evtSel&&qalCut1&&qalCut2);
   cout<<"jet65 and evtSel and QA1_3 = "<<ch[2]->GetEntries(jet65&&evtSel&&qalCut1&&qalCut3)<<endl;
-  ch[2]->Project("jet65_evtSel_qalCut1_qalCut3","hiBin",jet65&&evtSel&&qalCut1&&qalCut3);
+  //ch[2]->Project("jet65_evtSel_qalCut1_qalCut3","hiBin",jet65&&evtSel&&qalCut1&&qalCut3);
   cout<<"jet65 and evtSel and QA2_3 = "<<ch[2]->GetEntries(jet65&&evtSel&&qalCut2&&qalCut3)<<endl;
-  ch[2]->Project("jet65_evtSel_qalCut3_qalCut2","hiBin",jet65&&evtSel&&qalCut3&&qalCut2);
+  //ch[2]->Project("jet65_evtSel_qalCut3_qalCut2","hiBin",jet65&&evtSel&&qalCut3&&qalCut2);
 
   cout<<"with jet65 and trgObjpt selection"<<" = "<<ch[2]->GetEntries(jet65&&trg65)<<endl;
-  ch[2]->Project("jet65_trg65","hiBin",jet65&&trg65);
+  //ch[2]->Project("jet65_trg65","hiBin",jet65&&trg65);
   cout<<"with evtSel and Jet65 and trgobjpt added = "<<ch[2]->GetEntries(jet65&&trg65&&evtSel)<<endl;
-  ch[2]->Project("jet65_trg65_evtSel","hiBin",jet65&&trg65&&evtSel);
+  //ch[2]->Project("jet65_trg65_evtSel","hiBin",jet65&&trg65&&evtSel);
   cout<<"with Jet65_only and trgObjpt and evtSel added = "<<ch[2]->GetEntries(jet65only&&trg65&&evtSel)<<endl;
-  ch[2]->Project("jet65only_trg65_evtSel","hiBin",jet65only&&trg65&&evtSel);
+  //ch[2]->Project("jet65only_trg65_evtSel","hiBin",jet65only&&trg65&&evtSel);
 
   cout<<"jet65 and trgObjpt && evtSel && qalCut1"<<" = "<<ch[2]->GetEntries(jet65&&trg65&&evtSel&&qalCut1)<<endl;
-  ch[2]->Project("jet65_trg65_evtSel_qalCut1","hiBin",jet65&&trg65&&evtSel&&qalCut1);
+  //ch[2]->Project("jet65_trg65_evtSel_qalCut1","hiBin",jet65&&trg65&&evtSel&&qalCut1);
   cout<<"jet65 and trgObjpt && evtSel && qalCut2"<<" = "<<ch[2]->GetEntries(jet65&&trg65&&evtSel&&qalCut2)<<endl;
-  ch[2]->Project("jet65_trg65_evtSel_qalCut2","hiBin",jet65&&trg65&&evtSel&&qalCut2);
+  //ch[2]->Project("jet65_trg65_evtSel_qalCut2","hiBin",jet65&&trg65&&evtSel&&qalCut2);
   cout<<"jet65 and trgObjpt && evtSel && qalCut3"<<" = "<<ch[2]->GetEntries(jet65&&trg65&&evtSel&&qalCut3)<<endl;
-  ch[2]->Project("jet65_trg65_evtSel_qalCut3","hiBin",jet65&&trg65&&evtSel&&qalCut3);
+  //ch[2]->Project("jet65_trg65_evtSel_qalCut3","hiBin",jet65&&trg65&&evtSel&&qalCut3);
 
   cout<<"jet65 and trgObjpt and evtSel and QA1_2 = "<<ch[2]->GetEntries(jet65&&trg65&&evtSel&&qalCut1&&qalCut2)<<endl;
-  ch[2]->Project("jet65_trg65_evtSel_qalCut1_qalCut2","hiBin",jet65&&trg65&&evtSel&&qalCut1&&qalCut2);
+  //ch[2]->Project("jet65_trg65_evtSel_qalCut1_qalCut2","hiBin",jet65&&trg65&&evtSel&&qalCut1&&qalCut2);
   cout<<"jet65 and trgObjpt and evtSel and QA1_3 = "<<ch[2]->GetEntries(jet65&&trg65&&evtSel&&qalCut1&&qalCut3)<<endl;
-  ch[2]->Project("jet65_trg65_evtSel_qalCut1_qalCut3","hiBin",jet65&&trg65&&evtSel&&qalCut1&&qalCut3);
+  //ch[2]->Project("jet65_trg65_evtSel_qalCut1_qalCut3","hiBin",jet65&&trg65&&evtSel&&qalCut1&&qalCut3);
   cout<<"jet65 and trgObjpt and evtSel and QA2_3 = "<<ch[2]->GetEntries(jet65&&trg65&&evtSel&&qalCut2&&qalCut3)<<endl;
-  ch[2]->Project("jet65_trg65_evtSel_qalCut3_qalCut2","hiBin",jet65&&trg65&&evtSel&&qalCut3&&qalCut2);
+  //ch[2]->Project("jet65_trg65_evtSel_qalCut3_qalCut2","hiBin",jet65&&trg65&&evtSel&&qalCut3&&qalCut2);
   
 
-  
+  /*
   cout<<"with jet80"<<" = "<<Jet80->GetEntries(jet80)<<endl;
   cout<<"with evtSel and Jet80 added = "<<Jet80->GetEntries(jet80&&evtSel)<<endl;
 
@@ -410,13 +433,13 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   cout<<"jet80 and trgObjpt and evtSel and QA1_2 = "<<Jet80->GetEntries(jet80&&trg80&&evtSel&&qalCut1&&qalCut2)<<endl;
   cout<<"jet80 and trgObjpt and evtSel and QA1_3 = "<<Jet80->GetEntries(jet80&&trg80&&evtSel&&qalCut1&&qalCut3)<<endl;
   cout<<"jet80 and trgObjpt and evtSel and QA2_3 = "<<Jet80->GetEntries(jet80&&trg80&&evtSel&&qalCut2&&qalCut3)<<endl;
-  
+  */
 
 
 
   cout<<"jet55 only and trig 55 and eventSel and largejetpt"<<" = "<<ch[2]->GetEntries(evtSel&&jet55only&&trg55&&largejetpt)<<endl;
 
-  */
+  
 
   //ch[2]->Print();
   

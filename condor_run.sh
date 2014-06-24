@@ -1,4 +1,3 @@
-
 export SCRAM_ARCH=slc5_amd64_gcc462
 source /osg/app/cmssoft/cms/cmsset_default.sh
 #source /apps/02/cmssoft/cms/cmsset_default.sh
