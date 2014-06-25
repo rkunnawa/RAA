@@ -5,6 +5,7 @@ incrementer=1
 
 destination=/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/
 filelist=jet55or65_filelist.txt
+#filelist2=jet80_filelist.txt
 #filelist=wxie_MinBiasUPC_all.txt
 #filelist=pPbMCBForestList.txt
 
@@ -71,6 +72,7 @@ should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
 # specify any extra input files (for example, an orcarc file)
 transfer_input_files = $filelist
+#transfer_input_files = $filelist,$filelist2
 
 Queue
 EOF
