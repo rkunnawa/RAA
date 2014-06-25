@@ -5,7 +5,7 @@
 // RAA - analyze macro. following the steps of having a separate macro to do the work. 
 
 // this will be taken mostly from Unfold_RAA_V0.C from MIT. Im just keeping it here so that it will be easier to run. 
-// importnat point in the code is that in the loops for pbpb, the array index corrsponding to nbins_cent represents the 0-100 centrality bin. 
+// important point in the code is that in the loops for pbpb, the array index corrsponding to nbins_cent represents the 0-100 centrality bin. 
 // PbPb and pp are separated here - as they should be. 
 
 #include <iostream>
