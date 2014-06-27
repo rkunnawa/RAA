@@ -8,6 +8,13 @@
 // important point in the code is that in the loops for pbpb, the array index corrsponding to nbins_cent represents the 0-100 centrality bin. 
 // PbPb and pp are separated here - as they should be. 
 
+// June 25th - add separate files for reading in data from pp and PbPb. 
+//           - Run the full macro to check if it works. 
+//           - Wooo Hoooo! Macro runs fully without any error and produces the histograms 
+//           - Now to go ahead and check if they contain meaningful stuff. 
+//           - obviously till i get the full dataset, i cant get the lumi normalization required to add the triggers. 
+
+
 #include <iostream>
 #include <stdio.h>
 
@@ -77,12 +84,11 @@ TH1F *functionHist(TF1 *f, TH1F* h,char *fHistname)
 }
 
 
-void RAA_analyze(int radius = 3, char* algo = "Pu"){
+void RAA_analyze(int radius = 3, char* algo = "Vs"){
 
   TStopwatch timer; 
   timer.Start();
   
-
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
   
@@ -93,7 +99,8 @@ void RAA_analyze(int radius = 3, char* algo = "Pu"){
   //TFile* fData_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_data_ak%d_%s_cent%d_chMax_12003cut.root",radius,algo,date.GetDate()));
   //TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%d_%s_cent%d_chMax_12003cut.root",radius,algo,date.GetDate()));
 
-  TFile* fData_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_data_ak%d_%s_20140616_chMax_12003cut.root",radius,algo));
+  TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%d_%s_20140625_chMax_12003cut.root",radius,algo));
+  TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%d_20140623_chMax_12003cut.root",radius));
   TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%d_%s_20140616_chMax_12003cut.root",radius,algo));
 
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
@@ -104,7 +111,8 @@ void RAA_analyze(int radius = 3, char* algo = "Pu"){
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
   
   // histogram declarations with the following initial appendage: d - Data, m - MC, u- Unfolded
-  
+  // for the MC closure test, ive kept separate 
+
   TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1];
   
   TH1F *mPbPb_Gen[nbins_cent+1], *mPbPb_Reco[nbins_cent+1];
@@ -132,29 +140,29 @@ void RAA_analyze(int radius = 3, char* algo = "Pu"){
   // get PbPb data
   for(int i = 0;i<=nbins_cent;i++){
     cout<<"cent_"<<i<<endl;
-    dPbPb_TrgComb[i] = (TH1F*)fData_in->Get(Form("hpbpb_TrgObjComb_cent%d",i));
+    dPbPb_TrgComb[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObjComb_cent%d",i));
     dPbPb_TrgComb[i]->Print("base");
-    dPbPb_Trg80[i] = (TH1F*)fData_in->Get(Form("hpbpb_TrgObj80_cent%d",i));
+    dPbPb_Trg80[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj80_cent%d",i));
     dPbPb_Trg80[i]->Print("base");
-    dPbPb_Trg65[i] = (TH1F*)fData_in->Get(Form("hpbpb_TrgObj65_cent%d",i));
+    dPbPb_Trg65[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj65_cent%d",i));
     dPbPb_Trg65[i]->Print("base");
-    dPbPb_Trg55[i] = (TH1F*)fData_in->Get(Form("hpbpb_TrgObj55_cent%d",i));
+    dPbPb_Trg55[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj55_cent%d",i));
     dPbPb_Trg55[i]->Print("base");
 
-    dPbPb_Comb[i] = (TH1F*)fData_in->Get(Form("hpbpbComb_cent%d",i));
+    dPbPb_Comb[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpbComb_cent%d",i));
     dPbPb_Comb[i]->Print("base");
-    dPbPb_1[i] = (TH1F*)fData_in->Get(Form("hpbpb1_cent%d",i));
+    dPbPb_1[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb1_cent%d",i));
     dPbPb_1[i]->Print("base");
-    dPbPb_2[i] = (TH1F*)fData_in->Get(Form("hpbpb2_cent%d",i));
+    dPbPb_2[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb2_cent%d",i));
     dPbPb_2[i]->Print("base");
-    dPbPb_3[i] = (TH1F*)fData_in->Get(Form("hpbpb3_cent%d",i));
+    dPbPb_3[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb3_cent%d",i));
     dPbPb_3[i]->Print("base");
 
-    dPbPb_80[i] = (TH1F*)fData_in->Get(Form("hpbpb_80_cent%d",i));
+    dPbPb_80[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_80_cent%d",i));
     dPbPb_80[i]->Print("base");
-    dPbPb_65[i] = (TH1F*)fData_in->Get(Form("hpbpb_65_cent%d",i));
+    dPbPb_65[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_65_cent%d",i));
     dPbPb_65[i]->Print("base");
-    dPbPb_55[i] = (TH1F*)fData_in->Get(Form("hpbpb_55_cent%d",i));
+    dPbPb_55[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_55_cent%d",i));
     dPbPb_55[i]->Print("base");
 
   }
@@ -177,16 +185,16 @@ void RAA_analyze(int radius = 3, char* algo = "Pu"){
 
   // get PP data
   cout<<"Getting PP data and MC"<<endl;
-  dPP_1 = (TH1F*)fData_in->Get("hpp1");
+  dPP_1 = (TH1F*)fData_pp_in->Get("hpp1");
   dPP_1->Print("base");
-  dPP_2 = (TH1F*)fData_in->Get("hpp2");
+  dPP_2 = (TH1F*)fData_pp_in->Get("hpp2");
   dPP_2->Print("base");
-  dPP_3 = (TH1F*)fData_in->Get("hpp3");
+  dPP_3 = (TH1F*)fData_pp_in->Get("hpp3");
   dPP_3->Print("base");
-  dPP_Comb = (TH1F*)fData_in->Get("hppComb");
+  dPP_Comb = (TH1F*)fData_pp_in->Get("hppComb");
   dPP_Comb->Print("base");
 
-  // get PbPb MC
+  // get PP MC
   mPP_Gen = (TH1F*)fMC_in->Get("hpp_gen");
   mPP_Gen->Print("base");
   mPP_Reco = (TH1F*)fMC_in->Get("hpp_reco");
@@ -199,7 +207,7 @@ void RAA_analyze(int radius = 3, char* algo = "Pu"){
   //mPP_Response = (TH2F*)fMc_in->Get("hpp_gen");
 
   // make the response matrix.
-  // here since we dont have the simple nature of the uhist histograms which makes debugging a pain in the ass, we have to run the response matrix and unfolding separately for PbPb and pp which makes code ugly but easy to debugg at the same time. 
+  // here since we dont have the simple nature of the uhist histograms which makes debugging hard, we have to run the response matrix and unfolding separately for PbPb and pp which makes code ugly and not efficient but easy to debug at the same time. 
 
   cout<<"Filling the PbPb response Matrix"<<endl;
 
@@ -212,7 +220,7 @@ void RAA_analyze(int radius = 3, char* algo = "Pu"){
     hGenSpectraCorr->Fit("f"," ");
     hGenSpectraCorr->Fit("f","","");
     hGenSpectraCorr->Fit("f","LL");
-    TH1F *fHist = functionHist(f,hGenSpectraCorr,Form("fHist_cent%d",i));// that the function that you get from the fitting 
+    TH1F *fHist = functionHist(f,hGenSpectraCorr,Form("fHist_cent%d",i));// function that you get from the fitting 
     hGenSpectraCorr->Divide(fHist);
     for (int y=1;y<=mPbPb_Matrix[i]->GetNbinsY();y++) {
       double sum=0;
@@ -749,7 +757,7 @@ void RAA_analyze(int radius = 3, char* algo = "Pu"){
   
   TDatime date;
   
-  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%d_%s_cent%d_chMax_12003cut.root",radius,algo,date.GetDate()),"RECREATE");
+  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%d_%s_%d_chMax_12003cut.root",radius,algo,date.GetDate()),"RECREATE");
   fout.cd();
 
   for(int i = 0;i<=nbins_cent;i++){
