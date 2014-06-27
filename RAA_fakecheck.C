@@ -286,9 +286,9 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   TCut jet65 = "HLT_HIJet65_v1";
   TCut jet80 = "HLT_HIJet80_v1";
   TCut evtSel = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2";
-  TCut qalCut1 = "chargedMax/jtpt>0.01";
-  TCut qalCut2 = "TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975";
-  TCut qalCut3 = "jtpt/pt<3";
+  TCut qalCut1 = "(chargedMax/jtpt)>0.01";
+  TCut qalCut2 = "(TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum))<0.975";
+  TCut qalCut3 = "(jtpt/pt)<3";
   //TCut qalCut4 = "";
   TCut jet55only = "HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1";
   TCut jet65only = "HLT_HIJet65_v1&&!HLT_HIJet80_v1";

@@ -430,32 +430,32 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   Jet65_trg->SetYTitle("counts/(pt width)");
   //Jet65_trg->SetAxisRange(10,630,"X");
   Jet65_trg->Draw();
-  Jet65_trg->Print("base");
+  //Jet65_trg->Print("base");
 
   Jet65_trg_QA1->SetMarkerColor(2);
   Jet65_trg_QA1->SetMarkerStyle(24);
   Jet65_trg_QA1->Draw("same");
-  Jet65_trg_QA1->Print("base");
+  //Jet65_trg_QA1->Print("base");
 
   Jet65_trg_QA2->SetMarkerColor(3);
   Jet65_trg_QA2->SetMarkerStyle(25);
   Jet65_trg_QA2->Draw("same");
-  Jet65_trg_QA2->Print("base");
+  //Jet65_trg_QA2->Print("base");
 
   Jet65_trg_QA3->SetMarkerColor(4);
   Jet65_trg_QA3->SetMarkerStyle(27);
   Jet65_trg_QA3->Draw("same");
-  Jet65_trg_QA3->Print("base");
+  //Jet65_trg_QA3->Print("base");
 
   Jet65_trg_QA1_2->SetMarkerColor(5);
   Jet65_trg_QA1_2->SetMarkerStyle(28);
   Jet65_trg_QA1_2->Draw("same");
-  Jet65_trg_QA1_2->Print("base");
+  //Jet65_trg_QA1_2->Print("base");
 
   Jet65_trg_QA1_3->SetMarkerColor(6);
   Jet65_trg_QA1_3->SetMarkerStyle(30);
   Jet65_trg_QA1_3->Draw("same");
-  Jet65_trg_QA1_3->Print("base");
+  //Jet65_trg_QA1_3->Print("base");
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
   drawText("HLT_HIJet65_v1, 65<= trigObj p_{T} <80",0.3,0.85,16);
@@ -495,5 +495,63 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   putCMSPrel();
 
   c7->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_only_large_pt_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+
+
+  //plot 8
+  TCanvas *c8 = new TCanvas("c8","",800,600);
+  
+  //make the ratio plots with QA#/noQA. 
+  TH1F *Ratio_Jet55_trg_QA1 = (TH1F*)Jet55_trg_QA1->Clone("Ratio_Jet55_trg_QA1");
+  Ratio_Jet55_trg_QA1->Divide(Jet55_trg);
+  TH1F *Ratio_Jet55_trg_QA2 = (TH1F*)Jet55_trg_QA2->Clone("Ratio_Jet55_trg_QA2");
+  Ratio_Jet55_trg_QA2->Divide(Jet55_trg);
+  TH1F *Ratio_Jet55_trg_QA3 = (TH1F*)Jet55_trg_QA3->Clone("Ratio_Jet55_trg_QA3");
+  Ratio_Jet55_trg_QA3->Divide(Jet55_trg);
+  TH1F *Ratio_Jet55_trg_QA1_2 = (TH1F*)Jet55_trg_QA1_2->Clone("Ratio_Jet55_trg_QA1_2");
+  Ratio_Jet55_trg_QA1_2->Divide(Jet55_trg);
+  TH1F *Ratio_Jet55_trg_QA1_3 = (TH1F*)Jet55_trg_QA1_3->Clone("Ratio_Jet55_trg_QA1_3");
+  Ratio_Jet55_trg_QA1_3->Divide(Jet55_trg);
+  //TH1F *Ratio_Jet55_trg_QA3_2 = (TH1F*)Jet55_trg_QA1->Clone("Ratio_Jet55_trg_QA1");
+  //Ratio_Jet55_trg_QA1->Divide(Jet55_trg);
+
+  Ratio_Jet55_trg_QA1->SetMarkerColor(2);
+  Ratio_Jet55_trg_QA1->SetMarkerStyle(24);//24,25,27,28,30
+  Ratio_Jet55_trg_QA1->SetTitle(" ");
+  Ratio_Jet55_trg_QA1->SetXTitle("Jet p_{T} (GeV/c)");
+  Ratio_Jet55_trg_QA1->SetYTitle("#frac{}{}");
+  Ratio_Jet55_trg_QA1->Draw();
+
+  Ratio_Jet55_trg_QA2->SetMarkerColor(3);
+  Ratio_Jet55_trg_QA2->SetMarkerStyle(25);
+  Ratio_Jet55_trg_QA2->Draw("same");
+
+  Ratio_Jet55_trg_QA3->SetMarkerColor(4);
+  Ratio_Jet55_trg_QA3->SetMarkerStyle(27);
+  Ratio_Jet55_trg_QA3->Draw("same");
+
+  Ratio_Jet55_trg_QA1_2->SetMarkerColor(5);
+  Ratio_Jet55_trg_QA1_2->SetMarkerStyle(28);
+  Ratio_Jet55_trg_QA1_2->Draw("same");
+
+  Ratio_Jet55_trg_QA1_3->SetMarkerColor(6);
+  Ratio_Jet55_trg_QA1_3->SetMarkerStyle(30);
+  Ratio_Jet55_trg_QA1_3->Draw("same");
+
+  TLegend *title8 = myLegend(0.45,0.3,0.85,0.8);
+  title8->AddEntry(Ratio_Jet55_trg_QA1,"QA1","pl");
+  title8->AddEntry(Ratio_Jet55_trg_QA2,"QA2","pl");
+  title8->AddEntry(Ratio_Jet55_trg_QA3,"QA2","pl");
+  title8->AddEntry(Ratio_Jet55_trg_QA1_2,"QA2","pl");
+  title8->AddEntry(Ratio_Jet55_trg_QA1_3,"QA2","pl");
+  title8->SetTextSize(0.03);
+  title8->Draw();
+
+  drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
+  putCMSPrel();
+  drawText("HLT_HIJet55_V1, 55<=trgObjpt<65",0.2,0.85,16);
+  drawText(Form("ak%s%dPF Jets",algo,radius),0.7,0.9,16);
+  
+  c8->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_trig_QA_ratio_%d",radius,algo,date.GetDate()));
+  
 
 }

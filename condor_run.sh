@@ -24,11 +24,11 @@ process=$4
 
 echo "Processing..."
 
-#root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
-#mv PbPb_data_ak3_Vs_20140623_chMax_12003cut_$endfile.root ../../Output/.
+root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
+mv PbPb_data_ak3_Vs_20140625_chMax_12003cut_$endfile.root ../../Output/.
 
-root -b -q RAA_fakecheck.C\+\($startfile,$endfile\)
-mv pbpb_ak3_Vs_fakejet_histos_$endfile.root ../../Output/.
+#root -b -q RAA_fakecheck.C\+\($startfile,$endfile\)
+#mv pbpb_ak3_Vs_fakejet_histos_$endfile.root ../../Output/.
 
 #root -b -q RAA_duplicateEventsCheck.C\+\($startfile,$endfile\)
 #mv pbpb_jet55or65_duplicate_events_loop_run_lumi_event_$endfile.txt ../../Output/.
