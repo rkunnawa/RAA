@@ -179,24 +179,24 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   TH1F *Jet65_only = (TH1F*)fin->Get("hJet65_only");
   
   TH1F *Jet55_trg = (TH1F*)fin->Get("hJet55_trg");
-  TH1F *Jet55_trg_QA1 = (TH1F*)fin->Get("hJet55_trg_QA1");
-  TH1F *Jet55_trg_QA2_a = (TH1F*)fin->Get("hJet55_trg_QA2_a");
-  TH1F *Jet55_trg_QA2_b = (TH1F*)fin->Get("hJet55_trg_QA2_b");
-  TH1F *Jet55_trg_QA3 = (TH1F*)fin->Get("hJet55_trg_QA3");
-  TH1F *Jet55_trg_QA4 = (TH1F*)fin->Get("hJet55_trg_QA4");
-  TH1F *Jet55_trg_QA1_2b = (TH1F*)fin->Get("hJet55_trg_QA1_2b");
-  TH1F *Jet65_trg = (TH1F*)fin->Get("hJet65_trg_QA1");
-  TH1F *Jet65_trg_QA1 = (TH1F*)fin->Get("hJet65_trg_QA1");
-  TH1F *Jet65_trg_QA2_a = (TH1F*)fin->Get("hJet65_trg_QA2_a");
-  TH1F *Jet65_trg_QA2_b = (TH1F*)fin->Get("hJet65_trg_QA2_b");
-  TH1F *Jet65_trg_QA3 = (TH1F*)fin->Get("hJet65_trg_QA3");
-  TH1F *Jet65_trg_QA4 = (TH1F*)fin->Get("hJet65_trg_QA4");
-  TH1F *Jet65_trg_QA1_2b = (TH1F*)fin->Get("hJet65_trg_QA1_2b");
+  TH1F *Jet55_QA1 = (TH1F*)fin->Get("hJet55_QA1");
+  TH1F *Jet55_QA2_a = (TH1F*)fin->Get("hJet55_QA2_a");
+  TH1F *Jet55_QA2_b = (TH1F*)fin->Get("hJet55_QA2_b");
+  TH1F *Jet55_QA3 = (TH1F*)fin->Get("hJet55_QA3");
+  TH1F *Jet55_QA4 = (TH1F*)fin->Get("hJet55_QA4");
+  TH1F *Jet55_QA1_2b = (TH1F*)fin->Get("hJet55_QA1_2b");
+  TH1F *Jet65_trg = (TH1F*)fin->Get("hJet65_QA1");
+  TH1F *Jet65_QA1 = (TH1F*)fin->Get("hJet65_QA1");
+  TH1F *Jet65_QA2_a = (TH1F*)fin->Get("hJet65_QA2_a");
+  TH1F *Jet65_QA2_b = (TH1F*)fin->Get("hJet65_QA2_b");
+  TH1F *Jet65_QA3 = (TH1F*)fin->Get("hJet65_QA3");
+  TH1F *Jet65_QA4 = (TH1F*)fin->Get("hJet65_QA4");
+  TH1F *Jet65_QA1_2b = (TH1F*)fin->Get("hJet65_QA1_2b");
 
-  TH1F *Jet55_trg_QA1_3 = (TH1F*)fin->Get("hJet55_trg_QA1_3"); 
-  TH1F *Jet65_trg_QA1_3 = (TH1F*)fin->Get("hJet65_trg_QA1_3");
+  TH1F *Jet55_QA1_3 = (TH1F*)fin->Get("hJet55_QA1_3"); 
+  TH1F *Jet65_QA1_3 = (TH1F*)fin->Get("hJet65_QA1_3");
 
-  //TH1F *Jet55_trg_QA2_3 = (TH1F*)fin
+  //TH1F *Jet55_QA2_3 = (TH1F*)fin
  
   TH1F *Jet55_QA1_3 = (TH1F*)fin->Get("hJet55_QA1_3"); 
   TH1F *Jet65_QA1_3 = (TH1F*)fin->Get("hJet65_QA1_3");
@@ -292,21 +292,29 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   Jet55_QA1->SetMarkerStyle(24);
   Jet55_QA1->Draw("same");
 
-  Jet55_QA2->SetMarkerColor(3);
-  Jet55_QA2->SetMarkerStyle(25);
-  Jet55_QA2->Draw("same");
+  Jet55_QA2_a->SetMarkerColor(3);
+  Jet55_QA2_a->SetMarkerStyle(25);
+  Jet55_QA2_a->Draw("same");
 
-  Jet55_QA3->SetMarkerColor(4);
-  Jet55_QA3->SetMarkerStyle(27);
+  Jet55_QA2_b->SetMarkerColor(4);
+  Jet55_QA2_b->SetMarkerStyle(27);
+  Jet55_QA2_b->Draw("same");
+
+  Jet55_QA3->SetMarkerColor(5);
+  Jet55_QA3->SetMarkerStyle(28);
   Jet55_QA3->Draw("same");
 
-  Jet55_QA1_2->SetMarkerColor(5);
-  Jet55_QA1_2->SetMarkerStyle(28);
-  Jet55_QA1_2->Draw("same");
+  Jet55_QA4->SetMarkerColor(6);
+  Jet55_QA4->SetMarkerStyle(30);
+  Jet55_QA4->Draw("same");
 
-  Jet55_QA1_3->SetMarkerColor(6);
-  Jet55_QA1_3->SetMarkerStyle(30);
-  Jet55_QA1_3->Draw("same");
+  //Jet55_QA1_2->SetMarkerColor(6);
+  //Jet55_QA1_2->SetMarkerStyle(28);
+  //Jet55_QA1_2->Draw("same");
+
+  //Jet55_QA1_3->SetMarkerColor(7);
+  //Jet55_QA1_3->SetMarkerStyle(30);
+  //Jet55_QA1_3->Draw("same");
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
   drawText("HLT_HIJet55_v1",0.3,0.85,16);
@@ -316,11 +324,13 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
 
   TLegend *title3 = myLegend(0.45,0.3,0.85,0.8);
   title3->AddEntry(Jet55,"NO QA","pl");
-  title3->AddEntry(Jet55_QA1,"QA1 = #frac{chMax}{jtpt}>0.01","pl");
-  title3->AddEntry(Jet55_QA2,"QA2 = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
+  title3->AddEntry(Jet55_QA1,"QA1 = #frac{chMax}{jtpt}>0.05","pl");
+  title3->AddEntry(Jet55_QA2_a,"QA2_a = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
+  title3->AddEntry(Jet55_QA2_b,"QA2_b = #frac{chMax}{chSum}<0.975","pl");
   title3->AddEntry(Jet55_QA3,"QA3 = #frac{jtpt}{trgObjpt}<3","pl");
-  title3->AddEntry(Jet55_QA1_2,"QA1 & QA2","pl");
-  title3->AddEntry(Jet55_QA1_3,"QA1 & QA3","pl");
+  title3->AddEntry(Jet55_QA4,"QA4 = #frac{chSum+phSum+neSum+muSum+eSum}{jtpt}>1.01","pl");
+  //title3->AddEntry(Jet55_QA1_2,"QA1 & QA2","pl");
+  //title3->AddEntry(Jet55_QA1_3,"QA1 & QA3","pl");
   title3->SetTextSize(0.03);
   title3->Draw();
 
@@ -343,21 +353,29 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   Jet65_QA1->SetMarkerStyle(24);
   Jet65_QA1->Draw("same");
 
-  Jet65_QA2->SetMarkerColor(3);
-  Jet65_QA2->SetMarkerStyle(25);
-  Jet65_QA2->Draw("same");
+  Jet65_QA2_a->SetMarkerColor(3);
+  Jet65_QA2_a->SetMarkerStyle(25);
+  Jet65_QA2_a->Draw("same");
 
-  Jet65_QA3->SetMarkerColor(4);
-  Jet65_QA3->SetMarkerStyle(27);
+  Jet65_QA2_b->SetMarkerColor(4);
+  Jet65_QA2_b->SetMarkerStyle(27);
+  Jet65_QA2_b->Draw("same");
+
+  Jet65_QA3->SetMarkerColor(5);
+  Jet65_QA3->SetMarkerStyle(28);
   Jet65_QA3->Draw("same");
 
-  Jet65_QA1_2->SetMarkerColor(5);
-  Jet65_QA1_2->SetMarkerStyle(28);
-  Jet65_QA1_2->Draw("same");
+  Jet65_QA4->SetMarkerColor(6);
+  Jet65_QA4->SetMarkerStyle(30);
+  Jet65_QA4->Draw("same");
 
-  Jet65_QA1_3->SetMarkerColor(6);
-  Jet65_QA1_3->SetMarkerStyle(30);
-  Jet65_QA1_3->Draw("same");
+  //Jet65_QA1_2->SetMarkerColor(5);
+  //Jet65_QA1_2->SetMarkerStyle(28);
+  //Jet65_QA1_2->Draw("same");
+
+  //Jet65_QA1_3->SetMarkerColor(6);
+  //Jet65_QA1_3->SetMarkerStyle(30);
+  //Jet65_QA1_3->Draw("same");
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
   drawText("HLT_HIJet65_v1",0.3,0.85,16);
@@ -368,10 +386,12 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   TLegend *title4 = myLegend(0.45,0.3,0.85,0.8);
   title4->AddEntry(Jet65,"NO QA","pl");
   title4->AddEntry(Jet65_QA1,"QA1 = #frac{chMax}{jtpt}>0.01","pl");
-  title4->AddEntry(Jet65_QA2,"QA2 = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
+  title4->AddEntry(Jet65_QA2_a,"QA2_a = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
+  title4->AddEntry(Jet65_QA2_b,"QA2_b = #frac{chMax}{chSum}<0.975","pl");
   title4->AddEntry(Jet65_QA3,"QA3 = #frac{jtpt}{trgObjpt}<3","pl");
-  title4->AddEntry(Jet65_QA1_2,"QA1 & QA2","pl");
-  title4->AddEntry(Jet65_QA1_3,"QA1 & QA3","pl");
+  title4->AddEntry(Jet65_QA4,"QA4 = #frac{chSum+phSum+neSum+muSum+eSum}{jtpt}>1.01","pl");
+  //title4->AddEntry(Jet65_QA1_2,"QA1 & QA2","pl");
+  //title4->AddEntry(Jet65_QA1_3,"QA1 & QA3","pl");
   title4->SetTextSize(0.03);
   title4->Draw();
 
@@ -390,25 +410,33 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   //Jet55_trg->SetAxisRange(10,630,"X");
   Jet55_trg->Draw();
 
-  Jet55_trg_QA1->SetMarkerColor(2);
-  Jet55_trg_QA1->SetMarkerStyle(24);
-  Jet55_trg_QA1->Draw("same");
+  Jet55_QA1->SetMarkerColor(2);
+  Jet55_QA1->SetMarkerStyle(24);
+  Jet55_QA1->Draw("same");
 
-  Jet55_trg_QA2->SetMarkerColor(3);
-  Jet55_trg_QA2->SetMarkerStyle(25);
-  Jet55_trg_QA2->Draw("same");
+  Jet55_QA2_a->SetMarkerColor(3);
+  Jet55_QA2_a->SetMarkerStyle(25);
+  Jet55_QA2_a->Draw("same");
 
-  Jet55_trg_QA3->SetMarkerColor(4);
-  Jet55_trg_QA3->SetMarkerStyle(27);
-  Jet55_trg_QA3->Draw("same");
+  Jet55_QA2_b->SetMarkerColor(4);
+  Jet55_QA2_b->SetMarkerStyle(27);
+  Jet55_QA2_b->Draw("same");
 
-  Jet55_trg_QA1_2->SetMarkerColor(5);
-  Jet55_trg_QA1_2->SetMarkerStyle(28);
-  Jet55_trg_QA1_2->Draw("same");
+  Jet55_QA3->SetMarkerColor(5);
+  Jet55_QA3->SetMarkerStyle(28);
+  Jet55_QA3->Draw("same");
 
-  Jet55_trg_QA1_3->SetMarkerColor(6);
-  Jet55_trg_QA1_3->SetMarkerStyle(30);
-  Jet55_trg_QA1_3->Draw("same");
+  Jet55_QA4->SetMarkerColor(6);
+  Jet55_QA4->SetMarkerStyle(30);
+  Jet55_QA4->Draw("same");
+
+  //Jet55_QA1_2->SetMarkerColor(5);
+  //Jet55_QA1_2->SetMarkerStyle(28);
+  //Jet55_QA1_2->Draw("same");
+
+  //Jet55_QA1_3->SetMarkerColor(6);
+  //Jet55_QA1_3->SetMarkerStyle(30);
+  //Jet55_QA1_3->Draw("same");
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
   drawText("HLT_HIJet55_v1, 55<= trigObject p_{T} <65",0.3,0.85,16);
@@ -418,15 +446,17 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
 
   TLegend *title5 = myLegend(0.45,0.3,0.85,0.8);
   title5->AddEntry(Jet55_trg,"NO QA","pl");
-  title5->AddEntry(Jet55_trg_QA1,"QA1 = #frac{chMax}{jtpt}>0.01","pl");
-  title5->AddEntry(Jet55_trg_QA2,"QA2 = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
-  title5->AddEntry(Jet55_trg_QA3,"QA3 = #frac{jtpt}{trgObjpt}<3","pl");
-  title5->AddEntry(Jet55_trg_QA1_2,"QA1 & QA2","pl");
-  title5->AddEntry(Jet55_trg_QA1_3,"QA1 & QA3","pl");
+  title5->AddEntry(Jet55_QA1,"QA1 = #frac{chMax}{jtpt}>0.01","pl");
+  title5->AddEntry(Jet55_QA2_a,"QA2_a = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
+  title5->AddEntry(Jet55_QA2_b,"QA2_b = #frac{chMax}{chSum}<0.975","pl");
+  title5->AddEntry(Jet55_QA3,"QA3 = #frac{jtpt}{trgObjpt}<3","pl");
+  title5->AddEntry(Jet55_QA4,"QA4 = #frac{chSum+phSum+neSum+muSum+eSum}{jtpt}>1.01","pl");
+  //title5->AddEntry(Jet55_QA1_2,"QA1 & QA2","pl");
+  //title5->AddEntry(Jet55_QA1_3,"QA1 & QA3","pl");
   title5->SetTextSize(0.03);
   title5->Draw();
 
-  c5->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_trg_diff_QAcuts_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  c5->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_diff_QAcuts_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
 
 
   //plot 6
@@ -442,30 +472,40 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   Jet65_trg->Draw();
   //Jet65_trg->Print("base");
 
-  Jet65_trg_QA1->SetMarkerColor(2);
-  Jet65_trg_QA1->SetMarkerStyle(24);
-  Jet65_trg_QA1->Draw("same");
-  //Jet65_trg_QA1->Print("base");
+  Jet65_QA1->SetMarkerColor(2);
+  Jet65_QA1->SetMarkerStyle(24);
+  Jet65_QA1->Draw("same");
+  //Jet65_QA1->Print("base");
 
-  Jet65_trg_QA2->SetMarkerColor(3);
-  Jet65_trg_QA2->SetMarkerStyle(25);
-  Jet65_trg_QA2->Draw("same");
-  //Jet65_trg_QA2->Print("base");
+  Jet65_QA2_a->SetMarkerColor(3);
+  Jet65_QA2_a->SetMarkerStyle(25);
+  Jet65_QA2_a->Draw("same");
+  //Jet65_QA2_a->Print("base");
 
-  Jet65_trg_QA3->SetMarkerColor(4);
-  Jet65_trg_QA3->SetMarkerStyle(27);
-  Jet65_trg_QA3->Draw("same");
-  //Jet65_trg_QA3->Print("base");
+  Jet65_QA2_b->SetMarkerColor(4);
+  Jet65_QA2_b->SetMarkerStyle(27);
+  Jet65_QA2_b->Draw("same");
+  //Jet65_QA2_b->Print("base");
 
-  Jet65_trg_QA1_2->SetMarkerColor(5);
-  Jet65_trg_QA1_2->SetMarkerStyle(28);
-  Jet65_trg_QA1_2->Draw("same");
-  //Jet65_trg_QA1_2->Print("base");
+  Jet65_QA3->SetMarkerColor(5);
+  Jet65_QA3->SetMarkerStyle(28);
+  Jet65_QA3->Draw("same");
+  //Jet65_QA3->Print("base");
 
-  Jet65_trg_QA1_3->SetMarkerColor(6);
-  Jet65_trg_QA1_3->SetMarkerStyle(30);
-  Jet65_trg_QA1_3->Draw("same");
-  //Jet65_trg_QA1_3->Print("base");
+  Jet65_QA4->SetMarkerColor(6);
+  Jet65_QA4->SetMarkerStyle(30);
+  Jet65_QA4->Draw("same");
+  //Jet65_QA4->Print("base");
+
+  //Jet65_QA1_2->SetMarkerColor(5);
+  //Jet65_QA1_2->SetMarkerStyle(28);
+  //Jet65_QA1_2->Draw("same");
+  //Jet65_QA1_2->Print("base");
+
+  //Jet65_QA1_3->SetMarkerColor(6);
+  //Jet65_QA1_3->SetMarkerStyle(30);
+  //Jet65_QA1_3->Draw("same");
+  //Jet65_QA1_3->Print("base");
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
   drawText("HLT_HIJet65_v1, 65<= trigObj p_{T} <80",0.3,0.85,16);
@@ -475,15 +515,17 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
 
   TLegend *title6 = myLegend(0.45,0.3,0.85,0.8);
   title6->AddEntry(Jet65_trg,"NO QA","pl");
-  title6->AddEntry(Jet65_trg_QA1,"QA1 = #frac{chMax}{jtpt}>0.01","pl");
-  title6->AddEntry(Jet65_trg_QA2,"QA2 = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
-  title6->AddEntry(Jet65_trg_QA3,"QA3 = #frac{jtpt}{trgObjpt}<3","pl");
-  title6->AddEntry(Jet65_trg_QA1_2,"QA1 & QA2","pl");
-  title6->AddEntry(Jet65_trg_QA1_3,"QA1 & QA3","pl");
+  title6->AddEntry(Jet65_QA1,"QA1 = #frac{chMax}{jtpt}>0.01","pl");
+  title6->AddEntry(Jet65_QA2_a,"QA2_a = #frac{Max(chMax,neMax)}{Max(chSum,neSum)}<0.975","pl");
+  title6->AddEntry(Jet65_QA2_b,"QA2_b = #frac{chMax}{chSum}<0.975","pl");
+  title6->AddEntry(Jet65_QA3,"QA3 = #frac{jtpt}{trgObjpt}<3","pl");
+  title6->AddEntry(Jet65_QA4,"QA4 = #frac{chSum+phSum+neSum+muSum+eSum}{jtpt}>1.01","pl");
+  //title6->AddEntry(Jet65_QA1_2,"QA1 & QA2","pl");
+  //title6->AddEntry(Jet65_QA1_3,"QA1 & QA3","pl");
   title5->SetTextSize(0.03);
   title6->Draw();
 
-  c6->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet65_trg_diff_QAcuts_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  c6->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet65_diff_QAcuts_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
 
 
   //plot 7
@@ -506,11 +548,20 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
 
   c7->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_only_large_pt_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
 
-
-  //plot 8
-  TCanvas *c8 = new TCanvas("c8","",800,600);
   
   //make the ratio plots with QA#/noQA. 
+
+  TH1F *Ratio_Jet55_QA1 = (TH1F*)Jet55_QA1->Clone("Ratio_Jet55_QA1");
+  Ratio_Jet55_QA1->Divide(Jet55);
+  TH1F *Ratio_Jet55_QA2_a = (TH1F*)Jet55_QA2_a->Clone("Ratio_Jet55_QA2_a");
+  Ratio_Jet55_QA2_a->Divide(Jet55);
+  TH1F *Ratio_Jet55_QA2_b = (TH1F*)Jet55_QA2_b->Clone("Ratio_Jet55_QA2_b");
+  Ratio_Jet55_QA2_b->Divide(Jet55);
+  TH1F *Ratio_Jet55_QA3 = (TH1F*)Jet55_QA3->Clone("Ratio_Jet55_QA3");
+  Ratio_Jet55_QA3->Divide(Jet55);
+  TH1F *Ratio_Jet55_QA4 = (TH1F*)Jet55_QA4->Clone("Ratio_Jet55_QA4");
+  Ratio_Jet55_QA4->Divide(Jet55);
+
   TH1F *Ratio_Jet55_trg_QA1 = (TH1F*)Jet55_trg_QA1->Clone("Ratio_Jet55_trg_QA1");
   Ratio_Jet55_trg_QA1->Divide(Jet55_trg);
   TH1F *Ratio_Jet55_trg_QA2 = (TH1F*)Jet55_trg_QA2->Clone("Ratio_Jet55_trg_QA2");
@@ -524,44 +575,238 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   //TH1F *Ratio_Jet55_trg_QA3_2 = (TH1F*)Jet55_trg_QA1->Clone("Ratio_Jet55_trg_QA1");
   //Ratio_Jet55_trg_QA1->Divide(Jet55_trg);
 
-  Ratio_Jet55_trg_QA1->SetMarkerColor(2);
-  Ratio_Jet55_trg_QA1->SetMarkerStyle(24);//24,25,27,28,30
-  Ratio_Jet55_trg_QA1->SetTitle(" ");
-  Ratio_Jet55_trg_QA1->SetXTitle("Jet p_{T} (GeV/c)");
-  Ratio_Jet55_trg_QA1->SetYTitle("#frac{}{}");
-  Ratio_Jet55_trg_QA1->Draw();
+  TH1F *Ratio_Jet65_QA1 = (TH1F*)Jet65_QA1->Clone("Ratio_Jet65_QA1");
+  Ratio_Jet65_QA1->Divide(Jet65);
+  TH1F *Ratio_Jet65_QA2_a = (TH1F*)Jet65_QA2_a->Clone("Ratio_Jet65_QA2_a");
+  Ratio_Jet65_QA2_a->Divide(Jet65);
+  TH1F *Ratio_Jet65_QA2_b = (TH1F*)Jet65_QA2_b->Clone("Ratio_Jet65_QA2_b");
+  Ratio_Jet65_QA2_b->Divide(Jet65);
+  TH1F *Ratio_Jet65_QA3 = (TH1F*)Jet65_QA3->Clone("Ratio_Jet65_QA3");
+  Ratio_Jet65_QA3->Divide(Jet65);
+  TH1F *Ratio_Jet65_QA4 = (TH1F*)Jet65_QA4->Clone("Ratio_Jet65_QA4");
+  Ratio_Jet65_QA4->Divide(Jet65);
 
-  Ratio_Jet55_trg_QA2->SetMarkerColor(3);
-  Ratio_Jet55_trg_QA2->SetMarkerStyle(25);
-  Ratio_Jet55_trg_QA2->Draw("same");
+  TH1F *Ratio_Jet65_trg_QA1 = (TH1F*)Jet65_trg_QA1->Clone("Ratio_Jet65_trg_QA1");
+  Ratio_Jet65_trg_QA1->Divide(Jet65_trg);
+  TH1F *Ratio_Jet65_trg_QA2 = (TH1F*)Jet65_trg_QA2->Clone("Ratio_Jet65_trg_QA2");
+  Ratio_Jet65_trg_QA2->Divide(Jet65_trg);
+  TH1F *Ratio_Jet65_trg_QA3 = (TH1F*)Jet65_trg_QA3->Clone("Ratio_Jet65_trg_QA3");
+  Ratio_Jet65_trg_QA3->Divide(Jet65_trg);
+  TH1F *Ratio_Jet65_trg_QA1_2 = (TH1F*)Jet65_trg_QA1_2->Clone("Ratio_Jet65_trg_QA1_2");
+  Ratio_Jet65_trg_QA1_2->Divide(Jet65_trg);
+  TH1F *Ratio_Jet65_trg_QA1_3 = (TH1F*)Jet65_trg_QA1_3->Clone("Ratio_Jet65_trg_QA1_3");
+  Ratio_Jet65_trg_QA1_3->Divide(Jet65_trg);
+  //TH1F *Ratio_Jet65_trg_QA3_2 = (TH1F*)Jet65_trg_QA1->Clone("Ratio_Jet65_trg_QA1");
+  //Ratio_Jet65_trg_QA1->Divide(Jet65_trg);
 
-  Ratio_Jet55_trg_QA3->SetMarkerColor(4);
-  Ratio_Jet55_trg_QA3->SetMarkerStyle(27);
-  Ratio_Jet55_trg_QA3->Draw("same");
 
-  Ratio_Jet55_trg_QA1_2->SetMarkerColor(5);
-  Ratio_Jet55_trg_QA1_2->SetMarkerStyle(28);
-  Ratio_Jet55_trg_QA1_2->Draw("same");
+  //plot 8
+  TCanvas *c8 = new TCanvas("c8","",800,600);
+  Ratio_Jet55_QA1->SetMarkerColor(2);
+  Ratio_Jet55_QA1->SetMarkerStyle(24);//24,25,27,28,30
+  Ratio_Jet55_QA1->SetTitle(" ");
+  Ratio_Jet55_QA1->SetXTitle("Jet p_{T} (GeV/c)");
+  Ratio_Jet55_QA1->SetYTitle("#frac{QA #}{no QA}");
+  Ratio_Jet55_QA1->Draw();
 
-  Ratio_Jet55_trg_QA1_3->SetMarkerColor(6);
-  Ratio_Jet55_trg_QA1_3->SetMarkerStyle(30);
-  Ratio_Jet55_trg_QA1_3->Draw("same");
+  Ratio_Jet55_QA2_a->SetMarkerColor(3);
+  Ratio_Jet55_QA2_a->SetMarkerStyle(25);
+  Ratio_Jet55_QA2_a->Draw("same");
+
+  Ratio_Jet55_QA2_b->SetMarkerColor(4);
+  Ratio_Jet55_QA2_b->SetMarkerStyle(27);
+  Ratio_Jet55_QA2_b->Draw("same");
+
+  Ratio_Jet55_QA3->SetMarkerColor(5);
+  Ratio_Jet55_QA3->SetMarkerStyle(28);
+  Ratio_Jet55_QA3->Draw("same");
+
+  Ratio_Jet55_QA4->SetMarkerColor(6);
+  Ratio_Jet55_QA4->SetMarkerStyle(30);
+  Ratio_Jet55_QA4->Draw("same");
+
+  //Ratio_Jet55_QA1_2->SetMarkerColor(5);
+  //Ratio_Jet55_QA1_2->SetMarkerStyle(28);
+  //Ratio_Jet55_QA1_2->Draw("same");
+
+  //Ratio_Jet55_QA1_3->SetMarkerColor(6);
+  //Ratio_Jet55_QA1_3->SetMarkerStyle(30);
+  //Ratio_Jet55_QA1_3->Draw("same");
 
   TLegend *title8 = myLegend(0.45,0.3,0.85,0.8);
-  title8->AddEntry(Ratio_Jet55_trg_QA1,"QA1","pl");
-  title8->AddEntry(Ratio_Jet55_trg_QA2,"QA2","pl");
-  title8->AddEntry(Ratio_Jet55_trg_QA3,"QA2","pl");
-  title8->AddEntry(Ratio_Jet55_trg_QA1_2,"QA2","pl");
-  title8->AddEntry(Ratio_Jet55_trg_QA1_3,"QA2","pl");
+  title8->AddEntry(Ratio_Jet55_QA1,"QA1","pl");
+  title8->AddEntry(Ratio_Jet55_QA2_a,"QA2_a","pl");
+  title8->AddEntry(Ratio_Jet55_QA2_b,"QA2_b","pl");
+  title8->AddEntry(Ratio_Jet55_QA3,"QA3","pl");
+  title8->AddEntry(Ratio_Jet55_QA4,"QA4","pl");
+  //title8->AddEntry(Ratio_Jet55_QA1_2,"QA2","pl");
+  //title8->AddEntry(Ratio_Jet55_QA1_3,"QA2","pl");
   title8->SetTextSize(0.03);
   title8->Draw();
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
   putCMSPrel();
-  drawText("HLT_HIJet55_V1, 55<=trgObjpt<65",0.2,0.85,16);
+  drawText("HLT_HIJet55_v1",0.2,0.85,16);
+  drawText(Form("ak%s%dPF Jets",algo,radius),0.7,0.9,16);
+
+  c8->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_QA_ratio_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+
+
+  //plot 9
+  TCanvas *c9 = new TCanvas("c9","",800,600);
+
+  Ratio_Jet55_trg_QA1->SetMarkerColor(2);
+  Ratio_Jet55_trg_QA1->SetMarkerStyle(24);//24,25,27,28,30
+  Ratio_Jet55_trg_QA1->SetTitle(" ");
+  Ratio_Jet55_trg_QA1->SetXTitle("Jet p_{T} (GeV/c)");
+  Ratio_Jet55_trg_QA1->SetYTitle("#frac{QA #}{no QA}");
+  Ratio_Jet55_trg_QA1->Draw();
+
+  Ratio_Jet55_trg_QA2_a->SetMarkerColor(3);
+  Ratio_Jet55_trg_QA2_a->SetMarkerStyle(25);
+  Ratio_Jet55_trg_QA2_a->Draw("same");
+
+  Ratio_Jet55_trg_QA2_b->SetMarkerColor(4);
+  Ratio_Jet55_trg_QA2_b->SetMarkerStyle(27);
+  Ratio_Jet55_trg_QA2_b->Draw("same");
+
+  Ratio_Jet55_trg_QA3->SetMarkerColor(5);
+  Ratio_Jet55_trg_QA3->SetMarkerStyle(28);
+  Ratio_Jet55_trg_QA3->Draw("same");
+
+  Ratio_Jet55_trg_QA4->SetMarkerColor(6);
+  Ratio_Jet55_trg_QA4->SetMarkerStyle(30);
+  Ratio_Jet55_trg_QA4->Draw("same");
+
+  //Ratio_Jet55_trg_QA1_2->SetMarkerColor(5);
+  //Ratio_Jet55_trg_QA1_2->SetMarkerStyle(28);
+  //Ratio_Jet55_trg_QA1_2->Draw("same");
+
+  //Ratio_Jet55_trg_QA1_3->SetMarkerColor(6);
+  //Ratio_Jet55_trg_QA1_3->SetMarkerStyle(30);
+  //Ratio_Jet55_trg_QA1_3->Draw("same");
+
+  TLegend *title9 = myLegend(0.45,0.3,0.85,0.8);
+  title9->AddEntry(Ratio_Jet55_trg_QA1,"QA1","pl");
+  title9->AddEntry(Ratio_Jet55_trg_QA2_a,"QA2_a","pl");
+  title9->AddEntry(Ratio_Jet55_trg_QA2_b,"QA2_b","pl");
+  title9->AddEntry(Ratio_Jet55_trg_QA3,"QA3","pl");
+  title9->AddEntry(Ratio_Jet55_trg_QA4,"QA4","pl");
+  //title9->AddEntry(Ratio_Jet55_trg_QA1_2,"QA2","pl");
+  //title9->AddEntry(Ratio_Jet55_trg_QA1_3,"QA2","pl");
+  title9->SetTextSize(0.03);
+  title9->Draw();
+
+  drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
+  putCMSPrel();
+  drawText("HLT_HIJet55_v1, 55<=trgObjpt<65",0.2,0.85,16);
   drawText(Form("ak%s%dPF Jets",algo,radius),0.7,0.9,16);
   
-  c8->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_trig_QA_ratio_%d",radius,algo,date.GetDate()));
+  c9->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_trig_QA_ratio_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  
+
+  //plot 10
+  TCanvas *c10 = new TCanvas("c10","",800,600);
+  Ratio_Jet65_QA1->SetMarkerColor(2);
+  Ratio_Jet65_QA1->SetMarkerStyle(24);//24,25,27,28,30
+  Ratio_Jet65_QA1->SetTitle(" ");
+  Ratio_Jet65_QA1->SetXTitle("Jet p_{T} (GeV/c)");
+  Ratio_Jet65_QA1->SetYTitle("#frac{QA #}{no QA}");
+  Ratio_Jet65_QA1->Draw();
+
+  Ratio_Jet65_QA2_a->SetMarkerColor(3);
+  Ratio_Jet65_QA2_a->SetMarkerStyle(25);
+  Ratio_Jet65_QA2_a->Draw("same");
+
+  Ratio_Jet65_QA2_b->SetMarkerColor(4);
+  Ratio_Jet65_QA2_b->SetMarkerStyle(27);
+  Ratio_Jet65_QA2_b->Draw("same");
+
+  Ratio_Jet65_QA3->SetMarkerColor(5);
+  Ratio_Jet65_QA3->SetMarkerStyle(28);
+  Ratio_Jet65_QA3->Draw("same");
+
+  Ratio_Jet65_QA4->SetMarkerColor(6);
+  Ratio_Jet65_QA4->SetMarkerStyle(30);
+  Ratio_Jet65_QA4->Draw("same");
+
+  //Ratio_Jet65_QA1_2->SetMarkerColor(5);
+  //Ratio_Jet65_QA1_2->SetMarkerStyle(28);
+  //Ratio_Jet65_QA1_2->Draw("same");
+
+  //Ratio_Jet65_QA1_3->SetMarkerColor(6);
+  //Ratio_Jet65_QA1_3->SetMarkerStyle(30);
+  //Ratio_Jet65_QA1_3->Draw("same");
+
+  TLegend *title10 = myLegend(0.45,0.3,0.85,0.8);
+  title10->AddEntry(Ratio_Jet65_QA1,"QA1","pl");
+  title10->AddEntry(Ratio_Jet65_QA2_a,"QA2_a","pl");
+  title10->AddEntry(Ratio_Jet65_QA2_b,"QA2_b","pl");
+  title10->AddEntry(Ratio_Jet65_QA3,"QA3","pl");
+  title10->AddEntry(Ratio_Jet65_QA4,"QA4","pl");
+  //title10->AddEntry(Ratio_Jet65_QA1_2,"QA2","pl");
+  //title10->AddEntry(Ratio_Jet65_QA1_3,"QA2","pl");
+  title10->SetTextSize(0.03);
+  title10->Draw();
+
+  drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
+  putCMSPrel();
+  drawText("HLT_HIJet65_v1",0.2,0.85,16);
+  drawText(Form("ak%s%dPF Jets",algo,radius),0.7,0.9,16);
+
+  c10->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet65_QA_ratio_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+
+  //plot 11
+  TCanvas *c11 = new TCanvas("c11","",800,600);
+
+  Ratio_Jet65_trg_QA1->SetMarkerColor(2);
+  Ratio_Jet65_trg_QA1->SetMarkerStyle(24);//24,25,27,28,30
+  Ratio_Jet65_trg_QA1->SetTitle(" ");
+  Ratio_Jet65_trg_QA1->SetXTitle("Jet p_{T} (GeV/c)");
+  Ratio_Jet65_trg_QA1->SetYTitle("#frac{QA #}{no QA}");
+  Ratio_Jet65_trg_QA1->Draw();
+
+  Ratio_Jet65_trg_QA2_a->SetMarkerColor(3);
+  Ratio_Jet65_trg_QA2_a->SetMarkerStyle(25);
+  Ratio_Jet65_trg_QA2_a->Draw("same");
+
+  Ratio_Jet65_trg_QA2_b->SetMarkerColor(4);
+  Ratio_Jet65_trg_QA2_b->SetMarkerStyle(27);
+  Ratio_Jet65_trg_QA2_b->Draw("same");
+
+  Ratio_Jet65_trg_QA3->SetMarkerColor(5);
+  Ratio_Jet65_trg_QA3->SetMarkerStyle(28);
+  Ratio_Jet65_trg_QA3->Draw("same");
+
+  Ratio_Jet65_trg_QA4->SetMarkerColor(6);
+  Ratio_Jet65_trg_QA4->SetMarkerStyle(30);
+  Ratio_Jet65_trg_QA4->Draw("same");
+
+  //Ratio_Jet65_trg_QA1_2->SetMarkerColor(5);
+  //Ratio_Jet65_trg_QA1_2->SetMarkerStyle(28);
+  //Ratio_Jet65_trg_QA1_2->Draw("same");
+
+  //Ratio_Jet65_trg_QA1_3->SetMarkerColor(6);
+  //Ratio_Jet65_trg_QA1_3->SetMarkerStyle(30);
+  //Ratio_Jet65_trg_QA1_3->Draw("same");
+
+  TLegend *title11 = myLegend(0.45,0.3,0.85,0.8);
+  title11->AddEntry(Ratio_Jet65_trg_QA1,"QA1","pl");
+  title11->AddEntry(Ratio_Jet65_trg_QA2_a,"QA2_a","pl");
+  title11->AddEntry(Ratio_Jet65_trg_QA2_b,"QA2_b","pl");
+  title11->AddEntry(Ratio_Jet65_trg_QA3,"QA3","pl");
+  title11->AddEntry(Ratio_Jet65_trg_QA4,"QA4","pl");
+  //title11->AddEntry(Ratio_Jet65_trg_QA1_2,"QA2","pl");
+  //title11->AddEntry(Ratio_Jet65_trg_QA1_3,"QA2","pl");
+  title11->SetTextSize(0.03);
+  title11->Draw();
+
+  drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
+  putCMSPrel();
+  drawText("HLT_HIJet65_v1, 65<=trgObjpt<80",0.2,0.85,16);
+  drawText(Form("ak%s%dPF Jets",algo,radius),0.7,0.9,16);
+  
+  c11->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet65_trig_QA_ratio_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
   
 
 }
