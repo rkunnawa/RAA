@@ -151,39 +151,47 @@ using namespace std;
 
 
 void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
-
+  
   TH1::SetDefaultSumw2();
   
   TStopwatch timer;
   gStyle->SetOptStat(0);
 
   // get the file
-  TFile *fin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_Jet55or65_ak%d_%s_fakejet_histos_combined_v7.root",radius,algo));
+  TFile *fin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_Jet55or65_ak%d_%s_fakejet_histos_combined_v8.root",radius,algo));
 
   TH1F *Jet55 = (TH1F*)fin->Get("hJet55");
   TH1F *Jet55_QA1 = (TH1F*)fin->Get("hJet55_QA1");
-  TH1F *Jet55_QA2 = (TH1F*)fin->Get("hJet55_QA2");
+  TH1F *Jet55_QA2_a = (TH1F*)fin->Get("hJet55_QA2_a");
+  TH1F *Jet55_QA2_b = (TH1F*)fin->Get("hJet55_QA2_b");
   TH1F *Jet55_QA3 = (TH1F*)fin->Get("hJet55_QA3");
-  TH1F *Jet55_QA1_2 = (TH1F*)fin->Get("hJet55_QA1_2");
+  TH1F *Jet55_QA4 = (TH1F*)fin->Get("hJet55_QA4");
+  TH1F *Jet55_QA1_2b = (TH1F*)fin->Get("hJet55_QA1_2b");
   TH1F *Jet65 = (TH1F*)fin->Get("hJet65");
   TH1F *Jet65_QA1 = (TH1F*)fin->Get("hJet65_QA1");
-  TH1F *Jet65_QA2 = (TH1F*)fin->Get("hJet65_QA2");
+  TH1F *Jet65_QA2_a = (TH1F*)fin->Get("hJet65_QA2_a");
+  TH1F *Jet65_QA2_b = (TH1F*)fin->Get("hJet65_QA2_b");
   TH1F *Jet65_QA3 = (TH1F*)fin->Get("hJet65_QA3");
-  TH1F *Jet65_QA1_2 = (TH1F*)fin->Get("hJet65_QA1_2");
+  TH1F *Jet65_QA4 = (TH1F*)fin->Get("hJet65_QA4");
+  TH1F *Jet65_QA1_2b = (TH1F*)fin->Get("hJet65_QA1_2b");
   TH1F *Jet55Fake = (TH1F*)fin->Get("hJet55Fake");
   TH1F *Jet55_only = (TH1F*)fin->Get("hJet55_only");
   TH1F *Jet65_only = (TH1F*)fin->Get("hJet65_only");
   
   TH1F *Jet55_trg = (TH1F*)fin->Get("hJet55_trg");
   TH1F *Jet55_trg_QA1 = (TH1F*)fin->Get("hJet55_trg_QA1");
-  TH1F *Jet55_trg_QA2 = (TH1F*)fin->Get("hJet55_trg_QA2");
+  TH1F *Jet55_trg_QA2_a = (TH1F*)fin->Get("hJet55_trg_QA2_a");
+  TH1F *Jet55_trg_QA2_b = (TH1F*)fin->Get("hJet55_trg_QA2_b");
   TH1F *Jet55_trg_QA3 = (TH1F*)fin->Get("hJet55_trg_QA3");
-  TH1F *Jet55_trg_QA1_2 = (TH1F*)fin->Get("hJet55_trg_QA1_2");
+  TH1F *Jet55_trg_QA4 = (TH1F*)fin->Get("hJet55_trg_QA4");
+  TH1F *Jet55_trg_QA1_2b = (TH1F*)fin->Get("hJet55_trg_QA1_2b");
   TH1F *Jet65_trg = (TH1F*)fin->Get("hJet65_trg_QA1");
   TH1F *Jet65_trg_QA1 = (TH1F*)fin->Get("hJet65_trg_QA1");
-  TH1F *Jet65_trg_QA2 = (TH1F*)fin->Get("hJet65_trg_QA2");
+  TH1F *Jet65_trg_QA2_a = (TH1F*)fin->Get("hJet65_trg_QA2_a");
+  TH1F *Jet65_trg_QA2_b = (TH1F*)fin->Get("hJet65_trg_QA2_b");
   TH1F *Jet65_trg_QA3 = (TH1F*)fin->Get("hJet65_trg_QA3");
-  TH1F *Jet65_trg_QA1_2 = (TH1F*)fin->Get("hJet65_trg_QA1_2");
+  TH1F *Jet65_trg_QA4 = (TH1F*)fin->Get("hJet65_trg_QA4");
+  TH1F *Jet65_trg_QA1_2b = (TH1F*)fin->Get("hJet65_trg_QA1_2b");
 
   TH1F *Jet55_trg_QA1_3 = (TH1F*)fin->Get("hJet55_trg_QA1_3"); 
   TH1F *Jet65_trg_QA1_3 = (TH1F*)fin->Get("hJet65_trg_QA1_3");
@@ -200,6 +208,8 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   // 2) Jet66 same as above.  (2)
   // 3) look at Jet80 plots.  (maybe 2)
   // 4) particular fake plot - would have to decide on how to classify them. 
+
+  // make them all ratio plots which can show us the difference between cuts. 
 
   TDatime date;
   
