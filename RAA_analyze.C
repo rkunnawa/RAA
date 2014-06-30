@@ -14,6 +14,10 @@
 //           - Now to go ahead and check if they contain meaningful stuff. 
 //           - obviously till i get the full dataset, i cant get the lumi normalization required to add the triggers. 
 
+// June 30th - changed the names of hitograms to match what they mean. especially the unfolded ones. 
+//           - Ok there is a slight issue in the naming of histograms for the bayesian iteration unfolding. 
+//             - the histograms are called [nbins_cent][iterations] while they are saved ad [iterations][nbins_cent]
+//             - Just be careful when loading the histograms, especially in the plotting macro 
 
 #include <iostream>
 #include <stdio.h>
@@ -430,8 +434,10 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     for (int j=2;j<Iterations;j++){
       bayesianUnfold myUnfoldingSys(mPbPb_Matrix[i],hPrior,0);
       myUnfoldingSys.unfold(dPbPb_TrgComb[i],j);
-      uPbPb_BayesianIter[i][j]  = (TH1F*) myUnfoldingSys.hPrior->Clone(Form("uPbPb_bayesianIter%d_cent%d",j,i));
-      uPbPb_BayesianIter[i][j] ->Print("base");
+      uPbPb_BayesianIter[i][j]= (TH1F*) myUnfoldingSys.hPrior->Clone(Form("uPbPb_BayesianIter%d_cent%d",j,i));
+      uPbPb_BayesianIter[i][j]->Print("base");
+      if(i!=6) uPbPb_BayesianIter[i][j]->SetTitle(Form("Unfolded PbPb Bayesian iteration %d with %2.0f - %2.0f cent",j,5*boundaries_cent[i],5*boundaries_cent[i+1]));
+      else uPbPb_BayesianIter[i][j]->SetTitle(Form("Unfolded PbPb Bayesian iteration %d with 0-200 cent",j));
     }
     cout<<"passed iteration sys"<<endl;
     uPbPb_Bayes[i]        = (TH1F*) uPbPb_BayesianIter[i][BayesIter]->Clone(Form("uPbPb_Bayes_cent%i",i));
@@ -439,6 +445,13 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     //uhist[i]->hRecoSmearSys   = (TH1F*) myUnfoldingSmearSys.hPrior->Clone(Form("UnfoldedSmearSys_cent%i",i));
     //uPbPb_BinByBin[i] = (TH1F*) unfold2.Hreco();
     uPbPb_BinByBin[i]->SetName(Form("uPbPb_BinByBin_cent%i",i));
+    if(i!=6){
+      uPbPb_BinByBin[i]->SetTitle(Form("Unfolded PbPb bin by bin %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]));
+      uPbPb_Bayes[i]->SetTitle(Form("Unfolded PbPb Bayes %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]));
+    }else {
+      uPbPb_BinByBin[i]->SetTitle("Unfolded PbPb bin by bin 0-200 cent");
+      uPbPb_Bayes[i]->SetTitle("Unfolded PbPb Bayes 0-200 cent");
+    }
 
     delete hPrior;
 
@@ -595,6 +608,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     myUnfoldingSys.unfold(dPP_Comb,j);
     uPP_BayesianIter[j]  = (TH1F*) myUnfoldingSys.hPrior->Clone(Form("uPP_BayesianIter%d",j));
     uPP_BayesianIter[j]->Print("base");
+    uPP_BayesianIter[j]->SetTitle(Form("Unfolded pp Bayesian iteration %d",j));
   }
   
   uPP_Bayes        = (TH1F*) uPP_BayesianIter[BayesIter]->Clone("uPP_Bayes");
@@ -602,6 +616,9 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   //uhist[i]->hRecoSmearSys   = (TH1F*) myUnfoldingSmearSys.hPrior->Clone("UnfoldedSmearSys_cent%i",i));
   //uPP_BinByBin[i] = (TH1F*) unfold2.Hreco();
   uPP_BinByBin->SetName("uPP_BinByBin");  
+  
+  uPP_Bayes->SetTitle("Unfolded pp Bayes");
+  uPP_BinByBin->SetTitle("Unfolded pp BinByBin");
 
   delete hPriorPP;
   
@@ -671,6 +688,9 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
 
     bayesianUnfold myUnfoldingMC(mPbPb_Matrix[i],hPriorMC,0);
     myUnfoldingMC.unfold(mPbPb_mcclosure_data[i],BayesIter);
+    
+    mPbPb_mcclosure_data[i]->SetTitle(Form("PbPb MC closure test data cent%d",i));
+    mPbPb_mcclosure_data[i]->SetName(Form("mPbPb_mclosure_data_cent%d",i));
 
     cout <<"Unfolding bin "<<i<<endl;
 
@@ -683,6 +703,8 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
       myUnfoldingSys.unfold(mPbPb_mcclosure_data[i],j);
       uPbPb_MC_BayesianIter[i][j]  = (TH1F*) myUnfoldingSys.hPrior->Clone(Form("uPbPb_MC_BayesianIter%d_cent%d",j,i));
       uPbPb_MC_BayesianIter[i][j] ->Print("base");
+      if(i<6) uPbPb_MC_BayesianIter[i][j]->SetTitle(Form("Unfolded PbPb MC closure test Bayesian iteration %d with %2.0f - %2.0f cent",j,5*boundaries_cent[i],5*boundaries_cent[i+1]));
+      else uPbPb_MC_BayesianIter[i][j]->SetTitle(Form("Unfolded PbPb MC closure test Bayesian iteration %d with 0-200 cent",j));
     }
     cout<<"passed iteration sys"<<endl;
     uPbPb_MC_Bayes[i]        = (TH1F*) uPbPb_BayesianIter[i][BayesIter]->Clone(Form("uPbPb_MC_Bayes_cent%i",i));
@@ -690,6 +712,14 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     //uhist[i]->hRecoSmearSys   = (TH1F*) myUnfoldingSmearSys.hPrior->Clone(Form("UnfoldedSmearSys_cent%i",i));
     //uPbPb_BinByBin[i] = (TH1F*) unfold2.Hreco();
     uPbPb_MC_BinByBin[i]->SetName(Form("uPbPb_MC_BinByBin_cent%i",i));
+
+    if(i==6){
+      uPbPb_MC_Bayes[i]->SetTitle("Unfolded PbPb MC Closure test Bayes 0-200 cent");
+      uPbPb_MC_BinByBin[i]->SetTitle("Unfolded PbPb MC closure test BinByBin 0-200 cent");
+    }else {
+      uPbPb_MC_Bayes[i]->SetTitle(Form("Unfolded PbPb MC closure test Bayes %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]));
+      uPbPb_MC_BinByBin[i]->SetTitle(Form("Unfolded PbPb MC closure test BinByBin %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]));
+    }
 
     delete hPriorMC;
     
@@ -730,6 +760,9 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   
   bayesianUnfold myUnfoldingPPMC(mPP_Matrix,hPriorPPMC,0);
   myUnfoldingPPMC.unfold(mPP_mcclosure_data,BayesIter);
+
+  mPP_mcclosure_data->SetName("mPP_mcclosure_data");
+  mPP_mcclosure_data->SetTitle("PP mcclosure data");
   
   delete hBinByBinCorRawPPMC;
   delete hMCGenPPMC;
@@ -740,6 +773,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     myUnfoldingSys.unfold(mPP_mcclosure_data,j);
     uPP_MC_BayesianIter[j]  = (TH1F*) myUnfoldingSys.hPrior->Clone(Form("uPP_MC_BayesianIter%d",j));
     uPP_MC_BayesianIter[j]->Print("base");
+    uPP_MC_BayesianIter[j]->SetTitle(Form("Unfolded PP MC closure test iteration %d",j));
   }
   
   uPP_MC_Bayes        = (TH1F*) uPP_MC_BayesianIter[BayesIter]->Clone("uPP_MC_Bayes");
@@ -747,6 +781,9 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   //uhist[i]->hRecoSmearSys   = (TH1F*) myUnfoldingSmearSys.hPrior->Clone("UnfoldedSmearSys_cent%i",i));
   //uPP_BinByBin[i] = (TH1F*) unfold2.Hreco();
   uPP_MC_BinByBin->SetName("uPP_MC_BinByBin");  
+
+  uPP_MC_Bayes->SetTitle("Unfolded pp MC closure test Bayes");
+  uPP_MC_BinByBin->SetTitle("Unfolded pp MC closure test BinByBin");
 
   delete hPriorPPMC;
   
@@ -768,10 +805,14 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     mPbPb_ResponseNorm[i]->Write();
     mPbPb_Response[i]->Write();
     mPbPb_Matrix[i]->Write();
+    mPbPb_Gen[i]->Write();
+    mPbPb_Reco[i]->Write();
 
     uPbPb_MC_Bayes[i]->Write();
     uPbPb_MC_BinByBin[i]->Write();
-    
+
+    mPbPb_mcclosure_data[i]->Write();
+
     RAA[i]->Write();
     
     for(int j = 2;j<Iterations;j++){
@@ -784,7 +825,10 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   dPP_Comb->Write();
   mPP_ResponseNorm->Write();
   mPP_Response->Write();
+  mPP_Reco->Write();
+  mPP_Gen->Write();
   mPP_Matrix->Write();
+  mPP_mcclosure_data->Write();
   
   for(int i= 2;i<Iterations;i++){
     uPP_BayesianIter[i]->Write();
