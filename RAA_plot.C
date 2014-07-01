@@ -7,6 +7,10 @@
 
 // June 25th - just started working on the macro. will plot the iteration systematics, MC closure test, create setup for Unfolded vs measured, RAA and Normalized Response matrix plots as well. 
 
+// July 1st - finished the macro. it would have been very easy and efficient to put them all in 2 segments, 
+//            one for PbPb (with the centrality loop) and one for pp. 
+//          - But ive decided to keep it this way since we can easily delete any segments which are complete and remake any plots individually. 
+
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -115,7 +119,7 @@ void putCMSPrel(double x=0.1, double y=0.9, double size=0.04){
 }
 
 
-void putCMSSim(double x, double y, double size){
+void putCMSSim(double x=0.1, double y=0.9, double size=0.04){
 	TLatex *tex=0;
 	tex = new TLatex(x,y,"CMS Simulation");
 	tex->SetTextSize(size);
@@ -493,6 +497,10 @@ void RAA_plot(int radius = 3, char *algo = "Vs"){
   TStopwatch timer;
   timer.Start();
 
+  TDatime date;
+
+  gStyle->SetOptStat(0);
+
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
@@ -528,7 +536,9 @@ void RAA_plot(int radius = 3, char *algo = "Vs"){
   TH1F *uPP_MC_Bayes, *uPP_MC_BinByBin;
   TH1F *uPP_MC_BayesianIter[Iterations];
 
-  TH1F *RAA[nbins_cent+1];
+  TH1F *RAA_measured[nbins_cent+1];
+  TH1F *RAA_binbybin[nbins_cent+1];
+  TH1F *RAA_bayesian[nbins_cent+1];
 
   for(int i = 0;i<=nbins_cent;i++){
     
@@ -572,38 +582,129 @@ void RAA_plot(int radius = 3, char *algo = "Vs"){
 
   //Ok now that we have loaded all the histograms we need - lets start making the plots 
 
+  // line at 1
+  TLine *line = new TLine(50,1,300,1);
+  line->SetLineStyle(2);
+  line->SetLineWidth(2);
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
   //plot 1 - PbPb iteration systematics. 
   // this will be a 3 by 2 panel plot showing bayesian for PbPb. per centrality bin. 
+  // divide different unfolding iterations with iteration 4 - the nominal one. 
   TCanvas *cIterSysPbPb = new TCanvas("cIterSysPbPb","PbPb Iteration systematics",1200,800);
   makeMultiPanelCanvasWithGap(cIterSysPbPb,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
-  
-  TH1F *PbPb_iter_sys 
+ 
   for(int i = 0;i<nbins_cent;i++){
+  	cIterSysPbPb->cd(nbins_cent-i);
+
+  	TLegend *PbPb_itersys = myLegend(0.53,0.65,0.85,0.9);
+  	line->Draw();
+
+  	drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
+
+  	for(int j = 2;j<7;j++){
+  		
+  		uPbPb_BayesianIter[j][i]->Divide(uPbPb_Bayes);
+  		uPbPb_BayesianIter[j][i]->SetMarkerStyle(2);
+  		uPbPb_BayesianIter[j][i]->SetMarkerColor(j);
+  		if(j==2){
+  			makeHistTitle(uPbPb_BayesianIter[j][i]," ","Jet p_{T} (GeV/c)","Ratio (Unfolded/Nominal)");
+  			uPbPb_BayesianIter[j][i]->Draw();
+  		}else {
+  			uPbPb_BayesianIter[j][i]->Draw("same");
+  		}
+  		if(i==0) PbPb_itersys->AddEntry(uPbPb_BayesianIter[j][i],Form("Iteration %d",j),"pl");
+
+  	}
+
 
   }
+  PbPb_itersys->Draw();
 
+  cIterSysPbPb->cd(1);
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} %s Particle Flow Jets R=0.%d",algo, radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
   cIterSysPbPb->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PbPb_unfoldng_iteration_systematics_ak%d_%s_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
   //plot 2 - pp iteration systematics 
   // this is just one panel plot showing bayesian for pp. 
-  TCanvas *cIterSysPP = new TCanvas("cIterSysPP","PP Iteration systematics",800,600);
+  TCanvas *cIterSysPP = new TCanvas("cIterSysPP","PP Iteration systematics",600,400);
 
+  TLegend *PP_itersys = myLegend(0.53,0.65,0.85,0.9);
+  line->Draw();
 
+  for(int i = 2;i<7;i++){
+  	uPP_BayesianIter[i]->Divide(uPP_Bayes);
+  	uPP_BayesianIter[i]->SetMarkerStyle(2);
+  	uPP_BayesianIter[i]->SetMarkerColor(i);
+  	if(i==2){
+  		makeHistTitle(uPP_BayesianIter[i]," ","Jet p_{T} (GeV/c)","Ratio (unfolded/Nominal)");
+  		uPP_BayesianIter[i]->Draw();
+  	}else uPP_BayesianIter[i]->Draw("same");
+  	PP_itersys->AddEntry(uPP_BayesianIter[i],Form("Iteration %d",i),"pl");
+  }
+
+  PP_itersys->Draw();
+
+  cIterSysPbPb->cd(1);
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} Particle Flow Jets R=0.%d", radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
   cIterSysPP->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_unfoldng_iteration_systematics_ak%d_%s_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
   //plot 3 - RAA 
-  // again this will be a 6 panel plot. 
+  // again this will be a 6 panel plot. showing measured, unfolded Bayesian, and unfolded Bin By Bin methods. 
   TCanvas *cRAA = new TCanvas("cRAA","RAA",1200,800);
   makeMultiPanelCanvasWithGap(cRAA,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
 
+  TLegend *tRAA = myLegend(0.53,0.65,0.85,0.9);
 
+  for(int i = 0;i<nbins_cent;i++){
+
+  	cRAA->cd(nbins_cent-i);
+  	drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
+
+  	RAA_measured[i]->SetMarkerColor(kBlack);
+  	RAA_measured[i]->SetMarkerStyle(24);
+  	RAA_measured[i]->Draw();
+
+  	RAA_bayesian[i]->SetMarkerColor(kRed);
+  	RAA_bayesian[i]->SetMarkerStyle(33);
+  	RAA_bayesian[i]->Draw("same");
+
+  	RAA_binbybin[i]->SetMarkerStyle(29);
+  	RAA_binbybin[i]->SetMarkerColor(kBlue);
+  	RAA_binbybin[i]->DraW("same");
+
+  	line->DraW();
+
+  }
+
+  tRAA->AddEntry(RAA_measured[0],"No Unfolding","pl");
+  tRAA->AddEntry(RAA_bayesian[0],"Bayesian","pl");
+  tRAA->AddEntry(RAA_binbybin[0],"BinbyBin","pl");
+
+  cRAA->cd(0);
+  tRAA->Draw();
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} %s Particle Flow Jets R=0.%d",algo, radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
   cRAA->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/RAA_ak%d_%s_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
-
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
   //plot 4 - PbPb MC closure test 
@@ -611,17 +712,92 @@ void RAA_plot(int radius = 3, char *algo = "Vs"){
   TCanvas *cPbPbMCclosure = new TCanvas("cPbPbMCclosure","PbPb MC closure test",1200,800);
   makeMultiPanelCanvasWithGap(cPbPbMCclosure,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
 
+  TH1F *hMCClosurePbPb_Meas[nbins_cent+1], *hMCClosurePbPb_Bayesian, *hMCClosurePbPb_BinByBin[nbins_cent+1];
+  for(int i = 0;<nbins_cent;i++){
 
+  	cPbPbMCclosure->cd(nbins_cent-i);
+  	drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
+  	hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_Reco[i]->Clone(Form("hMCClosurePbPb_Meas_cent%d",i));
+  	hMCClosurePbPb_Bayesian[i] = (TH1F*)uPbPb_MC_Bayes[i]->Clone(Form("hMCClosurePbPb_Bayesian_cent%d",i));
+  	hMCClosurePbPb_BinByBin[i] = (TH1F*)uPbPb_MC_BinByBin[i]->Clone(Form("hMCClosurePbPb_BinByBin_cent%d",i));
+
+  	hMCClosurePbPb_Meas[i]->Divide(mPbPb_mcclosure_data[i]);
+  	hMCClosurePbPb_Bayesian[i]->Divide(mPbPb_mcclosure_data[i]);
+  	hMCClosurePbPb_BinByBin[i]->Divide(mPbPb_mcclosure_data[i]);
+
+  	makeHistTitle(hMCClosurePbPb_Meas[i]," ","Jet p_{T} (GeV/c)","Reco/Truth");
+  	hMCClosurePbPb_Meas[i]->SetMarkerStyle(24);
+  	hMCClosurePbPb_Meas[i]->SetMarkerColor(kBlack);
+  	hMCClosurePbPb_Meas[i]->Draw();
+
+  	hMCClosurePbPb_Bayesian[i]->SetMarkerStyle(33);
+  	hMCClosurePbPb_Bayesian[i]->SetMarkerColor(kRed);
+  	hMCClosurePbPb_Bayesian[i]->Draw("same");
+
+  	hMCClosurePbPb_BinByBin[i]->SetMarkerColor(kBlue);
+  	hMCClosurePbPb_BinByBin[i]->SetMarkerStyle(29);
+  	hMCClosurePbPb_BinbyBin[i]->Draw("same");
+
+  	line->Draw();
+
+  }
+
+  cPbPbMCclosure->cd(1);
+  TLegend *pbpbmcclosure = myLegend(0.53,0.65,0.85,0.9);
+  pbpbmcclosure->AddEntry(hMCClosurePbPb_Meas[0],"PbPb no unfolding","pl");
+  pbpbmcclosure->AddEntry(hMCClosurePbPb_Bayesian[0],"PbPb Bayesian 4 Iter","pl");
+  pbpbmcclosure->AddEntry(hMCClosurePbPb_BinbyBin[0],"PbPb BinbyBin","pl");
+  pbpbmcclosure->Draw();
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} %s Particle Flow Jets R=0.%d",algo, radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
   cPbPbMCclosure>SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PbPb_unfoldng_mc_closure_test_ak%d_%s_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
   //plot 5 - PP MC closure test
   TCanvas * cPPMCclosure = new TCanvas("cPPMCclosure","PP MC closure test",600,400);
+  TH1F *hMCClosurePP_Meas = (TH1F*)mPP_Reco->Clone("hMCClosurePP_Meas");
+  TH1F *hMCClosurePP_Bayesian = (TH1F*)uPP_MC_Bayes->Clone("hMCClosurePP_Bayesian");
+  TH1F *hMCClosurePP_BinbyBin = (TH1F*)uPP_MC_BinByBin->Clone("hMCClosurePP_BinbyBin");
 
+  hMCClosurePP_Bayesian->Divide(mPP_mcclosure_data);
+  hMCClosurePP_Meas->Divide(mPP_mcclosure_data);
+  hMCClosurePP_BinbyBin->Divide(mPP_mcclosure_data);
 
+  makeHistTitle(hMCClosurePP_Meas," ","Jet p_{T} (GeV/c)","Reco/Truth");
+  hMCClosurePP_Meas->SetAxisRange(50,300,"X");
+  hMCClosurePP_Meas->SetAxisRange(0,2,"Y");
 
-  cPPMCclosure>SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_unfoldng_mc_closure_test_ak%d_%s_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  hMCClosurePP_Meas->SetMarkerStyle(24);
+  hMCClosurePP_Meas->SetMarkerColor(kBlack);
+  hMCClosurePP_Meas->Draw();
+
+  hMCClosurePP_Bayesian->SetMarkerStyle(33);
+  hMCClosurePP_Bayesian->SetMarkerColor(kRed);
+  hMCClosurePP_Bayesian->Draw("same");
+
+  hMCClosurePP_BinbyBin->SetMarkerStyle(29);
+  hMCClosurePP_BinbyBin->SetMarkerColor(kBlue);
+  hMCClosurePP_BinbyBin->Draw("same");
+
+  line->Draw();
+
+  TLegend *ppmcclosure = myLegend(0.53,0.65,0.85,0.9);
+  ppmcclosure->AddEntry(hMCClosurePP_Meas,"pp no unfolding","pl");
+  ppmcclosure->AddEntry(hMCClosurePP_Bayesian,"pp Bayesian","pl");
+  ppmcclosure->AddEntry(hMCClosurePP_BinbyBin,"pp BinbyBin","pl");
+  ppmcclosure->Draw();
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} Particle Flow Jets R=0.%d",radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,22);
+  
+  cPPMCclosure>SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_unfoldng_mc_closure_test_ak%d_%d.pdf",radius,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
   //plot 6 - data vs MC for PbPb 
@@ -630,23 +806,196 @@ void RAA_plot(int radius = 3, char *algo = "Vs"){
   TCanvas *cPbPb_data_vs_mc = new TCanvas("cPbPb_data_vs_mc","PbPb data vs mc",1200,800);
   makeMultiPanelCanvasWithGap(cPbPb_data_vs_mc,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
 
+  TH1F *PbPb_meas_vs_mc[nbins_cent+1];
+  TH1F *PbPb_unfo_vs_mc[nbins_cent+1];
 
+  for(int i = 0;i<nbins_cent;i++){
 
+  	cPbPb_data_vs_mc->cd(nbins_cent-i);
+
+  	PbPb_meas_vs_mc[i] = (TH1F*)dPbPb_TrgComb[i]->Clone("PbPb_meas_vs_mc");
+  	PbPb_unfo_vs_mc[i] = (TH1F*)uPbPb_Bayes[i]->Clone("PbPb_unfo_vs_mc");
+
+  	PbPb_meas_vs_mc[i]->Divide(mPbPb_Reco[i]);
+  	PbPb_unfo_vs_mc[i]->Divide(mPbPb_Reco[i]);
+
+  	makeHistTitle(PbPb_meas_vs_mc[i]," ","Jet p_{T} (GeV/c)", "data/mc");
+  	PbPb_meas_vs_mc[i]->SetMarkerStyle(25);
+  	PbPb_meas_vs_mc[i]->SetMarkerColor(kBlack);
+  	PbPb_meas_vs_mc[i]->Draw();
+
+  	PbPb_unfo_vs_mc[i]->SetMarkerStyle(27);
+  	PbPb_unfo_vs_mc[i]->SetMarkerColor(kBlue);
+  	PbPb_unfo_vs_mc[i]->Draw("same");
+
+  	line->Draw();
+
+  	drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
+
+  }
+
+  cPbPb_data_vs_mc->cd(1);
+  TLegend *PbPb_datavsmc = myLegend(0.53,0.65,0.85,0.9);
+  PbPb_datavsmc->AddEntry(PbPb_meas_vs_mc,"no unfolding","pl");
+  PbPb_datavsmc->AddEntry(PbPb_unfo_vs_mc,"Bayesian 4 Iter","pl");
+  PbPb_datavsmc->Draw();
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} %s Particle Flow Jets R=0.%d",algo, radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
   cPbPb_data_vs_mc->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PbPb_data_vs_mc_ak%d_%s_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
   //plot7 - data vs MC for pp
   // made similar to above. 
-  TCanvas *cPP_data_vs_mc = new TCanvas("cPP_data_vs_mc","PP data vs MC",1200,800);
+  TCanvas *cPP_data_vs_mc = new TCanvas("cPP_data_vs_mc","PP data vs MC",600,400);
+
+  TH1F *PP_meas_vs_mc = (TH1F*)dPP_Comb->Clone("PP_meas_vs_mc");
+  TH1F *PP_unfo_vs_mc = (TH1F*)uPP_Bayes->Clone("PP_unfo_vs_mc");
+
+  PP_meas_vs_mc->Divide(mPP_Reco);
+  PP_unfo_vs_mc->Divide(mPP_Reco);
+
+  makeHistTitle(PP_meas_vs_mc," ","Jet p_{T} (GeV/c)","data/mc");
+  PP_meas_vs_mc->SetMarkerStyle(25);
+  PP_meas_vs_mc->SetMarkerColor(kBlack);
+  PP_meas_vs_mc->Draw();
+  PP_unfo_vs_mc->SetMarkerStyle(27);
+  PP_unfo_vs_mc->SetMarkerColor(kBlue);
+  PP_unfo_vs_mc->Draw("same");
+
+  line->Draw();
+
+  TLegend *PP_datavsmc = myLegend(0.53,0.65,0.85,0.9);
+  PP_datavsmc->AddEntry(PP_meas_vs_mc,"no unfolding","pl");
+  PP_datavsmc->AddEntry(PP_unfo_vs_mc,"Bayesian 4 Iter","pl");
+  PP_datavsmc->SetTextSize(0.02);
+  PP_datavsmc->Draw();
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} Particle Flow Jets R=0.%d",radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+
+  cPP_data_vs_mc->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_data_vs_mc_ak%d_%d.pdf",radius,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+  //plot8 - normalized Response Matrix for PbPb. 
+  TCanvas *cPbPb_NormResMat = new TCanvas("cPbPb_NormResMat","Normalized Response Matrix for PbPb",1200,800);
+  makeMultiPanelCanvasWithGap(cPbPb_NormResMat,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+
+  for(int i = 0;i<nbins_cent;i++){
+  	cPbPb_NormResMat->cd(nbins_cent-i);
+
+  	makeHistTitle(mPbPb_ResponseNorm[i]," ","Gen p_{T} (GeV/c)","Reco p_{T} (GeV/c)");
+  	drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
+
+  	mPbPb_ResponseNorm[i]->SetAxisRange(1e-10,1,"Z");
+  	mPbPb_ResponseNorm[i]->Draw("colz");
+
+  }
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} Particle Flow %s Jets R=0.%d",algo,radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cPbPb_NormResMat->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PbPb_normalized_response_matrix_ak%d_%s_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+  //plot9 - normalized response matrix for pp
+  TCanvas *cPP_NormResMat = new TCanvas("cPP_NormResMat","Normalized Response Matrix fr PP",600,400);
 
-  cPP_data_vs_mc->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_data_vs_mc_ak%d_%s_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  makeHistTitle(mPP_ResponseNorm," ","Gen p_{T} (GeV/c)","Reco p_{T} (GeV/c)");
+
+  mPP_ResponseNorm->SetAxisRange(1e-10,1,"Z");
+  mPP_ResponseNorm->Draw("colz");
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} Particle Flow Jets R=0.%d",radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cPP_NormResMat->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_normalized_response_matrix_ak%d_%d.pdf",radius,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+  //plot10 - Cross section for PbPb - in proper units per centrality bin.  
+  TCanvas *cPbPb_sigma = new TCanvas("cPbPb_sigma","PbPb inclusive jet invariant cross section",1200,800);
+  makeMultiPanelCanvasWithGap(cPbPb_sigma,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+
+  for(int i = 0;i<nbins_cent;i++){
+
+  	cPbPb_sigma->cd(nbins_cent-i);
+  	cPbPb_sigma->cd(nbins_cent-i)->SetLogy();
+
+  	makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","#frac{d^2 #sigma}{d#eta dp_{T}} micro barns");
+  	dPbPb_TrgComb[i]->SetMarkerStyle(24);
+  	dPbPb_TrgComb[i]->SetMarkerColor(kBlack);
+  	dPbPb_TrgComb[i]->Draw();
+
+  	uPbPb_Bayes[i]->SetMarkerStyle(33);
+  	uPbPb_Bayes[i]->SetMarkerColor(kRed);
+  	uPbPb_Bayes[i]->DraW("same");
+
+  	uPbPb_BinByBin[i]->SetMarkerStyle(29);
+  	uPbPb_BinByBin[i]->SetMarkerColor(kBlue);
+  	uPbPb_BinByBin[i]->Draw("same");
+
+  }
+
+  cPbPb_sigma->cd(1);
+  TLegend *PbPb_sigma = myLegend(0.53,0.65,0.85,0.9);
+  PbPb_sigma->AddEntry(dPbPb_TrgComb[0],"No Unfolding","pl");
+  PbPb_sigma->AddEntry(uPbPb_Bayes[0],"Bayesian 4 Iter","pl");
+  PbPb_sigma->AddEntry(uPbPb_BinByBin[0],"BinByBin","pl");
+  PbPb_sigma->Draw();
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} Particle Flow %s Jets R=0.%d",algo,radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cPbPb_sigma->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PbPb_invariant_cross_section_ak%d_%s_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+  //plot 11 - cross section for PP 
+  TCanvas *cPP_sigma = new TCanvas("cPP_sigma","PP inclusive jet invariant cross section",600,400);
+
+  cPP_sigma->SetLogy();
+
+  makeHistTitle(dPP_Comb,"","Jet p_{T} (GeV/c)","#frac{d^2 #sigma}{d#eta dp_{T}} nano barns");
+  dPP_Comb->SetMarkerStyle(24);
+  dPP_Comb->SetMarkerColor(kBlack);
+  dPP_Comb->Draw();
+
+  uPP_Bayes->SetMarkerColor(kRed);
+  uPP_Bayes->SetMarkerStyle(33);
+  uPP_Bayes->Draw("same");
+
+  uPP_BinByBin->SetMarkerStyle(29);
+  uPP_BinByBin->SetMarkerColor(kBlue);
+  uPP_BinByBin->Draw("same");
+
+  TLegend *PP_sigma = myLegend(0.53,0.65,0.85,0.9);
+  PP_sigma->AddEntry(dPP_Comb,"No Unfolding","pl");
+  PP_sigma->AddEntry(uPP_Bayes,"Bayesian 4 Iter","pl");
+  PP_sigma->AddEntry(uPP_BinByBin,"BinByBin","pl");
+  PP_sigma->Draw();
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} Particle Flow Jets R=0.%d",radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cPbPb_sigma->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_invariant_cross_section_ak%d_%d.pdf",radius,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 
+  timer.Stop();
+  cout<<" Total time taken CPU = "<<timer.CpuTime()<<endl;
+  cout<<" Total time taken Real = "<<timer.RealTime()<<endl;
 
 
 }

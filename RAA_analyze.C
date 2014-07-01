@@ -578,7 +578,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   TH1F* hBinByBinCorPP = (TH1F*)hBinByBinCorRawPP->Clone();//functionHist(f,hBinByBinCorRaw,Form("hBinByBinCorPP");
   //TH1F* hBinByBinCor = (TH1F*)functionHist(f,hBinByBinCorRaw,Form("hBinByBinCorPP");
 
-  uPP_BinByBin = (TH1F*) dPP_Comb->Clone("uPP_BinByBinPP");
+  uPP_BinByBin = (TH1F*)dPP_Comb->Clone("uPP_BinByBin");
   uPP_BinByBin->Divide(hBinByBinCorPP);
   //      uPP_BinByBin[i] = (TH1F*) hMCReco->Clone("hRecoBinByBinPP");
   
@@ -629,14 +629,20 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   // and just divide each other. 
   // RAA = dsigma ^PbPb / dp_T deta / ncoll * dsigma ^PP / dp_T deta
   
-  TH1F* RAA[nbins_cent+1];
+  TH1F *RAA_bayesian[nbins_cent+1];
+  TH1F *RAA_binbybin[nbins_cent+1];
+  TH1F *RAA_measured[nbins_cent+1];
   uPP_Bayes->Scale(1./64);
   for(int i = 0;i<=nbins_cent;i++){
 
     uPbPb_Bayes[i]->Scale(1./ncoll[i]);
     uPbPb_Bayes[i]->Scale(1./7.65);
-    RAA[i] = (TH1F*)uPbPb_Bayes[i]->Clone(Form("RAA_cent%d",i));
-    RAA[i]->Divide(uPP_Bayes);
+    RAA_bayesian[i] = (TH1F*)uPbPb_Bayes[i]->Clone(Form("RAA_bayesian_cent%d",i));
+    RAA_binbybin[i] = (TH1F*)uPbPb_BinByBin[i]->Clone(Form("RAA_binbybin_cent%d",i));
+    RAA_measured[i] = (TH1F*)dPbPb_TrgComb[i]->Clone(Form("RAA_measured_cent%d",i));
+    RAA_bayesian[i]->Divide(uPP_Bayes);
+    RAA_measured[i]->Divide(dPP_Comb);
+    RAA_binbybin[i]->Divide(uPP_BinByBin);
 
   }
   
@@ -813,7 +819,9 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
 
     mPbPb_mcclosure_data[i]->Write();
 
-    RAA[i]->Write();
+    RAA_measured[i]->Write();
+    RAA_binbybin[i]->Write();
+    RAA_bayesian[i]->Write();
     
     for(int j = 2;j<Iterations;j++){
       uPbPb_BayesianIter[i][j]->Write();
