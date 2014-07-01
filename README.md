@@ -3,7 +3,7 @@ June 4th 2014
 CERN 
 
 RAA: 
-This directory is created with the wisdon obtained after attending quark matter 2014. this comes after seeing people suffer during the build up by making tons of plots with corrections after corrections and with small changes etc... all this would have killed me if i had my previous set up. hence the stark reality and the need for change. The main idea with the analysis setup which i must follow is the following steps: 
+This directory is created with the wisdom obtained attending quark matter 2014. this comes after seeing people suffer during the build up by making tons of plots with corrections after corrections and with small changes etc... all this would have killed me if i had my previous set up. hence the stark reality and the need for change. The main idea with the analysis setup which i must follow is the following steps: 
     1) Reading macro
        this macro reads in the data files and creates useful histograms like the pt and eta and what ever etc... so that we can avoid rerunning over all the files again and again. saves us a lot of time. also create root files which contain those histograms. 
     2) Analysis macro 
@@ -33,4 +33,6 @@ June 18th
   finished the analysis macro. Only have to check it with the corresponding plots which are freaking numerous to make.  
   I still need to add the plotting macro. 
 
-
+July 1st 
+  Ive added the plotting macro and the NLO comparison macro from the previous setup. need to add the macros from Gabie as soon as i get it from her. 
+  finish all the rest of the macros needed for the analysis.

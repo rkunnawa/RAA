@@ -179,28 +179,31 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   TH1F *Jet65_only = (TH1F*)fin->Get("hJet65_only");
   
   TH1F *Jet55_trg = (TH1F*)fin->Get("hJet55_trg");
-  TH1F *Jet55_QA1 = (TH1F*)fin->Get("hJet55_QA1");
-  TH1F *Jet55_QA2_a = (TH1F*)fin->Get("hJet55_QA2_a");
-  TH1F *Jet55_QA2_b = (TH1F*)fin->Get("hJet55_QA2_b");
-  TH1F *Jet55_QA3 = (TH1F*)fin->Get("hJet55_QA3");
-  TH1F *Jet55_QA4 = (TH1F*)fin->Get("hJet55_QA4");
-  TH1F *Jet55_QA1_2b = (TH1F*)fin->Get("hJet55_QA1_2b");
-  TH1F *Jet65_trg = (TH1F*)fin->Get("hJet65_QA1");
-  TH1F *Jet65_QA1 = (TH1F*)fin->Get("hJet65_QA1");
-  TH1F *Jet65_QA2_a = (TH1F*)fin->Get("hJet65_QA2_a");
-  TH1F *Jet65_QA2_b = (TH1F*)fin->Get("hJet65_QA2_b");
-  TH1F *Jet65_QA3 = (TH1F*)fin->Get("hJet65_QA3");
-  TH1F *Jet65_QA4 = (TH1F*)fin->Get("hJet65_QA4");
-  TH1F *Jet65_QA1_2b = (TH1F*)fin->Get("hJet65_QA1_2b");
+  TH1F *Jet55_trg_QA1 = (TH1F*)fin->Get("hJet55_trg_QA1");
+  TH1F *Jet55_trg_QA2_a = (TH1F*)fin->Get("hJet55_trg_QA2_a");
+  TH1F *Jet55_trg_QA2_b = (TH1F*)fin->Get("hJet55_trg_QA2_b");
+  TH1F *Jet55_trg_QA3 = (TH1F*)fin->Get("hJet55_trg_QA3");
+  TH1F *Jet55_trg_QA4 = (TH1F*)fin->Get("hJet55_trg_QA4");
+  TH1F *Jet55_trg_QA1_2b = (TH1F*)fin->Get("hJet55_trg_QA1_2b");
+  TH1F *Jet65_trg = (TH1F*)fin->Get("hJet65_trg");
+  TH1F *Jet65_trg_trg = (TH1F*)fin->Get("hJet65_trg_QA1");
+  TH1F *Jet65_trg_QA1 = (TH1F*)fin->Get("hJet65_trg_QA1");
+  TH1F *Jet65_trg_QA2_a = (TH1F*)fin->Get("hJet65_trg_QA2_a");
+  TH1F *Jet65_trg_QA2_b = (TH1F*)fin->Get("hJet65_trg_QA2_b");
+  TH1F *Jet65_trg_QA3 = (TH1F*)fin->Get("hJet65_trg_QA3");
+  TH1F *Jet65_trg_QA4 = (TH1F*)fin->Get("hJet65_trg_QA4");
+  TH1F *Jet65_trg_QA1_2b = (TH1F*)fin->Get("hJet65_trg_QA1_2b");
 
-  TH1F *Jet55_QA1_3 = (TH1F*)fin->Get("hJet55_QA1_3"); 
-  TH1F *Jet65_QA1_3 = (TH1F*)fin->Get("hJet65_QA1_3");
+  TH1F *Jet55_trg_QA1_3 = (TH1F*)fin->Get("hJet55_trg_QA1_3"); 
+  TH1F *Jet65_trg_QA1_3 = (TH1F*)fin->Get("hJet65_trg_QA1_3");
 
   //TH1F *Jet55_QA2_3 = (TH1F*)fin
  
   TH1F *Jet55_QA1_3 = (TH1F*)fin->Get("hJet55_QA1_3"); 
   TH1F *Jet65_QA1_3 = (TH1F*)fin->Get("hJet65_QA1_3");
 
+
+  
   
 
   // list of plots to make - 
@@ -239,7 +242,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   TLegend *title1 = myLegend(0.2,0.6,0.8,0.8);
   title1->AddEntry(Jet55,"HLT_HIJet55","pl");
   title1->AddEntry(Jet55_only,"HLT_HIJet55 && !HLT_HIJet65 && !HLT_HIJet80","pl");
-  title1->SetTextSize(0.03);
+  title1->SetTextSize(0.02);
   title1->Draw();
 
   c1->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_HLT_HIJet55_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
@@ -270,7 +273,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   TLegend *title2 = myLegend(0.3,0.6,0.85,0.8);
   title2->AddEntry(Jet65,"HLT_HIJet65","pl");
   title2->AddEntry(Jet65_only,"HLT_HIJet65 && !HLT_HIJet80","pl");
-  title2->SetTextSize(0.03);
+  title2->SetTextSize(0.02);
   title2->Draw();
 
   c2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_HLT_HIJet65_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
@@ -331,7 +334,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   title3->AddEntry(Jet55_QA4,"QA4 = #frac{chSum+phSum+neSum+muSum+eSum}{jtpt}>1.01","pl");
   //title3->AddEntry(Jet55_QA1_2,"QA1 & QA2","pl");
   //title3->AddEntry(Jet55_QA1_3,"QA1 & QA3","pl");
-  title3->SetTextSize(0.03);
+  title3->SetTextSize(0.02);
   title3->Draw();
 
   c3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_diff_QAcuts_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
@@ -392,7 +395,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   title4->AddEntry(Jet65_QA4,"QA4 = #frac{chSum+phSum+neSum+muSum+eSum}{jtpt}>1.01","pl");
   //title4->AddEntry(Jet65_QA1_2,"QA1 & QA2","pl");
   //title4->AddEntry(Jet65_QA1_3,"QA1 & QA3","pl");
-  title4->SetTextSize(0.03);
+  title4->SetTextSize(0.02);
   title4->Draw();
 
   c4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet65_diff_QAcuts_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
@@ -453,7 +456,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   title5->AddEntry(Jet55_QA4,"QA4 = #frac{chSum+phSum+neSum+muSum+eSum}{jtpt}>1.01","pl");
   //title5->AddEntry(Jet55_QA1_2,"QA1 & QA2","pl");
   //title5->AddEntry(Jet55_QA1_3,"QA1 & QA3","pl");
-  title5->SetTextSize(0.03);
+  title5->SetTextSize(0.02);
   title5->Draw();
 
   c5->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet55_diff_QAcuts_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
@@ -522,7 +525,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   title6->AddEntry(Jet65_QA4,"QA4 = #frac{chSum+phSum+neSum+muSum+eSum}{jtpt}>1.01","pl");
   //title6->AddEntry(Jet65_QA1_2,"QA1 & QA2","pl");
   //title6->AddEntry(Jet65_QA1_3,"QA1 & QA3","pl");
-  title5->SetTextSize(0.03);
+  title5->SetTextSize(0.02);
   title6->Draw();
 
   c6->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Plots/PbPb_Jet55or65_ak%d_%s_Jet65_diff_QAcuts_eventSel_%d.pdf",radius,algo,date.GetDate()),"RECREATE");
@@ -564,12 +567,17 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
 
   TH1F *Ratio_Jet55_trg_QA1 = (TH1F*)Jet55_trg_QA1->Clone("Ratio_Jet55_trg_QA1");
   Ratio_Jet55_trg_QA1->Divide(Jet55_trg);
-  TH1F *Ratio_Jet55_trg_QA2 = (TH1F*)Jet55_trg_QA2->Clone("Ratio_Jet55_trg_QA2");
-  Ratio_Jet55_trg_QA2->Divide(Jet55_trg);
+  TH1F *Ratio_Jet55_trg_QA2_a = (TH1F*)Jet55_trg_QA2_a->Clone("Ratio_Jet55_trg_QA2_a");
+  Ratio_Jet55_trg_QA2_a->Divide(Jet55_trg);
+  TH1F *Ratio_Jet55_trg_QA2_b = (TH1F*)Jet55_trg_QA2_b->Clone("Ratio_Jet55_trg_QA2_b");
+  Ratio_Jet55_trg_QA2_b->Divide(Jet55_trg);
   TH1F *Ratio_Jet55_trg_QA3 = (TH1F*)Jet55_trg_QA3->Clone("Ratio_Jet55_trg_QA3");
   Ratio_Jet55_trg_QA3->Divide(Jet55_trg);
-  TH1F *Ratio_Jet55_trg_QA1_2 = (TH1F*)Jet55_trg_QA1_2->Clone("Ratio_Jet55_trg_QA1_2");
-  Ratio_Jet55_trg_QA1_2->Divide(Jet55_trg);
+  TH1F *Ratio_Jet55_trg_QA4 = (TH1F*)Jet55_trg_QA4->Clone("Ratio_Jet55_trg_QA4");
+  Ratio_Jet55_trg_QA4->Divide(Jet55_trg);
+
+  TH1F *Ratio_Jet55_trg_QA1_2b = (TH1F*)Jet55_trg_QA1_2b->Clone("Ratio_Jet55_trg_QA1_2b");
+  Ratio_Jet55_trg_QA1_2b->Divide(Jet55_trg);
   TH1F *Ratio_Jet55_trg_QA1_3 = (TH1F*)Jet55_trg_QA1_3->Clone("Ratio_Jet55_trg_QA1_3");
   Ratio_Jet55_trg_QA1_3->Divide(Jet55_trg);
   //TH1F *Ratio_Jet55_trg_QA3_2 = (TH1F*)Jet55_trg_QA1->Clone("Ratio_Jet55_trg_QA1");
@@ -588,12 +596,16 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
 
   TH1F *Ratio_Jet65_trg_QA1 = (TH1F*)Jet65_trg_QA1->Clone("Ratio_Jet65_trg_QA1");
   Ratio_Jet65_trg_QA1->Divide(Jet65_trg);
-  TH1F *Ratio_Jet65_trg_QA2 = (TH1F*)Jet65_trg_QA2->Clone("Ratio_Jet65_trg_QA2");
-  Ratio_Jet65_trg_QA2->Divide(Jet65_trg);
+  TH1F *Ratio_Jet65_trg_QA2_a = (TH1F*)Jet65_trg_QA2_a->Clone("Ratio_Jet65_trg_QA2_a");
+  Ratio_Jet65_trg_QA2_a->Divide(Jet65_trg);
+  TH1F *Ratio_Jet65_trg_QA2_b = (TH1F*)Jet65_trg_QA2_b->Clone("Ratio_Jet65_trg_QA2_b");
+  Ratio_Jet65_trg_QA2_b->Divide(Jet65_trg);
   TH1F *Ratio_Jet65_trg_QA3 = (TH1F*)Jet65_trg_QA3->Clone("Ratio_Jet65_trg_QA3");
   Ratio_Jet65_trg_QA3->Divide(Jet65_trg);
-  TH1F *Ratio_Jet65_trg_QA1_2 = (TH1F*)Jet65_trg_QA1_2->Clone("Ratio_Jet65_trg_QA1_2");
-  Ratio_Jet65_trg_QA1_2->Divide(Jet65_trg);
+  TH1F *Ratio_Jet65_trg_QA4 = (TH1F*)Jet65_trg_QA4->Clone("Ratio_Jet65_trg_QA4");
+  Ratio_Jet65_trg_QA4->Divide(Jet65_trg);
+  TH1F *Ratio_Jet65_trg_QA1_2b = (TH1F*)Jet65_trg_QA1_2b->Clone("Ratio_Jet65_trg_QA1_2b");
+  Ratio_Jet65_trg_QA1_2b->Divide(Jet65_trg);
   TH1F *Ratio_Jet65_trg_QA1_3 = (TH1F*)Jet65_trg_QA1_3->Clone("Ratio_Jet65_trg_QA1_3");
   Ratio_Jet65_trg_QA1_3->Divide(Jet65_trg);
   //TH1F *Ratio_Jet65_trg_QA3_2 = (TH1F*)Jet65_trg_QA1->Clone("Ratio_Jet65_trg_QA1");
@@ -641,7 +653,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   title8->AddEntry(Ratio_Jet55_QA4,"QA4","pl");
   //title8->AddEntry(Ratio_Jet55_QA1_2,"QA2","pl");
   //title8->AddEntry(Ratio_Jet55_QA1_3,"QA2","pl");
-  title8->SetTextSize(0.03);
+  title8->SetTextSize(0.02);
   title8->Draw();
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
@@ -694,7 +706,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   title9->AddEntry(Ratio_Jet55_trg_QA4,"QA4","pl");
   //title9->AddEntry(Ratio_Jet55_trg_QA1_2,"QA2","pl");
   //title9->AddEntry(Ratio_Jet55_trg_QA1_3,"QA2","pl");
-  title9->SetTextSize(0.03);
+  title9->SetTextSize(0.02);
   title9->Draw();
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
@@ -746,7 +758,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   title10->AddEntry(Ratio_Jet65_QA4,"QA4","pl");
   //title10->AddEntry(Ratio_Jet65_QA1_2,"QA2","pl");
   //title10->AddEntry(Ratio_Jet65_QA1_3,"QA2","pl");
-  title10->SetTextSize(0.03);
+  title10->SetTextSize(0.02);
   title10->Draw();
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
@@ -798,7 +810,7 @@ void RAA_plot_fakejets(int radius = 3, char *algo = "Vs"){
   title11->AddEntry(Ratio_Jet65_trg_QA4,"QA4","pl");
   //title11->AddEntry(Ratio_Jet65_trg_QA1_2,"QA2","pl");
   //title11->AddEntry(Ratio_Jet65_trg_QA1_3,"QA2","pl");
-  title11->SetTextSize(0.03);
+  title11->SetTextSize(0.02);
   title11->Draw();
 
   drawText("pcollisionEventSelection, pHBHENoisefilter, |vz|<15 & |#eta|<2",0.2,0.8,16);
