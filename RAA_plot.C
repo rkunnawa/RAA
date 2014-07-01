@@ -963,9 +963,8 @@ void RAA_plot(int radius = 3, char *algo = "Vs"){
 
   //plot 11 - cross section for PP 
   TCanvas *cPP_sigma = new TCanvas("cPP_sigma","PP inclusive jet invariant cross section",600,400);
-
   cPP_sigma->SetLogy();
-
+  
   makeHistTitle(dPP_Comb,"","Jet p_{T} (GeV/c)","#frac{d^2 #sigma}{d#eta dp_{T}} nano barns");
   dPP_Comb->SetMarkerStyle(24);
   dPP_Comb->SetMarkerColor(kBlack);
