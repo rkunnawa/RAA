@@ -20,6 +20,33 @@
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
+#include <TH1F.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TFile.h>
+#include <TTree.h>
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TLegend.h>
+#include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TH3.h>
+#include <TFile.h>
+#include <TStyle.h>
+#include <TStopwatch.h>
+#include <TRandom3.h>
+#include <TChain.h>
+#include <TProfile.h>
+#include <TStopwatch.h>
+#include <TCut.h>
+#include <cstdlib>
+#include <cmath>
+#include "TLegend.h"
+#include "TLatex.h"
+#include "TMath.h"
+#include "TLine.h"
 
   
 //static const int nbins_pt = 29; //old bins with slight difference in the low and high pt ranges. 
@@ -51,7 +78,7 @@ static const double boundaries_eta[nbins_eta][2] = {
   {+1.0,+1.5},
   {+1.5,+2.0}
 };
-static const char[nbins_eta][256] = {
+static const char etaWidth [nbins_eta][256] = {
   "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
   "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
   "p10_eta_p15","p15_eta_p20"
@@ -60,9 +87,9 @@ static const char[nbins_eta][256] = {
 //static const int no_radius = 7;//this just has all the radii in the 
 //static const double list_radius[no_radius] = {1,2,3,4,5,6,7};
 
-//these are the only radii we are interested for the RAA analysis. 
-static const int no_radius = 4; 
-static const double list_radius[no_radius] = {2,3,4,5};
+//these are the only radii we are interested for the RAA analysis: 2,3,4,5
+static const int no_radius = 2; 
+static const int list_radius[no_radius] = {3,4};
 
 static const int nbins_cent = 6;
 static const Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 2.5 to get your actual centrality % (old 2011 data) 
@@ -268,30 +295,35 @@ void RAA_read_mc(char *algo = "Pu"){
 
   TH1F *hpp_gen[no_radius][nbins_eta];
   TH1F *hpp_reco[no_radius][nbins_eta];
-  TH1F *hpp_matrix[no_radius][nbins_eta];
+  TH2F *hpp_matrix[no_radius][nbins_eta];
   TH1F *hpp_mcclosure_data[no_radius][nbins_eta];
 
   TH1F *hCentMC[no_radius];
   
-  TH1F *hVzMC[no_radius][nbins_eta];
-  TH1F *hVzPPMC[no_radius][nbins_eta];
+  TH1F *hVzMC[no_radius];
+  TH1F *hVzPPMC[no_radius];
 
-  TH1F *hPtHat[no_radius][nbins_eta];
-  TH1F *hPtHatRaw[no_radius][nbins_eta];
-  TH1F *hPtHatPP[no_radius][nbins_eta];
-  TH1F *hPtHatRawPP[no_radius][nbins_eta];
+  TH1F *hPtHat[no_radius];
+  TH1F *hPtHatRaw[no_radius];
+  TH1F *hPtHatPP[no_radius];
+  TH1F *hPtHatRawPP[no_radius];
   
 
   for(int k = 0;k<no_radius;k++){
-
+    cout<<"radius = "<<k<<endl;
     for(int j = 0;j<nbins_eta;j++){
-
+      cout<<"eta bin = "<<j<<endl;
       for(int i = 0;i<nbins_cent;i++){
+	cout<<"cent bin = "<<i<<endl;
         hpbpb_gen[k][j][i] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Gen refpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
-	      hpbpb_reco[k][j][i] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Reco jtpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
-	      hpbpb_matrix[k][j][i] = new TH2F(Form("hpbpb_matrix_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Matrix refpt jtpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
-	      hpbpb_mcclosure_data[k][j][i] = new TH1F(Form("hpbpb_mcclosure_data_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("data for unfolding mc closure test R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
-	      //hpbpb_response[h] = new TH2F(Form("hpbpb_response_cent%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[h],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+	//cout<<"A"<<endl;
+	hpbpb_reco[k][j][i] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Reco jtpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
+	//cout<<"B"<<endl;
+	hpbpb_matrix[k][j][i] = new TH2F(Form("hpbpb_matrix_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Matrix refpt jtpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+	//cout<<"C"<<endl;
+	hpbpb_mcclosure_data[k][j][i] = new TH1F(Form("hpbpb_mcclosure_data_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("data for unfolding mc closure test R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
+	//cout<<"D"<<endl;
+	//hpbpb_response[h] = new TH2F(Form("hpbpb_response_cent%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[h],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
       }// centrality bin loop
       
       hpbpb_gen[k][j][nbins_cent] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Gen refpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
@@ -305,13 +337,13 @@ void RAA_read_mc(char *algo = "Pu"){
       hpp_matrix[k][j] = new TH2F(Form("hpp_matrix_R%d_%s",list_radius[k],etaWidth[j]),Form("matrix refpt jtpt R%d %s",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
       //TH2F* hpp_response = new TH2F("hpp_response","response jtpt refpt",1000,0,1000,1000,0,1000);
       hpp_mcclosure_data[k][j] = new TH1F(Form("hpp_mcclosure_data_R%d_%s",list_radius[k],etaWidth[j]),Form("data for unfolding mc closure test pp R%d %s",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
-
-      hVzMC[k][j] = new TH1F(Form("hVzMC_R%d_%s",list_radius[k],etaWidth[j]),Form("PbPb MC Vz R%d %s",list_radius[k],etaWidth[j]),60,-15,+15);
-      hVzPPMC[k][j] = new TH1F(Form("hVzPPMC_R%d_%s",list_radius[k],etaWidth[j]),Form("PP MC Vz R%d %s",list_radius[k],etaWidth[j]),60,-15,+15);
       
     }// eta bin loop
 
-    hCentMC[k] = new TH1F(Form("hCentMC_R%d",list_radius[k]),"",200,0,200);
+    hVzMC[k] = new TH1F(Form("hVzMC_R%d",list_radius[k]),Form("PbPb MC Vz R%d",list_radius[k]),60,-15,+15);
+    hVzPPMC[k] = new TH1F(Form("hVzPPMC_R%d",list_radius[k]),Form("PP MC Vz R%d",list_radius[k]),60,-15,+15);
+
+    hCentMC[k] = new TH1F(Form("hCentMC_R%d",list_radius[k]),"",nbins_cent,boundaries_cent);
       
     hPtHat[k] = new TH1F(Form("hPtHat_R%d",list_radius[k]),"",nbins_pthat,boundaries_pthat);
     hPtHatRaw[k] = new TH1F(Form("hPtHatRaw_R%d",list_radius[k]),"",nbins_pthat,boundaries_pthat);
@@ -327,10 +359,15 @@ void RAA_read_mc(char *algo = "Pu"){
     cout<<"Radius = "<<list_radius[k]<<endl;
     cout<<"reading all the pbpb mc files"<<endl;
     for (int h=0;h<nbins_pthat;h++) {
-      data[k][h] = new JetData(fileName_pthat[h],Form("ak%s%dPFJetAnalyzer/t",algo,list_radius[k]),Form("ak%s%dPFJetAnalyzer/t",algo,list_radius[k]),0,1); 
+      //cout<<Form("ak%s%dJetAnalyzer/t",algo,list_radius[k])<<endl;
+      data[k][h] = new JetData(fileName_pthat[h],Form("ak%s%dPFJetAnalyzer/t",algo,list_radius[k]),Form("ak%sdfPFJetAnalyzer/t",algo,list_radius[k]),0,1);
+      //cout<<"A"<<endl;
       TH1F *hPtHatTmp = new TH1F("hPtHatTmp","",nbins_pthat,boundaries_pthat);
+      //cout<<"B"<<endl;
       data[k][h]->tJet->Project("hPtHatTmp","pthat");
+      //cout<<"C"<<endl;
       hPtHatRaw[k]->Add(hPtHatTmp);
+      //cout<<"D"<<endl;
       delete hPtHatTmp;
     }// pthat loop
     cout<<"reading all the pp mc files"<<endl;
@@ -376,7 +413,7 @@ void RAA_read_mc(char *algo = "Pu"){
         //double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/entries[h];
       
         if(fabs(data[k][h]->vz)>15) continue;
-        int cBin = hCent[k]->FindBin(data[k][h]->bin)-1;
+        int cBin = hCentMC[k]->FindBin(data[k][h]->bin)-1;
         //int cBin = nbins_cent-1;
         double weight_cent=1;
         double weight_pt=1;
@@ -413,7 +450,7 @@ void RAA_read_mc(char *algo = "Pu"){
 
             //int subEvt=-1;
             if ( data[k][h]->refpt[g]  < 30. ) continue;
-            if ( data[k][h]->jteta[g]  > boundaries_eta[j][1] || data[h]->jteta[k] < boundaries_eta[j][0] ) continue;
+            if ( data[k][h]->jteta[g]  > boundaries_eta[j][1] || data[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
 	        
             // jet quality cuts here: 
             if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.05) continue;
@@ -445,7 +482,7 @@ void RAA_read_mc(char *algo = "Pu"){
 	          hpbpb_gen[k][j][nbins_cent]->Fill(data[k][h]->refpt[g],scale*weight_vz);
 	          hpbpb_reco[k][j][nbins_cent]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
 
-	          if (jentry2>data[k][h]->tJet->GetEntries()/2.) {
+	          if (jentry>data[k][h]->tJet->GetEntries()/2.) {
 	            hpbpb_mcclosure_data[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
 	            hpbpb_mcclosure_data[k][j][nbins_cent]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
 	          }
@@ -479,8 +516,8 @@ void RAA_read_mc(char *algo = "Pu"){
         //dataPP[k][h]->tGenJet->GetEntry(jentry);
         //if(dataPP[k][h]->pthat<boundariesPP_pthat[h] || dataPP[k][h]->pthat>boundariesPP_pthat[i+1]) continue;
         //if(dataPP[k][h]->bin<=28) continue;
-        int pthatBin = hPtHatPP->FindBin(dataPP[k][h]->pthat);
-        float scalepp = (xsectionPP[pthatBin-1]-xsectionPP[pthatBin])/hPtHatRawPP->GetBinContent(pthatBin);
+        int pthatBin = hPtHatPP[k]->FindBin(dataPP[k][h]->pthat);
+        float scalepp = (xsectionPP[pthatBin-1]-xsectionPP[pthatBin])/hPtHatRawPP[k]->GetBinContent(pthatBin);
         if(fabs(dataPP[k][h]->vz)>15) continue;
         double weight_cent=1;
         double weight_pt=1;
@@ -490,9 +527,9 @@ void RAA_read_mc(char *algo = "Pu"){
         weight_vz = fVzPP->Eval(dataPP[k][h]->vz);
         //if (weight_vz>5||weight_vz<0.5) cout <<dataPP[k][h]->vz<<" "<<weight_vz<<endl;
         //weight_vz = 1;
-        hPtHatPP->Fill(dataPP[k][h]->pthat,scalepp*weight_vz);
+        hPtHatPP[k]->Fill(dataPP[k][h]->pthat,scalepp*weight_vz);
         int hasLeadingJet = 0;
-        hVzPPMC->Fill(dataPP[k][h]->vz,scalepp*weight_vz);
+        hVzPPMC[k]->Fill(dataPP[k][h]->vz,scalepp*weight_vz);
         /*
 	       for (int k= 0; k < dataPP[k][h]->njets; k++) { 
 	         if ( dataPP[k][h]->jteta[k]  > 2. || dataPP[k][h]->jteta[k] < -2. ) continue;
@@ -533,7 +570,7 @@ void RAA_read_mc(char *algo = "Pu"){
   
               
             if (jentry>dataPP[k][h]->tJet->GetEntries()/2.)
-              hpp_mcclosure_data[k][j]->Fill(dataPP[k][h]->jtpt[g],scale*weight_vz);
+              hpp_mcclosure_data[k][j]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
             
           }//eta loop
 	              
