@@ -57,6 +57,10 @@ void divideBinWidth(TH1 *h)
 	h->GetYaxis()->CenterTitle();
 }
 
+static const int dir=50;
+
+//static const int nbins_pt = 29;
+
 using namespace std;
 
 
@@ -88,12 +92,12 @@ void RAA_read_data_pp(int radius = 3){
 
 
   //get all the pp spectra here: 
-  TCut pp3 = "abs(eta)<2&&jet40&&!jet60&&!jet80&&(chMax/pt)>0.01&&(TMath::Max(neMax,chMax)/TMath::Max(chSum,neSum))>=0.975";
+  TCut pp3 = "jet40&&!jet60&&!jet80&&(chMax/pt)>0.01&&(TMath::Max(neMax,chMax)/TMath::Max(chSum,neSum))>=0.975";
   
-  TH1F *hpp1 = new TH1F("hpp1","Spectra from Jet 80",1000,0,1000);
-  TH1F *hpp2 = new TH1F("hpp2","Spectra from Jet 60 & !Jet80",1000,0,1000);
-  TH1F *hpp3 = new TH1F("hpp3","Spectra from Jet 40 & !Jet60 & !Jet80",1000,0,1000);
-  TH1F *hppComb = new TH1F("hppComb","Combined spectra according to 12003 method",1000,0,1000);
+  //TH1F *hpp1 = new TH1F("hpp1","Spectra from Jet 80",1000,0,1000);
+  //TH1F *hpp2 = new TH1F("hpp2","Spectra from Jet 60 & !Jet80",1000,0,1000);
+  //TH1F *hpp3 = new TH1F("hpp3","Spectra from Jet 40 & !Jet60 & !Jet80",1000,0,1000);
+  //TH1F *hppComb = new TH1F("hppComb","Combined spectra according to 12003 method",1000,0,1000);
   
   //get the prescl factor information. 
   //Float_t presclpbpb3 = (Float_t)jetpbpb1_v2->GetEntries("jet80")/jetpbpb1_v2->GetEntries("jet55&&jet80");
@@ -109,17 +113,55 @@ void RAA_read_data_pp(int radius = 3){
 
   // because whatever cut we use in PbPb, we have to use in pp. 
 
-  jetpp1_v2->Project("hpp1","pt","abs(eta)<2&&jet80&&(chMax/pt)>0.01&&(TMath::Max(chMax,neMax)/TMath::Max(chSum,neSum))>=0.975");
-  hpp1->Print("base");
- 
-  jetpp2_v2->Project("hpp2","pt","abs(eta)<2&&jet60&&!jet80&&(chMax/pt)>0.01&&(TMath::Max(chMax,neMax)/TMath::Max(chSum,neSum))>=0.975");
-  hpp2->Print("base");
+  //dont forget to change all this: 
 
-  jetpp2_v2->Project("hpp3","pt","9.25038"*pp3);
+  //jetpp1_v2->Project("hpp1","pt","abs(eta)<2&&jet80&&(chMax/pt)>0.01&&(TMath::Max(chMax,neMax)/TMath::Max(chSum,neSum))>=0.975");
+  //hpp1->Print("base");
+ 
+  //jetpp2_v2->Project("hpp2","pt","abs(eta)<2&&jet60&&!jet80&&(chMax/pt)>0.01&&(TMath::Max(chMax,neMax)/TMath::Max(chSum,neSum))>=0.975");
+  //hpp2->Print("base");
+
+  //jetpp2_v2->Project("hpp3","pt","9.25038"*pp3);
   // 9.25038 was the value. 
   //jetpp2_v2->Project("hpp3","pt","jet40_p"*pp3);
-  hpp3->Print("base");
+  //hpp3->Print("base");
  
+  //we need to get data in the same setup the NLO files are present so for R=0.2,0.3,0.4,0.5,0.7 and for the different eta bins
+  char etaWidth[dir][256] = {
+    "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
+    "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
+    "p10_eta_p15","p15_eta_p20",
+    "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
+    "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
+    "p10_eta_p15","p15_eta_p20",
+    "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
+    "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
+    "p10_eta_p15","p15_eta_p20",
+    "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
+    "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
+    "p10_eta_p15","p15_eta_p20",
+    "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
+    "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
+    "p10_eta_p15","p15_eta_p20"
+  };
+  
+  char radius_lable[dir][256] = {
+    "R2","R2","R2","R2","R2","R2","R2","R2","R2","R2",
+    "R3","R3","R3","R3","R3","R3","R3","R3","R3","R3",
+    "R4","R4","R4","R4","R4","R4","R4","R4","R4","R4",
+    "R5","R5","R5","R5","R5","R5","R5","R5","R5","R5",
+    "R7","R7","R7","R7","R7","R7","R7","R7","R7","R7"
+  };
+  
+  TCut pp3[dir]
+
+  for(int i = 0;i<dir;i++){
+    
+    
+
+
+  }
+
   
   hpp1->Scale(1./5300e6);//pp lumi
   hpp2->Scale(1./5300e6);

@@ -7,13 +7,60 @@
 // need to follow the same cuts used in the data analysis here as well. 
 // 
 
+// July 19 - all pp histograms will have 2D arrays with [radius][eta_bin]. the PbPb histograms will be defined by 3D arrays with [radius][eta_bin][centrality]. 
+
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
 
   
-static const int nbins_pt = 29;
-static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
+//static const int nbins_pt = 29;
+//static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
+
+static const int nbins_pt = 39;
+static const double boundaries_pt[nbins_pt+1] = {
+  3, 4, 5, 7, 9, 12, 
+  15, 18, 21, 24, 28,
+  32, 37, 43, 49, 56,
+  64, 74, 84, 97, 114,
+  133, 153, 174, 196,
+  220, 245, 272, 300, 
+  330, 362, 395, 430,
+  468, 507, 548, 592,
+  638, 686, 1000 
+};
+
+static const int nbins_eta = 10;
+static const double boundaries_eta[nbins_eta+1][2] = {
+  {-1.0,+1.0},
+  {-2.0,+2.0},
+  {-2.5,-2.0},
+  {-2.0,-1.5},
+  {-1.5,-1.0},
+  {-1.0,-0.5},
+  {-0.5,+0.5},
+  {+0.5,+1.0},
+  {+1.0,+1.5},
+  {+1.5,+2.0}
+};
+
+static const char[nbins_eta][256] = {
+  "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
+  "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
+  "p10_eta_p15","p15_eta_p20"
+};
+
+//static const int no_radius = 7;
+//static const double list_radius[no_radius] = {1,2,3,4,5,6,7};
+
+//these are the only radii we are interested for the RAA analysis. 
+static const int no_radius = 4; 
+static const double list_radius[no_radius] = {2,3,4,5};
+
+static const int nbins_cent = 6;
+static const Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 2.5 to get your actual centrality % (old 2011 data) 
+//now we have to multiply by 5, since centrality goes from 0-200. 
+static const Double_t ncoll[nbins_cent] = { 1660, 1310, 745, 251, 62.8, 10.8 };
 
 //static const int nAlgos = 9;
 //static const int BinLabelN = 11;
@@ -27,94 +74,93 @@ static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74,
 // divide by bin width
 void divideBinWidth(TH1 *h)
 {
-	h->Sumw2();
-	for (int i=0;i<=h->GetNbinsX();i++)
-	{
-		Float_t val = h->GetBinContent(i);
-		Float_t valErr = h->GetBinError(i);
-		val/=h->GetBinWidth(i);
-		valErr/=h->GetBinWidth(i);
-		h->SetBinContent(i,val);
-		h->SetBinError(i,valErr);
-	}
-	h->GetXaxis()->CenterTitle();
-	h->GetYaxis()->CenterTitle();
+  h->Sumw2();
+  for (int i=0;i<=h->GetNbinsX();i++)
+    {
+      Float_t val = h->GetBinContent(i);
+      Float_t valErr = h->GetBinError(i);
+      val/=h->GetBinWidth(i);
+      valErr/=h->GetBinWidth(i);
+      h->SetBinContent(i,val);
+      h->SetBinError(i,valErr);
+    }
+  h->GetXaxis()->CenterTitle();
+  h->GetYaxis()->CenterTitle();
 }
 
 class JetData
 {
 public:
   JetData(char *fileName, char *jetTree, char *genJetTree, bool loadGenJet = 0,bool isPbPb = 0) {
-		cout <<"Open "<<fileName<<endl;
-		tFile = new TFile(fileName,"read");
-		tEvt = (TTree*)tFile->Get("hiEvtAnalyzer/HiTree");
-		tSkim = (TTree*)tFile->Get("skimanalysis/HltTree");
-		tJet = (TTree*)tFile->Get(jetTree);
-		tJet->SetBranchAddress("jtpt" , jtpt );
-		tJet->SetBranchAddress("trackMax" , trackMax );
-		tJet->SetBranchAddress("chargedMax",chargedMax);
-		tJet->SetBranchAddress("chargedSum",chargedSum);
-		tJet->SetBranchAddress("neutralMax",neutralMax);
-		tJet->SetBranchAddress("neutralSum",neutralSum);
-		tJet->SetBranchAddress("refpt", refpt);
-		tJet->SetBranchAddress("nref" ,&njets);
-		tJet->SetBranchAddress("jteta", jteta);
-		tJet->SetBranchAddress("jtm",jtmass);
-		tJet->SetBranchAddress("pthat",&pthat);
-		if (loadGenJet) tGenJet = (TTree*)tFile->Get(genJetTree);
-		if (loadGenJet) tGenJet->SetBranchAddress("ngen" ,&ngen);
-		if (loadGenJet) tGenJet->SetBranchAddress("genpt", genpt);
-		if (loadGenJet) tGenJet->SetBranchAddress("gensubid", gensubid);
-		tEvt->SetBranchAddress("hiBin",&bin);
-		tEvt->SetBranchAddress("vz",&vz);
-		tSkim->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
-		if(isPbPb) tSkim->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
-		else tSkim->SetBranchAddress("pPAcollisionEventSelectionPA",&pPAcollisionEventSelectionPA);
-		tJet->AddFriend(tEvt);
-		tJet->AddFriend(tSkim);
-	};
-	TFile *tFile;
-	TTree *tJet;
-	TTree *tGenJet;
-	TTree *tEvt;
-	TTree* tSkim;
-	float jtpt[1000];
-	float refpt[1000];
-	float jteta[1000];
-	float jtmass[1000];
-	float trackMax[1000];
-	float chargedMax[1000];
-        float neutralMax[1000];
+    cout <<"Open "<<fileName<<endl;
+    tFile = new TFile(fileName,"read");
+    tEvt = (TTree*)tFile->Get("hiEvtAnalyzer/HiTree");
+    tSkim = (TTree*)tFile->Get("skimanalysis/HltTree");
+    tJet = (TTree*)tFile->Get(jetTree);
+    tJet->SetBranchAddress("jtpt" , jtpt );
+    tJet->SetBranchAddress("trackMax" , trackMax );
+    tJet->SetBranchAddress("chargedMax",chargedMax);
+    tJet->SetBranchAddress("chargedSum",chargedSum);
+    tJet->SetBranchAddress("neutralMax",neutralMax);
+    tJet->SetBranchAddress("neutralSum",neutralSum);
+    tJet->SetBranchAddress("refpt", refpt);
+    tJet->SetBranchAddress("nref" ,&njets);
+    tJet->SetBranchAddress("jteta", jteta);
+    tJet->SetBranchAddress("jtm",jtmass);
+    tJet->SetBranchAddress("pthat",&pthat);
+    if (loadGenJet) tGenJet = (TTree*)tFile->Get(genJetTree);
+    if (loadGenJet) tGenJet->SetBranchAddress("ngen" ,&ngen);
+    if (loadGenJet) tGenJet->SetBranchAddress("genpt", genpt);
+    if (loadGenJet) tGenJet->SetBranchAddress("gensubid", gensubid);
+    tEvt->SetBranchAddress("hiBin",&bin);
+    tEvt->SetBranchAddress("vz",&vz);
+    tSkim->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
+    if(isPbPb) tSkim->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
+    else tSkim->SetBranchAddress("pPAcollisionEventSelectionPA",&pPAcollisionEventSelectionPA);
+    tJet->AddFriend(tEvt);
+    tJet->AddFriend(tSkim);
+  };
+  TFile *tFile;
+  TTree *tJet;
+  TTree *tGenJet;
+  TTree *tEvt;
+  TTree* tSkim;
+  float jtpt[1000];
+  float refpt[1000];
+  float jteta[1000];
+  float jtmass[1000];
+  float trackMax[1000];
+  float chargedMax[1000];
+  float neutralMax[1000];
   float chargedSum[1000];
   float neutralSum[1000];
-	float genpt[1000];
-	int gensubid[1000];
-	float vz;
-	float pthat;
-	int njets;
-	int ngen;
-	int bin;     
-	int pHBHENoiseFilter;
-	int pPAcollisionEventSelectionPA;
-	int pcollisionEventSelection;
+  float genpt[1000];
+  int gensubid[1000];
+  float vz;
+  float pthat;
+  int njets;
+  int ngen;
+  int bin;     
+  int pHBHENoiseFilter;
+  int pPAcollisionEventSelectionPA;
+  int pcollisionEventSelection;
 };
 
 
 using namespace std;
 
-void RAA_read_mc(int radius = 3, char *algo = "Pu"){
-   
+void RAA_read_mc(char *algo = "Pu"){
+  
   TStopwatch timer;
   timer.Start();
-
+  
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
   gStyle->SetOptStat(0);
 
-  cout<<"Running for Radius = "<< radius<<" and Algorithm is "<<algo<<endl;
+  cout<<"Running for Algorithm "<<algo<<endl;
  
-
   const int nbins_pthat = 5;
   Double_t boundaries_pthat[nbins_pthat+1];
   char *fileName_pthat[nbins_pthat+1];
@@ -208,54 +254,59 @@ void RAA_read_mc(int radius = 3, char *algo = "Pu"){
   boundariesPP_pthat[8]=1000;
   
   
-  static const int nbins_cent = 6;
-  Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 2.5 to get your actual centrality % (old 2011 data) 
-  //now we have to multiply by 5, since centrality goes from 0-200. 
-  Double_t ncoll[nbins_cent] = { 1660, 1310, 745, 251, 62.8, 10.8 };
+  // lets declare all the histograms here. 
 
-  TH1F *hpbpb_gen[nbins_cent+1],*hpbpb_reco[nbins_cent+1];
-  TH2F *hpbpb_matrix[nbins_cent+1];
+  TH1F *hpbpb_gen[no_radius][nbins_eta][nbins_cent+1],*hpbpb_reco[no_radius][nbins_eta][nbins_cent+1];
+  TH2F *hpbpb_matrix[no_radius][nbins_eta][nbins_cent+1];
   //TH2F *hpbpb_response[nbins_cent+1];
-  TH1F *hpbpb_mcclosure_data[nbins_cent+1];
+  TH1F *hpbpb_mcclosure_data[no_radius][nbins_eta][nbins_cent+1];
 
-  for(int i = 0;i<nbins_cent;i++){
+  TH1F *hpp_gen[no_radius][nbins_eta];
+  TH1F *hpp_reco[no_radius][nbins_eta];
+  TH1F *hpp_matrix[no_radius][nbins_eta];
+  TH1F *hpp_mcclosure_data[no_radius][nbins_eta];
 
-    hpbpb_gen[i] = new TH1F(Form("hpbpb_gen_cent%d",i),Form("Gen refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
-    hpbpb_reco[i] = new TH1F(Form("hpbpb_reco_cent%d",i),Form("Reco jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
-    hpbpb_matrix[i] = new TH2F(Form("hpbpb_matrix_cent%d",i),Form("Matrix refpt jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
-    hpbpb_mcclosure_data[i] = new TH1F(Form("hpbpb_mcclosure_data_cent%d",i),Form("data for unfolding mc closure test %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
-    //hpbpb_response[i] = new TH2F(Form("hpbpb_response_cent%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
-  }
+  TH1F *hCentMC[no_radius][nbins_eta];
   
-  hpbpb_gen[nbins_cent] = new TH1F(Form("hpbpb_gen_cent%d",nbins_cent),"Gen refpt 0-200 cent",nbins_pt,boundaries_pt);
-  hpbpb_reco[nbins_cent] = new TH1F(Form("hpbpb_reco_cent%d",nbins_cent),"Reco jtpt 0-200 cent",nbins_pt,boundaries_pt);
-  hpbpb_matrix[nbins_cent] = new TH2F(Form("hpbpb_matrix_cent%d",nbins_cent),"Matrix refpt jtpt 0-200 cent",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
-  hpbpb_mcclosure_data[nbins_cent] = new TH1F(Form("hpbpb_mcclosure_data_cent%d",nbins_cent),"data for unfolding mc closure test 0-200 cent",nbins_pt,boundaries_pt);
-  //hpbpb_response[nbins_cent] = new TH2F(Form("hpbpb_response_cent%d",nbins_cent),"response jtpt refpt 0-200 cent",1000,0,1000,1000,0,1000);
+  TH1F *hVzMC[no_radius][nbins_eta];
+  TH1F *hVzPPMC[no_radius][nbins_eta];
   
 
-  TH1F* hpp_gen = new TH1F("hpp_gen","gen refpt",nbins_pt,boundaries_pt);
-  TH1F* hpp_reco = new TH1F("hpp_reco","reco jtpt",nbins_pt,boundaries_pt);
-  TH2F* hpp_matrix = new TH2F("hpp_matrix","matrix refpt jtpt",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
-  //TH2F* hpp_response = new TH2F("hpp_response","response jtpt refpt",1000,0,1000,1000,0,1000);
-  TH1F* hpp_mcclosure_data = new TH1F("hpp_mcclosure_data","data for unfolding mc closure test pp",nbins_pt,boundaries_pt);
+  for(int k = 0;k<no_radius;k++){
 
-  TH1F *hCent = new TH1F("hCent","",nbins_cent,boundaries_cent);
-  TH1F *hCentData = new TH1F("hCentData","",40,0,40);
-  TH1F *hCentMC = new TH1F("hCentMC","",40,0,40);
-	
-  TH1F *hVzData = new TH1F("hVzData","",60,-15,15);
-  TH1F *hVzMC = new TH1F("hVzMC","",60,-15,15);
-  TH1F *hVzPPData = new TH1F("hVzPPData","",60,-15,15);
-  TH1F *hVzPPMC = new TH1F("hVzPPMC","",60,-15,15);
-  hCent->Sumw2();
-  hCentData->Sumw2();
-  hCentMC->Sumw2();
-  hVzData->Sumw2();
-  hVzMC->Sumw2();
-  hVzPPData->Sumw2();
-  hVzPPMC->Sumw2();
+    for(int j = 0;j<nbins_eta;j++){
+
+      for(int i = 0;i<nbins_cent;i++){
+
+	hpbpb_gen[k][j][i] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Gen refpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
+	hpbpb_reco[k][j][i] = new TH1F(Form("hpbpb_reco_cent%d",i),Form("Reco jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
+	hpbpb_matrix[k][j][i] = new TH2F(Form("hpbpb_matrix_cent%d",i),Form("Matrix refpt jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+	hpbpb_mcclosure_data[k][j][i] = new TH1F(Form("hpbpb_mcclosure_data_cent%d",i),Form("data for unfolding mc closure test %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
+	//hpbpb_response[i] = new TH2F(Form("hpbpb_response_cent%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+      }
+      
+      
+      
+      hpbpb_gen[nbins_cent] = new TH1F(Form("hpbpb_gen_cent%d",nbins_cent),"Gen refpt 0-200 cent",nbins_pt,boundaries_pt);
+      hpbpb_reco[nbins_cent] = new TH1F(Form("hpbpb_reco_cent%d",nbins_cent),"Reco jtpt 0-200 cent",nbins_pt,boundaries_pt);
+      hpbpb_matrix[nbins_cent] = new TH2F(Form("hpbpb_matrix_cent%d",nbins_cent),"Matrix refpt jtpt 0-200 cent",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+      hpbpb_mcclosure_data[nbins_cent] = new TH1F(Form("hpbpb_mcclosure_data_cent%d",nbins_cent),"data for unfolding mc closure test 0-200 cent",nbins_pt,boundaries_pt);
+      //hpbpb_response[nbins_cent] = new TH2F(Form("hpbpb_response_cent%d",nbins_cent),"response jtpt refpt 0-200 cent",1000,0,1000,1000,0,1000);
+      
   
+
+      hpp_gen[k][j] = new TH1F("hpp_gen","gen refpt",nbins_pt,boundaries_pt);
+      TH1F* hpp_reco = new TH1F("hpp_reco","reco jtpt",nbins_pt,boundaries_pt);
+      TH2F* hpp_matrix = new TH2F("hpp_matrix","matrix refpt jtpt",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+      //TH2F* hpp_response = new TH2F("hpp_response","response jtpt refpt",1000,0,1000,1000,0,1000);
+      TH1F* hpp_mcclosure_data = new TH1F("hpp_mcclosure_data","data for unfolding mc closure test pp",nbins_pt,boundaries_pt);
+      
+     
+      
+    }// eta bin loop
+
+  }// radii loop
+
   // Setup jet data branches
   JetData *data[nbins_pthat]; 
   JetData *dataPP[nbinsPP_pthat];

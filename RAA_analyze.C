@@ -19,6 +19,8 @@
 //             - the histograms are called [nbins_cent][iterations] while they are saved ad [iterations][nbins_cent]
 //             - Just be careful when loading the histograms, especially in the plotting macro 
 
+// July 19th - started adding in the radius loop and the eta bins loop. when i add in the eta loop, i might as well add in radius loop to make things run faster. 
+
 #include <iostream>
 #include <stdio.h>
 
@@ -78,12 +80,11 @@ void removeZero(TH1 *h)
 TH1F *functionHist(TF1 *f, TH1F* h,char *fHistname)
 {
   TH1F *hF = (TH1F*)h->Clone(fHistname);
-  for (int i=1;i<=h->GetNbinsX();i++)
-    {
-      double var = f->Integral(h->GetBinLowEdge(i),h->GetBinLowEdge(i+1))/h->GetBinWidth(i);
-      hF->SetBinContent(i,var);
-      hF->SetBinError(i,0);
-    }
+  for (int i=1;i<=h->GetNbinsX();i++){
+    double var = f->Integral(h->GetBinLowEdge(i),h->GetBinLowEdge(i+1))/h->GetBinWidth(i);
+    hF->SetBinContent(i,var);
+    hF->SetBinError(i,0);
+  }
   return hF;
 }
 
