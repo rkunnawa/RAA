@@ -1,6 +1,7 @@
 // Raghav Kunnawalkam Elayavalli
 // June 5th 2014
 // CERN
+// for questions or comments: raghav.k.e at CERN dot CH
 
 // 
 // read all the MC files for PbPb and pp and make the required histograms for the analysis. 
@@ -8,13 +9,20 @@
 // 
 
 // July 19 - all pp histograms will have 2D arrays with [radius][eta_bin]. the PbPb histograms will be defined by 3D arrays with [radius][eta_bin][centrality]. 
+// July 20 - the loop structure(s) are defined as follows for the several histograms 
+//            Radius    : iteration variable: k;       number of iterations: no_radius;                                 values for the radii: list_radius
+//            Eta bins  : iteration variable: j;       number of iterations: nbins_eta;                                 values of the bins  : boundaries_eta
+//            Centrality: iteration variable: i;       number of iterations: nbins_cent +1;                             values of the bins  : boundaries_cent (till nbins_cent) + 0-200 (the whole range) for the final iteration. 
+//            p_T Hats  : iteration variable: h;       number of iterations: nbins_pthat (PbPb) and nbinsPP_pthat (pp); values of the bins  : boundaries_pthat (PbPb) and boundariesPP_pthat (pp)  
+//            jets      : iteration variable: g;       number of iterations: no of jets in Data[k][h];
+//            p_T       : defined just below as nbins_pt with 39 bins. to match our NLO and jet RpA analysis bins. 
 
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
 
   
-//static const int nbins_pt = 29;
+//static const int nbins_pt = 29; //old bins with slight difference in the low and high pt ranges. 
 //static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
 
 static const int nbins_pt = 39;
@@ -31,7 +39,7 @@ static const double boundaries_pt[nbins_pt+1] = {
 };
 
 static const int nbins_eta = 10;
-static const double boundaries_eta[nbins_eta+1][2] = {
+static const double boundaries_eta[nbins_eta][2] = {
   {-1.0,+1.0},
   {-2.0,+2.0},
   {-2.5,-2.0},
@@ -43,14 +51,13 @@ static const double boundaries_eta[nbins_eta+1][2] = {
   {+1.0,+1.5},
   {+1.5,+2.0}
 };
-
 static const char[nbins_eta][256] = {
   "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
   "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
   "p10_eta_p15","p15_eta_p20"
 };
 
-//static const int no_radius = 7;
+//static const int no_radius = 7;//this just has all the radii in the 
 //static const double list_radius[no_radius] = {1,2,3,4,5,6,7};
 
 //these are the only radii we are interested for the RAA analysis. 
@@ -72,18 +79,16 @@ static const Double_t ncoll[nbins_cent] = { 1660, 1310, 745, 251, 62.8, 10.8 };
 
 
 // divide by bin width
-void divideBinWidth(TH1 *h)
-{
+void divideBinWidth(TH1 *h){
   h->Sumw2();
-  for (int i=0;i<=h->GetNbinsX();i++)
-    {
-      Float_t val = h->GetBinContent(i);
-      Float_t valErr = h->GetBinError(i);
-      val/=h->GetBinWidth(i);
-      valErr/=h->GetBinWidth(i);
-      h->SetBinContent(i,val);
-      h->SetBinError(i,valErr);
-    }
+  for (int i=0;i<=h->GetNbinsX();i++){
+    Float_t val = h->GetBinContent(i);
+    Float_t valErr = h->GetBinError(i);
+    val/=h->GetBinWidth(i);
+    valErr/=h->GetBinWidth(i);
+    h->SetBinContent(i,val);
+    h->SetBinError(i,valErr);
+  }//binsX loop 
   h->GetXaxis()->CenterTitle();
   h->GetYaxis()->CenterTitle();
 }
@@ -266,10 +271,15 @@ void RAA_read_mc(char *algo = "Pu"){
   TH1F *hpp_matrix[no_radius][nbins_eta];
   TH1F *hpp_mcclosure_data[no_radius][nbins_eta];
 
-  TH1F *hCentMC[no_radius][nbins_eta];
+  TH1F *hCentMC[no_radius];
   
   TH1F *hVzMC[no_radius][nbins_eta];
   TH1F *hVzPPMC[no_radius][nbins_eta];
+
+  TH1F *hPtHat[no_radius][nbins_eta];
+  TH1F *hPtHatRaw[no_radius][nbins_eta];
+  TH1F *hPtHatPP[no_radius][nbins_eta];
+  TH1F *hPtHatRawPP[no_radius][nbins_eta];
   
 
   for(int k = 0;k<no_radius;k++){
@@ -277,307 +287,315 @@ void RAA_read_mc(char *algo = "Pu"){
     for(int j = 0;j<nbins_eta;j++){
 
       for(int i = 0;i<nbins_cent;i++){
-
-	hpbpb_gen[k][j][i] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Gen refpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
-	hpbpb_reco[k][j][i] = new TH1F(Form("hpbpb_reco_cent%d",i),Form("Reco jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
-	hpbpb_matrix[k][j][i] = new TH2F(Form("hpbpb_matrix_cent%d",i),Form("Matrix refpt jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
-	hpbpb_mcclosure_data[k][j][i] = new TH1F(Form("hpbpb_mcclosure_data_cent%d",i),Form("data for unfolding mc closure test %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
-	//hpbpb_response[i] = new TH2F(Form("hpbpb_response_cent%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
-      }
+        hpbpb_gen[k][j][i] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Gen refpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
+	      hpbpb_reco[k][j][i] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Reco jtpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
+	      hpbpb_matrix[k][j][i] = new TH2F(Form("hpbpb_matrix_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Matrix refpt jtpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+	      hpbpb_mcclosure_data[k][j][i] = new TH1F(Form("hpbpb_mcclosure_data_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("data for unfolding mc closure test R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
+	      //hpbpb_response[h] = new TH2F(Form("hpbpb_response_cent%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[h],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+      }// centrality bin loop
       
-      
-      
-      hpbpb_gen[nbins_cent] = new TH1F(Form("hpbpb_gen_cent%d",nbins_cent),"Gen refpt 0-200 cent",nbins_pt,boundaries_pt);
-      hpbpb_reco[nbins_cent] = new TH1F(Form("hpbpb_reco_cent%d",nbins_cent),"Reco jtpt 0-200 cent",nbins_pt,boundaries_pt);
-      hpbpb_matrix[nbins_cent] = new TH2F(Form("hpbpb_matrix_cent%d",nbins_cent),"Matrix refpt jtpt 0-200 cent",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
-      hpbpb_mcclosure_data[nbins_cent] = new TH1F(Form("hpbpb_mcclosure_data_cent%d",nbins_cent),"data for unfolding mc closure test 0-200 cent",nbins_pt,boundaries_pt);
+      hpbpb_gen[k][j][nbins_cent] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Gen refpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
+      hpbpb_reco[k][j][nbins_cent] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Reco jtpt R%d %s0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
+      hpbpb_matrix[k][j][nbins_cent] = new TH2F(Form("hpbpb_matrix_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Matrix refpt jtpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+      hpbpb_mcclosure_data[k][j][nbins_cent] = new TH1F(Form("hpbpb_mcclosure_data_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("data for unfolding mc closure test R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
       //hpbpb_response[nbins_cent] = new TH2F(Form("hpbpb_response_cent%d",nbins_cent),"response jtpt refpt 0-200 cent",1000,0,1000,1000,0,1000);
-      
-  
 
-      hpp_gen[k][j] = new TH1F("hpp_gen","gen refpt",nbins_pt,boundaries_pt);
-      TH1F* hpp_reco = new TH1F("hpp_reco","reco jtpt",nbins_pt,boundaries_pt);
-      TH2F* hpp_matrix = new TH2F("hpp_matrix","matrix refpt jtpt",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+      hpp_gen[k][j] = new TH1F(Form("hpp_gen_R%d_%s",list_radius[k],etaWidth[j]),Form("gen refpt R%d %s",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
+      hpp_reco[k][j] = new TH1F(Form("hpp_reco_R%d_%s",list_radius[k],etaWidth[j]),Form("reco jtpt R%d %s",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
+      hpp_matrix[k][j] = new TH2F(Form("hpp_matrix_R%d_%s",list_radius[k],etaWidth[j]),Form("matrix refpt jtpt R%d %s",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
       //TH2F* hpp_response = new TH2F("hpp_response","response jtpt refpt",1000,0,1000,1000,0,1000);
-      TH1F* hpp_mcclosure_data = new TH1F("hpp_mcclosure_data","data for unfolding mc closure test pp",nbins_pt,boundaries_pt);
-      
-     
+      hpp_mcclosure_data[k][j] = new TH1F(Form("hpp_mcclosure_data_R%d_%s",list_radius[k],etaWidth[j]),Form("data for unfolding mc closure test pp R%d %s",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
+
+      hVzMC[k][j] = new TH1F(Form("hVzMC_R%d_%s",list_radius[k],etaWidth[j]),Form("PbPb MC Vz R%d %s",list_radius[k],etaWidth[j]),60,-15,+15);
+      hVzPPMC[k][j] = new TH1F(Form("hVzPPMC_R%d_%s",list_radius[k],etaWidth[j]),Form("PP MC Vz R%d %s",list_radius[k],etaWidth[j]),60,-15,+15);
       
     }// eta bin loop
 
+    hCentMC[k] = new TH1F(Form("hCentMC_R%d",list_radius[k]),"",200,0,200);
+      
+    hPtHat[k] = new TH1F(Form("hPtHat_R%d",list_radius[k]),"",nbins_pthat,boundaries_pthat);
+    hPtHatRaw[k] = new TH1F(Form("hPtHatRaw_R%d",list_radius[k]),"",nbins_pthat,boundaries_pthat);
+    hPtHatPP[k] = new TH1F(Form("hPtHatPP_R%d",list_radius[k]),"",nbinsPP_pthat,boundariesPP_pthat);
+    hPtHatRawPP[k] = new TH1F(Form("hPtHatRawPP_R%d",list_radius[k]),"",nbinsPP_pthat,boundariesPP_pthat);
+
   }// radii loop
 
-  // Setup jet data branches
-  JetData *data[nbins_pthat]; 
-  JetData *dataPP[nbinsPP_pthat];
-  
-  for (int i=0;i<nbins_pthat;i++) data[i] = new JetData(fileName_pthat[i],Form("ak%s%dPFJetAnalyzer/t",algo,radius),Form("ak%s%dPFJetAnalyzer/t",algo,radius),0,1);	
-  for (int i=0;i<nbinsPP_pthat;i++) dataPP[i] = new JetData(fileNamePP_pthat[i],Form("ak%dPFJetAnalyzer/t",radius),Form("ak%dPFJetAnalyzer/t",radius),0,0);
+  // Setup jet data branches - this will be 2D with [radius][pthat-file], but the histogram here is just 1D with [radius]
+  JetData *data[no_radius][nbins_pthat]; 
+  JetData *dataPP[no_radius][nbinsPP_pthat];
+  for(int k = 0;k<no_radius;k++){
+    cout<<"Radius = "<<list_radius[k]<<endl;
+    cout<<"reading all the pbpb mc files"<<endl;
+    for (int h=0;h<nbins_pthat;h++) {
+      data[k][h] = new JetData(fileName_pthat[h],Form("ak%s%dPFJetAnalyzer/t",algo,list_radius[k]),Form("ak%s%dPFJetAnalyzer/t",algo,list_radius[k]),0,1); 
+      TH1F *hPtHatTmp = new TH1F("hPtHatTmp","",nbins_pthat,boundaries_pthat);
+      data[k][h]->tJet->Project("hPtHatTmp","pthat");
+      hPtHatRaw[k]->Add(hPtHatTmp);
+      delete hPtHatTmp;
+    }// pthat loop
+    cout<<"reading all the pp mc files"<<endl;
+    for (int h=0;h<nbinsPP_pthat;h++){ 
+      dataPP[k][h] = new JetData(fileNamePP_pthat[h],Form("ak%dPFJetAnalyzer/t",list_radius[k]),Form("ak%dPFJetAnalyzer/t",list_radius[k]),0,0);
+      TH1F *hPtHatTmp = new TH1F("hPtHatTmp","",nbinsPP_pthat,boundariesPP_pthat);
+      dataPP[k][h]->tJet->Project("hPtHatTmp","pthat");
+      hPtHatRawPP[k]->Add(hPtHatTmp);
+      delete hPtHatTmp;
+    }//pthatpp loop
+  }//radius loop
 
+  // checking the histograms to see if something is filled. 
+  hPtHatRaw[1]->Print("base");
+  hPtHatRawPP[1]->Print("base");
   
-  TH1F *hPtHat = new TH1F("hPtHat","",nbins_pthat,boundaries_pthat);
-  TH1F *hPtHatRaw = new TH1F("hPtHatRaw","",nbins_pthat,boundaries_pthat);
-  TH1F *hPtHatPP = new TH1F("hPtHatPP","",nbinsPP_pthat,boundariesPP_pthat);
-  TH1F *hPtHatRawPP = new TH1F("hPtHatRawPP","",nbinsPP_pthat,boundariesPP_pthat);
-  
-  
-  cout<<"reading all the pbpb mc files"<<endl;
-  for (int i=0;i<nbins_pthat;i++) {
-    TH1F *hPtHatTmp = new TH1F("hPtHatTmp","",nbins_pthat,boundaries_pthat);
-    data[i]->tJet->Project("hPtHatTmp","pthat");
-    hPtHatRaw->Add(hPtHatTmp);
-    delete hPtHatTmp;
-  }
-  
-  
-  cout<<"reading all the pp mc files"<<endl;
-  for (int i=0;i<nbinsPP_pthat;i++) {
-    TH1F *hPtHatTmp = new TH1F("hPtHatTmp","",nbinsPP_pthat,boundariesPP_pthat);
-    dataPP[i]->tJet->Project("hPtHatTmp","pthat");
-    hPtHatRawPP->Add(hPtHatTmp);
-    delete hPtHatTmp;
-  }
-  
-  hPtHatRawPP->Print("base");
-  
-  // fill PbPb MC 
-  
-  for (int i=0;i<nbins_pthat;i++) {
-    if (xsection[i]==0) continue;
-    cout <<"Loading pthat"<<boundaries_pthat[i]
-	 <<" sample, cross section = "<<xsection[i]
-	 << Form(" pthat>%.0f&&pthat<%.0f",boundaries_pthat[i],boundaries_pthat[i+1])<<endl;
-    cout<<data[i]->tJet->GetEntries()<<endl;
-    for (Long64_t jentry2=0; jentry2<data[i]->tJet->GetEntries();jentry2++) {
-      //for (Long64_t jentry2=0; jentry2<100;jentry2++) {
+  for(int k = 0;k<no_radius;k++){
+    cout<<"Filling MC for radius = "<<list_radius[k]<<endl;
+    // fill PbPb MC 
+    cout<<"Filling PbPb MC"<<endl;
+    for (int h=0;h<nbins_pthat;h++) {
+      if (xsection[h]==0) continue;
+      cout <<"Loading pthat"<<boundaries_pthat[h]<<" sample, cross section = "<<xsection[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundaries_pthat[h],boundaries_pthat[h+1])<<endl;
+      cout<<data[k][h]->tJet->GetEntries()<<endl;
+      for (Long64_t jentry=0; jentry<data[k][h]->tJet->GetEntries();jentry++) {
+        //for (Long64_t jentry=0; jentry<100;jentry++) {
 
-      //cout<<"hi"<<endl;
-      data[i]->tEvt->GetEntry(jentry2);
-      data[i]->tJet->GetEntry(jentry2);
-      //data[i]->tGenJet->GetEntry(jentry2);
-      if(data[i]->pthat<boundaries_pthat[i] || data[i]->pthat>boundaries_pthat[i+1]) continue;
-      //remember this cut is there because there was some rediculous values of pthats of -1 in the private production forests. 
+        //cout<<"hi"<<endl;
+        data[k][h]->tEvt->GetEntry(jentry);
+        data[k][h]->tJet->GetEntry(jentry);
+        //data[k][h]->tGenJet->GetEntry(jentry);
+        if(data[k][h]->pthat<boundaries_pthat[h] || data[k][h]->pthat>boundaries_pthat[h+1]) continue;
+        //remember this cut is there because there was some rediculous values of pthats of -1 in the private production forests. 
 	
-      //if(jentry2%100==0)cout<<"pthat of that event = "<<data[i]->pthat<<endl;
+        //if(jentry%100==0)cout<<"pthat of that event = "<<data[k][h]->pthat<<endl;
       
-      int pthatBin = hPtHat->FindBin(data[i]->pthat);
-      //if(jentry2%100==0)cout<<"pthatBin = "<<pthatBin<<endl;
+        int pthatBin = hPtHat[k]->FindBin(data[k][h]->pthat);
+        //if(jentry2%100==0)cout<<"pthatBin = "<<pthatBin<<endl;
       
-      //cout<<xsection[pthatBin-1]-xsection[pthatBin]<<endl;
-      //cout<<"nentries = "<<hPtHatRaw->GetBinContent(pthatBin)<<endl;
-      double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/hPtHatRaw->GetBinContent(pthatBin);
-      //double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/entries[i];
+        //cout<<xsection[pthatBin-1]-xsection[pthatBin]<<endl;
+        //cout<<"nentries = "<<hPtHatRaw->GetBinContent(pthatBin)<<endl;
+        double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/hPtHatRaw[k]->GetBinContent(pthatBin);
+        //double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/entries[h];
       
-      if(fabs(data[i]->vz)>15) continue;
-      int cBin = hCent->FindBin(data[i]->bin)-1;
-      //int cBin = nbins_cent-1;
-      double weight_cent=1;
-      double weight_pt=1;
-      double weight_vz=1;
+        if(fabs(data[k][h]->vz)>15) continue;
+        int cBin = hCent[k]->FindBin(data[k][h]->bin)-1;
+        //int cBin = nbins_cent-1;
+        double weight_cent=1;
+        double weight_pt=1;
+        double weight_vz=1;
       
-      //weight_cent = fCentralityWeight->Eval(data[i]->bin);
-      weight_vz = fVz->Eval(data[i]->vz);
-      hCentMC->Fill(data[i]->bin,scale*weight_cent*weight_vz);
-      hVzMC->Fill(data[i]->vz,scale*weight_cent*weight_vz);
-      if (cBin>=nbins_cent) continue;
-      if (cBin==-1) continue;
-      hPtHat->Fill(data[i]->pthat,scale*weight_cent*weight_vz);
+        //weight_cent = fCentralityWeight->Eval(data[h]->bin);
+        weight_vz = fVz->Eval(data[k][h]->vz);
+        hCentMC[k]->Fill(data[k][h]->bin,scale*weight_cent*weight_vz);
+        hVzMC[k]->Fill(data[k][h]->vz,scale*weight_cent*weight_vz);
+        if (cBin>=nbins_cent) continue;
+        if (cBin==-1) continue;
+        hPtHat[k]->Fill(data[k][h]->pthat,scale*weight_cent*weight_vz);
 
-      if(scale*weight_cent*weight_vz <=0 ) cout<<"RED FLAG RED FLAG RED FLAG"<<endl;
+        if(scale*weight_cent*weight_vz <=0 ) cout<<"RED FLAG RED FLAG RED FLAG"<<endl;
       
-      //cout<<"scale = "<<scale<<endl;
+        //cout<<"scale = "<<scale<<endl;
       
-      /*
-	int hasLeadingJet = 0;
-	for (int k= 0; k < data[i]->njets; k++) { 
-	if ( data[i]->jteta[k]  > 2. || data[i]->jteta[k] < -2. ) continue;
-	if ( data[i]->jtpt[k]>100) {
-	hasLeadingJet = 1;
-	}
-	break;
+        /*
+	       int hasLeadingJet = 0;
+	       for (int k= 0; k < data[h]->njets; k++) { 
+	         if ( data[h]->jteta[k]  > 2. || data[h]->jteta[k] < -2. ) continue;
+	         if ( data[h]->jtpt[k]>100) {
+	           hasLeadingJet = 1;
+	         }
+	         break;
 				 
-	}
-	if (hasLeadingJet == 0) continue;
-      */
+	       }
+	       if (hasLeadingJet == 0) continue;
+        */
 
-      for (int k= 0; k < data[i]->njets; k++) { 
-	//int subEvt=-1;
-	if ( data[i]->refpt[k]  < 30. ) continue;
-	if ( data[i]->jteta[k]  > 2. || data[i]->jteta[k] < -2. ) continue;
-	if ( data[i]->chargedMax[k]/data[i]->jtpt[k]<0.01) continue;
-	if ( data[i]->neutralMax[k]/TMath::Max(data[i]->chargedSum[k],data[i]->neutralSum[k]) < 0.975)continue;
+        for (int g = 0; g < data[k][h]->njets; g++) {
+  
+          for(int j = 0;j<nbins_eta;j++){
 
-	//for (int l= 0; l< data[i]->ngen;l++) {
-	//  if (data[i]->refpt[k]==data[i]->genpt[l]) {
-	//    subEvt = data[i]->gensubid[l];
-	//    break;
-	//  } 
-	//}
-	//if (subEvt!=0) continue;
-	//if (uhist[cBin]->hMeasMatch!=0) {
-	//   int ptBinNumber = uhist[cBin]->hMeasMatch->FindBin(data[i]->jtpt[k]);
-	//   int ratio = uhist[cBin]->hMeasMatch->GetBinContent(ptBinNumber);
-	//if (ratio!=0) weight_pt = 1./ratio;
-	//}
-	//if (!isMC||jentry2<data[i]->tJet->GetEntries()/2.) {
-	//cout<<"going to fill the histograms now"<<endl;
-	//cout<<"fvz = "<<weight_vz<<endl;
-	
-	//hpbpb_response[cBin]->Fill(data[i]->jtpt[k],data[i]->refpt[k],scale*weight_vz);
-	hpbpb_matrix[cBin]->Fill(data[i]->refpt[k],data[i]->jtpt[k],scale*weight_vz);
-	hpbpb_gen[cBin]->Fill(data[i]->refpt[k],scale*weight_vz);
-	hpbpb_reco[cBin]->Fill(data[i]->jtpt[k],scale*weight_vz);
-	
-	//hpbpb_response[nbins_cent]->Fill(data[i]->jtpt[k],data[i]->refpt[k],scale*weight_vz);
-	hpbpb_matrix[nbins_cent]->Fill(data[i]->refpt[k],data[i]->jtpt[k],scale*weight_vz);
-	hpbpb_gen[nbins_cent]->Fill(data[i]->refpt[k],scale*weight_vz);
-	hpbpb_reco[nbins_cent]->Fill(data[i]->jtpt[k],scale*weight_vz);
+            //int subEvt=-1;
+            if ( data[k][h]->refpt[g]  < 30. ) continue;
+            if ( data[k][h]->jteta[g]  > boundaries_eta[j][1] || data[h]->jteta[k] < boundaries_eta[j][0] ) continue;
+	        
+            // jet quality cuts here: 
+            if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.05) continue;
+	          //if ( data[k][h]->neutralMax[g]/TMath::Max(data[h]->chargedSum[k],data[h]->neutralSum[k]) < 0.975)continue;
 
-	if (jentry2>data[i]->tJet->GetEntries()/2.) {
-	  hpbpb_mcclosure_data[cBin]->Fill(data[i]->jtpt[k],scale*weight_vz);
-	  hpbpb_mcclosure_data[nbins_cent]->Fill(data[i]->jtpt[k],scale*weight_vz);
-	}
-	//  uhist[cBin]-> hGen->Fill(data[i]->refpt[k],scale*weight_vz);   
-	//  uhist[cBin]-> hMeas->Fill(data[i]->jtpt[k],scale*weight_vz);  	 
-	//uhist[cBin]-> hMeasJECSys->Fill(data[i]->jtpt[k]*(1.+0.02/nbins_cent*(nbins_cent-i)),scale*weight_cent*weight_pt*weight_vz); 
+	          //for (int l= 0; l< data[h]->ngen;l++) {
+	          //  if (data[h]->refpt[k]==data[h]->genpt[l]) {
+	          //    subEvt = data[h]->gensubid[l];
+	          //    break;
+	          //  } 
+	          //}
+	          //if (subEvt!=0) continue;
+	          //if (uhist[cBin]->hMeasMatch!=0) {
+	          //   int ptBinNumber = uhist[cBin]->hMeasMatch->FindBin(data[h]->jtpt[k]);
+	          //   int ratio = uhist[cBin]->hMeasMatch->GetBinContent(ptBinNumber);
+	          //if (ratio!=0) weight_pt = 1./ratio;
+	          //}
+	          //if (!isMC||jentry2<data[h]->tJet->GetEntries()/2.) {
+	          //cout<<"going to fill the histograms now"<<endl;
+	          //cout<<"fvz = "<<weight_vz<<endl;
 	
+	          //hpbpb_response[cBin]->Fill(data[h]->jtpt[k],data[h]->refpt[k],scale*weight_vz);
+	          hpbpb_matrix[k][j][cBin]->Fill(data[k][h]->refpt[g],data[k][h]->jtpt[g],scale*weight_vz);
+	          hpbpb_gen[k][j][cBin]->Fill(data[k][h]->refpt[g],scale*weight_vz);
+	          hpbpb_reco[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
 	
-	//}
-      }//njets loop
-      //uhist[cBin]->hGen->Print("base");
+	          //hpbpb_response[nbins_cent]->Fill(data[h]->jtpt[k],data[h]->refpt[k],scale*weight_vz);
+	          hpbpb_matrix[k][j][nbins_cent]->Fill(data[k][h]->refpt[g],data[k][h]->jtpt[g],scale*weight_vz);
+	          hpbpb_gen[k][j][nbins_cent]->Fill(data[k][h]->refpt[g],scale*weight_vz);
+	          hpbpb_reco[k][j][nbins_cent]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
+
+	          if (jentry2>data[k][h]->tJet->GetEntries()/2.) {
+	            hpbpb_mcclosure_data[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
+	            hpbpb_mcclosure_data[k][j][nbins_cent]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
+	          }
+	 
+	          //uhist[cBin]-> hMeasJECSys->Fill(data[h]->jtpt[k]*(1.+0.02/nbins_cent*(nbins_cent-i)),scale*weight_cent*weight_pt*weight_vz); 
+	
+	        }// eta bins loop
+	      
+        }//njets loop
       
-    }//nentry loop
+      }//nentry loop
     
-  }//ptbins loop
+    }//ptbins loop
   
   
-  // Vertex reweighting for pp
-  TF1 *fVzPP = new TF1("fVzPP","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
-  fVzPP->SetParameters(8.41684e-01,-2.58609e-02,4.86550e-03,-3.10581e-04,2.07918e-05);
+    // Vertex reweighting for pp
+    TF1 *fVzPP = new TF1("fVzPP","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
+    fVzPP->SetParameters(8.41684e-01,-2.58609e-02,4.86550e-03,-3.10581e-04,2.07918e-05);
   
-  // fill pp MC
-  for (int i=0;i<nbinsPP_pthat;i++) {
-    if (xsectionPP[i]==0) continue;
-    //float scale=(xsectionPP[i]-xsectionPP[i+1])/dataPP[i]->tJet->GetEntries(Form("pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[i],boundariesPP_pthat[i+1])); 
-    cout <<"Loading PP pthat"<<boundariesPP_pthat[i]
-	 <<" sample, cross section = "<<xsectionPP[i]
-	 << Form(" pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[i],boundariesPP_pthat[i+1])<<endl;
-    //cout<<""<<endl;
-    for (Long64_t jentry2=0; jentry2<dataPP[i]->tJet->GetEntries();jentry2++) {
-      //for (Long64_t jentry2=0; jentry2<10;jentry2++) {
-      dataPP[i]->tEvt->GetEntry(jentry2);
-      dataPP[i]->tJet->GetEntry(jentry2);
-      //dataPP[i]->tGenJet->GetEntry(jentry2);
-      //if(dataPP[i]->pthat<boundariesPP_pthat[i] || dataPP[i]->pthat>boundariesPP_pthat[i+1]) continue;
-      //if(dataPP[i]->bin<=28) continue;
-      int pthatBin = hPtHatPP->FindBin(dataPP[i]->pthat);
-      float scalepp = (xsectionPP[pthatBin-1]-xsectionPP[pthatBin])/hPtHatRawPP->GetBinContent(pthatBin);
-      if(fabs(dataPP[i]->vz)>15) continue;
-      double weight_cent=1;
-      double weight_pt=1;
-      double weight_vz=1;
-      if(!dataPP[i]->pPAcollisionEventSelectionPA || !dataPP[i]->pHBHENoiseFilter) continue;
+    cout<<"Filling PP MC"<<endl;
+    // fill pp MC
+    for (int h=0;h<nbinsPP_pthat;h++) {
+      if (xsectionPP[h]==0) continue;
+      //float scale=(xsectionPP[h]-xsectionPP[i+1])/dataPP[k][h]->tJet->GetEntries(Form("pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[h],boundariesPP_pthat[i+1])); 
+      cout <<"Loading PP pthat"<<boundariesPP_pthat[h]<<" sample, cross section = "<<xsectionPP[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[h],boundariesPP_pthat[h+1])<<endl;
+      //cout<<""<<endl;
+      for (Long64_t jentry=0; jentry<dataPP[k][h]->tJet->GetEntries();jentry++) {
+        //for (Long64_t jentry=0; jentry<10;jentry++) {
+        dataPP[k][h]->tEvt->GetEntry(jentry);
+        dataPP[k][h]->tJet->GetEntry(jentry);
+        //dataPP[k][h]->tGenJet->GetEntry(jentry);
+        //if(dataPP[k][h]->pthat<boundariesPP_pthat[h] || dataPP[k][h]->pthat>boundariesPP_pthat[i+1]) continue;
+        //if(dataPP[k][h]->bin<=28) continue;
+        int pthatBin = hPtHatPP->FindBin(dataPP[k][h]->pthat);
+        float scalepp = (xsectionPP[pthatBin-1]-xsectionPP[pthatBin])/hPtHatRawPP->GetBinContent(pthatBin);
+        if(fabs(dataPP[k][h]->vz)>15) continue;
+        double weight_cent=1;
+        double weight_pt=1;
+        double weight_vz=1;
+        if(!dataPP[k][h]->pPAcollisionEventSelectionPA || !dataPP[k][h]->pHBHENoiseFilter) continue;
       
-      weight_vz = fVzPP->Eval(dataPP[i]->vz);
-      //if (weight_vz>5||weight_vz<0.5) cout <<dataPP[i]->vz<<" "<<weight_vz<<endl;
-      //weight_vz = 1;
-      hPtHatPP->Fill(dataPP[i]->pthat,scalepp*weight_vz);
-      int hasLeadingJet = 0;
-      hVzPPMC->Fill(dataPP[i]->vz,scalepp*weight_vz);
-      /*
-	for (int k= 0; k < dataPP[i]->njets; k++) { 
-	if ( dataPP[i]->jteta[k]  > 2. || dataPP[i]->jteta[k] < -2. ) continue;
-	if ( dataPP[i]->jtpt[k]>100) {
-	hasLeadingJet = 1;
-	}
-	break;
+        weight_vz = fVzPP->Eval(dataPP[k][h]->vz);
+        //if (weight_vz>5||weight_vz<0.5) cout <<dataPP[k][h]->vz<<" "<<weight_vz<<endl;
+        //weight_vz = 1;
+        hPtHatPP->Fill(dataPP[k][h]->pthat,scalepp*weight_vz);
+        int hasLeadingJet = 0;
+        hVzPPMC->Fill(dataPP[k][h]->vz,scalepp*weight_vz);
+        /*
+	       for (int k= 0; k < dataPP[k][h]->njets; k++) { 
+	         if ( dataPP[k][h]->jteta[k]  > 2. || dataPP[k][h]->jteta[k] < -2. ) continue;
+	         if ( dataPP[k][h]->jtpt[k]>100) {
+	           hasLeadingJet = 1;
+	         }
+	         break;
 	
-	}
-	if (hasLeadingJet == 0) continue;
-      */
+	       }
+	       if (hasLeadingJet == 0) continue;
+        */
 
-      for (int k= 0; k < dataPP[i]->njets; k++) { 
-	int subEvt=-1;
-	if ( dataPP[i]->refpt[k]  < 30. ) continue;
-	if ( dataPP[i]->jteta[k]  > 2. || dataPP[i]->jteta[k] < -2. ) continue;
-	if ( dataPP[i]->chargedMax[k]/dataPP[i]->jtpt[k]<0.01) continue;
-	if ( dataPP[i]->neutralMax[k]/TMath::Max(dataPP[i]->chargedSum[k],dataPP[i]->neutralSum[k]) < 0.975)continue;
-	//if ( dataPP[i]->neu)
+        for (int g= 0; g< dataPP[k][h]->njets; g++) { 
 
-	//if (uhist[nbins_cent]->hMeasMatch!=0) {
-	//   int ptBinNumber = uhist[nbins_cent]->hMeasMatch->FindBin(dataPP[i]->jtpt[k]);
-	//   int ratio = uhist[nbins_cent]->hMeasMatch->GetBinContent(ptBinNumber);
-	//if (ratio!=0) weight_pt = 1./ratio;
-	//}
-					
-	//if (!isMC||jentry2<dataPP[i]->tJet->GetEntries()/2.) {
-	//if(!isMC){
-	//hpp_response->Fill(dataPP[i]->jtpt[k],dataPP[i]->refpt[k],scalepp*weight_vz);
-	hpp_matrix->Fill(dataPP[i]->refpt[k],dataPP[i]->jtpt[k],scalepp*weight_vz);
-	hpp_gen->Fill(dataPP[i]->refpt[k],scalepp*weight_vz);   
-	hpp_reco->Fill(dataPP[i]->jtpt[k],scalepp*weight_vz);
-	
-	//}	  
-	if (jentry2>dataPP[i]->tJet->GetEntries()/2.)
-	  hpp_mcclosure_data->Fill(dataPP[i]->jtpt[k],scale*weight_vz);
-	
-	//uhist[nbins_cent]-> hGen->Fill(dataPP[i]->refpt[k],scale*weight_vz);   
-	//uhist[nbins_cent]-> hMeas->Fill(dataPP[i]->jtpt[k],scale*weight_vz); 
-	//}
-      }//njet loop     
-    }//nentry loop
-  }//ptbins loop
+          for(int j = 0;j<nbins_eta;j++){
+            
+            int subEvt=-1;
+            if ( dataPP[k][h]->refpt[g]  < 30. ) continue;
+            if ( dataPP[k][h]->jteta[g]  > boundaries_eta[j][1] || dataPP[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
+
+            // jet QA cuts: 
+            //if ( dataPP[k][h]->chargedMax[g]/dataPP[k][h]->jtpt[g]<0.01) continue;
+            //if ( dataPP[k][h]->neutralMax[g]/TMath::Max(dataPP[k][h]->chargedSum[g],dataPP[k][h]->neutralSum[g]) < 0.975)continue;
+            //if ( dataPP[k][h]->neu)
+
+            //if (uhist[nbins_cent]->hMeasMatch!=0) {
+            //   int ptBinNumber = uhist[nbins_cent]->hMeasMatch->FindBin(dataPP[k][h]->jtpt[k]);
+            //   int ratio = uhist[nbins_cent]->hMeasMatch->GetBinContent(ptBinNumber);
+            //if (ratio!=0) weight_pt = 1./ratio;
+            //}
+          
+            //if (!isMC||jentry<dataPP[k][h]->tJet->GetEntries()/2.) {
+          
+            //hpp_response->Fill(dataPP[k][h]->jtpt[k],dataPP[k][h]->refpt[k],scalepp*weight_vz);
+            hpp_matrix[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+            hpp_gen[k][j]->Fill(dataPP[k][h]->refpt[g],scalepp*weight_vz);   
+            hpp_reco[k][j]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
   
+              
+            if (jentry>dataPP[k][h]->tJet->GetEntries()/2.)
+              hpp_mcclosure_data[k][j]->Fill(dataPP[k][h]->jtpt[g],scale*weight_vz);
+            
+          }//eta loop
+	              
+        }//njet loop     
+      
+      }//nentry loop
+    
+    }//ptbins loop
+
+  }// radius loop ends here
+
+
   TDatime date;
 
   //declare the output file 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_pp_mc_ak%d_%s_%d_chMax_12003cut.root",radius,algo,date.GetDate()),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_pp_mc_ak%s_%d.root",algo,date.GetDate()),"RECREATE");
   f.cd();
 
-  for(int i = 0;i<=nbins_cent;i++){
+  for(int k = 0;k<no_radius;k++){
     
-    //hpbpb_gen[i] = (TH1F*)hpbpb_gen[i]->Rebin(nbins_pt,Form("hpbpb_gen_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_gen[i]);
-    //hpbpb_reco[i] = (TH1F*)hpbpb_reco[i]->Rebin(nbins_pt,Form("hpbpb_reco_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_reco[i]);
-
-    divideBinWidth(hpbpb_mcclosure_data[i]);
-
-    //hpbpb_matrix[i] = (TH2F*)hpbpb_matrix[i]->Rebin(nbins_pt,Form("Matrix  refpt jtpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),boundaries_pt);
-    //hpbpb_response[i] = (TH2F*)hpbpb_response[i]->Rebin(nbins_pt,Form("Response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[i],5*boundaries_cent[i+1]),boundaries_pt);
-
-  }
-
-  divideBinWidth(hpp_gen);
-  divideBinWidth(hpp_reco);
-  divideBinWidth(hpp_mcclosure_data);
-
-  
-
-  for(int i = 0;i<=nbins_cent;i++){
+    for(int j=0;j<nbins_eta;j++){
+      
+      for(int i = 0;i<=nbins_cent;i++){
     
-    hpbpb_gen[i]->Write();
-    hpbpb_gen[i]->Print("base");
-    hpbpb_reco[i]->Write();
-    hpbpb_reco[i]->Print("base");
-    hpbpb_matrix[i]->Write();
-    hpbpb_matrix[i]->Print("base");
-    hpbpb_mcclosure_data[i]->Write();
-    hpbpb_mcclosure_data[i]->Print("base");
-    //hpbpb_response[i]->Write();
-    //hpbpb_response[i]->Print("base");
-  }
+        divideBinWidth(hpbpb_gen[k][j][i]);
+        divideBinWidth(hpbpb_reco[k][j][i]);
+        divideBinWidth(hpbpb_mcclosure_data[k][j][i]);
+        hpbpb_gen[k][j][i]->Write();
+        hpbpb_gen[k][j][i]->Print("base");
+        hpbpb_reco[k][j][i]->Write();
+        hpbpb_reco[k][j][i]->Print("base");
+        hpbpb_matrix[k][j][i]->Write();
+        hpbpb_matrix[k][j][i]->Print("base");
+        hpbpb_mcclosure_data[k][j][i]->Write();
+        hpbpb_mcclosure_data[k][j][i]->Print("base");
+    
+      }// cent loop 
 
-  hpp_gen->Write();
-  hpp_gen->Print("base");
-  hpp_reco->Write();
-  hpp_reco->Print("base");
-  hpp_matrix->Write();
-  hpp_matrix->Print("base");
-  hpp_mcclosure_data->Write();
-  hpp_mcclosure_data->Print("base");
-  //hpp_response->Write();
-  //hpp_response->Print("base");
+      divideBinWidth(hpp_gen[k][j]);
+      divideBinWidth(hpp_reco[k][j]);
+      divideBinWidth(hpp_mcclosure_data[k][j]);
+
+      hpp_gen[k][j]->Write();
+      hpp_gen[k][j]->Print("base");
+      hpp_reco[k][j]->Write();
+      hpp_reco[k][j]->Print("base");
+      hpp_matrix[k][j]->Write();
+      hpp_matrix[k][j]->Print("base");
+      hpp_mcclosure_data[k][j]->Write();
+      hpp_mcclosure_data[k][j]->Print("base");
+
+    }//eta loop
+
+    hCentMC[k]->Print("base");
+    hCentMC[k]->Write();
+    hPtHat[k]->Print("base");
+    hPtHat[k]->Write();
+    hPtHatPP[k]->Print("base");
+    hPtHatPP[k]->Write();
+
+  }// radius loop
+
   
   f.Write();
   f.Close();
