@@ -84,8 +84,8 @@ static const char etaWidth [nbins_eta][256] = {
   "p10_eta_p15","p15_eta_p20"
 };
 
-//static const int no_radius = 7;//this just has all the radii in the 
-//static const double list_radius[no_radius] = {1,2,3,4,5,6,7};
+//static const int no_radius = 1;//testing purposes 
+//static const int list_radius[no_radius] = {3};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 static const int no_radius = 7; 
@@ -220,7 +220,7 @@ void RAA_read_mc(char *algo = "Pu"){
   
   boundaries_pthat[3]=80;
   fileName_pthat[3] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT80_Hydjet1p8_STARTHI53_LV1_v15_full.root";
-  xsection[3]= 9.8653-05;
+  xsection[3]= 9.8653e-05;
   //entries[3] = ;//total - 49500
   
   boundaries_pthat[4]=120;
@@ -402,11 +402,11 @@ void RAA_read_mc(char *algo = "Pu"){
   
 
   for(int k = 0;k<no_radius;k++){
-    cout<<"radius = "<<list_radius[k]<<endl;
+    //cout<<"radius = "<<list_radius[k]<<endl;
     for(int j = 0;j<nbins_eta;j++){
-      cout<<"eta bin = "<<j<<endl;
+      //cout<<"eta bin = "<<j<<endl;
       for(int i = 0;i<nbins_cent;i++){
-	cout<<"cent bin = "<<i<<endl;
+	//cout<<"cent bin = "<<i<<endl;
         hpbpb_gen[k][j][i] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Gen refpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
 	//cout<<"A"<<endl;
 	hpbpb_reco[k][j][i] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Reco jtpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
@@ -454,8 +454,8 @@ void RAA_read_mc(char *algo = "Pu"){
   JetData *data[no_radius][nbins_pthat]; 
   JetData *dataPP[no_radius][nbinsPP_pthat];
   for(int k = 0;k<no_radius;k++){
-    cout<<"Radius = "<<list_radius[k]<<endl;
-    cout<<"reading all the pbpb mc files"<<endl;
+    //cout<<"Radius = "<<list_radius[k]<<endl;
+    //cout<<"reading all the pbpb mc files"<<endl;
     for (int h=0;h<nbins_pthat;h++) {
       //cout<<Form("ak%s%dJetAnalyzer/t",algo,list_radius[k])<<endl;
       data[k][h] = new JetData(fileName_pthat[h],Form("ak%s%dPFJetAnalyzer/t",algo,list_radius[k]),Form("ak%s%dfPFJetAnalyzer/t",algo,list_radius[k]),0,1);
@@ -491,7 +491,7 @@ void RAA_read_mc(char *algo = "Pu"){
       cout <<"Loading pthat"<<boundaries_pthat[h]<<" sample, cross section = "<<xsection[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundaries_pthat[h],boundaries_pthat[h+1])<<endl;
       cout<<data[k][h]->tJet->GetEntries()<<endl;
       for (Long64_t jentry=0; jentry<data[k][h]->tJet->GetEntries();jentry++) {
-        //for (Long64_t jentry=0; jentry<100;jentry++) {
+	//for (Long64_t jentry=0; jentry<100;jentry++) {
 
         //cout<<"hi"<<endl;
         data[k][h]->tEvt->GetEntry(jentry);
@@ -502,11 +502,14 @@ void RAA_read_mc(char *algo = "Pu"){
         //if(jentry%100==0)cout<<"pthat of that event = "<<data[k][h]->pthat<<endl;
       
         int pthatBin = hPtHat[k]->FindBin(data[k][h]->pthat);
+	//cout<<"pthat = "<<data[k][h]->pthat<<", pthatBin = "<<pthatBin<<", boundaries_pthat[pthatBin] = "<<boundaries_pthat[pthatBin]<<endl;
         //if(jentry2%100==0)cout<<"pthatBin = "<<pthatBin<<endl;
       
         //cout<<xsection[pthatBin-1]-xsection[pthatBin]<<endl;
         //cout<<"nentries = "<<hPtHatRaw->GetBinContent(pthatBin)<<endl;
         double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/hPtHatRaw[k]->GetBinContent(pthatBin);
+	//cout<<"scale = "<<scale<<endl;
+	//cout<<"xsection[pthatBin-1] = "<<xsection[pthatBin-1]<<", xsection[pthatBin] = "<<xsection[pthatBin]<<", bin content = "<<hPtHatRaw[k]->GetBinContent(pthatBin)<<endl;
         //double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/entries[h];
       
         if(fabs(data[k][h]->vz)>15) continue;
@@ -517,7 +520,7 @@ void RAA_read_mc(char *algo = "Pu"){
         double weight_vz=1;
       
         //weight_cent = fCentralityWeight->Eval(data[h]->bin);
-        weight_vz = fVz->Eval(data[k][h]->vz);
+        //weight_vz = fVz->Eval(data[k][h]->vz);
 	
         if(scale*weight_cent*weight_vz <=0 ) {
 	  cout<<"RED FLAG RED FLAG RED FLAG"<<endl;
@@ -613,7 +616,7 @@ void RAA_read_mc(char *algo = "Pu"){
       cout <<"Loading PP pthat"<<boundariesPP_pthat[h]<<" sample, cross section = "<<xsectionPP[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[h],boundariesPP_pthat[h+1])<<endl;
       //cout<<""<<endl;
       for (Long64_t jentry=0; jentry<dataPP[k][h]->tJet->GetEntries();jentry++) {
-        //for (Long64_t jentry=0; jentry<10;jentry++) {
+	//for (Long64_t jentry=0; jentry<10;jentry++) {
         dataPP[k][h]->tEvt->GetEntry(jentry);
         dataPP[k][h]->tJet->GetEntry(jentry);
         //dataPP[k][h]->tGenJet->GetEntry(jentry);
@@ -689,7 +692,6 @@ void RAA_read_mc(char *algo = "Pu"){
 
   }// radius loop
 
-
   TDatime date;
 
   //declare the output file 
@@ -697,7 +699,7 @@ void RAA_read_mc(char *algo = "Pu"){
   f.cd();
 
   for(int k = 0;k<no_radius;k++){
-    /*
+    
     for(int j=0;j<nbins_eta;j++){
       
       for(int i = 0;i<=nbins_cent;i++){
@@ -730,7 +732,7 @@ void RAA_read_mc(char *algo = "Pu"){
       hpp_mcclosure_data[k][j]->Print("base");
 
     }//eta loop
-    *///just the check the Pthat distributions for PbPb and pp. should be fine. 
+    //just the check the Pthat distributions for PbPb and pp. should be fine. 
 
     hCentMC[k]->Print("base");
     hCentMC[k]->Write();
