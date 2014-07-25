@@ -64,7 +64,7 @@ static const int dir=50;
 using namespace std;
 
 
-void RAA_read_data_pp(int radius = 3){
+void RAA_read_data_pp(){
 
   TH1::SetDefaultSumw2();
   gStyle->SetOptStat(0);

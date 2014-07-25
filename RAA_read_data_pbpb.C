@@ -18,6 +18,8 @@
 
 // And it looks like we have to separate the pp side from this macro due to condor job submission - Done
 
+// July 25 - add in the capability to read different radii and eta widths in the same macro. 
+
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -49,8 +51,8 @@
 #include "TMath.h"
 #include "TLine.h"
 
-static const int nbins_pt = 29;
-static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
+//static const int nbins_pt = 29;
+//static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
 
 //only for the jet80 merged file
 static const int job_no = 11;
@@ -58,80 +60,118 @@ static const double boundaries_loopno_job[job_no+1] = {0,100000,200000,300000,40
 
 static const double boundaries_fileno_job[job_no+1] = {0, 413, 826, 1239, 1652, 2065, 2478, 2891, 3304, 3717, 4130, 4542};
 
+static const int nbins_pt = 39;
+static const double boundaries_pt[nbins_pt+1] = {
+  3, 4, 5, 7, 9, 12, 
+  15, 18, 21, 24, 28,
+  32, 37, 43, 49, 56,
+  64, 74, 84, 97, 114,
+  133, 153, 174, 196,
+  220, 245, 272, 300, 
+  330, 362, 395, 430,
+  468, 507, 548, 592,
+  638, 686, 1000 
+};
+
+static const int nbins_eta = 10;
+static const double boundaries_eta[nbins_eta][2] = {
+  {-1.0,+1.0},
+  {-2.0,+2.0},
+  {-2.5,-2.0},
+  {-2.0,-1.5},
+  {-1.5,-1.0},
+  {-1.0,-0.5},
+  {-0.5,+0.5},
+  {+0.5,+1.0},
+  {+1.0,+1.5},
+  {+1.5,+2.0}
+};
+static const char etaWidth [nbins_eta][256] = {
+  "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
+  "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
+  "p10_eta_p15","p15_eta_p20"
+};
+
+//static const int no_radius = 1;//testing purposes 
+//static const int list_radius[no_radius] = {3};
+
+//these are the only radii we are interested for the RAA analysis: 2,3,4,5
+static const int no_radius = 7; 
+static const int list_radius[no_radius] = {1,2,3,4,5,6,7};
+
 
 // divide by bin width
 void divideBinWidth(TH1 *h)
 {
-	h->Sumw2();
-	for (int i=0;i<=h->GetNbinsX();i++)
-	{
-		Float_t val = h->GetBinContent(i);
-		Float_t valErr = h->GetBinError(i);
-		val/=h->GetBinWidth(i);
-		valErr/=h->GetBinWidth(i);
-		h->SetBinContent(i,val);
-		h->SetBinError(i,valErr);
-	}
-	h->GetXaxis()->CenterTitle();
-	h->GetYaxis()->CenterTitle();
+  h->Sumw2();
+  for (int i=0;i<=h->GetNbinsX();i++){
+    Float_t val = h->GetBinContent(i);
+    Float_t valErr = h->GetBinError(i);
+    val/=h->GetBinWidth(i);
+    valErr/=h->GetBinWidth(i);
+    h->SetBinContent(i,val);
+    h->SetBinError(i,valErr);
+  }
+  h->GetXaxis()->CenterTitle();
+  h->GetYaxis()->CenterTitle();
 }
 
 class JetData
 {
 public:
   JetData(char *fileName, char *jetTree, char *genJetTree, bool loadGenJet = 0,bool isPbPb = 0) {
-		cout <<"Open "<<fileName<<endl;
-		tFile = new TFile(fileName,"read");
-		tEvt = (TTree*)tFile->Get("hiEvtAnalyzer/HiTree");
-		tSkim = (TTree*)tFile->Get("skimanalysis/HltTree");
-		tJet = (TTree*)tFile->Get(jetTree);
-		tJet->SetBranchAddress("jtpt" , jtpt );
-		tJet->SetBranchAddress("trackMax" , trackMax );
-		tJet->SetBranchAddress("chargedMax",chargedMax);
-		tJet->SetBranchAddress("refpt", refpt);
-		tJet->SetBranchAddress("nref" ,&njets);
-		tJet->SetBranchAddress("jteta", jteta);
-		tJet->SetBranchAddress("jtm",jtmass);
-		tJet->SetBranchAddress("pthat",&pthat);
-		if (loadGenJet) tGenJet = (TTree*)tFile->Get(genJetTree);
-		if (loadGenJet) tGenJet->SetBranchAddress("ngen" ,&ngen);
-		if (loadGenJet) tGenJet->SetBranchAddress("genpt", genpt);
-		if (loadGenJet) tGenJet->SetBranchAddress("gensubid", gensubid);
-		tEvt->SetBranchAddress("hiBin",&bin);
-		tEvt->SetBranchAddress("vz",&vz);
-		tSkim->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
-		if(isPbPb) tSkim->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
-		else tSkim->SetBranchAddress("pPAcollisionEventSelectionPA",&pPAcollisionEventSelectionPA);
-		tJet->AddFriend(tEvt);
-		tJet->AddFriend(tSkim);
-	};
-	TFile *tFile;
-	TTree *tJet;
-	TTree *tGenJet;
-	TTree *tEvt;
-	TTree* tSkim;
-	float jtpt[1000];
-	float refpt[1000];
-	float jteta[1000];
-	float jtmass[1000];
-	float trackMax[1000];
-	float chargedMax[1000];
-	float genpt[1000];
-	int gensubid[1000];
-	float vz;
-	float pthat;
-	int njets;
-	int ngen;
-	int bin;     
-	int pHBHENoiseFilter;
-	int pPAcollisionEventSelectionPA;
-	int pcollisionEventSelection;
+    cout <<"Open "<<fileName<<endl;
+    tFile = new TFile(fileName,"read");
+    tEvt = (TTree*)tFile->Get("hiEvtAnalyzer/HiTree");
+    tSkim = (TTree*)tFile->Get("skimanalysis/HltTree");
+    tJet = (TTree*)tFile->Get(jetTree);
+    tJet->SetBranchAddress("jtpt" , jtpt );
+    tJet->SetBranchAddress("trackMax" , trackMax );
+    tJet->SetBranchAddress("chargedMax",chargedMax);
+    tJet->SetBranchAddress("refpt", refpt);
+    tJet->SetBranchAddress("nref" ,&njets);
+    tJet->SetBranchAddress("jteta", jteta);
+    tJet->SetBranchAddress("jtm",jtmass);
+    tJet->SetBranchAddress("pthat",&pthat);
+    if (loadGenJet) tGenJet = (TTree*)tFile->Get(genJetTree);
+    if (loadGenJet) tGenJet->SetBranchAddress("ngen" ,&ngen);
+    if (loadGenJet) tGenJet->SetBranchAddress("genpt", genpt);
+    if (loadGenJet) tGenJet->SetBranchAddress("gensubid", gensubid);
+    tEvt->SetBranchAddress("hiBin",&bin);
+    tEvt->SetBranchAddress("vz",&vz);
+    tSkim->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
+    if(isPbPb) tSkim->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
+    else tSkim->SetBranchAddress("pPAcollisionEventSelectionPA",&pPAcollisionEventSelectionPA);
+    tJet->AddFriend(tEvt);
+    tJet->AddFriend(tSkim);
+  };
+  TFile *tFile;
+  TTree *tJet;
+  TTree *tGenJet;
+  TTree *tEvt;
+  TTree* tSkim;
+  float jtpt[1000];
+  float refpt[1000];
+  float jteta[1000];
+  float jtmass[1000];
+  float trackMax[1000];
+  float chargedMax[1000];
+  float genpt[1000];
+  int gensubid[1000];
+  float vz;
+  float pthat;
+  int njets;
+  int ngen;
+  int bin;     
+  int pHBHENoiseFilter;
+  int pPAcollisionEventSelectionPA;
+  int pcollisionEventSelection;
 };
 
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char *algo = "Vs"){
+void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs"){
 
   
   TH1::SetDefaultSumw2();
@@ -140,7 +180,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
   TStopwatch timer;
   timer.Start();
 
-  cout<<"Running for Radius = "<<radius<<" and Algo = "<<algo<<endl;
+  cout<<"Running for Algo = "<<algo<<endl;
 
   // number convension:
   // 0 - MB
@@ -148,7 +188,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
   // 2 - 80 or 95 
   // 80 is the unprescaled trigger - yes
   // 
-
 
   // Now im going to change the file reading here for PbPb to look at the unmerged files through condor. 
   std::string infile1;
@@ -173,38 +212,26 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
     instr2>>filename2;
   }
 
-
+ 
   const int N = 5;
-  
-  TChain *jetpbpb1[N];
-  TChain *jetpbpb2[N];
-  
-  string dir[N] = {
-    "hltanalysis",
-    "skimanalysis",
-    //"hcalNoise",
-    Form("ak%s%dPFJetAnalyzer",algo,radius),
-    //"akPu5PFJetAnalyzer",
-    //"multiPhotonAnalyzer",
-    //"ppTrack",
-    //"pfcandAnalyzer",
-    //"anaMET",
-    //"muonTree",
-    "hiEvtAnalyzer",
-    "hltobject"
-  };
     
+  TChain *jetpbpb1[N][no_radius];
+  TChain *jetpbpb2[N][no_radius];
+  
+  string dir[N][no_radius];
+  
+  for(int k = 0;k<no_radius;k++){
+    dir[0][k] = "hltanalysis";
+    dir[1][k] = "skimanalysis";
+    dir[2][k] = Form("ak%s%dPFJetAnalyzer",algo,list_radius[k]);
+    dir[3][k] = "hiEvtAnalyzer";
+    dir[4][k] = "hltonject";
+  }
+
   string trees[N] = {
     "HltTree",
     "HltTree",
-    //"hbhenoise",
     "t",
-    //"t",
-    //"photon",
-    //"trackTree",
-    //"pfTree",
-    //"metTree",
-    //"HLTMuTree",
     "HiTree",
     "jetObjTree"
   };
@@ -213,33 +240,34 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
     
     instr1>>filename1;
     cout<<"File: "<<filename1<<endl;
+    for(int k = 0;k<no_radius;k++){
 
-    for(int i = 0;i<N;i++){
+      for(int t = 0;t<N;t++){
 
-      jetpbpb1[i] = new TChain(string(dir[i]+"/"+trees[i]).data()) ;
-      jetpbpb1[i]->Add(filename1.c_str());
-      cout << "Tree loaded  " << string(dir[i]+"/"+trees[i]).data() << endl;
-      cout << "Entries : " << jetpbpb1[i]->GetEntries() << endl;
+      jetpbpb1[t][k] = new TChain(string(dir[t][k]+"/"+trees[t]).data()) ;
+      jetpbpb1[t][k]->Add(filename1.c_str());
+      cout << "Tree loaded  " << string(dir[t][k]+"/"+trees[t]).data() << endl;
+      cout << "Entries : " << jetpbpb1[t][k]->GetEntries() << endl;
 
-    }
+      }// tree loop ends
 
-    //jetpbpb1->Add(filename.c_str());
-    //hltpbpb1->Add(filename.c_str());
-    //skmpbpb1->Add(filename.c_str());
-    //hltobjpbpb1->Add(filename.c_str());
-    //evtpbpb1->Add(filename.c_str());
-    //cout<<"Entries = "<<jetpbpb1->GetEntries()<<endl;
-  }
+      //jetpbpb1->Add(filename.c_str());
+      //hltpbpb1->Add(filename.c_str());
+      //skmpbpb1->Add(filename.c_str());
+      //hltobjpbpb1->Add(filename.c_str());
+      //evtpbpb1->Add(filename.c_str());
+      //cout<<"Entries = "<<jetpbpb1->GetEntries()<<endl;
+    }// radius loop ends
 
-  jetpbpb1[2]->AddFriend(jetpbpb1[0]);
-  jetpbpb1[2]->AddFriend(jetpbpb1[1]);
-  jetpbpb1[2]->AddFriend(jetpbpb1[3]);
-  jetpbpb1[2]->AddFriend(jetpbpb1[4]);
+  }// file loop ends
 
+  
 
-  for(int i = 0;i<N;i++){
-    jetpbpb2[i] = new TChain(string(dir[i]+"/"+trees[i]).data());
-  }
+  for(int k = 0;k<no_radius;k++){
+    for(int t = 0;t<N;t++){
+      jetpbpb2[t][k] = new TChain(string(dir[t][k]+"/"+trees[t]).data());
+    }//tree loop ends
+  }// radius loop ends
 
   for(int ifile = boundaries_fileno_job[startfile];ifile<boundaries_fileno_job[endfile];ifile++){
   //for(int ifile = 0;ifile<10;ifile++){
@@ -247,35 +275,42 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
     instr2>>filename2;
     cout<<"File: "<<filename2<<endl;
 
-    for(int i = 0;i<N;i++){
+    for(int k = 0;k<no_radius;k++){
+
+      for(int t = 0;t<N;t++){
 
       //jetpbpb2[i] = new TChain(string(dir[i]+"/"+trees[i]).data()) ;
-      jetpbpb2[i]->Add(filename2.c_str());
+      jetpbpb2[t][k]->Add(filename2.c_str());
       //cout << "Tree loaded  " << string(dir[i]+"/"+trees[i]).data() << endl;
       //cout << "Entries : " << jetpbpb2[i]->GetEntries() << endl;
 
-    }
-
+      }//tree loop ends
+    }// radius loop ends
     //jetpbpb1->Add(filename.c_str());
     //hltpbpb1->Add(filename.c_str());
     //skmpbpb1->Add(filename.c_str());
     //hltobjpbpb1->Add(filename.c_str());
     //evtpbpb1->Add(filename.c_str());
     //cout<<"Entries = "<<jetpbpb1->GetEntries()<<endl;
-  }
+  }// file loop ends
 
-  jetpbpb2[2]->AddFriend(jetpbpb2[0]);
-  jetpbpb2[2]->AddFriend(jetpbpb2[1]);
-  jetpbpb2[2]->AddFriend(jetpbpb2[3]);
-  jetpbpb2[2]->AddFriend(jetpbpb2[4]);
+  for(int k = 0;k<no_radius;k++){
+    jetpbpb1[2][k]->AddFriend(jetpbpb1[0][k]);
+    jetpbpb1[2][k]->AddFriend(jetpbpb1[1][k]);
+    jetpbpb1[2][k]->AddFriend(jetpbpb1[3][k]);
+    jetpbpb1[2][k]->AddFriend(jetpbpb1[4][k]);
 
+    jetpbpb2[2][k]->AddFriend(jetpbpb2[0][k]);
+    jetpbpb2[2][k]->AddFriend(jetpbpb2[1][k]);
+    jetpbpb2[2][k]->AddFriend(jetpbpb2[3][k]);
+    jetpbpb2[2][k]->AddFriend(jetpbpb2[4][k]);
+
+  }// radius loop ends
  
   // Ok this should now work. 
 
-  cout<<"total no of entries in the Jet55or65 tree = "<<jetpbpb1[2]->GetEntries()<<endl;
-  cout<<"total no of entries in the Jet80 Tree     = "<<jetpbpb2[2]->GetEntries()<<endl;
- 
-
+  cout<<"total no of entries in the Jet55or65 tree = "<<jetpbpb1[2][0]->GetEntries()<<endl;
+  cout<<"total no of entries in the Jet80 Tree     = "<<jetpbpb2[2][0]->GetEntries()<<endl;
 
   //these were for doing it from the forests directly without the proper JEC's 
   //add the centrality cuts: 
@@ -295,7 +330,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
 
   // ok so this is pretty important here: 
   // the structure of the macro realies heavily on the centrality loop. so histograms arrays from 0 to nbins_cent-1 will have the spectra for the pbpb at different centrality classes. the one at nbins_cent contains the spectra for the 0-200 bin. so its the full spectra. this was done as a cross check rather than just adding the other histograms. 
-  
+
+  /*
   
   TCut pbpb0 = "abs(vz)<15&&pcollisionEventSelection&&pHBHENoiseFilter&&abs(jteta)<2&&HLT_HIZeroBiasPizel_SingleTrack_v1&&chargedMax/jtpt>0.01";//this is just for the MB file. not really used here so far. 
 
@@ -316,7 +352,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
 
 
   //old way of finding trigger turn on which didnt work since we dont have a good MB sample. 
-  /*
+  
   TH1F* hTurnon80_old = new TH1F("hTurnon80_old","",150,0,150);
   TH1F* hTurnon65_old = new TH1F("hTurnon65_old","",150,0,150);
   TH1F* hTurnon55_old = new TH1F("hTurnon55_old","",150,0,150);
@@ -354,7 +390,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
   hTurnon80_old->Divide(hMB_old);
   hTurnon65_old->Divide(hMB_old);
   hTurnon55_old->Divide(hMB_old);
-  */
+  
 
   
   //centrality loop for the pbpb files/histograms 
@@ -362,18 +398,18 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
 
     cout<<"centrality boundary = "<<boundaries_cent[i]*5<<" - "<<boundaries_cent[i+1]*5<<endl;
 
-    /*
-      Ok so i screwed up the convention here. the tcuts and the histogram has the number appendage going from 
-      1 - 80
-      2 - 65
-      3 - 55
+   
+    //  Ok so i screwed up the convention here. the tcuts and the histogram has the number appendage going from 
+    //  1 - 80
+    //  2 - 65
+    //  3 - 55
 
-      but thats the reverse for the jet trees. 
-      2 - HLT_80 or HLT_95
-      1 - HLT_55 or HLT_65
+    //  but thats the reverse for the jet trees. 
+    //  2 - HLT_80 or HLT_95
+    //  1 - HLT_55 or HLT_65
 
       so be careful when moving through the code. 
-    */
+    
 
     //list of cuts we are using to remove all the fake jets. 
     // chMax/jtpt>0.01 - studied
@@ -553,6 +589,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
   
   //ok now we have the spectra for the 0-200% centrality. 
   
+  */
+
   
   // do the trigger object merging here: 
   // this has to be done in the event loop which means that we have to get the 
@@ -616,23 +654,24 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
 //   float trgObj_phi_0;
 //   float trgObj_mass_0;
 
+
   //file 1: 
   // jet tree
-  int nrefe_1;
-  float pt_1[1000];
+  int nrefe_1[no_radius];
+  float pt_1[1000][no_radius];
   //float old_pt3[1000];
-  float raw_1[1000];
-  float eta_1[1000];
-  float eta_1_CM[1000];
-  float phi_1[1000];
-  float chMax_1[1000];
-  float trkMax_1[1000];
-  float chSum_1[1000];
-  float phSum_1[1000];
-  float neSum_1[1000];
-  float trkSum_1[1000];
-  float phMax_1[1000];
-  float neMax_1[1000];
+  float raw_1[1000][no_radius];
+  float eta_1[1000][no_radius];
+  float eta_1_CM[1000][no_radius];
+  float phi_1[1000][no_radius];
+  float chMax_1[1000][no_radius];
+  float trkMax_1[1000][no_radius];
+  float chSum_1[1000][no_radius];
+  float phSum_1[1000][no_radius];
+  float neSum_1[1000][no_radius];
+  float trkSum_1[1000][no_radius];
+  float phMax_1[1000][no_radius];
+  float neMax_1[1000][no_radius];
 
   // event tree
   int evt_1;
@@ -675,20 +714,20 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
   //file 2: 
   // jet tree
   int nrefe_2;
-  float pt_2[1000];
+  float pt_2[1000][no_radius];
   //float old_pt3[1000];
-  float raw_2[1000];
-  float eta_2[1000];
-  float eta_2_CM[1000];
-  float phi_2[1000];
-  float chMax_2[1000];
-  float trkMax_2[1000];
-  float chSum_2[1000];
-  float phSum_2[1000];
-  float neSum_2[1000];
-  float trkSum_2[1000];
-  float phMax_2[1000];
-  float neMax_2[1000];
+  float raw_2[1000][no_radius];
+  float eta_2[1000][no_radius];
+  float eta_2_CM[1000][no_radius];
+  float phi_2[1000][no_radius];
+  float chMax_2[1000][no_radius];
+  float trkMax_2[1000][no_radius];
+  float chSum_2[1000][no_radius];
+  float phSum_2[1000][no_radius];
+  float neSum_2[1000][no_radius];
+  float trkSum_2[1000][no_radius];
+  float phMax_2[1000][no_radius];
+  float neMax_2[1000][no_radius];
 
   // event tree
   int evt_2;
@@ -789,104 +828,107 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
 //   jetpbpb0_old->SetBranchAddress("mass",&trgObj_mass_0);
 //   */
 
-  //set the branch addresses:  - one of the most boring parts of the code: 
-  jetpbpb1[2]->SetBranchAddress("evt",&evt_1);
-  jetpbpb1[2]->SetBranchAddress("run",&run_1);
-  jetpbpb1[2]->SetBranchAddress("lumi",&lumi_1);
-  jetpbpb1[2]->SetBranchAddress("hiBin",&hiBin_1);
-  jetpbpb1[2]->SetBranchAddress("vz",&vz_1);
-  jetpbpb1[2]->SetBranchAddress("vx",&vx_1);
-  jetpbpb1[2]->SetBranchAddress("vy",&vy_1);
-  jetpbpb1[2]->SetBranchAddress("hiNtracks",&hiNtracks_1);
-  jetpbpb1[2]->SetBranchAddress("hiHFminus",&hiHFminus_1);
-  jetpbpb1[2]->SetBranchAddress("hiHFplus",&hiHFplus_1);
-  jetpbpb1[2]->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4_1);
-  jetpbpb1[2]->SetBranchAddress("hiHFminusEta4",&hiHFminusEta4_1);
-  jetpbpb1[2]->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection_1);
-  jetpbpb1[2]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter_1);
-  //jetpbpb1[2]->SetBranchAddress("pprimaryvertexFilter",&pprimaryvertexFilter_1);
-  //jetpbpb1[2]->SetBranchAddress("pVertexFilterCutGplus",&pVertexFilterCutGplus_1);
+  for(int k = 0;k<no_radius;k++){
+    //set the branch addresses:  - one of the most boring parts of the code: 
+    jetpbpb1[2]->SetBranchAddress("evt",&evt_1);
+    jetpbpb1[2]->SetBranchAddress("run",&run_1);
+    jetpbpb1[2]->SetBranchAddress("lumi",&lumi_1);
+    jetpbpb1[2]->SetBranchAddress("hiBin",&hiBin_1);
+    jetpbpb1[2]->SetBranchAddress("vz",&vz_1);
+    jetpbpb1[2]->SetBranchAddress("vx",&vx_1);
+    jetpbpb1[2]->SetBranchAddress("vy",&vy_1);
+    jetpbpb1[2]->SetBranchAddress("hiNtracks",&hiNtracks_1);
+    jetpbpb1[2]->SetBranchAddress("hiHFminus",&hiHFminus_1);
+    jetpbpb1[2]->SetBranchAddress("hiHFplus",&hiHFplus_1);
+    jetpbpb1[2]->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4_1);
+    jetpbpb1[2]->SetBranchAddress("hiHFminusEta4",&hiHFminusEta4_1);
+    jetpbpb1[2]->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection_1);
+    jetpbpb1[2]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter_1);
+    //jetpbpb1[2]->SetBranchAddress("pprimaryvertexFilter",&pprimaryvertexFilter_1);
+    //jetpbpb1[2]->SetBranchAddress("pVertexFilterCutGplus",&pVertexFilterCutGplus_1);
   
-  jetpbpb1[2]->SetBranchAddress("nref",&nrefe_1);
-  jetpbpb1[2]->SetBranchAddress("jtpt",&pt_1);
-  jetpbpb1[2]->SetBranchAddress("jteta",&eta_1);
-  jetpbpb1[2]->SetBranchAddress("jtphi",&phi_1);
-  jetpbpb1[2]->SetBranchAddress("rawpt",&raw_1);
-  jetpbpb1[2]->SetBranchAddress("chargedMax",&chMax_1);
-  jetpbpb1[2]->SetBranchAddress("chargedSum",&chSum_1);
-  jetpbpb1[2]->SetBranchAddress("trackMax",&trkMax_1);
-  jetpbpb1[2]->SetBranchAddress("trackSum",&trkSum_1);
-  jetpbpb1[2]->SetBranchAddress("photonMax",&phMax_1);
-  jetpbpb1[2]->SetBranchAddress("photonSum",&phSum_1);
-  jetpbpb1[2]->SetBranchAddress("neutralMax",&neMax_1);
-  jetpbpb1[2]->SetBranchAddress("neutralSum",&neSum_1);
+    jetpbpb1[2]->SetBranchAddress("nref",&nrefe_1);
+    jetpbpb1[2]->SetBranchAddress("jtpt",&pt_1);
+    jetpbpb1[2]->SetBranchAddress("jteta",&eta_1);
+    jetpbpb1[2]->SetBranchAddress("jtphi",&phi_1);
+    jetpbpb1[2]->SetBranchAddress("rawpt",&raw_1);
+    jetpbpb1[2]->SetBranchAddress("chargedMax",&chMax_1);
+    jetpbpb1[2]->SetBranchAddress("chargedSum",&chSum_1);
+    jetpbpb1[2]->SetBranchAddress("trackMax",&trkMax_1);
+    jetpbpb1[2]->SetBranchAddress("trackSum",&trkSum_1);
+    jetpbpb1[2]->SetBranchAddress("photonMax",&phMax_1);
+    jetpbpb1[2]->SetBranchAddress("photonSum",&phSum_1);
+    jetpbpb1[2]->SetBranchAddress("neutralMax",&neMax_1);
+    jetpbpb1[2]->SetBranchAddress("neutralSum",&neSum_1);
 
-  //jetpbpb1[2]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_1);
-  //jetpbpb1[2]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_1);
-  //jetpbpb1[2]->SetBranchAddress("L1_ZeroBias",&L1_MB_1);
-  //jetpbpb1[2]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
-  jetpbpb1[2]->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
-  jetpbpb1[2]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_1);
-  jetpbpb1[2]->SetBranchAddress("HLT_HIJet65_v1",&jet65_1);
-  jetpbpb1[2]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_1);
-  jetpbpb1[2]->SetBranchAddress("HLT_HIJet80_v1",&jet80_1);
-  jetpbpb1[2]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_1);
+    //jetpbpb1[2]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_1);
+    //jetpbpb1[2]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_1);
+    //jetpbpb1[2]->SetBranchAddress("L1_ZeroBias",&L1_MB_1);
+    //jetpbpb1[2]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
+    jetpbpb1[2]->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
+    jetpbpb1[2]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_1);
+    jetpbpb1[2]->SetBranchAddress("HLT_HIJet65_v1",&jet65_1);
+    jetpbpb1[2]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_1);
+    jetpbpb1[2]->SetBranchAddress("HLT_HIJet80_v1",&jet80_1);
+    jetpbpb1[2]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_1);
 
-  jetpbpb1[2]->SetBranchAddress("id",&trgObj_id_1);
-  jetpbpb1[2]->SetBranchAddress("pt",&trgObj_pt_1);
-  jetpbpb1[2]->SetBranchAddress("eta",&trgObj_eta_1);
-  jetpbpb1[2]->SetBranchAddress("phi",&trgObj_phi_1);
-  jetpbpb1[2]->SetBranchAddress("mass",&trgObj_mass_1);
+    jetpbpb1[2]->SetBranchAddress("id",&trgObj_id_1);
+    jetpbpb1[2]->SetBranchAddress("pt",&trgObj_pt_1);
+    jetpbpb1[2]->SetBranchAddress("eta",&trgObj_eta_1);
+    jetpbpb1[2]->SetBranchAddress("phi",&trgObj_phi_1);
+    jetpbpb1[2]->SetBranchAddress("mass",&trgObj_mass_1);
 
-  //set the branch addresses:  - one of the most boring parts of the code: 
-  jetpbpb2[2]->SetBranchAddress("evt",&evt_2);
-  jetpbpb2[2]->SetBranchAddress("run",&run_2);
-  jetpbpb2[2]->SetBranchAddress("lumi",&lumi_2);
-  jetpbpb2[2]->SetBranchAddress("hiBin",&hiBin_2);
-  jetpbpb2[2]->SetBranchAddress("vz",&vz_2);
-  jetpbpb2[2]->SetBranchAddress("vx",&vx_2);
-  jetpbpb2[2]->SetBranchAddress("vy",&vy_2);
-  jetpbpb2[2]->SetBranchAddress("hiNtracks",&hiNtracks_2);
-  jetpbpb2[2]->SetBranchAddress("hiHFminus",&hiHFminus_2);
-  jetpbpb2[2]->SetBranchAddress("hiHFplus",&hiHFplus_2);
-  jetpbpb2[2]->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4_2);
-  jetpbpb2[2]->SetBranchAddress("hiHFminusEta4",&hiHFminusEta4_2);
-  jetpbpb2[2]->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection_2);
-  jetpbpb2[2]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter_2);
-  //jetpbpb2[2]->SetBranchAddress("pprimaryvertexFilter",&pprimaryvertexFilter_2);
-  //jetpbpb2[2]->SetBranchAddress("pVertexFilterCutGplus",&pVertexFilterCutGplus_2);
+    //set the branch addresses:  - one of the most boring parts of the code: 
+    jetpbpb2[2]->SetBranchAddress("evt",&evt_2);
+    jetpbpb2[2]->SetBranchAddress("run",&run_2);
+    jetpbpb2[2]->SetBranchAddress("lumi",&lumi_2);
+    jetpbpb2[2]->SetBranchAddress("hiBin",&hiBin_2);
+    jetpbpb2[2]->SetBranchAddress("vz",&vz_2);
+    jetpbpb2[2]->SetBranchAddress("vx",&vx_2);
+    jetpbpb2[2]->SetBranchAddress("vy",&vy_2);
+    jetpbpb2[2]->SetBranchAddress("hiNtracks",&hiNtracks_2);
+    jetpbpb2[2]->SetBranchAddress("hiHFminus",&hiHFminus_2);
+    jetpbpb2[2]->SetBranchAddress("hiHFplus",&hiHFplus_2);
+    jetpbpb2[2]->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4_2);
+    jetpbpb2[2]->SetBranchAddress("hiHFminusEta4",&hiHFminusEta4_2);
+    jetpbpb2[2]->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection_2);
+    jetpbpb2[2]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter_2);
+    //jetpbpb2[2]->SetBranchAddress("pprimaryvertexFilter",&pprimaryvertexFilter_2);
+    //jetpbpb2[2]->SetBranchAddress("pVertexFilterCutGplus",&pVertexFilterCutGplus_2);
   
-  jetpbpb2[2]->SetBranchAddress("nref",&nrefe_2);
-  jetpbpb2[2]->SetBranchAddress("jtpt",&pt_2);
-  jetpbpb2[2]->SetBranchAddress("jteta",&eta_2);
-  jetpbpb2[2]->SetBranchAddress("jtphi",&phi_2);
-  jetpbpb2[2]->SetBranchAddress("rawpt",&raw_2);
-  jetpbpb2[2]->SetBranchAddress("chargedMax",&chMax_2);
-  jetpbpb2[2]->SetBranchAddress("chargedSum",&chSum_2);
-  jetpbpb2[2]->SetBranchAddress("trackMax",&trkMax_2);
-  jetpbpb2[2]->SetBranchAddress("trackSum",&trkSum_2);
-  jetpbpb2[2]->SetBranchAddress("photonMax",&phMax_2);
-  jetpbpb2[2]->SetBranchAddress("photonSum",&phSum_2);
-  jetpbpb2[2]->SetBranchAddress("neutralMax",&neMax_2);
-  jetpbpb2[2]->SetBranchAddress("neutralSum",&neSum_2);
+    jetpbpb2[2]->SetBranchAddress("nref",&nrefe_2);
+    jetpbpb2[2]->SetBranchAddress("jtpt",&pt_2);
+    jetpbpb2[2]->SetBranchAddress("jteta",&eta_2);
+    jetpbpb2[2]->SetBranchAddress("jtphi",&phi_2);
+    jetpbpb2[2]->SetBranchAddress("rawpt",&raw_2);
+    jetpbpb2[2]->SetBranchAddress("chargedMax",&chMax_2);
+    jetpbpb2[2]->SetBranchAddress("chargedSum",&chSum_2);
+    jetpbpb2[2]->SetBranchAddress("trackMax",&trkMax_2);
+    jetpbpb2[2]->SetBranchAddress("trackSum",&trkSum_2);
+    jetpbpb2[2]->SetBranchAddress("photonMax",&phMax_2);
+    jetpbpb2[2]->SetBranchAddress("photonSum",&phSum_2);
+    jetpbpb2[2]->SetBranchAddress("neutralMax",&neMax_2);
+    jetpbpb2[2]->SetBranchAddress("neutralSum",&neSum_2);
 
-  //jetpbpb2[2]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_2);
-  //jetpbpb2[2]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_2);
-  //jetpbpb2[2]->SetBranchAddress("L1_ZeroBias",&L1_MB_2);
-  //jetpbpb2[2]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_2);
-  jetpbpb2[2]->SetBranchAddress("HLT_HIJet55_v1",&jet55_2);
-  jetpbpb2[2]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_2);
-  jetpbpb2[2]->SetBranchAddress("HLT_HIJet65_v1",&jet65_2);
-  jetpbpb2[2]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_2);
-  jetpbpb2[2]->SetBranchAddress("HLT_HIJet80_v1",&jet80_2);
-  jetpbpb2[2]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_2);
+    //jetpbpb2[2]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_2);
+    //jetpbpb2[2]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_2);
+    //jetpbpb2[2]->SetBranchAddress("L1_ZeroBias",&L1_MB_2);
+    //jetpbpb2[2]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_2);
+    jetpbpb2[2]->SetBranchAddress("HLT_HIJet55_v1",&jet55_2);
+    jetpbpb2[2]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_2);
+    jetpbpb2[2]->SetBranchAddress("HLT_HIJet65_v1",&jet65_2);
+    jetpbpb2[2]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_2);
+    jetpbpb2[2]->SetBranchAddress("HLT_HIJet80_v1",&jet80_2);
+    jetpbpb2[2]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_2);
 
-  jetpbpb2[2]->SetBranchAddress("id",&trgObj_id_2);
-  jetpbpb2[2]->SetBranchAddress("pt",&trgObj_pt_2);
-  jetpbpb2[2]->SetBranchAddress("eta",&trgObj_eta_2);
-  jetpbpb2[2]->SetBranchAddress("phi",&trgObj_phi_2);
-  jetpbpb2[2]->SetBranchAddress("mass",&trgObj_mass_2);
+    jetpbpb2[2]->SetBranchAddress("id",&trgObj_id_2);
+    jetpbpb2[2]->SetBranchAddress("pt",&trgObj_pt_2);
+    jetpbpb2[2]->SetBranchAddress("eta",&trgObj_eta_2);
+    jetpbpb2[2]->SetBranchAddress("phi",&trgObj_phi_2);
+    jetpbpb2[2]->SetBranchAddress("mass",&trgObj_mass_2);
   
+  }
+
   //now that we have all the branch addresses set up we can start going through the loop to look at the trigger objects 
   
   //before we go and do the trigger object merging lets do the text file information here: 
@@ -910,7 +952,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, int radius = 3, char
 
 
   //declare the histograms needed for the hpbpb_TrigObj80, hpbpb_TrigObj65, hpbpb_TrigObj55, hpbpb_TrigObjMB, hpbpb_TrigComb;
-  TH1F *hpbpb_TrgObj80[nbins_cent+1], *hpbpb_TrgObj65[nbins_cent+1], *hpbpb_TrgObj55[nbins_cent+1], *hpbpb_TrgObjMB[nbins_cent+1], *hpbpb_TrgObjComb[nbins_cent+1];
+  TH1F *hpbpb_TrgObj80[no_radius][nbins_eta][nbins_cent+1], *hpbpb_TrgObj65[nbins_cent+1], *hpbpb_TrgObj55[nbins_cent+1], *hpbpb_TrgObjMB[nbins_cent+1], *hpbpb_TrgObjComb[nbins_cent+1];
 
   for(int i = 0;i<nbins_cent;i++){
 
