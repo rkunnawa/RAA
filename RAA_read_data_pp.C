@@ -37,9 +37,6 @@
 #include "TMath.h"
 #include "TLine.h"
 
-static const int nbins_pt = 29;
-static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
-
 // divide by bin width
 void divideBinWidth(TH1 *h)
 {
@@ -57,12 +54,51 @@ void divideBinWidth(TH1 *h)
 	h->GetYaxis()->CenterTitle();
 }
 
-static const int dir=50;
 
-//static const int nbins_pt = 29;
+static const int nbins_pt = 39;
+static const double boundaries_pt[nbins_pt+1] = {
+  3, 4, 5, 7, 9, 12, 
+  15, 18, 21, 24, 28,
+  32, 37, 43, 49, 56,
+  64, 74, 84, 97, 114,
+  133, 153, 174, 196,
+  220, 245, 272, 300, 
+  330, 362, 395, 430,
+  468, 507, 548, 592,
+  638, 686, 1000 
+};
+
+static const int nbins_eta = 10;
+static const double boundaries_eta[nbins_eta][2] = {
+  {-1.0,+1.0},
+  {-2.0,+2.0},
+  {-2.5,-2.0},
+  {-2.0,-1.5},
+  {-1.5,-1.0},
+  {-1.0,-0.5},
+  {-0.5,+0.5},
+  {+0.5,+1.0},
+  {+1.0,+1.5},
+  {+1.5,+2.0}
+};
+
+static const double delta_eta[nbins_eta] = {
+  2.0, 4.0, 
+  0.5, 0.5, 
+  0.5, 0.5, 
+  1.0, 0.5,
+  0.5, 0.5
+};
+
+static const char etaWidth [nbins_eta][256] = {
+  "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
+  "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
+  "p10_eta_p15","p15_eta_p20"
+};
+
+
 
 using namespace std;
-
 
 void RAA_read_data_pp(){
 
@@ -73,23 +109,28 @@ void RAA_read_data_pp(){
   timer.Start();
 
   cout<<"Reading PP 2013 data"<<endl;
-  cout<<"Running for Radius = "<<radius<<endl;
 
    // data files - pp 
-  TFile *fpp1_v2 = TFile::Open("/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/data/ntuple_2013_JEC_applied_ppJet80_v2.root");
-  TFile *fpp2_v2 = TFile::Open("/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/data/ntuple_2013_JEC_applied_ppJet40_v2.root");
+  TFile *fpp80or100 = TFile::Open("/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/data/ntuple_2013_JEC_applied_ppJet80_v2.root");
+  TFile *fpp40or60 = TFile::Open("/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/data/ntuple_2013_JEC_applied_ppJet40_v2.root");
 
+  TTree *jetpp80or100[no_radius];
+  TTree *jetpp40or60[no_radius];
 
-    //do it for the pp - need to check up on this. 
-  TTree *jetpp1_v2 = (TTree*)fpp1_v2->Get(Form("jetR%d",radius));
-  TTree *jetpp2_v2 = (TTree*)fpp2_v2->Get(Form("jetR%d",radius));
+  TTree *evtpp80or100 = (TTree*)fpp80or100->Get("evt");
+  TTree *evtpp40or60 = (TTree*)fpp40or60->Get("evt");
 
-  TTree *evtpp1_v2 = (TTree*)fpp1_v2->Get("evt");
-  TTree *evtpp2_v2 = (TTree*)fpp2_v2->Get("evt");
+  for(int k = 0;k<no_radius;k++){
 
-  jetpp1_v2->AddFriend(evtpp1_v2);
-  jetpp2_v2->AddFriend(evtpp2_v2);
+    jetpp80or100[k] = (TTree*)fpp80or100->Get(Form("jetR%d",list_radius[k]));
+    jetpp40or60[k] = (TTree*)fpp40or60->Get(Form("jetR%d",list_radius[k]));
 
+    jetpp80or100[k]->AddFriend(evtpp80or100);
+    jetpp40or60[k]->AddFriend(evtpp40or60);
+
+  }//radius loop
+
+  //declare the histograms here. 
 
   //get all the pp spectra here: 
   TCut pp3 = "jet40&&!jet60&&!jet80&&(chMax/pt)>0.01&&(TMath::Max(neMax,chMax)/TMath::Max(chSum,neSum))>=0.975";
@@ -125,44 +166,7 @@ void RAA_read_data_pp(){
   // 9.25038 was the value. 
   //jetpp2_v2->Project("hpp3","pt","jet40_p"*pp3);
   //hpp3->Print("base");
- 
-  //we need to get data in the same setup the NLO files are present so for R=0.2,0.3,0.4,0.5,0.7 and for the different eta bins
-  char etaWidth[dir][256] = {
-    "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
-    "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
-    "p10_eta_p15","p15_eta_p20",
-    "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
-    "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
-    "p10_eta_p15","p15_eta_p20",
-    "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
-    "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
-    "p10_eta_p15","p15_eta_p20",
-    "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
-    "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
-    "p10_eta_p15","p15_eta_p20",
-    "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
-    "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
-    "p10_eta_p15","p15_eta_p20"
-  };
-  
-  char radius_lable[dir][256] = {
-    "R2","R2","R2","R2","R2","R2","R2","R2","R2","R2",
-    "R3","R3","R3","R3","R3","R3","R3","R3","R3","R3",
-    "R4","R4","R4","R4","R4","R4","R4","R4","R4","R4",
-    "R5","R5","R5","R5","R5","R5","R5","R5","R5","R5",
-    "R7","R7","R7","R7","R7","R7","R7","R7","R7","R7"
-  };
-  
-  TCut pp3[dir]
 
-  for(int i = 0;i<dir;i++){
-    
-    
-
-
-  }
-
-  
   hpp1->Scale(1./5300e6);//pp lumi
   hpp2->Scale(1./5300e6);
   hpp3->Scale(1./5300e6);

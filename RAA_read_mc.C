@@ -695,7 +695,7 @@ void RAA_read_mc(char *algo = "Pu"){
   TDatime date;
 
   //declare the output file 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/PbPb_pp_mc_ak%s_%d.root",algo,date.GetDate()),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_ak%s_%d.root",algo,date.GetDate()),"RECREATE");
   f.cd();
 
   for(int k = 0;k<no_radius;k++){
