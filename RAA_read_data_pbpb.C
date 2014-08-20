@@ -10,8 +10,8 @@
 
 // the best way i think would be to just use the unmerged files for the condor script. that way once we have a TChain of all the files everything below would work. 
 
-// NOW THE # for LUMI NORMALIZATION is WRONG!!!! need to change that once we get the full dataset. I already have the lumi mask. will get the required numbers from that. 
-// Lumi seen by the respective triggers 
+// I have the lumi mask. will get the required numbers from that - which are as follows:  
+// CORRECT Lumi seen by the respective triggers 
 // Jet65 - 139.571 ub-1
 // Jet55 - 75.086 ub-1 
 // Jet80 - 149.427 ub-1 

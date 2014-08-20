@@ -181,7 +181,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc(char *algo = "Pu"){
+void RAA_read_mc(char *algo = "Vs"){
   
   TStopwatch timer;
   timer.Start();
@@ -618,9 +618,9 @@ void RAA_read_mc(char *algo = "Pu"){
       for (Long64_t jentry=0; jentry<dataPP[k][h]->tJet->GetEntries();jentry++) {
 	//for (Long64_t jentry=0; jentry<10;jentry++) {
         dataPP[k][h]->tEvt->GetEntry(jentry);
-        dataPP[k][h]->tJet->GetEntry(jentry);
-        //dataPP[k][h]->tGenJet->GetEntry(jentry);
-        //if(dataPP[k][h]->pthat<boundariesPP_pthat[h] || dataPP[k][h]->pthat>boundariesPP_pthat[i+1]) continue;
+	dataPP[k][h]->tJet->GetEntry(jentry);
+	//dataPP[k][h]->tGenJet->GetEntry(jentry);
+	//if(dataPP[k][h]->pthat<boundariesPP_pthat[h] || dataPP[k][h]->pthat>boundariesPP_pthat[i+1]) continue;
         //if(dataPP[k][h]->bin<=28) continue;
         int pthatBin = hPtHatPP[k]->FindBin(dataPP[k][h]->pthat);
         float scalepp = (xsectionPP[pthatBin-1]-xsectionPP[pthatBin])/hPtHatRawPP[k]->GetBinContent(pthatBin);

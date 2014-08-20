@@ -3,7 +3,7 @@
 counter=0
 incrementer=1
 
-destination=/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Output/
+destination=/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/
 filelist=jet55or65_filelist.txt
 filelist2=jet80_filelist.txt
 #filelist=wxie_MinBiasUPC_all.txt
