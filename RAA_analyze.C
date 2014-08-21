@@ -1,6 +1,7 @@
 // Raghav Kunnawalkam Elayavalli
 // June 10th 2014
 // CERN
+// raghav.k.e AT CERN DOT CH
 
 // RAA - analyze macro. following the steps of having a separate macro to do the work. 
 
@@ -19,7 +20,9 @@
 //             - the histograms are called [nbins_cent][iterations] while they are saved ad [iterations][nbins_cent]
 //             - Just be careful when loading the histograms, especially in the plotting macro 
 
-// July 19th - started adding in the radius loop and the eta bins loop. when i add in the eta loop, i might as well add in radius loop to make things run faster. 
+// July 19th - started adding in the radius loop and the eta bins loop.
+
+// Aug 20th - continued editing the radius and eta bin loop. 
 
 #include <iostream>
 #include <stdio.h>
@@ -36,38 +39,32 @@ static const int nbins_pt = 29;
 static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
 
 // Remove bins with error > central value
-void cleanup(TH1F *h)
-{
-  for (int i=1;i<=h->GetNbinsX();i++)
-    {
-      double val1 = h->GetBinContent(i);
-      double valErr1 = h->GetBinError(i);
-      if (valErr1>=val1) {
-	h->SetBinContent(i,0);
-	h->SetBinError(i,0);
-      }
-    }   
+void cleanup(TH1F *h){
+  for (int i=1;i<=h->GetNbinsX();i++){
+    double val1 = h->GetBinContent(i);
+    double valErr1 = h->GetBinError(i);
+    if (valErr1>=val1) {
+      h->SetBinContent(i,0);
+      h->SetBinError(i,0);
+    }
+  }   
 }
 
 // Remove error 
-void removeError(TH1F *h)
-{
-  for (int i=1;i<=h->GetNbinsX();i++)
-    {
-      h->SetBinError(i,0);
-    }   
-
-}
+void removeError(TH1F *h){
+  for (int i=1;i<=h->GetNbinsX();i++){
+    h->SetBinError(i,0);
+  } 
+}  
 
 // Remove Zero
-void removeZero(TH1 *h)
-{
+void removeZero(TH1 *h){
   double min = 0;
   for(int i = 1;i<h->GetNbinsX();i++){
     if(h->GetBinContent(i)>min&&h->GetBinContent(i)>0)
       min = h->GetBinContent(i);
   }
-
+  
   for(int i = 1;i<h->GetNbinsX();i++){
     if(h->GetBinContent(i) == 0){
       h->SetBinContent(i,min/10.);
@@ -77,8 +74,7 @@ void removeZero(TH1 *h)
 }
 
 // make a histogram from TF1 function
-TH1F *functionHist(TF1 *f, TH1F* h,char *fHistname)
-{
+TH1F *functionHist(TF1 *f, TH1F* h,char *fHistname){
   TH1F *hF = (TH1F*)h->Clone(fHistname);
   for (int i=1;i<=h->GetNbinsX();i++){
     double var = f->Integral(h->GetBinLowEdge(i),h->GetBinLowEdge(i+1))/h->GetBinWidth(i);
@@ -89,7 +85,7 @@ TH1F *functionHist(TF1 *f, TH1F* h,char *fHistname)
 }
 
 
-void RAA_analyze(int radius = 3, char* algo = "Vs"){
+void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
 
   TStopwatch timer; 
   timer.Start();
@@ -97,16 +93,15 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
   
+  bool printDebug = true;
+
   // get the data and mc histograms from the output of the read macro. 
   
-  //TDatime date;//this is just here to get them to run optimized. 
-  
-  //TFile* fData_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_data_ak%d_%s_cent%d_chMax_12003cut.root",radius,algo,date.GetDate()));
-  //TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%d_%s_cent%d_chMax_12003cut.root",radius,algo,date.GetDate()));
+  TDatime date;//this is just here to get them to run optimized. 
 
-  TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%d_%s_20140625_chMax_12003cut.root",radius,algo));
+  TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%s%s_20140820.root",algo,jet_type));
   TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%d_20140623_chMax_12003cut.root",radius));
-  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%d_%s_20140616_chMax_12003cut.root",radius,algo));
+  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%s%s_20140820.root",algo,jet_type));
 
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
   // for the above condition, i might have to play with the date stamp. 
@@ -117,6 +112,8 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   
   // histogram declarations with the following initial appendage: d - Data, m - MC, u- Unfolded
   // for the MC closure test, ive kept separate 
+
+  // setup the radius and the eta bin loop here later. not for the time being. Aug 20th. only run the -2 < eta < 2 with the differenent centrality bins 
 
   TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1];
   
@@ -144,16 +141,17 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   
   // get PbPb data
   for(int i = 0;i<=nbins_cent;i++){
-    cout<<"cent_"<<i<<endl;
-    dPbPb_TrgComb[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObjComb_cent%d",i));
+    if(printDebug) cout<<"cent_"<<i<<endl;
+    dPbPb_TrgComb[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObjComb_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_TrgComb[i]->Print("base");
-    dPbPb_Trg80[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj80_cent%d",i));
+    dPbPb_Trg80[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj80_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_Trg80[i]->Print("base");
-    dPbPb_Trg65[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj65_cent%d",i));
+    dPbPb_Trg65[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj65_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_Trg65[i]->Print("base");
-    dPbPb_Trg55[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj55_cent%d",i));
+    dPbPb_Trg55[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj55_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_Trg55[i]->Print("base");
 
+    /*
     dPbPb_Comb[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpbComb_cent%d",i));
     dPbPb_Comb[i]->Print("base");
     dPbPb_1[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb1_cent%d",i));
@@ -169,27 +167,27 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     dPbPb_65[i]->Print("base");
     dPbPb_55[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_55_cent%d",i));
     dPbPb_55[i]->Print("base");
+    */
 
   }
 
   // get PbPb MC
   for(int i = 0;i<=nbins_cent;i++){
-
-   mPbPb_Gen[i] = (TH1F*)fMC_in->Get(Form("hpbpb_gen_cent%d",i));
-   mPbPb_Gen[i]->Print("base");
-   mPbPb_Reco[i] = (TH1F*)fMC_in->Get(Form("hpbpb_reco_cent%d",i));
-   mPbPb_Reco[i]->Print("base");
-   mPbPb_Matrix[i] = (TH2F*)fMC_in->Get(Form("hpbpb_matrix_cent%d",i));
-   mPbPb_Matrix[i]->Print("base");
-   mPbPb_mcclosure_data[i] = (TH1F*)fMC_in->Get(Form("hpbpb_mcclosure_data_cent%d",i));
-   mPbPb_mcclosure_data[i]->Print("base");
+    
+    mPbPb_Gen[i] = (TH1F*)fMC_in->Get(Form("hpbpb_gen_R%d_n20_eta_p20_cent%d",radius,i));
+    mPbPb_Gen[i]->Print("base");
+    mPbPb_Reco[i] = (TH1F*)fMC_in->Get(Form("hpbpb_reco_R%d_n20_eta_p20_cent%d",radius,i));
+    mPbPb_Reco[i]->Print("base");
+    mPbPb_Matrix[i] = (TH2F*)fMC_in->Get(Form("hpbpb_matrix_R%d_n20_eta_p20_cent%d",radius,i));
+    mPbPb_Matrix[i]->Print("base");
+    mPbPb_mcclosure_data[i] = (TH1F*)fMC_in->Get(Form("hpbpb_mcclosure_data_R%d_n20_eta_p20_cent%d",radius,i));
+    mPbPb_mcclosure_data[i]->Print("base");
     //mPbPb_Response[i] = new TH2F(Form("mPbPb_Response_cent%d",i),"Response Matrix",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
     //mPbPb_ResponseNorm[i] = new TH2F(Form("mPbPb_ResponseNorm_cent%d",i),"Normalized Response Matrix",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
-    
   }
-
+  
   // get PP data
-  cout<<"Getting PP data and MC"<<endl;
+  if(printDebug) cout<<"Getting PP data and MC"<<endl;
   dPP_1 = (TH1F*)fData_pp_in->Get("hpp1");
   dPP_1->Print("base");
   dPP_2 = (TH1F*)fData_pp_in->Get("hpp2");
@@ -200,13 +198,13 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   dPP_Comb->Print("base");
 
   // get PP MC
-  mPP_Gen = (TH1F*)fMC_in->Get("hpp_gen");
+  mPP_Gen = (TH1F*)fMC_in->Get(Form("hpp_gen_R%d_n20_eta_p20",radius));
   mPP_Gen->Print("base");
-  mPP_Reco = (TH1F*)fMC_in->Get("hpp_reco");
+  mPP_Reco = (TH1F*)fMC_in->Get(Form("hpp_reco_R%d_n20_eta_p20",radius));
   mPP_Reco->Print("base");
-  mPP_Matrix = (TH2F*)fMC_in->Get("hpp_matrix");
+  mPP_Matrix = (TH2F*)fMC_in->Get(Form("hpp_matrix_R%d_n20_eta_p20",radius));
   mPP_Matrix->Print("base");
-  mPP_mcclosure_data = (TH1F*)fMC_in->Get("hpp_mcclosure_data");
+  mPP_mcclosure_data = (TH1F*)fMC_in->Get(Form("hpp_mcclosure_data_R%d_n20_eta_p20",radius));
   mPP_mcclosure_data->Print("base");
   //mPP_Matrix->Print("base");
   //mPP_Response = (TH2F*)fMc_in->Get("hpp_gen");
@@ -214,11 +212,11 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   // make the response matrix.
   // here since we dont have the simple nature of the uhist histograms which makes debugging hard, we have to run the response matrix and unfolding separately for PbPb and pp which makes code ugly and not efficient but easy to debug at the same time. 
 
-  cout<<"Filling the PbPb response Matrix"<<endl;
+  if(printDebug) cout<<"Filling the PbPb response Matrix"<<endl;
 
   // response matrix and unfolding for PbPb 
   for(int i = 0;i<=nbins_cent;i++){
-    cout<<"centrality bin iteration = "<<i<<endl;
+    if(printDebug) cout<<"centrality bin iteration = "<<i<<endl;
     TF1 *f = new TF1("f","[0]*pow(x+[2],[1])");
     f->SetParameters(1e10,-8.8,40);
     TH1F *hGenSpectraCorr = (TH1F*)mPbPb_Matrix[i]->ProjectionX()->Clone(Form("hGenSpectraCorr_cent%d",i));
@@ -295,16 +293,16 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     }
   }
 
-  cout<<"Filling PP response Matrix"<<endl;
+  if(printDebug) cout<<"Filling PP response Matrix"<<endl;
 
   // response matrix for pp.  
   // Kurt doesnt have this whole hGenSpectraCorr thing in his macro. need to check why the difference exits between out codes
   
   TF1 *fpp = new TF1("fpp","[0]*pow(x+[2],[1])");
   fpp->SetParameters(1e10,-8.8,40);
-  //cout<<"before getting the gen spectra corr matrix"<<endl;
+  //if(printDebug) cout<<"before getting the gen spectra corr matrix"<<endl;
   TH1F *hGenSpectraCorrPP = (TH1F*)mPP_Matrix->ProjectionX()->Clone("hGenSpectraCorrPP");
-  //cout<<"after gettign the gen spectra corr matrix"<<endl;
+  //if(printDebug) cout<<"after gettign the gen spectra corr matrix"<<endl;
   hGenSpectraCorrPP->Fit("f"," ");
   hGenSpectraCorrPP->Fit("f","","");
   hGenSpectraCorrPP->Fit("f","LL");
@@ -331,7 +329,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   
   // Ok major differences here between my code and Kurt in b-jet Tools under Unfold - lines 469 and above.  
 
-  cout<<"getting the response matrix"<<endl;
+  if(printDebug) cout<<"getting the response matrix"<<endl;
 
   mPP_Response = (TH2F*)mPP_Matrix->Clone("mPP_Response");
   TH1F *hProjPP = (TH1F*)mPP_Response->ProjectionY()->Clone("hProjPP");
@@ -341,7 +339,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     double sum=0;
     for (int x=1;x<=mPP_Response->GetNbinsX();x++) {
       if (mPP_Response->GetBinContent(x,y)<=1*mPP_Response->GetBinError(x,y)) {
-	// in the above if loop, kurt has 1*error and my old has 0*error
+	// in the above if statement, kurt has 1*error and my old has 0*error
 	mPP_Response->SetBinContent(x,y,0);
 	mPP_Response->SetBinError(x,y,0);
       }
@@ -360,7 +358,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
       mPP_Response->SetBinError(x,y,mPP_Response->GetBinError(x,y)*ratio);
     }
   }
-  cout<<"getting the normalized response matrix"<<endl;
+  if(printDebug) cout<<"getting the normalized response matrix"<<endl;
   mPP_ResponseNorm = (TH2F*)mPP_Matrix->Clone("mPP_ResponseNorm");
   for (int x=1;x<=mPP_ResponseNorm->GetNbinsX();x++) {
     double sum=0;
@@ -382,7 +380,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     
   }
 
-  cout<<"finished with all the response matrix. now going for unfolding"<<endl;
+  if(printDebug) cout<<"finished with all the response matrix. now going for unfolding"<<endl;
   
   // do the unfolding - including the iteration systematics (ofcourse). Similar to the above version, we have to create 2 separate unfolding for PbPb and pp. 
 
@@ -392,7 +390,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   for (int i=0;i<=nbins_cent;i++) {
 
     // Do Bin-by-bin
-    cout<<"doing bin by bin unfolding for PbPb for centrality = "<<i<<endl;
+    if(printDebug) cout<<"doing bin by bin unfolding for PbPb for centrality = "<<i<<endl;
 
     TH1F* hBinByBinCorRaw = (TH1F*)mPbPb_Response[i]->ProjectionY();
     TH1F* hMCGen          = (TH1F*)mPbPb_Response[i]->ProjectionX(); // gen
@@ -402,20 +400,20 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     TH1F* hBinByBinCor = (TH1F*)hBinByBinCorRaw->Clone();//functionHist(f,hBinByBinCorRaw,Form("hBinByBinCor_cent%d",i));
     //TH1F* hBinByBinCor = (TH1F*)functionHist(f,hBinByBinCorRaw,Form("hBinByBinCor_cent%d",i));
 
-    cout<<"passed here after binbybincorrraw"<<endl;
+    if(printDebug) cout<<"passed here after binbybincorrraw"<<endl;
     dPbPb_TrgComb[i]->Print("base");
     uPbPb_BinByBin[i] = (TH1F*)dPbPb_TrgComb[i]->Clone(Form("uPbPb_BinByBin_cent%d",i));
-    cout<<"maybe here?"<<endl;
+    if(printDebug) cout<<"maybe here?"<<endl;
     uPbPb_BinByBin[i]->Divide(hBinByBinCor);
     //      uPbPb_BinByBin[i] = (TH1F*) hMCReco->Clone(Form("hRecoBinByBin_cent%d",i));
-    cout<<"passed A"<<endl;
+    if(printDebug) cout<<"passed A"<<endl;
     // Do unfolding
     //prior myPrior(mPbPb_Matrix[i],dPbPb_TrgComb[i],0);
     //myPrior.unfold(dPbPb_TrgComb[i],1);
     TH1F* hPrior = (TH1F*)hMCGen->Clone("hPrior");
     removeZero(hPrior);
     //hPrior->Scale(dPbPb_TrgComb[i]->Integral(0,1000)/hPrior->Integral(0,1000));
-    cout<<"passed B"<<endl;
+    if(printDebug) cout<<"passed B"<<endl;
     //TH1F *hReweightedPbPb = (TH1F*)mPbPb_Response[i]->ProjectionY()->Clone(Form("hReweightedPbPb_cent%d",i));
 
     //bayesianUnfold myUnfoldingJECSys(mPbPb_Matrix[i],hPrior,0);
@@ -426,7 +424,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     bayesianUnfold myUnfolding(mPbPb_Matrix[i],hPrior,0);
     myUnfolding.unfold(dPbPb_TrgComb[i],BayesIter);
 
-    cout <<"Unfolding bin "<<i<<endl;
+    if(printDebug) cout <<"Unfolding bin "<<i<<endl;
 
     delete hBinByBinCorRaw;
     delete hMCGen;
@@ -440,7 +438,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
       if(i!=6) uPbPb_BayesianIter[i][j]->SetTitle(Form("Unfolded PbPb Bayesian iteration %d with %2.0f - %2.0f cent",j,5*boundaries_cent[i],5*boundaries_cent[i+1]));
       else uPbPb_BayesianIter[i][j]->SetTitle(Form("Unfolded PbPb Bayesian iteration %d with 0-200 cent",j));
     }
-    cout<<"passed iteration sys"<<endl;
+    if(printDebug) cout<<"passed iteration sys"<<endl;
     uPbPb_Bayes[i]        = (TH1F*) uPbPb_BayesianIter[i][BayesIter]->Clone(Form("uPbPb_Bayes_cent%i",i));
     //uhist[i]->hRecoJECSys   = (TH1F*) myUnfoldingJECSys.hPrior->Clone(Form("UnfoldedJECSys_cent%i",i));
     //uhist[i]->hRecoSmearSys   = (TH1F*) myUnfoldingSmearSys.hPrior->Clone(Form("UnfoldedSmearSys_cent%i",i));
@@ -467,7 +465,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     myUnfoldingJECSys.unfold(dPbPb_TrgComb[i]JECSys,nBayesianIter);
     bayesianUnfold myUnfoldingSmearSys(mPbPb_Matrix[i],hPrior,0);
     myUnfoldingSmearSys.unfold(dPbPb_TrgComb[i]SmearSys,nBayesianIter);
-    cout <<"Unfolding bin "<<i<<endl;
+    if(printDebug) cout <<"Unfolding bin "<<i<<endl;
     // Iteration Systematics
     for (int j=2;j<7;j++)
     {
@@ -510,7 +508,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     // 	TH1F *hToy = (TH1F*)dPbPb_TrgComb[i]->Clone();   
     // 	TH2F *hMatrixToy = (TH2F*)mPbPb_Matrix[i]->Clone();
     // 	hToy->SetName("hToy");
-    // 	if (exp%100==0) cout <<"Pseudo-experiment "<<exp<<endl;
+    // 	if (exp%100==0) if(printDebug) cout <<"Pseudo-experiment "<<exp<<endl;
     // 	for (int j=1;j<=hToy->GetNbinsX();j++) {
     // 	  double value = gRandom->Poisson(dPbPb_TrgComb[i]->GetBinContent(j));
     // 	  hToy->SetBinContent(j,value);
@@ -549,7 +547,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     // 	    hTmp[j]->Fit("f","LL Q ");
     // 	    hTmp[j]->Fit("f","LL Q ");
     // 	    //	       cToy->SaveAs(Form("toy/cent-%d-pt-%.0f.gif",i,uhist[i]->hReco->GetBinCenter(j)));
-    // 	    //     	       cout <<j<<" "<<f->GetParameter(2)<<endl;
+    // 	    //     	       if(printDebug) cout <<j<<" "<<f->GetParameter(2)<<endl;
     // 	    uhist[i]->hReco->SetBinError(j,f->GetParameter(2));
     // 	  }	       
     // 	  f->SetParameters(hTmp2[j]->GetMaximum(),hTmp2[j]->GetMean(),hTmp2[j]->GetRMS());
@@ -557,7 +555,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     // 	    hTmp2[j]->Fit("f","LL Q ");
     // 	    hTmp2[j]->Fit("f","LL Q ");
     // 	    //cToy->SaveAs(Form("toy/cent2-%d-pt-%.0f.gif",i,uhist[i]->hReco->GetBinCenter(j)));
-    // 	    //cout <<j<<" "<<f->GetParameter(2)<<endl;
+    // 	    //if(printDebug) cout <<j<<" "<<f->GetParameter(2)<<endl;
     // 	    uPbPb_BinByBin[i]->SetBinError(j,f->GetParameter(2));
     // 	  }	       
     // 	  delete hTmp[j];
@@ -569,7 +567,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
 
   // do the pp unfolding. 
   // Do Bin-by-bin
-  cout<<"doing bin by bin unfolding - PP"<<endl;
+  if(printDebug) cout<<"doing bin by bin unfolding - PP"<<endl;
 
   TH1F* hBinByBinCorRawPP = (TH1F*)mPP_Response->ProjectionY();
   TH1F* hMCGenPP          = (TH1F*)mPP_Response->ProjectionX(); // gen
@@ -661,7 +659,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   for (int i=0;i<=nbins_cent;i++) {
 
     // Do Bin-by-bin
-    cout<<"doing bin by bin unfolding for PbPb MC closure test for centrality = "<<i<<endl;
+    if(printDebug) cout<<"doing bin by bin unfolding for PbPb MC closure test for centrality = "<<i<<endl;
 
     TH1F* hBinByBinCorRaw = (TH1F*)mPbPb_Response[i]->ProjectionY();
     TH1F* hMCGen          = (TH1F*)mPbPb_Response[i]->ProjectionX(); // gen
@@ -671,13 +669,13 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     TH1F* hBinByBinCor = (TH1F*)hBinByBinCorRaw->Clone();//functionHist(f,hBinByBinCorRaw,Form("hBinByBinCor_cent%d",i));
     //TH1F* hBinByBinCor = (TH1F*)functionHist(f,hBinByBinCorRaw,Form("hBinByBinCor_cent%d",i));
 
-    //cout<<"passed here after binbybincorrraw"<<endl;
+    //if(printDebug) cout<<"passed here after binbybincorrraw"<<endl;
     //dPbPb_TrgComb[i]->Print("base");
     uPbPb_MC_BinByBin[i] = (TH1F*)mPbPb_mcclosure_data[i]->Clone(Form("uPbPb_MC_BinByBin_cent%d",i));
-    //cout<<"maybe here?"<<endl;
+    //if(printDebug) cout<<"maybe here?"<<endl;
     uPbPb_MC_BinByBin[i]->Divide(hBinByBinCor);
     //uPbPb_BinByBin[i] = (TH1F*) hMCReco->Clone(Form("hRecoBinByBin_cent%d",i));
-    //cout<<"passed A"<<endl;
+    //if(printDebug) cout<<"passed A"<<endl;
     
     // Do unfolding
     //prior myPrior(mPbPb_Matrix[i],dPbPb_TrgComb[i],0);
@@ -685,7 +683,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     TH1F* hPriorMC = (TH1F*)hMCGen->Clone("hPriorMC");
     removeZero(hPriorMC);
     //hPrior->Scale(dPbPb_TrgComb[i]->Integral(0,1000)/hPrior->Integral(0,1000));
-    //cout<<"passed B"<<endl;
+    //if(printDebug) cout<<"passed B"<<endl;
     //TH1F *hReweightedPbPb = (TH1F*)mPbPb_Response[i]->ProjectionY()->Clone(Form("hReweightedPbPb_cent%d",i));
 
     //bayesianUnfold myUnfoldingJECSys(mPbPb_Matrix[i],hPrior,0);
@@ -699,7 +697,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
     mPbPb_mcclosure_data[i]->SetTitle(Form("PbPb MC closure test data cent%d",i));
     mPbPb_mcclosure_data[i]->SetName(Form("mPbPb_mclosure_data_cent%d",i));
 
-    cout <<"Unfolding bin "<<i<<endl;
+    if(printDebug) cout <<"Unfolding bin "<<i<<endl;
 
     delete hBinByBinCorRaw;
     delete hMCGen;
@@ -713,7 +711,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
       if(i<6) uPbPb_MC_BayesianIter[i][j]->SetTitle(Form("Unfolded PbPb MC closure test Bayesian iteration %d with %2.0f - %2.0f cent",j,5*boundaries_cent[i],5*boundaries_cent[i+1]));
       else uPbPb_MC_BayesianIter[i][j]->SetTitle(Form("Unfolded PbPb MC closure test Bayesian iteration %d with 0-200 cent",j));
     }
-    cout<<"passed iteration sys"<<endl;
+    if(printDebug) cout<<"passed iteration sys"<<endl;
     uPbPb_MC_Bayes[i]        = (TH1F*) uPbPb_BayesianIter[i][BayesIter]->Clone(Form("uPbPb_MC_Bayes_cent%i",i));
     //uhist[i]->hRecoJECSys   = (TH1F*) myUnfoldingJECSys.hPrior->Clone(Form("UnfoldedJECSys_cent%i",i));
     //uhist[i]->hRecoSmearSys   = (TH1F*) myUnfoldingSmearSys.hPrior->Clone(Form("UnfoldedSmearSys_cent%i",i));
@@ -734,7 +732,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
 
   // do pp mc unfolding closure test 
   // Do Bin-by-bin
-  cout<<"doing bin by bin unfolding for MC closure test - PP"<<endl;
+  if(printDebug) cout<<"doing bin by bin unfolding for MC closure test - PP"<<endl;
 
   TH1F *uPP_MC_BinByBin, *uPP_MC_Bayes;
   TH1F *uPP_MC_BayesianIter[Iterations];
@@ -767,7 +765,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   
   bayesianUnfold myUnfoldingPPMC(mPP_Matrix,hPriorPPMC,0);
   myUnfoldingPPMC.unfold(mPP_mcclosure_data,BayesIter);
-
+  
   mPP_mcclosure_data->SetName("mPP_mcclosure_data");
   mPP_mcclosure_data->SetTitle("PP mcclosure data");
   
@@ -797,11 +795,8 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
 
   // write it to the output file
   
-  
-  
-  TDatime date;
-  
-  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%d_%s_%d_chMax_12003cut.root",radius,algo,date.GetDate()),"RECREATE");
+    
+  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_%d.root",algo,radius,jet_type,date.GetDate()),"RECREATE");
   fout.cd();
 
   for(int i = 0;i<=nbins_cent;i++){
@@ -853,8 +848,8 @@ void RAA_analyze(int radius = 3, char* algo = "Vs"){
   fout.Close();
   
   timer.Stop();
-  cout<<"CPU time = "<<timer.CpuTime()<<endl;
-  cout<<"Real tile = "<<timer.RealTime()<<endl;
+  if(printDebug) cout<<"CPU time = "<<timer.CpuTime()<<endl;
+  if(printDebug) cout<<"Real tile = "<<timer.RealTime()<<endl;
   
   
 }
