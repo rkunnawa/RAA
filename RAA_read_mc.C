@@ -143,6 +143,7 @@ public:
     tSkim = (TTree*)tFile->Get("skimanalysis/HltTree");
     tJet = (TTree*)tFile->Get(jetTree);
     tJet->SetBranchAddress("jtpt" , jtpt );
+    tJet->SetBranchAddress("rawpt", rawpt);
     tJet->SetBranchAddress("trackMax" , trackMax );
     tJet->SetBranchAddress("chargedMax",chargedMax);
     tJet->SetBranchAddress("chargedSum",chargedSum);
@@ -153,6 +154,7 @@ public:
     tJet->SetBranchAddress("jteta", jteta);
     tJet->SetBranchAddress("jtm",jtmass);
     tJet->SetBranchAddress("pthat",&pthat);
+    if(isPbPb) tJet->SetBranchAddress("subid",&subid);
     if (loadGenJet) tGenJet = (TTree*)tFile->Get(genJetTree);
     if (loadGenJet) tGenJet->SetBranchAddress("ngen" ,&ngen);
     if (loadGenJet) tGenJet->SetBranchAddress("genpt", genpt);
@@ -171,6 +173,7 @@ public:
   TTree *tEvt;
   TTree* tSkim;
   float jtpt[1000];
+  float rawpt[1000];
   float refpt[1000];
   float jteta[1000];
   float jtmass[1000];
@@ -181,6 +184,7 @@ public:
   float neutralSum[1000];
   float genpt[1000];
   int gensubid[1000];
+  float subid[1000];
   float vz;
   float pthat;
   int njets;
@@ -570,11 +574,13 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
           for(int j = 0;j<nbins_eta;j++){
 
             //int subEvt=-1;
-            if ( data[k][h]->refpt[g]  < 30. ) continue;
+	    if ( data[k][h]->subid[g] != 0 ) continue;
+            if ( data[k][h]->rawpt[g]  <= 10. ) continue;
+	    if ( data[k][h]->jtpt[g] > 3*data[k][h]->pthat) continue;
             if ( data[k][h]->jteta[g]  > boundaries_eta[j][1] || data[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
-	        
+	         
             // jet quality cuts here: 
-            if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.05) continue;
+            //if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.05) continue;
 	    //if ( data[k][h]->neutralMax[g]/TMath::Max(data[h]->chargedSum[k],data[h]->neutralSum[k]) < 0.975)continue;
 
 	    //for (int l= 0; l< data[h]->ngen;l++) {
@@ -592,17 +598,17 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
 	    //if (!isMC||jentry2<data[h]->tJet->GetEntries()/2.) {
 	    //cout<<"going to fill the histograms now"<<endl;
 	    //cout<<"fvz = "<<weight_vz<<endl;
-	
+	    
 	    //hpbpb_response[cBin]->Fill(data[h]->jtpt[k],data[h]->refpt[k],scale*weight_vz);
 	    hpbpb_matrix[k][j][cBin]->Fill(data[k][h]->refpt[g],data[k][h]->jtpt[g],scale*weight_vz);
 	    hpbpb_gen[k][j][cBin]->Fill(data[k][h]->refpt[g],scale*weight_vz);
 	    hpbpb_reco[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
-	
+	    
 	    //hpbpb_response[nbins_cent]->Fill(data[h]->jtpt[k],data[h]->refpt[k],scale*weight_vz);
 	    hpbpb_matrix[k][j][nbins_cent]->Fill(data[k][h]->refpt[g],data[k][h]->jtpt[g],scale*weight_vz);
 	    hpbpb_gen[k][j][nbins_cent]->Fill(data[k][h]->refpt[g],scale*weight_vz);
 	    hpbpb_reco[k][j][nbins_cent]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
-
+	    
 	    if (jentry>data[k][h]->tJet->GetEntries()/2.) {
 	      hpbpb_mcclosure_data[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
 	      hpbpb_mcclosure_data[k][j][nbins_cent]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
@@ -672,7 +678,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
           for(int j = 0;j<nbins_eta;j++){
             
             int subEvt=-1;
-            if ( dataPP[k][h]->refpt[g]  < 30. ) continue;
+            if ( dataPP[k][h]->rawpt[g]  <= 10. ) continue;
             if ( dataPP[k][h]->jteta[g]  > boundaries_eta[j][1] || dataPP[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
 
             // jet QA cuts: 
@@ -692,8 +698,8 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
             hpp_matrix[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],scalepp*weight_vz);
             hpp_gen[k][j]->Fill(dataPP[k][h]->refpt[g],scalepp*weight_vz);   
             hpp_reco[k][j]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
-  
-              
+	    
+	    
             if (jentry>dataPP[k][h]->tJet->GetEntries()/2.)
               hpp_mcclosure_data[k][j]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
             
