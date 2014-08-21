@@ -20,6 +20,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
+#include <sstream>
 #include <TH1F.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -40,6 +41,8 @@
 #include <TChain.h>
 #include <TProfile.h>
 #include <TStopwatch.h>
+#include <TEventList.h>
+#include <TSystem.h>
 #include <TCut.h>
 #include <cstdlib>
 #include <cmath>
@@ -239,7 +242,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
   
   boundaries_pthat[3]=80;
   fileName_pthat[3] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT80_Hydjet1p8_STARTHI53_LV1_v15_full.root";
-  xsection[3]= 9.8653e-05;
+  xsection[3]= 9.865e-05;
   //entries[3] = ;//total - 49500
   
   boundaries_pthat[4]=120;
@@ -526,8 +529,25 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       
         //cout<<xsection[pthatBin-1]-xsection[pthatBin]<<endl;
         //cout<<"nentries = "<<hPtHatRaw->GetBinContent(pthatBin)<<endl;
-        double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/hPtHatRaw[k]->GetBinContent(pthatBin);
+        double scale_old = (double)(xsection[pthatBin-1]-xsection[pthatBin])/hPtHatRaw[k]->GetBinContent(pthatBin);
 	//cout<<"scale = "<<scale<<endl;
+
+	//from Pawan's code: /net/hisrv0001/home/pawan/Validation/CMSSW_7_1_1/src/combinePtHatBins/pbpbJEC2014/condor/CondorPbPbCalJec.C
+	TEventList *el = new TEventList("el","el");
+	double pthat_event = data[k][h]->pthat;
+	double pthat_lower = boundaries_pthat[h];
+	double pthat_upper = boundaries_pthat[h+1];
+	stringstream selection; selection<<"pthat_lower<"<<pthat_upper;
+
+	data[k][h]->tJet->Draw(">>el",selection.str().c_str());
+	double fentries = el->GetN();
+	if(jentry==0)cout<<"tree entries: "<<data[k][h]->tJet->GetEntries()<<" elist: "<<fentries<<endl;
+	delete el;
+
+	//double fentries = data[k][h]->tJet->GetEntries(data[k][h]->pthat>=boundaries_pthat[h] && data[k][h]->pthat<boundaries_pthat[h+1]);
+	//if(jentry==0)cout<<fentries<<endl;
+	double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/fentries;
+
 	//cout<<"xsection[pthatBin-1] = "<<xsection[pthatBin-1]<<", xsection[pthatBin] = "<<xsection[pthatBin]<<", bin content = "<<hPtHatRaw[k]->GetBinContent(pthatBin)<<endl;
         //double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/entries[h];
 	
@@ -576,11 +596,11 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
             //int subEvt=-1;
 	    if ( data[k][h]->subid[g] != 0 ) continue;
             if ( data[k][h]->rawpt[g]  <= 10. ) continue;
-	    if ( data[k][h]->jtpt[g] > 3*data[k][h]->pthat) continue;
+	    if ( data[k][h]->jtpt[g] > 2.*data[k][h]->pthat) continue;
             if ( data[k][h]->jteta[g]  > boundaries_eta[j][1] || data[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
-	         
+	    
             // jet quality cuts here: 
-            //if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.05) continue;
+            if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.01) continue;
 	    //if ( data[k][h]->neutralMax[g]/TMath::Max(data[h]->chargedSum[k],data[h]->neutralSum[k]) < 0.975)continue;
 
 	    //for (int l= 0; l< data[h]->ngen;l++) {
@@ -640,6 +660,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
 	//for (Long64_t jentry=0; jentry<10;jentry++) {
         dataPP[k][h]->tEvt->GetEntry(jentry);
 	dataPP[k][h]->tJet->GetEntry(jentry);
+
 	//dataPP[k][h]->tGenJet->GetEntry(jentry);
 	//if(dataPP[k][h]->pthat<boundariesPP_pthat[h] || dataPP[k][h]->pthat>boundariesPP_pthat[i+1]) continue;
         //if(dataPP[k][h]->bin<=28) continue;
@@ -682,7 +703,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
             if ( dataPP[k][h]->jteta[g]  > boundaries_eta[j][1] || dataPP[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
 
             // jet QA cuts: 
-            //if ( dataPP[k][h]->chargedMax[g]/dataPP[k][h]->jtpt[g]<0.01) continue;
+            if ( dataPP[k][h]->chargedMax[g]/dataPP[k][h]->jtpt[g]<0.01) continue;
             //if ( dataPP[k][h]->neutralMax[g]/TMath::Max(dataPP[k][h]->chargedSum[g],dataPP[k][h]->neutralSum[g]) < 0.975)continue;
             //if ( dataPP[k][h]->neu)
 
