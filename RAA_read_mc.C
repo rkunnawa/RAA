@@ -64,7 +64,7 @@ static const double boundaries_pt[nbins_pt+1] = {
   468, 507, 548, 592,
   638, 686, 1000 
 };
-
+/*
 static const int nbins_eta = 10;
 static const double boundaries_eta[nbins_eta][2] = {
   {-1.0,+1.0},
@@ -78,18 +78,31 @@ static const double boundaries_eta[nbins_eta][2] = {
   {+1.0,+1.5},
   {+1.5,+2.0}
 };
+
 static const char etaWidth [nbins_eta][256] = {
   "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
   "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
   "p10_eta_p15","p15_eta_p20"
 };
 
-//static const int no_radius = 1;//testing purposes 
-//static const int list_radius[no_radius] = {3};
+*/
+
+static const int nbins_eta = 2;
+static const double boundaries_eta[nbins_eta][2] = {
+  {-1.0,+1.0},
+  {-2.0,+2.0}
+};
+
+static const char etaWidth[nbins_eta][256] = {
+  "n10_eta_p10","n20_eta_p20"
+};
+
+static const int no_radius = 2;//testing purposes 
+static const int list_radius[no_radius] = {3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
-static const int no_radius = 7; 
-static const int list_radius[no_radius] = {1,2,3,4,5,6,7};
+//static const int no_radius = 7; 
+//static const int list_radius[no_radius] = {1,2,3,4,5,6,7};
 
 static const int nbins_cent = 6;
 static const Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 2.5 to get your actual centrality % (old 2011 data) 
@@ -181,7 +194,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc(char *algo = "Vs"){
+void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
   
   TStopwatch timer;
   timer.Start();
@@ -191,8 +204,10 @@ void RAA_read_mc(char *algo = "Vs"){
 
   gStyle->SetOptStat(0);
 
-  cout<<"Running for Algorithm "<<algo<<endl;
+  cout<<"Running for Algorithm "<<algo<<" "<<jet_type<<endl;
  
+  bool printDebug = true;
+
   const int nbins_pthat = 9;
   Double_t boundaries_pthat[nbins_pthat+1];
   char *fileName_pthat[nbins_pthat+1];
@@ -419,7 +434,7 @@ void RAA_read_mc(char *algo = "Vs"){
       }// centrality bin loop
       
       hpbpb_gen[k][j][nbins_cent] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Gen refpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
-      hpbpb_reco[k][j][nbins_cent] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Reco jtpt R%d %s0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
+      hpbpb_reco[k][j][nbins_cent] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Reco jtpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
       hpbpb_matrix[k][j][nbins_cent] = new TH2F(Form("hpbpb_matrix_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Matrix refpt jtpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
       hpbpb_mcclosure_data[k][j][nbins_cent] = new TH1F(Form("hpbpb_mcclosure_data_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("data for unfolding mc closure test R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
       //hpbpb_response[nbins_cent] = new TH2F(Form("hpbpb_response_cent%d",nbins_cent),"response jtpt refpt 0-200 cent",1000,0,1000,1000,0,1000);
@@ -458,7 +473,7 @@ void RAA_read_mc(char *algo = "Vs"){
     //cout<<"reading all the pbpb mc files"<<endl;
     for (int h=0;h<nbins_pthat;h++) {
       //cout<<Form("ak%s%dJetAnalyzer/t",algo,list_radius[k])<<endl;
-      data[k][h] = new JetData(fileName_pthat[h],Form("ak%s%dPFJetAnalyzer/t",algo,list_radius[k]),Form("ak%s%dfPFJetAnalyzer/t",algo,list_radius[k]),0,1);
+      data[k][h] = new JetData(fileName_pthat[h],Form("ak%s%d%sJetAnalyzer/t",algo,list_radius[k],jet_type),Form("ak%s%d%sJetAnalyzer/t",algo,list_radius[k],jet_type),0,1);
       //cout<<"A"<<endl;
       TH1F *hPtHatTmp = new TH1F("hPtHatTmp","",nbins_pthat,boundaries_pthat);
       //cout<<"B"<<endl;
@@ -470,7 +485,7 @@ void RAA_read_mc(char *algo = "Vs"){
     }// pthat loop
     cout<<"reading all the pp mc files"<<endl;
     for (int h=0;h<nbinsPP_pthat;h++){ 
-      dataPP[k][h] = new JetData(fileNamePP_pthat[h],Form("ak%dPFJetAnalyzer/t",list_radius[k]),Form("ak%dPFJetAnalyzer/t",list_radius[k]),0,0);
+      dataPP[k][h] = new JetData(fileNamePP_pthat[h],Form("ak%d%sJetAnalyzer/t",list_radius[k],jet_type),Form("ak%d%sJetAnalyzer/t",list_radius[k],jet_type),0,0);
       TH1F *hPtHatTmp = new TH1F("hPtHatTmp","",nbinsPP_pthat,boundariesPP_pthat);
       dataPP[k][h]->tJet->Project("hPtHatTmp","pthat");
       hPtHatRawPP[k]->Add(hPtHatTmp);
@@ -511,14 +526,14 @@ void RAA_read_mc(char *algo = "Vs"){
 	//cout<<"scale = "<<scale<<endl;
 	//cout<<"xsection[pthatBin-1] = "<<xsection[pthatBin-1]<<", xsection[pthatBin] = "<<xsection[pthatBin]<<", bin content = "<<hPtHatRaw[k]->GetBinContent(pthatBin)<<endl;
         //double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/entries[h];
-      
+	
         if(fabs(data[k][h]->vz)>15) continue;
         int cBin = hCentMC[k]->FindBin(data[k][h]->bin)-1;
         //int cBin = nbins_cent-1;
         double weight_cent=1;
         double weight_pt=1;
         double weight_vz=1;
-      
+	
         //weight_cent = fCentralityWeight->Eval(data[h]->bin);
         //weight_vz = fVz->Eval(data[k][h]->vz);
 	
@@ -526,7 +541,7 @@ void RAA_read_mc(char *algo = "Vs"){
 	  cout<<"RED FLAG RED FLAG RED FLAG"<<endl;
 	  continue;
 	}
-
+	
 	hPbPb_pthat_fine[k]->Fill(data[k][h]->pthat,weight_vz*scale);
 	hPbPb_pthat_fine_noScale[k]->Fill(data[k][h]->pthat);
         hCentMC[k]->Fill(data[k][h]->bin,scale*weight_cent*weight_vz);
@@ -534,9 +549,9 @@ void RAA_read_mc(char *algo = "Vs"){
         if (cBin>=nbins_cent) continue;
         if (cBin==-1) continue;
         hPtHat[k]->Fill(data[k][h]->pthat,scale*weight_cent*weight_vz);
-      
+	
         //cout<<"scale = "<<scale<<endl;
-      
+	
         /*
 	  int hasLeadingJet = 0;
 	  for (int k= 0; k < data[h]->njets; k++) { 
@@ -695,7 +710,7 @@ void RAA_read_mc(char *algo = "Vs"){
   TDatime date;
 
   //declare the output file 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_ak%s_%d.root",algo,date.GetDate()),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   f.cd();
 
   for(int k = 0;k<no_radius;k++){
@@ -759,7 +774,7 @@ void RAA_read_mc(char *algo = "Vs"){
   
   timer.Stop();
   cout<<"Macro finished: "<<endl;
-  cout<<"CPU time (min)  = "<<timer.CpuTime()<<endl;
-  cout<<"Real time (min) = "<<timer.RealTime()<<endl;
+  cout<<"CPU time (min)  = "<<(Float_t)timer.CpuTime()/60<<endl;
+  cout<<"Real time (min) = "<<(Float_t)timer.RealTime()/60<<endl;
   
 }//macro end

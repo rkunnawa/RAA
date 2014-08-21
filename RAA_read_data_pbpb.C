@@ -196,7 +196,7 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs"){
+void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", char *jet_type = "Calo"){
 
   TH1::SetDefaultSumw2();
   gStyle->SetOptStat(0);
@@ -206,7 +206,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs"){
 
   bool printDebug = false;
 
-  cout<<"Running for Algo = "<<algo<<endl;
+  cout<<"Running for Algo = "<<algo<<" "<<jet_type<<endl;
 
   // number convension:
   // 0 - MB
@@ -248,7 +248,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs"){
   for(int k = 0;k<no_radius;k++){
     dir[0][k] = "hltanalysis";
     dir[1][k] = "skimanalysis";
-    dir[2][k] = Form("ak%s%dPFJetAnalyzer",algo,list_radius[k]);
+    dir[2][k] = Form("ak%s%d%sJetAnalyzer",algo,list_radius[k],jet_type);
     dir[3][k] = "hiEvtAnalyzer";
     dir[4][k] = "hltobject";
   }
@@ -1086,7 +1086,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs"){
 
               if(eta_2[g]>=boundaries_eta[j][0] && eta_2[g]<boundaries_eta[j][1]){
 
-                if(jet80_2 && trgObj_pt_1>=80){
+                if(jet80_2 && trgObj_pt_2>=80){
 
                   hpbpb_TrgObj80[k][j][centBin]->Fill(pt_2[g],jet80_p_2);
                   hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_2[g],jet80_p_2);
@@ -1110,7 +1110,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs"){
   TDatime date;
 
   //declare the output file
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak_%s_%d_endfile_%d.root",algo,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   
   f.cd();
 
@@ -1127,8 +1127,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs"){
 	// Jet80 - 149.427 ub-1 
 
 	hpbpb_TrgObj80[k][j][i]->Scale(1./1000000/ncoll[i]/delta_eta[j]/149.427);
-	hpbpb_TrgObj65[k][j][i]->Scale(1./1000000/ncoll[i]/delta_eta[j]/139.571);
-	hpbpb_TrgObj55[k][j][i]->Scale(1./1000000/ncoll[i]/delta_eta[j]/75.086);
+	hpbpb_TrgObj65[k][j][i]->Scale(1./1000000/ncoll[i]/delta_eta[j]/(139.571*0.308));//*0.308 is due to the ~31% dataset which was forested at that time. 
+	hpbpb_TrgObj55[k][j][i]->Scale(1./1000000/ncoll[i]/delta_eta[j]/(75.086*0.308));
 
 	divideBinWidth(hpbpb_TrgObj80[k][j][i]);
 	divideBinWidth(hpbpb_TrgObj65[k][j][i]);
@@ -1152,7 +1152,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs"){
     }//eta bins loop
 
   }//radius loop
-    
+  
   f.Write();
 
   f.Close();

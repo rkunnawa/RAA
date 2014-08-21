@@ -96,8 +96,6 @@ static const char etaWidth [nbins_eta][256] = {
   "p10_eta_p15","p15_eta_p20"
 };
 
-
-
 using namespace std;
 
 void RAA_read_data_pp(){
