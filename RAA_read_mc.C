@@ -512,9 +512,26 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       if (xsection[h]==0) continue;
       cout <<"Loading pthat"<<boundaries_pthat[h]<<" sample, cross section = "<<xsection[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundaries_pthat[h],boundaries_pthat[h+1])<<endl;
       cout<<data[k][h]->tJet->GetEntries()<<endl;
+      
+      //TCut pthatcut = Form("pthat>%d && pthat<%d",boundaries_pthat[h],boundaries_pthat[h+1]);
+      //double fentries_test = data[k][h]->tJet->GetEntries(pthatcut);
+      //cout<<"fentries_test = "<<fentries_test<<endl;
+
+      //from Pawan's code: /net/hisrv0001/home/pawan/Validation/CMSSW_7_1_1/src/combinePtHatBins/pbpbJEC2014/condor/CondorPbPbCalJec.C
+      TEventList *el = new TEventList("el","el");
+      //double pthat_event = data[k][h]->pthat;
+      //double pthat_lower = boundaries_pthat[h];
+      double pthat_upper = boundaries_pthat[h+1];
+      stringstream selection; selection<<"pthat<"<<pthat_upper;
+      
+      data[k][h]->tJet->Draw(">>el",selection.str().c_str());
+      double fentries = el->GetN();
+      cout<<"tree entries: "<<data[k][h]->tJet->GetEntries()<<" elist: "<<fentries<<endl;
+      delete el;
+      
       for (Long64_t jentry=0; jentry<data[k][h]->tJet->GetEntries();jentry++) {
 	//for (Long64_t jentry=0; jentry<100;jentry++) {
-
+	
         //cout<<"hi"<<endl;
         data[k][h]->tEvt->GetEntry(jentry);
         data[k][h]->tJet->GetEntry(jentry);
@@ -529,23 +546,11 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       
         //cout<<xsection[pthatBin-1]-xsection[pthatBin]<<endl;
         //cout<<"nentries = "<<hPtHatRaw->GetBinContent(pthatBin)<<endl;
-        double scale_old = (double)(xsection[pthatBin-1]-xsection[pthatBin])/hPtHatRaw[k]->GetBinContent(pthatBin);
-	//cout<<"scale = "<<scale<<endl;
-
-	//from Pawan's code: /net/hisrv0001/home/pawan/Validation/CMSSW_7_1_1/src/combinePtHatBins/pbpbJEC2014/condor/CondorPbPbCalJec.C
-	TEventList *el = new TEventList("el","el");
-	double pthat_event = data[k][h]->pthat;
-	double pthat_lower = boundaries_pthat[h];
-	double pthat_upper = boundaries_pthat[h+1];
-	stringstream selection; selection<<"pthat_lower<"<<pthat_upper;
-
-	data[k][h]->tJet->Draw(">>el",selection.str().c_str());
-	double fentries = el->GetN();
-	if(jentry==0)cout<<"tree entries: "<<data[k][h]->tJet->GetEntries()<<" elist: "<<fentries<<endl;
-	delete el;
+        //double scale_old = (double)(xsection[pthatBin-1]-xsection[pthatBin])/hPtHatRaw[k]->GetBinContent(pthatBin);
 
 	//double fentries = data[k][h]->tJet->GetEntries(data[k][h]->pthat>=boundaries_pthat[h] && data[k][h]->pthat<boundaries_pthat[h+1]);
 	//if(jentry==0)cout<<fentries<<endl;
+	
 	double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/fentries;
 
 	//cout<<"xsection[pthatBin-1] = "<<xsection[pthatBin-1]<<", xsection[pthatBin] = "<<xsection[pthatBin]<<", bin content = "<<hPtHatRaw[k]->GetBinContent(pthatBin)<<endl;
@@ -656,6 +661,19 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       //float scale=(xsectionPP[h]-xsectionPP[i+1])/dataPP[k][h]->tJet->GetEntries(Form("pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[h],boundariesPP_pthat[i+1])); 
       cout <<"Loading PP pthat"<<boundariesPP_pthat[h]<<" sample, cross section = "<<xsectionPP[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[h],boundariesPP_pthat[h+1])<<endl;
       //cout<<""<<endl;
+
+      //from Pawan's code: /net/hisrv0001/home/pawan/Validation/CMSSW_7_1_1/src/combinePtHatBins/pbpbJEC2014/condor/CondorPbPbCalJec.C
+      TEventList *el = new TEventList("el","el");
+      //double pthat_event = data[k][h]->pthat;
+      //double pthat_lower = boundaries_pthat[h];
+      double pthat_upper = boundariesPP_pthat[h+1];
+      stringstream selection; selection<<"pthat<"<<pthat_upper;
+      
+      dataPP[k][h]->tJet->Draw(">>el",selection.str().c_str());
+      double fentries = el->GetN();
+      cout<<"tree entries: "<<dataPP[k][h]->tJet->GetEntries()<<" elist: "<<fentries<<endl;
+      delete el;
+
       for (Long64_t jentry=0; jentry<dataPP[k][h]->tJet->GetEntries();jentry++) {
 	//for (Long64_t jentry=0; jentry<10;jentry++) {
         dataPP[k][h]->tEvt->GetEntry(jentry);
@@ -665,7 +683,9 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
 	//if(dataPP[k][h]->pthat<boundariesPP_pthat[h] || dataPP[k][h]->pthat>boundariesPP_pthat[i+1]) continue;
         //if(dataPP[k][h]->bin<=28) continue;
         int pthatBin = hPtHatPP[k]->FindBin(dataPP[k][h]->pthat);
-        float scalepp = (xsectionPP[pthatBin-1]-xsectionPP[pthatBin])/hPtHatRawPP[k]->GetBinContent(pthatBin);
+        //float scalepp_old = (xsectionPP[pthatBin-1]-xsectionPP[pthatBin])/hPtHatRawPP[k]->GetBinContent(pthatBin);
+        float scalepp = (xsectionPP[pthatBin-1]-xsectionPP[pthatBin])/fentries;
+
         if(fabs(dataPP[k][h]->vz)>15) continue;
         double weight_cent=1;
         double weight_pt=1;
@@ -700,6 +720,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
             
             int subEvt=-1;
             if ( dataPP[k][h]->rawpt[g]  <= 10. ) continue;
+	    if ( dataPP[k][h]->jtpt[g] > 2.*dataPP[k][h]->pthat) continue;
             if ( dataPP[k][h]->jteta[g]  > boundaries_eta[j][1] || dataPP[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
 
             // jet QA cuts: 
