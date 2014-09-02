@@ -68,25 +68,32 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 /*
-static const int nbins_eta = 10;
+
+static const int nbins_eta = 14;
 static const double boundaries_eta[nbins_eta][2] = {
-  {-1.0,+1.0},
-  {-2.0,+2.0},
-  {-2.5,-2.0},
-  {-2.0,-1.5},
-  {-1.5,-1.0},
-  {-1.0,-0.5},
-  {-0.5,+0.5},
-  {+0.5,+1.0},
-  {+1.0,+1.5},
-  {+1.5,+2.0}
+  {-1.0,+1.0}, {-2.0,+2.0}, {-3.0,+3.0},
+  {-3.0,-2.5}, {-2.5,-2.0}, {-2.0,-1.5}, 
+  {-1.5,-1.0}, {-1.0,-0.5}, {-0.5,+0.5}, 
+  {+0.5,+1.0}, {+1.0,+1.5}, {+1.5,+2.0}, 
+  {+2.0,+2.5}, {+2.5,+3.0}
+};
+
+static const double delta_eta[nbins_eta] = {
+  2.0, 4.0, 6.0, 
+  0.5, 0.5, 0.5, 
+  0.5, 0.5, 1.0, 
+  0.5, 0.5, 0.5, 
+  0.5, 0.5
 };
 
 static const char etaWidth [nbins_eta][256] = {
-  "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
-  "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
-  "p10_eta_p15","p15_eta_p20"
+  "n10_eta_p10","n20_eta_p20","n30_eta_p30",
+  "n30_eta_n25","n25_eta_n20","n20_eta_n15",
+  "n15_eta_n10","n10_eta_n05","n05_eta_p05",
+  "p05_eta_p10","p10_eta_p15","p15_eta_p20",
+  "p20_eta_p25","p25_eta_p30"
 };
+
 
 */
 
@@ -95,6 +102,10 @@ static const double boundaries_eta[nbins_eta][2] = {
   {-1.0,+1.0},
   {-2.0,+2.0}
 };
+
+static const double delta_eta[nbins_eta] = {
+  2.0, 4.0
+}
 
 static const char etaWidth[nbins_eta][256] = {
   "n10_eta_p10","n20_eta_p20"
@@ -770,12 +781,15 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
         divideBinWidth(hpbpb_gen[k][j][i]);
         divideBinWidth(hpbpb_reco[k][j][i]);
         divideBinWidth(hpbpb_mcclosure_data[k][j][i]);
+	hpbpb_gen[k][j][i]->Scale(1./delta_eta[j]);
         hpbpb_gen[k][j][i]->Write();
         hpbpb_gen[k][j][i]->Print("base");
+	hpbpb_reco[k][j][i]->Scale(1./delta_eta[j]);
         hpbpb_reco[k][j][i]->Write();
         hpbpb_reco[k][j][i]->Print("base");
         hpbpb_matrix[k][j][i]->Write();
         hpbpb_matrix[k][j][i]->Print("base");
+	hpbpb_mcclosure_data[k][j][i]->Scale(1./delta_eta[j]);
         hpbpb_mcclosure_data[k][j][i]->Write();
         hpbpb_mcclosure_data[k][j][i]->Print("base");
     
@@ -784,6 +798,10 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       divideBinWidth(hpp_gen[k][j]);
       divideBinWidth(hpp_reco[k][j]);
       divideBinWidth(hpp_mcclosure_data[k][j]);
+
+      hpp_gen[k][j]->Scale(1./delta_eta[j]);
+      hpp_reco[k][j]->Scale(1./delta_eta[j]);
+      hpp_mcclosure_data[k][j]->Scale(1./delta_eta[j]);
 
       hpp_gen[k][j]->Write();
       hpp_gen[k][j]->Print("base");
@@ -795,7 +813,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       hpp_mcclosure_data[k][j]->Print("base");
 
     }//eta loop
-    //just the check the Pthat distributions for PbPb and pp. should be fine. 
+    //just check the Pthat distributions for PbPb and pp. should be fine. 
 
     hCentMC[k]->Print("base");
     hCentMC[k]->Write();
