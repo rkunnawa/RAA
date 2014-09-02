@@ -1031,7 +1031,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     
           for(int g = 0;g<nrefe_1;g++){
 
-            if(/*put your favourite QA cut here*/1>0){
+            if(/*put your favourite QA cut here*/chMax_1[g]/pt_1[g]>0.01){
 
               if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
 
@@ -1082,7 +1082,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     
           for(int g = 0;g<nrefe_2;g++){
 
-            if(/*put your favourite QA cut here*/1>0){
+            if(/*put your favourite QA cut here*/chMax_2[g]/pt_2[g]>0.01){
 
               if(eta_2[g]>=boundaries_eta[j][0] && eta_2[g]<boundaries_eta[j][1]){
 

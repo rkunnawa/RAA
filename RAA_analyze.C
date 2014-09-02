@@ -35,8 +35,21 @@
 #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/bayesianUnfold.h"
 #include "TStopwatch.h"
 
-static const int nbins_pt = 29;
-static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
+//static const int nbins_pt = 29;
+//static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
+
+static const int nbins_pt = 39;
+static const double boundaries_pt[nbins_pt+1] = {
+  3, 4, 5, 7, 9, 12, 
+  15, 18, 21, 24, 28,
+  32, 37, 43, 49, 56,
+  64, 74, 84, 97, 114,
+  133, 153, 174, 196,
+  220, 245, 272, 300, 
+  330, 362, 395, 430,
+  468, 507, 548, 592,
+  638, 686, 1000 
+};
 
 // Remove bins with error > central value
 void cleanup(TH1F *h){
@@ -100,7 +113,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   TDatime date;//this is just here to get them to run optimized. 
 
   TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%s%s_20140820.root",algo,jet_type));
-  TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%d_20140623_chMax_12003cut.root",radius));
+  TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%s_20140829.root",jet_type));
   TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%s%s_20140821.root",algo,jet_type));
 
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
@@ -188,13 +201,13 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   
   // get PP data
   if(printDebug) cout<<"Getting PP data and MC"<<endl;
-  dPP_1 = (TH1F*)fData_pp_in->Get("hpp1");
+  dPP_1 = (TH1F*)fData_pp_in->Get(Form("hpp_Trg80_R%d_n20_eta_p20",radius));
   dPP_1->Print("base");
-  dPP_2 = (TH1F*)fData_pp_in->Get("hpp2");
+  dPP_2 = (TH1F*)fData_pp_in->Get(Form("hpp_Trg60_R%d_n20_eta_p20",radius));
   dPP_2->Print("base");
-  dPP_3 = (TH1F*)fData_pp_in->Get("hpp3");
+  dPP_3 = (TH1F*)fData_pp_in->Get(Form("hpp_Trg40_R%d_n20_eta_p20",radius));
   dPP_3->Print("base");
-  dPP_Comb = (TH1F*)fData_pp_in->Get("hppComb");
+  dPP_Comb = (TH1F*)fData_pp_in->Get(Form("hpp_TrgComb_R%d_n20_eta_p20",radius));
   dPP_Comb->Print("base");
 
   // get PP MC
@@ -215,20 +228,23 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   if(printDebug) cout<<"Filling the PbPb response Matrix"<<endl;
 
   // response matrix and unfolding for PbPb 
+  // going to try it the way kurt has it. 
+
   for(int i = 0;i<=nbins_cent;i++){
     if(printDebug) cout<<"centrality bin iteration = "<<i<<endl;
     TF1 *f = new TF1("f","[0]*pow(x+[2],[1])");
     f->SetParameters(1e10,-8.8,40);
-    TH1F *hGenSpectraCorr = (TH1F*)mPbPb_Matrix[i]->ProjectionX()->Clone(Form("hGenSpectraCorr_cent%d",i));
-    hGenSpectraCorr->Fit("f"," ");
-    hGenSpectraCorr->Fit("f","","");
-    hGenSpectraCorr->Fit("f","LL");
-    TH1F *fHist = functionHist(f,hGenSpectraCorr,Form("fHist_cent%d",i));// function that you get from the fitting 
-    hGenSpectraCorr->Divide(fHist);
+    // TH1F *hGenSpectraCorr = (TH1F*)mPbPb_Matrix[i]->ProjectionX()->Clone(Form("hGenSpectraCorr_cent%d",i));
+    // hGenSpectraCorr->Fit("f"," ");
+    // hGenSpectraCorr->Fit("f","","");
+    // hGenSpectraCorr->Fit("f","LL");
+    // TH1F *fHist = functionHist(f,hGenSpectraCorr,Form("fHist_cent%d",i));// function that you get from the fitting 
+    // hGenSpectraCorr->Divide(fHist);
     for (int y=1;y<=mPbPb_Matrix[i]->GetNbinsY();y++) {
       double sum=0;
       for (int x=1;x<=mPbPb_Matrix[i]->GetNbinsX();x++) {
-	if (mPbPb_Matrix[i]->GetBinContent(x,y)<=0*mPbPb_Matrix[i]->GetBinError(x,y)) {
+	if (mPbPb_Matrix[i]->GetBinContent(x,y)<=1*mPbPb_Matrix[i]->GetBinError(x,y)) {
+	  //in the above line mine had 0*getbinerror while Kurt's had 1*. 
 	  mPbPb_Matrix[i]->SetBinContent(x,y,0);
 	  mPbPb_Matrix[i]->SetBinError(x,y,0);
 	}
@@ -252,7 +268,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
       double sum=0;
       for (int x=1;x<=mPbPb_Response[i]->GetNbinsX();x++) {
 	if (mPbPb_Response[i]->GetBinContent(x,y)<=1*mPbPb_Response[i]->GetBinError(x,y)) {
-	  // in the above if loop, kurt has 1*error and my old has 0*error
+	  // in the above if loop, kurt has 1*error and my old had 0*error
 	  mPbPb_Response[i]->SetBinContent(x,y,0);
 	  mPbPb_Response[i]->SetBinError(x,y,0);
 	}
@@ -276,7 +292,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
     for (int x=1;x<=mPbPb_ResponseNorm[i]->GetNbinsX();x++) {
       double sum=0;
       for (int y=1;y<=mPbPb_ResponseNorm[i]->GetNbinsY();y++) {
-	if (mPbPb_ResponseNorm[i]->GetBinContent(x,y)<=0*mPbPb_ResponseNorm[i]->GetBinError(x,y)) {
+	if (mPbPb_ResponseNorm[i]->GetBinContent(x,y)<=1*mPbPb_ResponseNorm[i]->GetBinError(x,y)) {
 	  mPbPb_ResponseNorm[i]->SetBinContent(x,y,0);
 	  mPbPb_ResponseNorm[i]->SetBinError(x,y,0);
 	}
@@ -300,18 +316,19 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   
   TF1 *fpp = new TF1("fpp","[0]*pow(x+[2],[1])");
   fpp->SetParameters(1e10,-8.8,40);
-  //if(printDebug) cout<<"before getting the gen spectra corr matrix"<<endl;
-  TH1F *hGenSpectraCorrPP = (TH1F*)mPP_Matrix->ProjectionX()->Clone("hGenSpectraCorrPP");
-  //if(printDebug) cout<<"after gettign the gen spectra corr matrix"<<endl;
-  hGenSpectraCorrPP->Fit("f"," ");
-  hGenSpectraCorrPP->Fit("f","","");
-  hGenSpectraCorrPP->Fit("f","LL");
-  TH1F *fHistPP = functionHist(fpp,hGenSpectraCorrPP,"fHistPP");// that the function that you get from the fitting 
-  hGenSpectraCorrPP->Divide(fHistPP);
+  // if(printDebug) cout<<"before getting the gen spectra corr matrix"<<endl;
+  // TH1F *hGenSpectraCorrPP = (TH1F*)mPP_Matrix->ProjectionX()->Clone("hGenSpectraCorrPP");
+  // if(printDebug) cout<<"after gettign the gen spectra corr matrix"<<endl;
+  // hGenSpectraCorrPP->Fit("f"," ");
+  // hGenSpectraCorrPP->Fit("f","","");
+  // hGenSpectraCorrPP->Fit("f","LL");
+  // TH1F *fHistPP = functionHist(fpp,hGenSpectraCorrPP,"fHistPP");// that the function that you get from the fitting 
+  // hGenSpectraCorrPP->Divide(fHistPP);
+  
   for (int y=1;y<=mPP_Matrix->GetNbinsY();y++) {
     double sum=0;
     for (int x=1;x<=mPP_Matrix->GetNbinsX();x++) {
-      if (mPP_Matrix->GetBinContent(x,y)<=0*mPP_Matrix->GetBinError(x,y)) {
+      if (mPP_Matrix->GetBinContent(x,y)<=1*mPP_Matrix->GetBinError(x,y)) {
 	mPP_Matrix->SetBinContent(x,y,0);
 	mPP_Matrix->SetBinError(x,y,0);
       }
@@ -363,7 +380,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   for (int x=1;x<=mPP_ResponseNorm->GetNbinsX();x++) {
     double sum=0;
     for (int y=1;y<=mPP_ResponseNorm->GetNbinsY();y++) {
-      if (mPP_ResponseNorm->GetBinContent(x,y)<=0*mPP_ResponseNorm->GetBinError(x,y)) {
+      if (mPP_ResponseNorm->GetBinContent(x,y)<=1*mPP_ResponseNorm->GetBinError(x,y)) {
 	mPP_ResponseNorm->SetBinContent(x,y,0);
 	mPP_ResponseNorm->SetBinError(x,y,0);
       }
@@ -626,7 +643,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   // scale PbPb by 1./ncoll[i]
   // scale PbPb by 1./7.65 sigma inelastic
   // and just divide each other. 
-  // RAA = dsigma ^PbPb / dp_T deta / ncoll * dsigma ^PP / dp_T deta
+  // RAA = (dsigma ^PbPb / dp_T deta) / (ncoll * dsigma ^PP / dp_T deta)
   
   TH1F *RAA_bayesian[nbins_cent+1];
   TH1F *RAA_binbybin[nbins_cent+1];
