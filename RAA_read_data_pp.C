@@ -480,9 +480,9 @@ void RAA_read_data_pp(char *jet_type = "Calo"){
 
     for(int j = 0;j<nbins_eta;j++){
 
-      hpp_Trg80[k][j]->Scale(1./5300e6/delta_eta[j]);//5300e6 is the lumi of the dataset. 
-      hpp_Trg60[k][j]->Scale(1./5300e6/delta_eta[j]);
-      hpp_Trg40[k][j]->Scale(1./5300e6/delta_eta[j]);
+      hpp_Trg80[k][j]->Scale(1./5.3/1000000000/delta_eta[j]);//5300e6 is the lumi of the dataset. 
+      hpp_Trg60[k][j]->Scale(1./5.3/1000000000/delta_eta[j]);
+      hpp_Trg40[k][j]->Scale(1./5.3/1000000000/delta_eta[j]);
       
       divideBinWidth(hpp_Trg80[k][j]);// divide by delta pt. 
       divideBinWidth(hpp_Trg60[k][j]);

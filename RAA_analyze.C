@@ -112,9 +112,9 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   
   TDatime date;//this is just here to get them to run optimized. 
 
-  TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%s%s_20140820.root",algo,jet_type));
-  TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%s_20140829.root",jet_type));
-  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%s%s_20140821.root",algo,jet_type));
+  TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%s%s_20140902.root",algo,jet_type));
+  TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%s_20140903.root",jet_type));
+  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%s%s_20140902.root",algo,jet_type));
 
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
   // for the above condition, i might have to play with the date stamp. 
@@ -253,7 +253,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
       
       for (int x=1;x<=mPbPb_Matrix[i]->GetNbinsX();x++) {	   
 	double ratio = 1;
-	if (hGenSpectraCorr->GetBinContent(x)!=0) ratio = 1e5/hGenSpectraCorr->GetBinContent(x);
+	// if (hGenSpectraCorr->GetBinContent(x)!=0) ratio = 1e5/hGenSpectraCorr->GetBinContent(x);
 	mPbPb_Matrix[i]->SetBinContent(x,y,mPbPb_Matrix[i]->GetBinContent(x,y)*ratio);
 	mPbPb_Matrix[i]->SetBinError(x,y,mPbPb_Matrix[i]->GetBinError(x,y)*ratio);
       }
@@ -337,7 +337,7 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
     
     for (int x=1;x<=mPP_Matrix->GetNbinsX();x++) {	   
       double ratio = 1;
-      if (hGenSpectraCorrPP->GetBinContent(x)!=0) ratio = 1e5/hGenSpectraCorrPP->GetBinContent(x);
+      // if (hGenSpectraCorrPP->GetBinContent(x)!=0) ratio = 1e5/hGenSpectraCorrPP->GetBinContent(x);
       mPP_Matrix->SetBinContent(x,y,mPP_Matrix->GetBinContent(x,y)*ratio);
       mPP_Matrix->SetBinError(x,y,mPP_Matrix->GetBinError(x,y)*ratio);
     }
@@ -648,17 +648,21 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   TH1F *RAA_bayesian[nbins_cent+1];
   TH1F *RAA_binbybin[nbins_cent+1];
   TH1F *RAA_measured[nbins_cent+1];
-  uPP_Bayes->Scale(1./64);
+  //uPP_Bayes->Scale(1./64);
   for(int i = 0;i<=nbins_cent;i++){
 
-    uPbPb_Bayes[i]->Scale(1./ncoll[i]);
-    uPbPb_Bayes[i]->Scale(1./7.65);
+    //uPbPb_Bayes[i]->Scale(1./ncoll[i]);
+    //uPbPb_Bayes[i]->Scale(1./7.65);
     RAA_bayesian[i] = (TH1F*)uPbPb_Bayes[i]->Clone(Form("RAA_bayesian_cent%d",i));
     RAA_binbybin[i] = (TH1F*)uPbPb_BinByBin[i]->Clone(Form("RAA_binbybin_cent%d",i));
     RAA_measured[i] = (TH1F*)dPbPb_TrgComb[i]->Clone(Form("RAA_measured_cent%d",i));
     RAA_bayesian[i]->Divide(uPP_Bayes);
     RAA_measured[i]->Divide(dPP_Comb);
     RAA_binbybin[i]->Divide(uPP_BinByBin);
+
+    RAA_bayesian[i]->Scale(64./(ncoll[i]*7.65));
+    RAA_measured[i]->Scale(64./(ncoll[i]*7.65));
+    RAA_binbybin[i]->Scale(64./(ncoll[i]*7.65));
 
   }
   
