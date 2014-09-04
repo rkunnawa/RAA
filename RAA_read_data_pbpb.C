@@ -203,10 +203,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 
   TStopwatch timer;
   timer.Start();
-
-  bool printDebug = false;
-
+ 
   cout<<"Running for Algo = "<<algo<<" "<<jet_type<<endl;
+  
+  bool printDebug = false;
 
   // number convension:
   // 0 - MB
@@ -1126,9 +1126,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 	// Jet55 - 75.086 ub-1 
 	// Jet80 - 149.427 ub-1 
 
-	hpbpb_TrgObj80[k][j][i]->Scale(1./1000000/ncoll[i]/delta_eta[j]/149.427);
-	hpbpb_TrgObj65[k][j][i]->Scale(1./1000000/ncoll[i]/delta_eta[j]/(139.571*0.308));//*0.308 is due to the ~31% dataset which was forested at that time. 
-	hpbpb_TrgObj55[k][j][i]->Scale(1./1000000/ncoll[i]/delta_eta[j]/(75.086*0.308));
+	//not dividing by ncoll here. will do that in the plotting macro under RAA. 
+
+	hpbpb_TrgObj80[k][j][i]->Scale(1./1000000/delta_eta[j]/149.427);
+	hpbpb_TrgObj65[k][j][i]->Scale(1./1000000/delta_eta[j]/(139.571*0.308));//*0.308 is due to the ~31% dataset which was forested at that time. 
+	hpbpb_TrgObj55[k][j][i]->Scale(1./1000000/delta_eta[j]/(75.086*0.308));
 
 	divideBinWidth(hpbpb_TrgObj80[k][j][i]);
 	divideBinWidth(hpbpb_TrgObj65[k][j][i]);
