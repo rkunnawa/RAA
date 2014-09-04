@@ -105,7 +105,7 @@ static const double boundaries_eta[nbins_eta][2] = {
 
 static const double delta_eta[nbins_eta] = {
   2.0, 4.0
-}
+};
 
 static const char etaWidth[nbins_eta][256] = {
   "n10_eta_p10","n20_eta_p20"
@@ -611,7 +611,9 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
 
             //int subEvt=-1;
 	    if ( data[k][h]->subid[g] != 0 ) continue;
-            if ( data[k][h]->rawpt[g]  <= 10. ) continue;
+            if ( data[k][h]->rawpt[g] <= 10. ) continue;
+	    if ( data[k][h]->refpt[g] <= 15. ) continue; //to see if we can get a better response matrix 
+	    //if ( data[k][h]->jtpt[g] <= 15 ) continue;
 	    if ( data[k][h]->jtpt[g] > 2.*data[k][h]->pthat) continue;
             if ( data[k][h]->jteta[g]  > boundaries_eta[j][1] || data[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
 	    
@@ -730,7 +732,8 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
           for(int j = 0;j<nbins_eta;j++){
             
             int subEvt=-1;
-            if ( dataPP[k][h]->rawpt[g]  <= 10. ) continue;
+            if ( dataPP[k][h]->rawpt[g] <= 10. ) continue;
+	    if ( dataPP[k][h]->refpt[g] <= 15. ) continue; // to see if we can get a better response matrix. 
 	    if ( dataPP[k][h]->jtpt[g] > 2.*dataPP[k][h]->pthat) continue;
             if ( dataPP[k][h]->jteta[g]  > boundaries_eta[j][1] || dataPP[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
 
