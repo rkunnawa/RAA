@@ -152,17 +152,6 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
 
   }
 
-  //scale the spectra histograms back to the cross section levels 
-  // uPbPb-> scale by ncoll and 7.65 pp inelastic, dPbPb only by ncoll 
-  // upp-> scale by 64 - sigma pp 
-
-  for(int i = 0;i<=nbins_cent;i++){
-    uPbPb_Bayes[i]->Scale(ncoll[i]*7.65);
-    dPbPb_TrgComb[i]->Scale(ncoll[i]);
-  }
-
-  uPP_Bayes->Scale(64);
-
 
   //Ok now that we have loaded all the histograms we need - lets start making the plots 
 
