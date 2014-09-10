@@ -606,6 +606,8 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
         //double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/entries[h];
 	
         if(fabs(data[k][h]->vz)>15) continue;
+	if(!data[k][h]->pcollisionEventSelection || !data[k][h]->pHBHENoiseFilter) continue;
+
         int cBin = hCentMC[k]->FindBin(data[k][h]->bin)-1;
         //int cBin = nbins_cent-1;
         double weight_cent=1;
@@ -644,26 +646,29 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
         */
 
         for (int g = 0; g < data[k][h]->njets; g++) {
-  
-	  hpbpb_eta_full[k]->Fill(data[k][h]->jteta[g],scale*weight_vz);
-	  hpbpb_phi_full[k]->Fill(data[k][h]->jtphi[g],scale*weight_vz);
 
 	  hpbpb_eta_full_noScale[k]->Fill(data[k][h]->jteta[g]);
 	  hpbpb_phi_full_noScale[k]->Fill(data[k][h]->jtphi[g]);
+  
+	  if ( data[k][h]->subid[g] != 0 ) continue;
+	  if ( data[k][h]->rawpt[g] <= 10. ) continue;
+	  if ( data[k][h]->refpt[g] <= 15. ) continue; //to see if we can get a better response matrix 
+	  //if ( data[k][h]->jtpt[g] <= 15 ) continue;
+	  if ( data[k][h]->jtpt[g] > 2.*data[k][h]->pthat) continue;
+	  
+	  // jet quality cuts here: 
+	  if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.01) continue;
+	  //if ( data[k][h]->neutralMax[g]/TMath::Max(data[h]->chargedSum[k],data[h]->neutralSum[k]) < 0.975)continue;
+	  
+	  hpbpb_eta_full[k]->Fill(data[k][h]->jteta[g],scale*weight_vz);
+	  hpbpb_phi_full[k]->Fill(data[k][h]->jtphi[g],scale*weight_vz);
 
           for(int j = 0;j<nbins_eta;j++){
 
             //int subEvt=-1;
-	    if ( data[k][h]->subid[g] != 0 ) continue;
-            if ( data[k][h]->rawpt[g] <= 10. ) continue;
-	    if ( data[k][h]->refpt[g] <= 15. ) continue; //to see if we can get a better response matrix 
-	    //if ( data[k][h]->jtpt[g] <= 15 ) continue;
-	    if ( data[k][h]->jtpt[g] > 2.*data[k][h]->pthat) continue;
-            if ( data[k][h]->jteta[g]  > boundaries_eta[j][1] || data[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
 	    
-            // jet quality cuts here: 
-            if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.01) continue;
-	    //if ( data[k][h]->neutralMax[g]/TMath::Max(data[h]->chargedSum[k],data[h]->neutralSum[k]) < 0.975)continue;
+            if ( data[k][h]->jteta[g]  > boundaries_eta[j][1] || data[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
+	   
 
 	    //for (int l= 0; l< data[h]->ngen;l++) {
 	    //  if (data[h]->refpt[k]==data[h]->genpt[l]) {
@@ -774,24 +779,29 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
 
         for (int g= 0; g< dataPP[k][h]->njets; g++) { 
 
+	  hpp_eta_full_noScale[k]->Fill(dataPP[k][h]->jteta[g]);
+	  hpp_phi_full_noScale[k]->Fill(dataPP[k][h]->jtphi[g]);
+
+	  if ( dataPP[k][h]->rawpt[g] <= 10. ) continue;
+	  if ( dataPP[k][h]->refpt[g] <= 15. ) continue; // to see if we can get a better response matrix. 
+	  if ( dataPP[k][h]->jtpt[g] > 2.*dataPP[k][h]->pthat) continue;
+	  
+	  // jet QA cuts: 
+	  if ( dataPP[k][h]->chargedMax[g]/dataPP[k][h]->jtpt[g]<0.01) continue;
+	  //if ( dataPP[k][h]->neutralMax[g]/TMath::Max(dataPP[k][h]->chargedSum[g],dataPP[k][h]->neutralSum[g]) < 0.975)continue;
+	  //if ( dataPP[k][h]->neu)
+	  
 	  hpp_eta_full[k]->Fill(dataPP[k][h]->jteta[g],scalepp*weight_vz);
 	  hpp_phi_full[k]->Fill(dataPP[k][h]->jtphi[g],scalepp*weight_vz);
 
-	  hpp_eta_full_noScale[k]->Fill(dataPP[k][h]->jteta[g]);
-	  hpp_phi_full_noScale[k]->Fill(dataPP[k][h]->jtphi[g]);
 
           for(int j = 0;j<nbins_eta;j++){
             
             int subEvt=-1;
-            if ( dataPP[k][h]->rawpt[g] <= 10. ) continue;
-	    if ( dataPP[k][h]->refpt[g] <= 15. ) continue; // to see if we can get a better response matrix. 
-	    if ( dataPP[k][h]->jtpt[g] > 2.*dataPP[k][h]->pthat) continue;
+
             if ( dataPP[k][h]->jteta[g]  > boundaries_eta[j][1] || dataPP[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
 
-            // jet QA cuts: 
-            if ( dataPP[k][h]->chargedMax[g]/dataPP[k][h]->jtpt[g]<0.01) continue;
-            //if ( dataPP[k][h]->neutralMax[g]/TMath::Max(dataPP[k][h]->chargedSum[g],dataPP[k][h]->neutralSum[g]) < 0.975)continue;
-            //if ( dataPP[k][h]->neu)
+
 
             //if (uhist[nbins_cent]->hMeasMatch!=0) {
             //   int ptBinNumber = uhist[nbins_cent]->hMeasMatch->FindBin(dataPP[k][h]->jtpt[k]);
