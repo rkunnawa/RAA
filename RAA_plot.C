@@ -78,7 +78,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 
-  TFile *fin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type,date.GetDate()));
+  TFile *fin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140912.root",algo,radius,jet_type));
 
   TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1];
   
@@ -112,7 +112,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
 
   for(int i = 0;i<=nbins_cent;i++){
     
-    cout<<"cent = "<<i<<endl;
+    //cout<<"cent = "<<i<<endl;
     dPbPb_TrgComb[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObjComb_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Reco[i] = (TH1F*)fin->Get(Form("hpbpb_reco_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Gen[i] = (TH1F*)fin->Get(Form("hpbpb_gen_R%d_n20_eta_p20_cent%d",radius,i));
@@ -155,15 +155,12 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
 
   //Ok now that we have loaded all the histograms we need - lets start making the plots 
 
-  // line at 1
-  TLine *line = new TLine(50,1,300,1);
-  line->SetLineStyle(2);
-  line->SetLineWidth(2);
-
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+  /*
   // plot 0 - PbPb and pp Unfolded Spectra compared with Data(measured) and MC Spectra. in a 2 by 1 canvas. with the PbPb doing the multiply by powers of 10. unfolded in black circles, MC in black (dotted) line, measured in red open boxes. 
+  
   TCanvas *cSpectra = new TCanvas("cSpectra","PbPb and PP spectra",1000,1000);
   cSpectra->Divide(2,1);
   
@@ -177,9 +174,9 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   
   for(int i = 0;i<=nbins_cent;i++){
     
-    uPbPb_Bayes[i]->Scale(1./scaleFactor[i]);
-    dPbPb_TrgComb[i]->Scale(1./scaleFactor[i]);
-    mPbPb_Reco[i]->Scale(1./scaleFactor[i]);
+    uPbPb_Bayes[i]->Scale(1./(scaleFactor[i]*1e6));
+    dPbPb_TrgComb[i]->Scale(1./(scaleFactor[i]*1e6));
+    mPbPb_Reco[i]->Scale(1./(scaleFactor[i]));
 
     uPbPb_Bayes[i]->SetMarkerStyle(20);
     uPbPb_Bayes[i]->SetMarkerColor(i+1);
@@ -205,7 +202,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
     if(i<nbins_cent)
       PbPbSpectra->AddEntry(uPbPb_Bayes[i],Form("%2.0f - %2.0f cent * 10^{%d}",5*boundaries_cent[i],5*boundaries_cent[i+1],i),"pl");
     else 
-      PbPbSpectra->AddEntry(uPbPb_Bayes[i],Form("0 - 200 cent * 10^{%d}",i),"pl");
+      PbPbSpectra->AddEntry(uPbPb_Bayes[i],Form("0 - 200 cent x 10^{%d} x 10^{6}",i),"pl");
   }
 
   PbPbSpectra->SetTextSize(0.04);
@@ -244,8 +241,9 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   Spectra->SetTextSize(0.04);
   Spectra->Draw();
   
-  cSpectra->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/Unfolded_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  cSpectra->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/Unfolded_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
+  
   //rescale the histograms which were scaled: 
   
 
@@ -259,6 +257,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
 
   
   
+  
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
@@ -267,20 +266,24 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   // divide different unfolding iterations with iteration 4 - the nominal one. 
   TCanvas *cIterSysPbPb = new TCanvas("cIterSysPbPb","PbPb Iteration systematics",1200,800);
   makeMultiPanelCanvasWithGap(cIterSysPbPb,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
- 
-  TLegend *PbPb_itersys = myLegend(0.53,0.65,0.85,0.9);
+
+  // line at 1
+  TLine *linePbPb_iter = new TLine(30,1,500,1);
+  linePbPb_iter->SetLineStyle(2);
+  linePbPb_iter->SetLineWidth(2);
+  
+  TLegend *PbPb_itersys = myLegend(0.43,0.75,0.65,0.9);
   
   for(int i = 0;i<nbins_cent;i++){
     cIterSysPbPb->cd(nbins_cent-i);
-    line->Draw();
-
-    drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
 
     for(int j = 2;j<7;j++){
   		
       uPbPb_BayesianIter[j][i]->Divide(uPbPb_Bayes[i]);
       uPbPb_BayesianIter[j][i]->SetMarkerStyle(2);
       uPbPb_BayesianIter[j][i]->SetMarkerColor(j);
+      uPbPb_BayesianIter[j][i]->SetAxisRange(30,500,"X");
+      uPbPb_BayesianIter[j][i]->SetAxisRange(0,2,"Y");
       if(j==2){
 	makeHistTitle(uPbPb_BayesianIter[j][i]," ","Jet p_{T} (GeV/c)","Ratio (Unfolded/Nominal)");
 	uPbPb_BayesianIter[j][i]->Draw();
@@ -288,10 +291,12 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
       else {
 	uPbPb_BayesianIter[j][i]->Draw("same");
       }
-      if(i==0) PbPb_itersys->AddEntry(uPbPb_BayesianIter[j][i],Form("Iteration %d",j),"pl");
+      if(i==0 && j!=4) PbPb_itersys->AddEntry(uPbPb_BayesianIter[j][i],Form("Iteration %d",j),"pl");
 
     }
 
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+    linePbPb_iter->Draw();
 
   }
   PbPb_itersys->Draw();
@@ -301,54 +306,68 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, radius),0.2,0.23,20);
   drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
-  cIterSysPbPb->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_iteration_systematics_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  cIterSysPbPb->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PbPb_unfoldng_iteration_systematics_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+  
   
   //plot 2 - pp iteration systematics 
   // this is just one panel plot showing bayesian for pp. 
   TCanvas *cIterSysPP = new TCanvas("cIterSysPP","PP Iteration systematics",600,400);
 
   TLegend *PP_itersys = myLegend(0.53,0.65,0.85,0.9);
-  line->Draw();
+  TLine *linePP_iter = new TLine(30,1,500,1);
+  linePP_iter->SetLineStyle(2);
+  linePP_iter->SetLineWidth(2);
 
   for(int i = 2;i<7;i++){
     uPP_BayesianIter[i]->Divide(uPP_Bayes);
     uPP_BayesianIter[i]->SetMarkerStyle(2);
     uPP_BayesianIter[i]->SetMarkerColor(i);
+    uPP_BayesianIter[i]->SetAxisRange(30,500,"X");
+    uPP_BayesianIter[i]->SetAxisRange(0,2,"Y");
+    uPP_BayesianIter[i]->SetXTitle("Jet p_{T} (GeV/c)");
+    uPP_BayesianIter[i]->SetYTitle("Ratio (unfolded/Nominal)");
+    uPP_BayesianIter[i]->SetTitle(" ");
+    uPP_BayesianIter[i]->GetXaxis()->CenterTitle();
+    uPP_BayesianIter[i]->GetYaxis()->CenterTitle();
     if(i==2){
-      makeHistTitle(uPP_BayesianIter[i]," ","Jet p_{T} (GeV/c)","Ratio (unfolded/Nominal)");
+      //makeHistTitle(uPP_BayesianIter[i]," ","Jet p_{T} (GeV/c)","Ratio (unfolded/Nominal)");
       uPP_BayesianIter[i]->Draw();
     }else if(i==4);
     else uPP_BayesianIter[i]->Draw("same");
-    PP_itersys->AddEntry(uPP_BayesianIter[i],Form("Iteration %d",i),"pl");
+    if(i!=4)PP_itersys->AddEntry(uPP_BayesianIter[i],Form("Iteration %d",i),"pl");
   }
-
+  linePP_iter->Draw();
   PP_itersys->Draw();
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type,radius),0.2,0.23,20);
   drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
-  cIterSysPP->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_iteration_systematics_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  cIterSysPP->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_unfoldng_iteration_systematics_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+  
   
   //plot 3 - RAA 
   // again this will be a 6 panel plot. showing measured, unfolded Bayesian, and unfolded Bin By Bin methods. 
   TCanvas *cRAA = new TCanvas("cRAA","RAA",1200,800);
   makeMultiPanelCanvasWithGap(cRAA,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
 
-  TLegend *tRAA = myLegend(0.53,0.65,0.85,0.9);
+  TLegend *tRAA = myLegend(0.45,0.75,0.85,0.9);
+  TLine *lineRAA = new TLine(30,1,500,1);
+  lineRAA->SetLineStyle(2);
+  lineRAA->SetLineWidth(2);
 
   for(int i = 0;i<nbins_cent;i++){
 
     cRAA->cd(nbins_cent-i);
-    drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
 
     RAA_measured[i]->SetMarkerColor(kBlack);
     RAA_measured[i]->SetMarkerStyle(24);
+    makeHistTitle(RAA_measured[i],"","Jet p_{T} (GeV/c)","R_{AA}");
+    RAA_measured[i]->SetAxisRange(30,500,"X");
+    RAA_measured[i]->SetAxisRange(0,1.5,"Y");
     RAA_measured[i]->Draw();
 
     RAA_bayesian[i]->SetMarkerColor(kRed);
@@ -359,35 +378,41 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
     RAA_binbybin[i]->SetMarkerColor(kBlue);
     RAA_binbybin[i]->Draw("same");
 
-    line->Draw();
+    lineRAA->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
 
   }
 
   tRAA->AddEntry(RAA_measured[0],"No Unfolding","pl");
   tRAA->AddEntry(RAA_bayesian[0],"Bayesian","pl");
   tRAA->AddEntry(RAA_binbybin[0],"BinbyBin","pl");
+  tRAA->SetTextSize(0.04);
 
-  cRAA->cd(0);
+  cRAA->cd(6);
   tRAA->Draw();
+  cRAA->cd(1);
   putCMSPrel();
-  drawText(Form("Anti-k_{T} %s Particle Flow Jets R=0.%d",algo, radius),0.2,0.23,20);
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,20);
   drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
-  cRAA->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  cRAA->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/RAA_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
+  
+  
   //plot 4 - PbPb MC closure test 
   // this will also be a 6 panel plot showing bayesian iteration 4 and binbybin divided by measured which is actually the MC
   TCanvas *cPbPbMCclosure = new TCanvas("cPbPbMCclosure","PbPb MC closure test",1200,800);
   makeMultiPanelCanvasWithGap(cPbPbMCclosure,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
 
+  TLine *linePbPb_mcclosure = new TLine(30,1,500,1);
+  linePbPb_mcclosure->SetLineStyle(2);
+  linePbPb_mcclosure->SetLineWidth(2);
+
   TH1F *hMCClosurePbPb_Meas[nbins_cent+1], *hMCClosurePbPb_Bayesian[nbins_cent+1], *hMCClosurePbPb_BinByBin[nbins_cent+1];
   for(int i = 0;i<nbins_cent;i++){
 
     cPbPbMCclosure->cd(nbins_cent-i);
-    drawText(Form("%2.0f-%2.0f",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
     //hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_Reco[i]->Clone(Form("hMCClosurePbPb_Meas_cent%d",i));
     hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_mcclosure_data[i]->Clone(Form("hMCClosurePbPb_Meas_cent%d",i));
     hMCClosurePbPb_Bayesian[i] = (TH1F*)uPbPb_MC_Bayes[i]->Clone(Form("hMCClosurePbPb_Bayesian_cent%d",i));
@@ -400,6 +425,8 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
     makeHistTitle(hMCClosurePbPb_Meas[i]," ","Jet p_{T} (GeV/c)","Reco/Truth");
     hMCClosurePbPb_Meas[i]->SetMarkerStyle(24);
     hMCClosurePbPb_Meas[i]->SetMarkerColor(kBlack);
+    hMCClosurePbPb_Meas[i]->SetAxisRange(30,500,"X");
+    hMCClosurePbPb_Meas[i]->SetAxisRange(0,2,"Y");
     hMCClosurePbPb_Meas[i]->Draw();
 
     hMCClosurePbPb_Bayesian[i]->SetMarkerStyle(33);
@@ -410,7 +437,8 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
     hMCClosurePbPb_BinByBin[i]->SetMarkerStyle(29);
     hMCClosurePbPb_BinByBin[i]->Draw("same");
 
-    line->Draw();
+    linePbPb_mcclosure->Draw();
+    drawText(Form("%2.0f-%2.0f %",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
 
   }
 
@@ -421,31 +449,42 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   pbpbmcclosure->AddEntry(hMCClosurePbPb_BinByBin[0],"PbPb BinbyBin","pl");
   pbpbmcclosure->Draw();
   putCMSPrel();
-  drawText(Form("Anti-k_{T} %s Particle Flow Jets R=0.%d",algo, radius),0.2,0.23,20);
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,20);
   drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
   
-  cPbPbMCclosure->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_mc_closure_test_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  cPbPbMCclosure->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PbPb_unfoldng_mc_closure_test_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+  
 
   //plot 5 - PP MC closure test
-  TCanvas * cPPMCclosure = new TCanvas("cPPMCclosure","PP MC closure test",600,400);
+  TCanvas * cPPMCclosure = new TCanvas("cPPMCclosure","PP MC closure test",600,600);
   //TH1F *hMCClosurePP_Meas = (TH1F*)mPP_Reco->Clone("hMCClosurePP_Meas");
   TH1F *hMCClosurePP_Meas = (TH1F*)mPP_mcclosure_data->Clone("hMCClosurePP_Meas");
   TH1F *hMCClosurePP_Bayesian = (TH1F*)uPP_MC_Bayes->Clone("hMCClosurePP_Bayesian");
   TH1F *hMCClosurePP_BinbyBin = (TH1F*)uPP_MC_BinByBin->Clone("hMCClosurePP_BinbyBin");
 
+  TLine *linePP_mcclosure = new TLine(30,1,500,1);
+  linePP_mcclosure->SetLineStyle(2);
+  linePP_mcclosure->SetLineWidth(2);
+
   hMCClosurePP_Bayesian->Divide(mPP_mcclosure_data);
   hMCClosurePP_Meas->Divide(mPP_mcclosure_data);
   hMCClosurePP_BinbyBin->Divide(mPP_mcclosure_data);
 
-  makeHistTitle(hMCClosurePP_Meas," ","Jet p_{T} (GeV/c)","Reco/Truth");
-  hMCClosurePP_Meas->SetAxisRange(50,300,"X");
+  hMCClosurePP_Meas->SetAxisRange(30,500,"X");
   hMCClosurePP_Meas->SetAxisRange(0,2,"Y");
 
   hMCClosurePP_Meas->SetMarkerStyle(24);
   hMCClosurePP_Meas->SetMarkerColor(kBlack);
+
+  hMCClosurePP_Meas->SetTitle(" ");
+  hMCClosurePP_Meas->SetXTitle("Jet p_{T} (GeV/c)");
+  hMCClosurePP_Meas->SetYTitle("Reco/Truth");
+  
+  hMCClosurePP_Meas->GetXaxis()->CenterTitle();
+  hMCClosurePP_Meas->GetYaxis()->CenterTitle();
+
   hMCClosurePP_Meas->Draw();
 
   hMCClosurePP_Bayesian->SetMarkerStyle(33);
@@ -456,22 +495,22 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   hMCClosurePP_BinbyBin->SetMarkerColor(kBlue);
   hMCClosurePP_BinbyBin->Draw("same");
 
-  line->Draw();
-
   TLegend *ppmcclosure = myLegend(0.53,0.65,0.85,0.9);
   ppmcclosure->AddEntry(hMCClosurePP_Meas,"pp no unfolding","pl");
   ppmcclosure->AddEntry(hMCClosurePP_Bayesian,"pp Bayesian","pl");
   ppmcclosure->AddEntry(hMCClosurePP_BinbyBin,"pp BinbyBin","pl");
   ppmcclosure->Draw();
 
+  linePP_mcclosure->Draw();
+
   putCMSPrel();
-  drawText(Form("Anti-k_{T} Particle Flow Jets R=0.%d",radius),0.2,0.23,20);
+  drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
   drawText("|#eta|<2, |vz|<15",0.6,0.31,22);
   
-  cPPMCclosure->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_mc_closure_test_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+  cPPMCclosure->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_unfoldng_mc_closure_test_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+ 
   
   //plot 6 - data vs MC for PbPb 
   // i want to make it like ratio plots for each centrality class. and plot the unfolded ratio as well. 
@@ -482,9 +521,15 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   TH1F *PbPb_meas_vs_mc[nbins_cent+1];
   TH1F *PbPb_unfo_vs_mc[nbins_cent+1];
 
+  TLine *linePbPb_data_vs_mc = new TLine(30,1,500,1);
+  linePbPb_data_vs_mc->SetLineStyle(2);
+  linePbPb_data_vs_mc->SetLineWidth(2);
+
+
   for(int i = 0;i<nbins_cent;i++){
 
     cPbPb_data_vs_mc->cd(nbins_cent-i);
+    //cPbPb_data_vs_mc->cd(nbins_cent-i)->SetLogy();
 
     PbPb_meas_vs_mc[i] = (TH1F*)dPbPb_TrgComb[i]->Clone("PbPb_meas_vs_mc");
     PbPb_unfo_vs_mc[i] = (TH1F*)uPbPb_Bayes[i]->Clone("PbPb_unfo_vs_mc");
@@ -492,17 +537,19 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
     PbPb_meas_vs_mc[i]->Divide(mPbPb_Reco[i]);
     PbPb_unfo_vs_mc[i]->Divide(mPbPb_Reco[i]);
 
-    makeHistTitle(PbPb_meas_vs_mc[i]," ","Jet p_{T} (GeV/c)", "data/mc");
+    makeHistTitle(PbPb_meas_vs_mc[i]," ","Jet p_{T} (GeV/c)", "#frac{data}{MC RECO}");
     PbPb_meas_vs_mc[i]->SetMarkerStyle(25);
     PbPb_meas_vs_mc[i]->SetMarkerColor(kBlack);
+    PbPb_meas_vs_mc[i]->SetAxisRange(30,500,"X");
+    PbPb_meas_vs_mc[i]->SetAxisRange(0,1e8,"Y");
     PbPb_meas_vs_mc[i]->Draw();
 
     PbPb_unfo_vs_mc[i]->SetMarkerStyle(27);
     PbPb_unfo_vs_mc[i]->SetMarkerColor(kBlue);
     PbPb_unfo_vs_mc[i]->Draw("same");
 
-    line->Draw();
-
+    linePbPb_data_vs_mc->Draw();
+    
     drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
 
   }
@@ -514,25 +561,36 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   PbPb_datavsmc->Draw();
 
   putCMSPrel();
-  drawText(Form("Anti-k_{T} %s Particle Flow Jets R=0.%d",algo, radius),0.2,0.23,20);
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,20);
   drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
-  cPbPb_data_vs_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_vs_mc_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  cPbPb_data_vs_mc->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PbPb_data_vs_mc_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+  
   //plot7 - data vs MC for pp
   // made similar to above. 
-  TCanvas *cPP_data_vs_mc = new TCanvas("cPP_data_vs_mc","PP data vs MC",600,400);
+  TCanvas *cPP_data_vs_mc = new TCanvas("cPP_data_vs_mc","PP data vs MC",600,600);
 
   TH1F *PP_meas_vs_mc = (TH1F*)dPP_Comb->Clone("PP_meas_vs_mc");
   TH1F *PP_unfo_vs_mc = (TH1F*)uPP_Bayes->Clone("PP_unfo_vs_mc");
+  
+  TLine *linePP_data_vs_mc = new TLine(30,1,500,1);
+  linePP_data_vs_mc->SetLineStyle(2);
+  linePP_data_vs_mc->SetLineWidth(2);
 
   PP_meas_vs_mc->Divide(mPP_Reco);
   PP_unfo_vs_mc->Divide(mPP_Reco);
 
-  makeHistTitle(PP_meas_vs_mc," ","Jet p_{T} (GeV/c)","data/mc");
+  //makeHistTitle(PP_meas_vs_mc," ","Jet p_{T} (GeV/c)","#frac{data}{MC RECO}");
+
+  PP_meas_vs_mc->SetTitle(" ");
+  PP_meas_vs_mc->SetXTitle("Jet p_{T} (GeV/c)");
+  PP_meas_vs_mc->SetYTitle("#frac{data}{MC RECO}");
+  PP_meas_vs_mc->GetXaxis()->CenterTitle();
+  PP_meas_vs_mc->GetYaxis()->CenterTitle();  
+
   PP_meas_vs_mc->SetMarkerStyle(25);
   PP_meas_vs_mc->SetMarkerColor(kBlack);
   PP_meas_vs_mc->Draw();
@@ -540,7 +598,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   PP_unfo_vs_mc->SetMarkerColor(kBlue);
   PP_unfo_vs_mc->Draw("same");
 
-  line->Draw();
+  linePP_data_vs_mc->Draw();
 
   TLegend *PP_datavsmc = myLegend(0.53,0.65,0.85,0.9);
   PP_datavsmc->AddEntry(PP_meas_vs_mc,"no unfolding","pl");
@@ -549,52 +607,83 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   PP_datavsmc->Draw();
 
   putCMSPrel();
-  drawText(Form("Anti-k_{T} Particle Flow Jets R=0.%d",radius),0.2,0.23,20);
+  drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
   drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
-  cPP_data_vs_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_data_vs_mc_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+  cPP_data_vs_mc->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_data_vs_mc_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+  
 
   //plot8 - normalized Response Matrix for PbPb. 
   TCanvas *cPbPb_NormResMat = new TCanvas("cPbPb_NormResMat","Normalized Response Matrix for PbPb",1200,800);
   makeMultiPanelCanvasWithGap(cPbPb_NormResMat,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  
+  TLine *linePbPb_Res = new TLine(15,15,1000,1000);
+  linePbPb_Res->SetLineStyle(2);
+  linePbPb_Res->SetLineWidth(2);
 
   for(int i = 0;i<nbins_cent;i++){
     cPbPb_NormResMat->cd(nbins_cent-i);
+    cPbPb_NormResMat->cd(nbins_cent-i)->SetLogy();
+    cPbPb_NormResMat->cd(nbins_cent-i)->SetLogx();
+    cPbPb_NormResMat->cd(nbins_cent-i)->SetLogz();
 
     makeHistTitle(mPbPb_ResponseNorm[i]," ","Gen p_{T} (GeV/c)","Reco p_{T} (GeV/c)");
-    drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
 
     mPbPb_ResponseNorm[i]->SetAxisRange(1e-10,1,"Z");
+    mPbPb_ResponseNorm[i]->SetAxisRange(15,800,"X");
+    mPbPb_ResponseNorm[i]->SetAxisRange(15,800,"Y");
+   
     mPbPb_ResponseNorm[i]->Draw("colz");
+    
+    linePbPb_Res->Draw();
+    drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
 
   }
   putCMSPrel();
-  drawText(Form("Anti-k_{T} Particle Flow %s Jets R=0.%d",algo,radius),0.2,0.23,20);
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.2,0.23,20);
   drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cPbPb_NormResMat->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_normalized_response_matrix_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-  //plot9 - normalized response matrix for pp
-  TCanvas *cPP_NormResMat = new TCanvas("cPP_NormResMat","Normalized Response Matrix fr PP",600,400);
-
-  makeHistTitle(mPP_ResponseNorm," ","Gen p_{T} (GeV/c)","Reco p_{T} (GeV/c)");
-
-  mPP_ResponseNorm->SetAxisRange(1e-10,1,"Z");
-  mPP_ResponseNorm->Draw("colz");
-
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} Particle Flow Jets R=0.%d",radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cPP_NormResMat->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_normalized_response_matrix_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+  cPbPb_NormResMat->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PbPb_normalized_response_matrix_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
 
+  //plot9 - normalized response matrix for pp
+  TCanvas *cPP_NormResMat = new TCanvas("cPP_NormResMat","Normalized Response Matrix fr PP",600,600);
+  cPP_NormResMat->SetLogy();
+  cPP_NormResMat->SetLogx();
+  cPP_NormResMat->SetLogz();
+
+  TLine *linePP_Res = new TLine(15,15,1000,1000);
+  linePP_Res->SetLineStyle(2);
+  linePP_Res->SetLineWidth(2);
+
+  //makeHistTitle(mPP_ResponseNorm," ","Gen p_{T} (GeV/c)","Reco p_{T} (GeV/c)");
+
+  mPP_ResponseNorm->SetAxisRange(1e-10,1,"Z");
+  mPP_ResponseNorm->SetAxisRange(15,800,"X");
+  mPP_ResponseNorm->SetAxisRange(15,800,"Y");
+
+  mPP_ResponseNorm->SetTitle(" ");
+  mPP_ResponseNorm->SetXTitle("Gen p_{T} (GeV/c)");
+  mPP_ResponseNorm->SetYTitle("Reco p_{T} (GeV/c)");
+  mPP_ResponseNorm->GetXaxis()->CenterTitle();
+  mPP_ResponseNorm->GetYaxis()->CenterTitle();
+
+  mPP_ResponseNorm->Draw("colz");
+
+  linePP_Res->Draw();
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
+  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cPP_NormResMat->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_normalized_response_matrix_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+ */
   //plot10 - Cross section for PbPb - in proper units per centrality bin.  
   TCanvas *cPbPb_sigma = new TCanvas("cPbPb_sigma","PbPb inclusive jet invariant cross section",1200,800);
   makeMultiPanelCanvasWithGap(cPbPb_sigma,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
@@ -604,47 +693,56 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
     cPbPb_sigma->cd(nbins_cent-i);
     cPbPb_sigma->cd(nbins_cent-i)->SetLogy();
     cPbPb_sigma->cd(nbins_cent-i)->SetLogx();
-    
-    drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.85,0.8,20);
 
-    makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","#frac{d^2 #sigma}{d#eta dp_{T}} micro barns");
+    makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","#frac{d^2 #sigma}{d#eta dp_{T}} something barns");
+    //dPbPb_TrgComb[i]->Scale(1e-6)
     dPbPb_TrgComb[i]->SetMarkerStyle(24);
     dPbPb_TrgComb[i]->SetMarkerColor(kBlack);
-    dPbPb_TrgComb[i]->SetAxisRange(20,600,"X");
+    dPbPb_TrgComb[i]->SetAxisRange(30,500,"X");
     dPbPb_TrgComb[i]->Draw();
 
     uPbPb_Bayes[i]->SetMarkerStyle(33);
     uPbPb_Bayes[i]->SetMarkerColor(kRed);
     uPbPb_Bayes[i]->Draw("same");
 
+
+    //uPbPb_BinByBin[i]->Scale(1e-6);
     uPbPb_BinByBin[i]->SetMarkerStyle(29);
     uPbPb_BinByBin[i]->SetMarkerColor(kBlue);
     uPbPb_BinByBin[i]->Draw("same");
 
+    drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.7,20);
+    
   }
 
   cPbPb_sigma->cd(1);
-  TLegend *PbPb_sigma = myLegend(0.53,0.65,0.85,0.9);
+  TLegend *PbPb_sigma = myLegend(0.53,0.75,0.8,0.9);
   PbPb_sigma->AddEntry(dPbPb_TrgComb[0],"No Unfolding","pl");
   PbPb_sigma->AddEntry(uPbPb_Bayes[0],"Bayesian 4 Iter","pl");
   PbPb_sigma->AddEntry(uPbPb_BinByBin[0],"BinByBin","pl");
+  PbPb_sigma->SetTextSize(0.04);
   PbPb_sigma->Draw();
 
   putCMSPrel();
-  drawText(Form("Anti-k_{T} Particle Flow %s Jets R=0.%d",algo,radius),0.3,0.95,15);
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.95,15);
   drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cPbPb_sigma->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_invariant_cross_section_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  cPbPb_sigma->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PbPb_invariant_cross_section_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
-
+  /*
+  
   //plot 11 - cross section for PP 
   TCanvas *cPP_sigma = new TCanvas("cPP_sigma","PP inclusive jet invariant cross section",600,400);
   cPP_sigma->SetLogy();
+  cPP_sigma->SetLogy();
 
-  makeHistTitle(dPP_Comb,"","Jet p_{T} (GeV/c)","#frac{d^2 #sigma}{d#eta dp_{T}} nano barns");
   dPP_Comb->SetMarkerStyle(24);
   dPP_Comb->SetMarkerColor(kBlack);
+  dPP_Comb->SetTitle(" ");
+  dPP_Comb->SetXTitle("Jet p_{T} (GeV/c)");
+  dPP_Comb->SetYTitle("#frac{d^2 #sigma}{d#eta dp_{T}} something barns");
+  dPP_Comb->SetAxisRange(30,500,"X");
   dPP_Comb->Draw();
 
   uPP_Bayes->SetMarkerColor(kRed);
@@ -659,17 +757,19 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   PP_sigma->AddEntry(dPP_Comb,"No Unfolding","pl");
   PP_sigma->AddEntry(uPP_Bayes,"Bayesian 4 Iter","pl");
   PP_sigma->AddEntry(uPP_BinByBin,"BinByBin","pl");
+  PP_sigma->SetTextSize(0.04);
   PP_sigma->Draw();
 
   putCMSPrel();
-  drawText(Form("Anti-k_{T} Particle Flow Jets R=0.%d",radius),0.2,0.23,20);
+  drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
   drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cPbPb_sigma->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_invariant_cross_section_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+  cPP_sigma->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/PP_invariant_cross_section_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
 
   // plot 12 - Gen Spectra for PbPb and pp. 
+  
   TCanvas *cGenSpectra = new TCanvas("cGenSpectra","Generator Level Spectra for PbPb and pp",1400,1000);
   
   cGenSpectra->Divide(2,1);
@@ -743,15 +843,15 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   GenSpectra->SetTextSize(0.04);
   GenSpectra->Draw();
   
-  cGenSpectra->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/MC_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  cGenSpectra->SaveAs(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Plots/MC_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
  
   //unscale the gen and reco histograms: 
   for(int i = 0;i<=nbins_cent;i++){ 
     mPbPb_Gen[i]->Scale(1./scaleFactor[i]);
     mPbPb_Reco[i]->Scale(1./scaleFactor[i]); 
   }
- 
   
+  */
  
   timer.Stop();
   cout<<" Total time taken CPU = "<<timer.CpuTime()<<endl;
