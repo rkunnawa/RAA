@@ -74,11 +74,19 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
+  char *location = "MIT";
+
   const int nbins_cent = 6;
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 
-  TFile *fin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type,date.GetDate()));
+  TFile *fin; 
+  /*
+  //if(location=="MIT") 
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfo_ak%s%d%s_20140912.root",algo,radius,jet_type));
+  //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
+  //if(location=="MPB") fin= TFile::Open(Form(""))
+  
 
   TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1];
   
@@ -154,7 +162,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
 
 
   //Ok now that we have loaded all the histograms we need - lets start making the plots 
-
+  /*
   // line at 1
   TLine *line = new TLine(50,1,300,1);
   line->SetLineStyle(2);
@@ -177,8 +185,8 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   
   for(int i = 0;i<=nbins_cent;i++){
     
-    uPbPb_Bayes[i]->Scale(1./scaleFactor[i]);
-    dPbPb_TrgComb[i]->Scale(1./scaleFactor[i]);
+    uPbPb_Bayes[i]->Scale(1./(scaleFactor[i]*1e6));
+    dPbPb_TrgComb[i]->Scale(1./(scaleFactor[i]*1e6));
     mPbPb_Reco[i]->Scale(1./scaleFactor[i]);
 
     uPbPb_Bayes[i]->SetMarkerStyle(20);
@@ -256,7 +264,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
     mPbPb_Reco[i]->Scale(scaleFactor[i]);
 
   }
-
+  
   
   
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -751,7 +759,58 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
     mPbPb_Reco[i]->Scale(1./scaleFactor[i]); 
   }
  
+  */
   
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // Plotting the average energy subtracted in the Vs cone 
+  if(algo=="Vs"){
+
+    TFile *fMCin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_akVsCalo_20141003.root");
+    TH1F *hPbPb_jtpu[no_radius][nbins_eta][nbins_cent+1];
+    
+    for(int i = 0;i<=nbins_cent;i++){
+
+      for(int j = 0;j<nbins_eta;j++){
+
+	for(int k = 0;k<no_radius;k++){
+
+	  hPbPb_jtpu[i][j][k] = (TH1F*)fMCin->Get(Form("hpbpb_jtpu_R%d_%s_cent%d",list_radius[k],etaWidth[j],i));
+
+	}// radius loop
+	
+      }//eta bins loop
+
+    }//centrality loop
+
+    TCanvas *cPbPb_MC_jtpu[nbins_eta];
+    
+    for(int j = 0;j<nbins_eta;j++){
+
+      cPbPb_MC_jtpu[j] = new TCanvas(Form("cPbPb_MC_jtpu_%s",etaWidth[j]),FOrm("energy subtracted from Jets in the Vs algorithmin the range %s",etaWidth[j]),1000,800);
+      makeMultiPanelCanvasWithGap(cPbPb_MC_jtpu[j],3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+      
+      TLegend *LPbPb_MC_jtpu = myLegend(0.53,0.65,0.85,0.9);
+      
+      for(int i = 0;i<nbins_cent;i++){
+
+	cPbPb_MC_jtpu[j]->cd(i);
+	cPbPb_MC_jtpu[j]->cd(i)->SetLogy();
+
+	for(int k = 1;k<4;k++){
+
+	  hPbPb_jtpu[k][j][i]->Set
+
+	}//radius loop
+
+      }//centrality loop
+
+      cPbPb_MC_jtpu[j]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/bkg_energy_subtracted_%s_ak%s_%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
+
+    }//eta bins loop for the canvas
+
+  }// random cone plotting if statement only for Vs so far
+
  
   timer.Stop();
   cout<<" Total time taken CPU = "<<timer.CpuTime()<<endl;

@@ -67,13 +67,13 @@ static const double boundaries_pt[nbins_pt+1] = {
   468, 507, 548, 592,
   638, 686, 1000 
 };
-/*
 
-static const int nbins_eta = 14;
+
+static const int nbins_eta = 15;
 static const double boundaries_eta[nbins_eta][2] = {
   {-1.0,+1.0}, {-2.0,+2.0}, {-3.0,+3.0},
   {-3.0,-2.5}, {-2.5,-2.0}, {-2.0,-1.5}, 
-  {-1.5,-1.0}, {-1.0,-0.5}, {-0.5,+0.5}, 
+  {-1.5,-1.0}, {-1.0,-0.5}, {-0.5,0}, {0,+0.5}, 
   {+0.5,+1.0}, {+1.0,+1.5}, {+1.5,+2.0}, 
   {+2.0,+2.5}, {+2.5,+3.0}
 };
@@ -81,7 +81,7 @@ static const double boundaries_eta[nbins_eta][2] = {
 static const double delta_eta[nbins_eta] = {
   2.0, 4.0, 6.0, 
   0.5, 0.5, 0.5, 
-  0.5, 0.5, 1.0, 
+  0.5, 0.5, 0.5, 0.5, 
   0.5, 0.5, 0.5, 
   0.5, 0.5
 };
@@ -89,14 +89,14 @@ static const double delta_eta[nbins_eta] = {
 static const char etaWidth [nbins_eta][256] = {
   "n10_eta_p10","n20_eta_p20","n30_eta_p30",
   "n30_eta_n25","n25_eta_n20","n20_eta_n15",
-  "n15_eta_n10","n10_eta_n05","n05_eta_p05",
+  "n15_eta_n10","n10_eta_n05","n05_eta_0","0_eta_p05",
   "p05_eta_p10","p10_eta_p15","p15_eta_p20",
   "p20_eta_p25","p25_eta_p30"
 };
 
 
-*/
 
+/*
 static const int nbins_eta = 2;
 static const double boundaries_eta[nbins_eta][2] = {
   {-1.0,+1.0},
@@ -110,13 +110,14 @@ static const double delta_eta[nbins_eta] = {
 static const char etaWidth[nbins_eta][256] = {
   "n10_eta_p10","n20_eta_p20"
 };
+*/
 
-static const int no_radius = 2;//testing purposes 
-static const int list_radius[no_radius] = {3,4};
+//static const int no_radius = 2;//testing purposes 
+//static const int list_radius[no_radius] = {3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
-//static const int no_radius = 7; 
-//static const int list_radius[no_radius] = {1,2,3,4,5,6,7};
+static const int no_radius = 7; 
+static const int list_radius[no_radius] = {1,2,3,4,5,6,7};
 
 static const int nbins_cent = 6;
 static const Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 2.5 to get your actual centrality % (old 2011 data) 
@@ -157,6 +158,7 @@ public:
     tSkim = (TTree*)tFile->Get("skimanalysis/HltTree");
     tJet = (TTree*)tFile->Get(jetTree);
     tJet->SetBranchAddress("jtpt" , jtpt );
+    if(isPbPb )tJet->SetBranchAddress("jtpu", jtpu );
     tJet->SetBranchAddress("rawpt", rawpt);
     tJet->SetBranchAddress("trackMax" , trackMax );
     tJet->SetBranchAddress("chargedMax",chargedMax);
@@ -188,6 +190,7 @@ public:
   TTree *tEvt;
   TTree* tSkim;
   float jtpt[1000];
+  float jtpu[1000];
   float rawpt[1000];
   float refpt[1000];
   float jteta[1000];
@@ -226,7 +229,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
 
   cout<<"Running for Algorithm "<<algo<<" "<<jet_type<<endl;
  
-  bool printDebug = true;
+  bool printDebug = false;
 
   const int nbins_pthat = 9;
   Double_t boundaries_pthat[nbins_pthat+1];
@@ -236,7 +239,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
   //there are two ways in which we can select the no of events we use to scale - it has to be between the pthat range. 
   //first file name - partial 50K statistics, second one is full statistics sample. 
   //similarly the entries number is for the small statistics. 
-
+  
   // refer this twiki for the data and MC files: http://twiki.cern.ch/twiki/bin/viewauth/CMS/HiForestPA2014#PYTHIA_HYDJET_embedded_sample
 
   boundaries_pthat[0]=15;
@@ -271,9 +274,9 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
   // entries[4] = ;//total - 49500
 
   boundaries_pthat[5]=170;
-  fileName_pthat[5] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT170_Hydjet1p8_STARTHI53_LV1_v15_full.root";
-  // fileName_pthat[5] = "";
-   xsection[5]= 1.465e-06;
+  //fileName_pthat[5] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT170_Hydjet1p8_STARTHI53_LV1_v15_full.root";
+  fileName_pthat[5] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat170_Track9_Jet30_matchEqR_merged_forest_0.root";
+  xsection[5]= 1.465e-06;
   // entries[5] = ;//total - 49444
 
   boundaries_pthat[6]=220;
@@ -424,6 +427,8 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
   TH2F *hpbpb_matrix[no_radius][nbins_eta][nbins_cent+1];
   //TH2F *hpbpb_response[nbins_cent+1];
   TH1F *hpbpb_mcclosure_data[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_jtpu[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_jtpu_noScale[no_radius][nbins_eta][nbins_cent+1];
 
   //TH1F *hpbpb_eta[no_radius][nbins_eta][nbins_cent+1], *hpbpb_phi[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_eta_full[no_radius], *hpbpb_phi_full[no_radius];
@@ -469,6 +474,9 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
 	//cout<<"C"<<endl;
 	hpbpb_mcclosure_data[k][j][i] = new TH1F(Form("hpbpb_mcclosure_data_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("data for unfolding mc closure test R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
 
+	hpbpb_jtpu[k][j][i] = new TH1F(Form("hpbpb_jtpu_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("jtpu Vs algorithm R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,500);
+	hpbpb_jtpu_noScale[k][j][i] = new TH1F(Form("hpbpb_jtpu_noScale_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("jtpu Vs algorithm not Scaled R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,500);
+
 	//hpbpb_eta[k][j][i] = new TH1F(Form("hpbpb_eta_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("eta distribution R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],8*boundaries_cent[i],5*boundaries_cent[i+1]),60,-4,+4);
 	//hpbpb_phi[k][j][i] = new TH1F(Form("hpbpb_phi_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("phi distribution R%d in eta widths %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],8*boundaries_cent[i],5*boundaries_cent[i+1]),60,-3.2,+3.2);
 	
@@ -480,6 +488,8 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       hpbpb_reco[k][j][nbins_cent] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Reco jtpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
       hpbpb_matrix[k][j][nbins_cent] = new TH2F(Form("hpbpb_matrix_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Matrix refpt jtpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
       hpbpb_mcclosure_data[k][j][nbins_cent] = new TH1F(Form("hpbpb_mcclosure_data_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("data for unfolding mc closure test R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
+      hpbpb_jtpu[k][j][nbins_cent] = new TH1F(Form("hpbpb_jtpu_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jtpu Vs algorithm R%d %s",list_radius[k],etaWidth[j]),1000,0,500);
+      hpbpb_jtpu_noScale[k][j][nbins_cent] = new TH1F(Form("hpbpb_jtpu_noScale_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jtpu Vs algorithm not Scaled R%d %s",list_radius[k],etaWidth[j]),1000,0,500);
       //hpbpb_response[nbins_cent] = new TH2F(Form("hpbpb_response_cent%d",nbins_cent),"response jtpt refpt 0-200 cent",1000,0,1000,1000,0,1000);
 
       hpp_gen[k][j] = new TH1F(Form("hpp_gen_R%d_%s",list_radius[k],etaWidth[j]),Form("gen refpt R%d %s",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
@@ -525,8 +535,8 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
   JetData *data[no_radius][nbins_pthat]; 
   JetData *dataPP[no_radius][nbinsPP_pthat];
   for(int k = 0;k<no_radius;k++){
-    //cout<<"Radius = "<<list_radius[k]<<endl;
-    //cout<<"reading all the pbpb mc files"<<endl;
+    if(printDebug)cout<<"Radius = "<<list_radius[k]<<endl;
+    if(printDebug)cout<<"reading all the pbpb mc files"<<endl;
     for (int h=0;h<nbins_pthat;h++) {
       //cout<<Form("ak%s%dJetAnalyzer/t",algo,list_radius[k])<<endl;
       data[k][h] = new JetData(fileName_pthat[h],Form("ak%s%d%sJetAnalyzer/t",algo,list_radius[k],jet_type),Form("ak%s%d%sJetAnalyzer/t",algo,list_radius[k],jet_type),0,1);
@@ -539,7 +549,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       //cout<<"D"<<endl;
       delete hPtHatTmp;
     }// pthat loop
-    cout<<"reading all the pp mc files"<<endl;
+    if(printDebug)cout<<"reading all the pp mc files"<<endl;
     for (int h=0;h<nbinsPP_pthat;h++){ 
       dataPP[k][h] = new JetData(fileNamePP_pthat[h],Form("ak%d%sJetAnalyzer/t",list_radius[k],jet_type),Form("ak%d%sJetAnalyzer/t",list_radius[k],jet_type),0,0);
       TH1F *hPtHatTmp = new TH1F("hPtHatTmp","",nbinsPP_pthat,boundariesPP_pthat);
@@ -550,17 +560,17 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
   }//radius loop
 
   // checking the histograms to see if something is filled. 
-  hPtHatRaw[1]->Print("base");
-  hPtHatRawPP[1]->Print("base");
+  if(printDebug)hPtHatRaw[1]->Print("base");
+  if(printDebug)hPtHatRawPP[1]->Print("base");
   
   for(int k = 0;k<no_radius;k++){
-    cout<<"Filling MC for radius = "<<list_radius[k]<<endl;
+    if(printDebug)cout<<"Filling MC for radius = "<<list_radius[k]<<endl;
     // fill PbPb MC 
-    cout<<"Filling PbPb MC"<<endl;
+    if(printDebug)cout<<"Filling PbPb MC"<<endl;
     for (int h=0;h<nbins_pthat;h++) {
       if (xsection[h]==0) continue;
-      cout <<"Loading pthat"<<boundaries_pthat[h]<<" sample, cross section = "<<xsection[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundaries_pthat[h],boundaries_pthat[h+1])<<endl;
-      cout<<data[k][h]->tJet->GetEntries()<<endl;
+      if(printDebug)cout <<"Loading pthat"<<boundaries_pthat[h]<<" sample, cross section = "<<xsection[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundaries_pthat[h],boundaries_pthat[h+1])<<endl;
+      if(printDebug)cout<<data[k][h]->tJet->GetEntries()<<endl;
       
       //TCut pthatcut = Form("pthat>%d && pthat<%d",boundaries_pthat[h],boundaries_pthat[h+1]);
       //double fentries_test = data[k][h]->tJet->GetEntries(pthatcut);
@@ -575,7 +585,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       
       data[k][h]->tJet->Draw(">>el",selection.str().c_str());
       double fentries = el->GetN();
-      cout<<"tree entries: "<<data[k][h]->tJet->GetEntries()<<" elist: "<<fentries<<endl;
+      if(printDebug)cout<<"tree entries: "<<data[k][h]->tJet->GetEntries()<<" elist: "<<fentries<<endl;
       delete el;
       
       for (Long64_t jentry=0; jentry<data[k][h]->tJet->GetEntries();jentry++) {
@@ -690,12 +700,19 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
 	    hpbpb_matrix[k][j][cBin]->Fill(data[k][h]->refpt[g],data[k][h]->jtpt[g],scale*weight_vz);
 	    hpbpb_gen[k][j][cBin]->Fill(data[k][h]->refpt[g],scale*weight_vz);
 	    hpbpb_reco[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
-	    
+
+	    hpbpb_jtpu[k][j][cBin]->Fill(data[k][h]->jtpu[g],scale*weight_vz);	    
+	    hpbpb_jtpu_noScale[k][j][cBin]->Fill(data[k][h]->jtpu[g],1);
+
 	    //hpbpb_response[nbins_cent]->Fill(data[h]->jtpt[k],data[h]->refpt[k],scale*weight_vz);
 	    hpbpb_matrix[k][j][nbins_cent]->Fill(data[k][h]->refpt[g],data[k][h]->jtpt[g],scale*weight_vz);
 	    hpbpb_gen[k][j][nbins_cent]->Fill(data[k][h]->refpt[g],scale*weight_vz);
 	    hpbpb_reco[k][j][nbins_cent]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
 	    
+	    hpbpb_jtpu[k][j][nbins_cent]->Fill(data[k][h]->jtpu[g],scale*weight_vz);
+	    hpbpb_jtpu_noScale[k][j][nbins_cent]->Fill(data[k][h]->jtpu[g],1);
+		    
+
 	    if (jentry>data[k][h]->tJet->GetEntries()/2.) {
 	      hpbpb_mcclosure_data[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
 	      hpbpb_mcclosure_data[k][j][nbins_cent]->Fill(data[k][h]->jtpt[g],scale*weight_vz);
@@ -716,12 +733,12 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
     TF1 *fVzPP = new TF1("fVzPP","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
     fVzPP->SetParameters(8.41684e-01,-2.58609e-02,4.86550e-03,-3.10581e-04,2.07918e-05);
   
-    cout<<"Filling PP MC"<<endl;
+    if(printDebug)cout<<"Filling PP MC"<<endl;
     // fill pp MC
     for (int h=0;h<nbinsPP_pthat;h++) {
       if (xsectionPP[h]==0) continue;
       //float scale=(xsectionPP[h]-xsectionPP[i+1])/dataPP[k][h]->tJet->GetEntries(Form("pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[h],boundariesPP_pthat[i+1])); 
-      cout <<"Loading PP pthat"<<boundariesPP_pthat[h]<<" sample, cross section = "<<xsectionPP[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[h],boundariesPP_pthat[h+1])<<endl;
+      if(printDebug)cout <<"Loading PP pthat"<<boundariesPP_pthat[h]<<" sample, cross section = "<<xsectionPP[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[h],boundariesPP_pthat[h+1])<<endl;
       //cout<<""<<endl;
 
       //from Pawan's code: /net/hisrv0001/home/pawan/Validation/CMSSW_7_1_1/src/combinePtHatBins/pbpbJEC2014/condor/CondorPbPbCalJec.C
@@ -733,7 +750,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       
       dataPP[k][h]->tJet->Draw(">>el",selection.str().c_str());
       double fentries = el->GetN();
-      cout<<"tree entries: "<<dataPP[k][h]->tJet->GetEntries()<<" elist: "<<fentries<<endl;
+      if(printDebug)cout<<"tree entries: "<<dataPP[k][h]->tJet->GetEntries()<<" elist: "<<fentries<<endl;
       delete el;
 
       for (Long64_t jentry=0; jentry<dataPP[k][h]->tJet->GetEntries();jentry++) {
@@ -842,20 +859,27 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       
       for(int i = 0;i<=nbins_cent;i++){
     
+	// normalize all the cross sections to barns and delta pt and delta eta
+
         divideBinWidth(hpbpb_gen[k][j][i]);
         divideBinWidth(hpbpb_reco[k][j][i]);
         divideBinWidth(hpbpb_mcclosure_data[k][j][i]);
-	hpbpb_gen[k][j][i]->Scale(1./delta_eta[j]);
+	hpbpb_gen[k][j][i]->Scale(1./(delta_eta[j]*1e3));
         hpbpb_gen[k][j][i]->Write();
-        hpbpb_gen[k][j][i]->Print("base");
-	hpbpb_reco[k][j][i]->Scale(1./delta_eta[j]);
+        if(printDebug)hpbpb_gen[k][j][i]->Print("base");
+	hpbpb_reco[k][j][i]->Scale(1./(delta_eta[j]*1e3));
         hpbpb_reco[k][j][i]->Write();
-        hpbpb_reco[k][j][i]->Print("base");
+        if(printDebug)hpbpb_reco[k][j][i]->Print("base");
         hpbpb_matrix[k][j][i]->Write();
-        hpbpb_matrix[k][j][i]->Print("base");
-	hpbpb_mcclosure_data[k][j][i]->Scale(1./delta_eta[j]);
+        if(printDebug)hpbpb_matrix[k][j][i]->Print("base");
+	hpbpb_mcclosure_data[k][j][i]->Scale(1./(delta_eta[j]*1e3));
         hpbpb_mcclosure_data[k][j][i]->Write();
-        hpbpb_mcclosure_data[k][j][i]->Print("base");
+        if(printDebug)hpbpb_mcclosure_data[k][j][i]->Print("base");
+	
+	hpbpb_jtpu[k][j][i]->Write();
+	if(printDebug)hpbpb_jtpu[k][j][i]->Print();
+	hpbpb_jtpu_noScale[k][j][i]->Write();
+	if(printDebug)hpbpb_jtpu_noScale[k][j][i]->Print();
     
       }// cent loop 
       
@@ -863,56 +887,56 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
       divideBinWidth(hpp_reco[k][j]);
       divideBinWidth(hpp_mcclosure_data[k][j]);
 
-      hpp_gen[k][j]->Scale(1./delta_eta[j]);
-      hpp_reco[k][j]->Scale(1./delta_eta[j]);
-      hpp_mcclosure_data[k][j]->Scale(1./delta_eta[j]);
+      hpp_gen[k][j]->Scale(1./(delta_eta[j]*1e3));
+      hpp_reco[k][j]->Scale(1./(delta_eta[j]*1e3));
+      hpp_mcclosure_data[k][j]->Scale(1./(delta_eta[j]*1e3));
 
       hpp_gen[k][j]->Write();
-      hpp_gen[k][j]->Print("base");
+      if(printDebug)hpp_gen[k][j]->Print("base");
       hpp_reco[k][j]->Write();
-      hpp_reco[k][j]->Print("base");
+      if(printDebug)hpp_reco[k][j]->Print("base");
       hpp_matrix[k][j]->Write();
-      hpp_matrix[k][j]->Print("base");
+      if(printDebug)hpp_matrix[k][j]->Print("base");
       hpp_mcclosure_data[k][j]->Write();
-      hpp_mcclosure_data[k][j]->Print("base");
+      if(printDebug)hpp_mcclosure_data[k][j]->Print("base");
 
     }//eta loop
     //just check the Pthat distributions for PbPb and pp. should be fine. 
 
-    hCentMC[k]->Print("base");
+    if(printDebug)hCentMC[k]->Print("base");
     hCentMC[k]->Write();
-    hPtHat[k]->Print("base");
+    if(printDebug)hPtHat[k]->Print("base");
     hPtHat[k]->Write();
-    hPtHatPP[k]->Print("base");
+    if(printDebug)hPtHatPP[k]->Print("base");
     hPtHatPP[k]->Write();
-    hPbPb_pthat_fine[k]->Print("base");
+    if(printDebug)hPbPb_pthat_fine[k]->Print("base");
     hPbPb_pthat_fine[k]->Write();
-    hPP_pthat_fine[k]->Print("base");
+    if(printDebug)hPP_pthat_fine[k]->Print("base");
     hPP_pthat_fine[k]->Write();
 
     hpbpb_eta_full[k]->Write();
-    hpbpb_eta_full[k]->Print("base");
+    if(printDebug)hpbpb_eta_full[k]->Print("base");
     hpbpb_phi_full[k]->Write();
-    hpbpb_phi_full[k]->Print("base");
+    if(printDebug)hpbpb_phi_full[k]->Print("base");
 
     hpp_eta_full[k]->Write();
-    hpp_eta_full[k]->Print("base");
+    if(printDebug)hpp_eta_full[k]->Print("base");
     hpp_phi_full[k]->Write();
-    hpp_phi_full[k]->Print("base");
+    if(printDebug)hpp_phi_full[k]->Print("base");
 
     hpbpb_eta_full_noScale[k]->Write();
-    hpbpb_eta_full_noScale[k]->Print("base");
+    if(printDebug)hpbpb_eta_full_noScale[k]->Print("base");
     hpbpb_phi_full_noScale[k]->Write();
-    hpbpb_phi_full_noScale[k]->Print("base");
+    if(printDebug)hpbpb_phi_full_noScale[k]->Print("base");
 
     hpp_eta_full_noScale[k]->Write();
-    hpp_eta_full_noScale[k]->Print("base");
+    if(printDebug)hpp_eta_full_noScale[k]->Print("base");
     hpp_phi_full_noScale[k]->Write();
-    hpp_phi_full_noScale[k]->Print("base");
+    if(printDebug)hpp_phi_full_noScale[k]->Print("base");
 
-    hPbPb_pthat_fine_noScale[k]->Print("base");
+    if(printDebug)hPbPb_pthat_fine_noScale[k]->Print("base");
     hPbPb_pthat_fine_noScale[k]->Write();
-    hPP_pthat_fine_noScale[k]->Print("base");
+    if(printDebug)hPP_pthat_fine_noScale[k]->Print("base");
     hPP_pthat_fine_noScale[k]->Write();
 
   }// radius loop
