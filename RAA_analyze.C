@@ -112,9 +112,9 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   
   TDatime date;//this is just here to get them to run optimized. 
 
-  TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%s%s_20140902.root",algo,jet_type));
-  TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%s_20140903.root",jet_type));
-  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%s%s_20140902.root",algo,jet_type));
+  TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%s%s_20140912.root",algo,jet_type));
+  TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%s_20140912.root",jet_type));
+  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%s%s_20140912.root",algo,jet_type));
 
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
   // for the above condition, i might have to play with the date stamp. 
@@ -663,7 +663,15 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
     RAA_bayesian[i]->Scale(64./(ncoll[i]*7.65));
     RAA_measured[i]->Scale(64./(ncoll[i]*7.65));
     RAA_binbybin[i]->Scale(64./(ncoll[i]*7.65));
-
+    
+    if(i!=6){
+      RAA_bayesian[i]->SetTitle(Form("RAA ak%s%d%s bayesian unfolded %2.0f - %2.0f cent",algo,radius,jet_type,5*boundaries_cent[i], 5*boundaries_cent[i+1]));
+      RAA_measured[i]->SetTitle(Form("RAA ak%s%d%s measured unfolded %2.0f - %2.0f cent",algo,radius,jet_type,5*boundaries_cent[i], 5*boundaries_cent[i+1]));
+      RAA_binbybin[i]->SetTitle(Form("RAA ak%s%d%s binbybin unfolded %2.0f - %2.0f cent",algo,radius,jet_type,5*boundaries_cent[i], 5*boundaries_cent[i+1]));
+    }else 
+      RAA_bayesian[i]->SetTitle(Form("RAA ak%s%d%s bayesian unfolded 0 - 200 cent",algo,radius,jet_type));
+      RAA_measured[i]->SetTitle(Form("RAA ak%s%d%s measured unfolded 0 - 200 cent",algo,radius,jet_type));
+      RAA_binbybin[i]->SetTitle(Form("RAA ak%s%d%s binbybin unfolded 0 - 200 cent",algo,radius,jet_type));
   }
   
   // think if there are any other systematic checks to be performed. 
