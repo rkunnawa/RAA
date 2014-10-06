@@ -918,7 +918,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   if(algo=="Vs"){
 
     TFile *fMCin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_akVsCalo_20141003.root");
-    TH1F *hPbPb_jtpu[no_radius][nbins_eta][nbins_cent+1];
+    TH1F *hPbPb_MC_jtpu[no_radius][nbins_eta][nbins_cent+1];
     
     for(int i = 0;i<=nbins_cent;i++){
 
@@ -926,7 +926,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
 
 	for(int k = 0;k<no_radius;k++){
 
-	  hPbPb_jtpu[i][j][k] = (TH1F*)fMCin->Get(Form("hpbpb_jtpu_R%d_%s_cent%d",list_radius[k],etaWidth[j],i));
+	  hPbPb_MC_jtpu[k][j][i] = (TH1F*)fMCin->Get(Form("hpbpb_jtpu_noScale_R%d_%s_cent%d",list_radius[k],etaWidth[j],i));
 
 	}// radius loop
 	
@@ -935,31 +935,90 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
     }//centrality loop
 
     TCanvas *cPbPb_MC_jtpu[nbins_eta];
-    
+
+    TF1 *fMC[no_radius][nbins_eta][nbins_cent];
+    double c1FixMinX = 0.2;
+    double c1xMax = 5;
+
+    double fit_mean[no_radius][nbins_eta][nbins_cent];
+    double fit_mean_err[no_radius][nbins_eta][nbins_cent];
+
     for(int j = 0;j<nbins_eta;j++){
 
-      cPbPb_MC_jtpu[j] = new TCanvas(Form("cPbPb_MC_jtpu_%s",etaWidth[j]),FOrm("energy subtracted from Jets in the Vs algorithmin the range %s",etaWidth[j]),1000,800);
-      makeMultiPanelCanvasWithGap(cPbPb_MC_jtpu[j],3,2,0.01,0.01,0.16,0.2,0.04,0.04);
-      
-      TLegend *LPbPb_MC_jtpu = myLegend(0.53,0.65,0.85,0.9);
-      
+      cPbPb_MC_jtpu[j] = new TCanvas(Form("cPbPb_MC_jtpu_%s",etaWidth[j]),Form("energy subtracted from Jets in the Vs algorithmin the range %s",etaWidth[j]),1200,1000);
+      makeMultiPanelCanvas(cPbPb_MC_jtpu[j],3,2,0.0,0.0,0.2,0.15,0.07);
+      TLegend *LPbPb_MC_jtpu[nbins_cent];
+
       for(int i = 0;i<nbins_cent;i++){
 
-	cPbPb_MC_jtpu[j]->cd(i);
-	cPbPb_MC_jtpu[j]->cd(i)->SetLogy();
+	LPbPb_MC_jtpu[i] = myLegend(0.40,0.65,0.50,0.85);
 
-	for(int k = 1;k<4;k++){
+	cPbPb_MC_jtpu[j]->cd(nbins_cent-i)->SetLogy();
+	//cPbPb_MC_jtpu[j]->cd(i+1)->SetLogx();
+	//cPbPb_MC_jtpu[j]->cd(i+1)->SetGridy();
+	cPbPb_MC_jtpu[j]->cd(nbins_cent-i)->SetGridx();
+	cPbPb_MC_jtpu[j]->cd(nbins_cent-i);
 
-	  hPbPb_jtpu[k][j][i]->Set
+	for(int k = 1;k<5;k++){
+
+	  hPbPb_MC_jtpu[k][j][i]->SetMarkerStyle(20+k);
+	  hPbPb_MC_jtpu[k][j][i]->SetMarkerColor(1+k);
+	  hPbPb_MC_jtpu[k][j][i]->SetAxisRange(5,250,"X");
+	  hPbPb_MC_jtpu[k][j][i]->SetAxisRange(1,3.5e3,"Y");
+	  makeHistTitle(hPbPb_MC_jtpu[k][j][i]," ","Subtracted p_{T} (GeV/c) from Jet","counts");
+	 
+	  fMC[k][j][i] = new TF1(Form("fMC_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),"[0]*exp(-0.5*((x-[1])/[2])^2)",5,250);
+	  //fMC[k][j][i]->SetParameters(0.3,hPbPb_MC_jtpu[k][j][i]->GetMean(),10);
+	  //fMC[k][j][i]->FixParameter(1,hPbPb_MC_jtpu[k][j][i]->GetMean());
+
+	  hPbPb_MC_jtpu[k][j][i]->Fit(Form("fMC_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),"0");
+	  
+	  fit_mean[k][j][i] = fMC[k][j][i]->GetParameter(2);
+	  fit_mean_err[k][j][i] = fMC[k][j][i]->GetParError(2);
+
+	  // this fit values doesnt look reasonable??? 
+
+	  if(k==1)
+	    hPbPb_MC_jtpu[k][j][i]->Draw();
+	  else 
+	    hPbPb_MC_jtpu[k][j][i]->Draw("same");
+	  
+	  //LPbPb_MC_jtpu[i]->AddEntry(,"","");
+	  LPbPb_MC_jtpu[i]->AddEntry(hPbPb_MC_jtpu[k][j][i],Form("R=0.%d #bar{p_{T}}:%5.2f #pm %5.2f",list_radius[k],hPbPb_MC_jtpu[k][j][i]->GetMean(),hPbPb_MC_jtpu[k][j][i]->GetMeanError()),"pl");
+	  //LPbPb_MC_jtpu[i]->AddEntry("",Form("Fit mean:%5.2f #pm %5.2f",fit_mean[k][j][i],fit_mean_err[k][j][i]),"");
 
 	}//radius loop
+	
+	LPbPb_MC_jtpu[i]->SetTextSize(0.04);
+	LPbPb_MC_jtpu[i]->Draw();
+	drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.87,20);
 
       }//centrality loop
-
-      cPbPb_MC_jtpu[j]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/bkg_energy_subtracted_%s_ak%s_%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
+      cPbPb_MC_jtpu[j]->cd(1);
+      putCMSSim();
+      cPbPb_MC_jtpu[j]->cd(nbins_cent);
+      drawText(Form("Anti-k_{T} %s %s",algo,jet_type),0.5,0.55,16);
+      drawText(Form("%s |vz|<15",etaWidth[j]),0.5,0.60,16);
+      
+      cPbPb_MC_jtpu[j]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/bkg_energy_subtracted_%s_ak%s_%s_%d.pdf",etaWidth[j],algo,jet_type,date.GetDate()),"RECREATE");
 
     }//eta bins loop for the canvas
 
+    /*
+    TCanvas *cMeanVsEta[4];
+    TH1F *hPbPb_MC_jtpu_mean_vs_eta[4];
+    hPbPb_MC_jtpu_mean_vs_eta[k] = new TH1F(Form("hPbPb_MC_jtpu_mean_vs_eta_R%d",list_radius[k]),"",12,-3,+3);
+
+    for(int k = 1;k<5;k++){
+      
+      cMeanVsEta[k-1] = new TCanvas(Form("cMeanVsEta_R%d",list_radius[k]),"",800,600);
+      for(int n = 0;n<12;n++){
+	hPbPb_MC_jtpu_mean_vs_eta[k]->SetBin;
+      }
+    }
+    */
+
+    
   }// random cone plotting if statement only for Vs so far
 
  
