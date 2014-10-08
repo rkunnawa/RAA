@@ -40,7 +40,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   else if(type=="MC")
     FileA = TFile::Open("/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root");
   
-  TFile* outf = new TFile(Form("test_test_randomcone_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
+  TFile* outf = new TFile(Form("test_randomcone_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
 			  
   //TFile *FileA = TFile::Open(Form("/net/hisrv0001/home/icali/hadoop/HIMinBiasUPC_skimmed/MinBias-reTracking-merged/MinBias_Merged_tracking_all.root"));
   //TString outname = "dataAKSkimNtupleRandomConeRings_v4_TkpTCut0_ak3dataMB.root"; 
@@ -51,7 +51,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   cout<<"   COLLTYPE : "<<COLLTYPE<<endl;
   
   //****** Analysis knobs *****************
-  Float_t JETRADIUS = rad;
+  Float_t JETRADIUS = (Float_t)rad/10;
   //Float_t PTCUT1 = 120;      //leading jet
   //Float_t PTCUT2 = 50;       //away jet
   Float_t PTCUT3 = 20;       //perp jets
@@ -68,12 +68,11 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   double HI_dR[]  = {0.05, 0.10, 0.15, 0.20, 0.25, 0.30};
   const int nRings = 6;      // rings for JetShapes 
   //const Int_t nRan = 100;    // number of random cones
-  int nRandom = 1;
+  int nRandom = 100;
   // int nRan= 100; - not used here 
-  int Nevents = 2;
-  int nMarks = 10;
+  int Nevents = 1000;
+  int nMarks = 50;
   //****************************************
-  
   
   TTree* ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,rad,jet_type));
   // - TTree* ic      = (TTree*)FileA->Get("icPu5JetAnalyzer/t"); // - not there in the new forest 
@@ -417,6 +416,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   //nt->Branch("EBsumEt",EBsumEt,"EBsumEt[nJets]/F");
   //nt->Branch("nEErhits",nEErhits,"nEErhits[nJets]/I");    
   //nt->Branch("EEsumEt",EEsumEt,"EEsumEt[nJets]/F");
+
   if(jet_type=="Calo"){
     nt->Branch("nTower_objs",nTower_objs,"nTower_objs[nJets]/I");    
     nt->Branch("Tower_sumEt",Tower_sumEt,"Tower_sumEt[nJets]/F");
@@ -622,12 +622,16 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
       event = eventN;
       lumi = lumiS;
       bin = cBin;
+      
+      //cout<<"run = "<<run<<endl;
+      //cout<<"event = "<<event<<endl;
+      
       // maxHPDhits = HCALmaxhpdhits;
       // maxRBXhits = HCALmaxrbxhits;
       // ntrianglenoise = HCALntrianglenoise;
       // nspikenoise = HCALnspikenoise;
       // hasBadRBXTS4TS5 = HCALhasBadRBXTS4TS5;
-    
+      
       nJets = nAKJets;
       // nTracks = nTrk;
       //nJets = 1; //for dijet studies
@@ -768,8 +772,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 	// ranTkSumEt_ring5[qq] = -99;
 	// nRanTks_ring5[qq] = 0;
       }
-
-      cout<<"Event = "<<iev<<endl;
+      
       
       //----------------------------------------------------------------------
       //  Now loop over the Jets
@@ -789,11 +792,11 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 	  if ( jtpt[iJet] < PTCUT3 ) continue;
 
 	  
-	  cout<<"jet pt = "<<jpt[iJet]<<endl;
-	  cout<<"jet pu = "<<jpu[iJet]<<endl;
-	  cout<<"raw pt = "<<jrawpt[iJet]<<endl;
-	  cout<<"eta: "<<jeta[iJet]<<", phi: "<<jphi[iJet]<<endl;
-	  
+	  //cout<<"jet pt = "<<jpt[iJet]<<endl;
+	  //cout<<"jet pu = "<<jpu[iJet]<<endl;
+	  //cout<<"raw pt = "<<jrawpt[iJet]<<endl;
+	  //cout<<"eta: "<<jeta[iJet]<<", phi: "<<jphi[iJet]<<endl;
+
 	  /*
 
 	  //----------------------------------------------------------------------
@@ -896,17 +899,19 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 	    Int_t ringCounter[nRings] ={0,0,0,0,0,0};
 	    double ringSumEtCh[nRings]={0,0,0,0,0,0};
 	    Int_t ringCounterCh[nRings] ={0,0,0,0,0,0};	  
-	    cout<<"no of PF candidates = "<<PF_n<<endl;
+	    //cout<<"no of PF candidates = "<<PF_n<<endl;
 	    for(int iPF = 0; iPF<PF_n; iPF++)
 	      {
 		if (PF_pt[iPF] < PF_TRACKPTCUT) continue;
 		if ( fabs(PF_eta[iPF] ) >= PF_TRACKETACUT ) continue;
-		double dRhitJetPF = sqrt(((PF_eta[iPF]-jteta[iJet])*(PF_eta[iPF]-jteta[iJet])) + ((PF_phi[iPF]-jtphi[iJet])*(PF_phi[iPF]-jtphi[iJet])));	  
+		double dRhitJetPF = sqrt(((PF_eta[iPF]-jteta[iJet])*(PF_eta[iPF]-jteta[iJet])) + ((PF_phi[iPF]-jtphi[iJet])*(PF_phi[iPF]-jtphi[iJet])));  
 		if (dRhitJetPF<=JETRADIUS)
 		  {
 		    sumEtPF += PF_pt[iPF];
 		    PFCounter +=1;
-		    cout<<"PF pt ["<<iPF<<"] = "<<PF_pt[iPF]<<" with current sum: "<<sumEtPF<<endl;
+		    //cout<<"PF pt ["<<iPF<<"] = "<<PF_pt[iPF]<<" with current sum: "<<sumEtPF<<endl;
+		    //cout<<"PF eta["<<iPF<<"] = "<<PF_eta[iPF]<<", PF phi["<<iPF<<"] = "<<PF_phi[iPF]<<endl;
+		    //cout<<"delta R = "<<dRhitJetPF<<endl;
 		  }	      
 		//For the JetShapes analysis get the energy in each ring in dR(\eta,\phi)
 		for (int iRing = 0; iRing<=nRings; iRing++)
@@ -951,7 +956,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 	    nPFchObjs_ring4[iJet] = ringCounterCh[4];
 	    nPFchObjs_ring5[iJet] = ringCounterCh[5];
 	    PFsumEt[iJet] = sumEtPF;
-	    cout<<"Event no = "<<iJet<<", sumEtPF = "<<sumEtPF<<endl;
+	    //cout<<"Event no = "<<iJet<<", sumEtPF = "<<sumEtPF<<endl;
 	    nPFobjs[iJet] = PFCounter;
 
 	  }else if(jet_type=="Calo"){
@@ -1075,7 +1080,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 	  float ranEta = myDice.Uniform(-2,2);
 	  float ranPhi = myDice.Uniform(-3.14159,3.13159);
 
-	  cout<<"ranEta = "<<ranEta<<", ranPhi = "<<ranPhi<<endl;
+	  //cout<<"ranEta = "<<ranEta<<", ranPhi = "<<ranPhi<<endl;
 
 	  /*
 
@@ -1152,7 +1157,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 		  {
 		    ranSumEtPF += PF_pt[iPF];
 		    ranPFCounter +=1;
-		    cout<<"random cone PF_pt ["<<iPF<<"] = "<<PF_pt[iPF]<<" with current sum: "<<ranSumEtPF<<endl;
+		    //cout<<"random cone PF_pt ["<<iPF<<"] = "<<PF_pt[iPF]<<" with current sum: "<<ranSumEtPF<<endl;
 		  }
 		//For the JetShapes analysis get the energy in each ring in dR(\eta,\phi)
 		for (int iRing = 0; iRing<=nRings; iRing++)
@@ -1188,7 +1193,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 	    ranPFsumEt[iRan] = ranSumEtPF;
 	    ranNPFobjs[iRan] = ranPFCounter;
 
-	    cout<<"Event no = "<<iev<<", sum of random PF candidates in the R=0."<<rad<<" = "<<ranSumEtPF<<endl;
+	    //cout<<"Event no = "<<iev<<", sum of random PF candidates in the R=0."<<rad<<" = "<<ranSumEtPF<<endl;
 
 	    ranPFchSumEt_ring0[iRan] = ranRingSumEtCh[0];
 	    ranPFchSumEt_ring1[iRan] = ranRingSumEtCh[1];
