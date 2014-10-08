@@ -1,3 +1,15 @@
+// Raghav Kunnawalkam Elayavalli
+// Oct 6th 2014
+// Rutgers
+// For questions or comments: raghav.k.e at CERN dot CH
+
+// 
+// Macro from Jorge to do the random cone study in the pf candidates 
+// one of the main comments is to look at the distribution in centrality and eta with pt on the z axis. 
+//
+
+
+
 #include <TROOT.h>
 #include <iostream>
 #include <algorithm>
@@ -16,21 +28,28 @@
 
 //#define nRan 100;
 
-void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
+using namespace std;
 
+void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",const char *type="MC"){
   
-  TFile *FileA = TFile::Open("/mnt/hadoop/cms/store/user/velicanu/HIMinBias2011_GR_R_53_LV6_CMSSW_5_3_16_lumi2_FOREST_TRY2merged/0.root");
-  TFile* outf = new TFile("test.root","recreate"); 
+  TDatime date;
 
+  TFile *FileA; 
+  if(type=="data")
+    FileA = TFile::Open("/mnt/hadoop/cms/store/user/velicanu/HIMinBias2011_GR_R_53_LV6_CMSSW_5_3_16_lumi2_FOREST_TRY2merged/0.root");
+  else if(type=="MC")
+    FileA = TFile::Open("/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root");
+  
+  TFile* outf = new TFile(Form("test_test_randomcone_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
+			  
   //TFile *FileA = TFile::Open(Form("/net/hisrv0001/home/icali/hadoop/HIMinBiasUPC_skimmed/MinBias-reTracking-merged/MinBias_Merged_tracking_all.root"));
   //TString outname = "dataAKSkimNtupleRandomConeRings_v4_TkpTCut0_ak3dataMB.root"; 
   //TFile* outf = new TFile(outname,"recreate");
 
   cout<<"The radius is : "<<rad<<endl;
   char *COLLTYPE = "PbPb";
-
-  cout<<"TYPE : "<<TYPE<<"   COLLTYPE : "<<COLLTYPE<<endl;
-
+  cout<<"   COLLTYPE : "<<COLLTYPE<<endl;
+  
   //****** Analysis knobs *****************
   Float_t JETRADIUS = rad;
   //Float_t PTCUT1 = 120;      //leading jet
@@ -41,23 +60,22 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
   Float_t TRACKPTCUT = 0.0; //
   Float_t TRACKETACUT = 2.0; //eta acceptance
   Float_t PF_TRACKPTCUT = 0.0; //
-  Float_t PF_TRACKETACUT = 2.0; //eta acceptance
+  Float_t PF_TRACKETACUT = 1.0; //eta acceptance
+  Float_t Tower_TRACKPTCUT = 0.0; //
+  Float_t Tower_TRACKETACUT = 2.0; //eta acceptance
   //bool debug = true;
   double LOW_dR[] = {   0, 0.05, 0.10, 0.15, 0.20, 0.25};
   double HI_dR[]  = {0.05, 0.10, 0.15, 0.20, 0.25, 0.30};
   const int nRings = 6;      // rings for JetShapes 
   //const Int_t nRan = 100;    // number of random cones
-  int nRandom = 50;
-  int nRan= 50;
-  int Nevents = nMaxEv;
-  int nMarks = 200;
+  int nRandom = 1;
+  // int nRan= 100; - not used here 
+  int Nevents = 2;
+  int nMarks = 10;
   //****************************************
   
   
-  TTree* ak      = (TTree*)FileA->Get("akPu3PFJetAnalyzer/t");
-  //TTree* ak3      = (TTree*)FileA->Get("akPu3PFJetAnalyzer/t");
-  //TTree* ak4      = (TTree*)FileA->Get("akPu4PFJetAnalyzer/t");
-  //TTree* ak5      = (TTree*)FileA->Get("akPu5PFJetAnalyzer/t");
+  TTree* ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,rad,jet_type));
   // - TTree* ic      = (TTree*)FileA->Get("icPu5JetAnalyzer/t"); // - not there in the new forest 
   TTree* hlt     = (TTree*)FileA->Get("hltanalysis/HltTree");
   TTree* skim    = (TTree*)FileA->Get("skimanalysis/HltTree");
@@ -65,12 +83,14 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
   //TTree* rhEB    = (TTree*)FileA->Get("rechitanalyzer/eb");
   //TTree* rhEE    = (TTree*)FileA->Get("rechitanalyzer/ee");
   //TTree* rhHBHE  = (TTree*)FileA->Get("rechitanalyzer/hbhe");
-  //TTree* rhTower = (TTree*)FileA->Get("rechitanalyzer/tower");
+  TTree* rhtower = (TTree*)FileA->Get("rechitanalyzer/tower");
   //TTree* hcal    = (TTree*)FileA->Get("hcalNoise/hcalNoise"); //- not there in the new forests 
   //if(COLLTYPE=="pA")   TTree* ttrack  = (TTree*)FileA->Get("ppTrack/trackTree");
   //if(COLLTYPE=="PbPb") TTree* ttrack  = (TTree*)FileA->Get("mergedTrack/trackTree"); // - also not needed here 
   TTree* pflow   = (TTree*)FileA->Get("pfcandAnalyzer/pfTree");
   
+  // variables for the input file: 
+
   Float_t vz;
   Int_t nAKJets;
   Float_t jteta[1000];
@@ -78,7 +98,7 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
   Float_t jtpt[1000];
   Float_t jtpu[1000];
   Float_t rawpt[1000];
-  
+  /*
   Int_t nTrk;
   Float_t trkEta[10000];
   Float_t trkPhi[10000];
@@ -95,71 +115,101 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
   Float_t EBeta[10000000];
   Float_t EBphi[10000000];
   Float_t EBet[10000000];
-  Int_t PFn;
-  Float_t PFeta[10000000];
-  Float_t PFphi[10000000];
-  Float_t PFpt[10000000];
-  Int_t PFid[10000000];
+  */
+
+  Int_t PF_n;
+  Float_t PF_eta[10000000];
+  Float_t PF_phi[10000000];
+  Float_t PF_pt[10000000];
+  Float_t PF_vspt[10000000];
+  Float_t PF_sumpt[10000000];
+  Int_t PF_id[10000000];
+
+  Int_t Tower_n;
+  Float_t Tower_eta[10000000];
+  Float_t Tower_phi[10000000];
+  Float_t Tower_pt[10000000];
+  Float_t Tower_emEt[10000000];
+  Float_t Tower_hadEt[10000000];
+  Float_t Tower_sumpt[10000000];
+  Float_t Tower_vspt[10000000];
+
   Int_t eventN;
   Int_t runN;
   Int_t lumiS;
   Int_t cBin;
   Int_t pCES;
-  Int_t phfPosFilter1;
-  Int_t phfNegFilter1;
-  Int_t phltPixelClusterShapeFilter;
+  //Int_t phfPosFilter1;
+  //Int_t phfNegFilter1;
+  //Int_t phltPixelClusterShapeFilter;
   Int_t pprimaryvertexFilter;
   Int_t pHBHENoiseFilter;
-  Int_t HCALmaxhpdhits;
-  Int_t HCALmaxrbxhits;
-  Int_t HCALntrianglenoise;
-  Int_t HCALnspikenoise;
-  Bool_t HCALhasBadRBXTS4TS5;
+  //Int_t HCALmaxhpdhits;
+  //Int_t HCALmaxrbxhits;
+  //Int_t HCALntrianglenoise;
+  //Int_t HCALnspikenoise;
+  //Bool_t HCALhasBadRBXTS4TS5;
 
   //Take the variables from the incoming TTrees
   skim->SetBranchAddress("pcollisionEventSelection",&pCES);
   skim->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
+  
   //if(COLLTYPE=="pA")skim->SetBranchAddress("pprimaryvertexFilter",&pprimaryvertexFilter);
   //if(COLLTYPE=="pA")skim->SetBranchAddress("phltPixelClusterShapeFilter",&phltPixelClusterShapeFilter);
   //if(COLLTYPE=="pA")skim->SetBranchAddress("phfNegFilter1",&phfNegFilter1);
   //if(COLLTYPE=="pA")skim->SetBranchAddress("phfPosFilter1",&phfPosFilter1);
+  
   hlt->SetBranchAddress("Run",&runN);
   hlt->SetBranchAddress("Event",&eventN);
   hlt->SetBranchAddress("LumiBlock",&lumiS);
   hiEv->SetBranchAddress("hiBin",&cBin);
   hiEv->SetBranchAddress("vz",&vz);
+  
   ak->SetBranchAddress("jteta",&jteta);
   ak->SetBranchAddress("jtpt",&jtpt);
   ak->SetBranchAddress("jtphi",&jtphi);
   ak->SetBranchAddress("jtpu",&jtpu);
   ak->SetBranchAddress("rawpt",&rawpt);
   ak->SetBranchAddress("nref",&nAKJets);
+
   // ttrack->SetBranchAddress("trkEta",&trkEta);
   // ttrack->SetBranchAddress("trkPt",&trkPt);
   // ttrack->SetBranchAddress("trkPhi",&trkPhi);
   // ttrack->SetBranchAddress("nTrk",&nTrk);
-//  rhHBHE->SetBranchAddress("eta",&HBHEeta);
-//   rhHBHE->SetBranchAddress("phi",&HBHEphi);
-//   rhHBHE->SetBranchAddress("et",&HBHEet);
-//   rhHBHE->SetBranchAddress("n",&HBHEn);
-//   rhEB->SetBranchAddress("eta",&EBeta);
-//   rhEB->SetBranchAddress("phi",&EBphi);
-//   rhEB->SetBranchAddress("et",&EBet);
-//   rhEB->SetBranchAddress("n",&EBn);
-//   rhEE->SetBranchAddress("eta",&EEeta);
-//   rhEE->SetBranchAddress("phi",&EEphi);
-//   rhEE->SetBranchAddress("et",&EEet);
-//   rhEE->SetBranchAddress("n",&EEn);
+  // rhHBHE->SetBranchAddress("eta",&HBHEeta);
+  // rhHBHE->SetBranchAddress("phi",&HBHEphi);
+  // rhHBHE->SetBranchAddress("et",&HBHEet);
+  // rhHBHE->SetBranchAddress("n",&HBHEn);
+  // rhEB->SetBranchAddress("eta",&EBeta);
+  // rhEB->SetBranchAddress("phi",&EBphi);
+  // rhEB->SetBranchAddress("et",&EBet);
+  // rhEB->SetBranchAddress("n",&EBn);
+  // rhEE->SetBranchAddress("eta",&EEeta);
+  // rhEE->SetBranchAddress("phi",&EEphi);
+  // rhEE->SetBranchAddress("et",&EEet);
+  // rhEE->SetBranchAddress("n",&EEn);
   // hcal->SetBranchAddress("nspikenoise",&HCALnspikenoise);
   // hcal->SetBranchAddress("hasBadRBXTS4TS5",&HCALhasBadRBXTS4TS5);
   // hcal->SetBranchAddress("maxhpdhits",&HCALmaxhpdhits);
   // hcal->SetBranchAddress("maxrbxhits",&HCALmaxrbxhits);
   // hcal->SetBranchAddress("ntrianglenoise",&HCALntrianglenoise);
-  pflow->SetBranchAddress("nPFpart",&PFn);
-  pflow->SetBranchAddress("pfEta",&PFeta);
-  pflow->SetBranchAddress("pfPhi",&PFphi);
-  pflow->SetBranchAddress("pfPt",&PFpt);
-  pflow->SetBranchAddress("pfId",&PFid);
+  
+  pflow->SetBranchAddress("nPFpart",&PF_n);
+  pflow->SetBranchAddress("pfEta",&PF_eta);
+  pflow->SetBranchAddress("pfPhi",&PF_phi);
+  pflow->SetBranchAddress("pfPt",&PF_pt);
+  pflow->SetBranchAddress("pfVsPt",&PF_vspt);
+  pflow->SetBranchAddress("sumpt",&PF_sumpt);
+  pflow->SetBranchAddress("pfId",&PF_id);
+  
+  rhtower->SetBranchAddress("n",&Tower_n);
+  rhtower->SetBranchAddress("eta",&Tower_eta);
+  rhtower->SetBranchAddress("phi",&Tower_phi);
+  rhtower->SetBranchAddress("et",&Tower_pt);
+  rhtower->SetBranchAddress("emEt",&Tower_emEt);
+  rhtower->SetBranchAddress("hadEt",&Tower_hadEt);
+  rhtower->SetBranchAddress("sumpt",&Tower_sumpt);
+  rhtower->SetBranchAddress("vsPt",&Tower_vspt);
 
   Int_t nJets;
   Float_t jeta[1000];
@@ -171,15 +221,33 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
 //   Float_t treta[1000];
 //   Float_t trphi[1000];
 //   Float_t trpt[1000];
-  Int_t nTrInJet[1000];
-  Float_t trkSumPtInJet[1000];
-  //Float_t dr_TrJet[10000][1000];
- //  Int_t nHBHErhits[1000];
-//   Float_t HBHEsumEt[1000];
-//   Int_t nEErhits[1000];
-//   Float_t EEsumEt[1000];
-//   Int_t nEBrhits[1000];
-//   Float_t EBsumEt[1000];
+  
+  // Int_t nTrInJet[1000];
+  // Float_t trkSumPtInJet[1000];
+  // Float_t dr_TrJet[10000][1000];
+  // Int_t nHBHErhits[1000];
+  // Float_t HBHEsumEt[1000];
+  // Int_t nEErhits[1000];
+  // Float_t EEsumEt[1000];
+  // Int_t nEBrhits[1000];
+  // Float_t EBsumEt[1000];
+  
+  Int_t nTower_objs[1000];
+  Float_t Tower_sumEt[1000];
+  Int_t nTower_objs_ring0[1000];
+  Int_t nTower_objs_ring1[1000];
+  Int_t nTower_objs_ring2[1000];
+  Int_t nTower_objs_ring3[1000];
+  Int_t nTower_objs_ring4[1000];
+  Int_t nTower_objs_ring5[1000];
+  Float_t Tower_sumEt_ring0[1000];
+  Float_t Tower_sumEt_ring1[1000];
+  Float_t Tower_sumEt_ring2[1000];
+  Float_t Tower_sumEt_ring3[1000];
+  Float_t Tower_sumEt_ring4[1000];
+  Float_t Tower_sumEt_ring5[1000];
+  // we dont have charge identification in the towers 
+
   Int_t nPFobjs[1000];
   Float_t PFsumEt[1000];
   Int_t nPFobjs_ring0[1000];
@@ -207,31 +275,32 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
   Float_t PFchSumEt_ring4[1000];
   Float_t PFchSumEt_ring5[1000];
 
-  Int_t nTks_ring0[10000];
-  Int_t nTks_ring1[10000];
-  Int_t nTks_ring2[10000];
-  Int_t nTks_ring3[10000];
-  Int_t nTks_ring4[10000];
-  Int_t nTks_ring5[10000];
-  Float_t TkSumEt_ring0[10000];
-  Float_t TkSumEt_ring1[10000];
-  Float_t TkSumEt_ring2[10000];
-  Float_t TkSumEt_ring3[10000];
-  Float_t TkSumEt_ring4[10000];
-  Float_t TkSumEt_ring5[10000];
+  // not using tracks in the analysis 
+  // Int_t nTks_ring0[10000];
+  // Int_t nTks_ring1[10000];
+  // Int_t nTks_ring2[10000];
+  // Int_t nTks_ring3[10000];
+  // Int_t nTks_ring4[10000];
+  // Int_t nTks_ring5[10000];
+  // Float_t TkSumEt_ring0[10000];
+  // Float_t TkSumEt_ring1[10000];
+  // Float_t TkSumEt_ring2[10000];
+  // Float_t TkSumEt_ring3[10000];
+  // Float_t TkSumEt_ring4[10000];
+  // Float_t TkSumEt_ring5[10000];
+  // Int_t nRanTks_ring0[1000];
+  // Int_t nRanTks_ring1[1000];
+  // Int_t nRanTks_ring2[1000];
+  // Int_t nRanTks_ring3[1000];
+  // Int_t nRanTks_ring4[1000];
+  // Int_t nRanTks_ring5[1000];
+  // Float_t ranTkSumEt_ring0[1000];
+  // Float_t ranTkSumEt_ring1[1000];
+  // Float_t ranTkSumEt_ring2[1000];
+  // Float_t ranTkSumEt_ring3[1000];
+  // Float_t ranTkSumEt_ring4[1000];
+  // Float_t ranTkSumEt_ring5[1000];
 
-  Int_t nRanTks_ring0[1000];
-  Int_t nRanTks_ring1[1000];
-  Int_t nRanTks_ring2[1000];
-  Int_t nRanTks_ring3[1000];
-  Int_t nRanTks_ring4[1000];
-  Int_t nRanTks_ring5[1000];
-  Float_t ranTkSumEt_ring0[1000];
-  Float_t ranTkSumEt_ring1[1000];
-  Float_t ranTkSumEt_ring2[1000];
-  Float_t ranTkSumEt_ring3[1000];
-  Float_t ranTkSumEt_ring4[1000];
-  Float_t ranTkSumEt_ring5[1000];
   Int_t run ;
   Int_t event ;
   Int_t lumi ;
@@ -239,35 +308,56 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
   Int_t CES;
 //   Float_t dPhi_TT, dPhi_JT, dPhi_JJ;
 //   Float_t dEta_TT, dEta_JT, dEta_JJ;
-  Int_t maxHPDhits;
-  Int_t maxRBXhits;
-  Int_t ntrianglenoise;
-  Int_t nspikenoise;
-  Bool_t hasBadRBXTS4TS5;
-  //const Int_t InTracks_set = 3; 
-  Float_t inTreta;
-  Float_t inTrphi;
-  Float_t inTrpt;
-  Float_t outTreta;
-  Float_t outTrphi;
-  Float_t outTrpt;
-  Float_t dRinCone[1000][1000];
+  // Int_t maxHPDhits;
+  // Int_t maxRBXhits;
+  // Int_t ntrianglenoise;
+  // Int_t nspikenoise;
+  // Bool_t hasBadRBXTS4TS5;
+  // //const Int_t InTracks_set = 3; 
+  // Float_t inTreta;
+  // Float_t inTrphi;
+  // Float_t inTrpt;
+  // Float_t outTreta;
+  // Float_t outTrphi;
+  // Float_t outTrpt;
+  // Float_t dRinCone[1000][1000];
 
  
   Float_t ranConeEta[1000];
   Float_t ranConePhi[1000];
-  Float_t ranTrkSumPt[1000];
-  Int_t ranNtracks[1000];
- //  Float_t ranHBHEsumEt[1000];
-//   Int_t ranNHBHErhits[1000];
-//   Float_t ranEBsumEt[1000];
-//   Int_t ranNEBrhits[1000];
-//   Float_t ranEEsumEt[1000];
-//   Int_t ranNEErhits[1000];
+  // Float_t ranTrkSumPt[1000];
+  // Int_t ranNtracks[1000];
+  // Float_t ranHBHEsumEt[1000];
+  // Int_t ranNHBHErhits[1000];
+  // Float_t ranEBsumEt[1000];
+  // Int_t ranNEBrhits[1000];
+  // Float_t ranEEsumEt[1000];
+  // Int_t ranNEErhits[1000];
+
+  
+  Float_t ranTower_sumEt[1000];
+  Int_t ranNTower_objs[1000];
+  Int_t ranNTower_objsRing[1000];
+  Float_t ranTower_ringSumEt[1000];
+
+  Int_t ranNTower_objs_ring0[1000];
+  Float_t ranTower_sumEt_ring0[1000];
+  Int_t ranNTower_objs_ring1[1000];
+  Float_t ranTower_sumEt_ring1[1000];
+  Int_t ranNTower_objs_ring2[1000];
+  Float_t ranTower_sumEt_ring2[1000];
+  Int_t ranNTower_objs_ring3[1000];
+  Float_t ranTower_sumEt_ring3[1000];
+  Int_t ranNTower_objs_ring4[1000];
+  Float_t ranTower_sumEt_ring4[1000];
+  Int_t ranNTower_objs_ring5[1000];
+  Float_t ranTower_sumEt_ring5[1000];
+
+  
   Float_t ranPFsumEt[1000];
   Int_t ranNPFobjs[1000];
-  //Int_t ranNPFobjsRing[1000];
-  //Float_t ranPFringSumEt[1000];
+  Int_t ranNPFobjsRing[1000];
+  Float_t ranPFringSumEt[1000];
 
   Int_t ranNPFobjs_ring0[1000];
   Float_t ranPFsumEt_ring0[1000];
@@ -302,59 +392,79 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
   nt->Branch("event",&event,"event/I");
   nt->Branch("bin", &bin, "bin/F");
   nt->Branch("CES",&CES,"CES/I");
-  nt->Branch("maxHPDhits",&maxHPDhits,"maxHPDhits/I");
-  nt->Branch("maxRBXhits",&maxRBXhits,"maxRBXhits/I");
-  nt->Branch("ntrianglenoise",&ntrianglenoise,"ntrianglenoise/I");
-  nt->Branch("nspikenoise",&nspikenoise,"nspikenoise/I");
-  nt->Branch("hasBadRBXTS4TS5",&hasBadRBXTS4TS5,"hasBadRBXTS4TS5/O");
+  //nt->Branch("maxHPDhits",&maxHPDhits,"maxHPDhits/I");
+  //nt->Branch("maxRBXhits",&maxRBXhits,"maxRBXhits/I");
+  //nt->Branch("ntrianglenoise",&ntrianglenoise,"ntrianglenoise/I");
+  //nt->Branch("nspikenoise",&nspikenoise,"nspikenoise/I");
+  //nt->Branch("hasBadRBXTS4TS5",&hasBadRBXTS4TS5,"hasBadRBXTS4TS5/O");
   nt->Branch("nJets",&nJets,"nJets/I");
   nt->Branch("jeta",jeta,"jeta[nJets]/F");
   nt->Branch("jphi",jphi,"jphi[nJets]/F");
   nt->Branch("jpt",jpt,"jpt[nJets]/F");
   nt->Branch("jpu",jpu,"jpu[nJets]/F");
   nt->Branch("jrawpt",jrawpt,"jrawpt[nJets]/F");
-  nt->Branch("nTracks",&nTracks,"nTracks/I");
+  //nt->Branch("nTracks",&nTracks,"nTracks/I");
   //nt->Branch("treta",treta,"treta[nTracks]/F");
   //nt->Branch("trphi",trphi,"trphi[nTracks]/F");
   //nt->Branch("trpt",trpt,"trpt[nTracks]/F");
-  nt->Branch("nTrInJet",nTrInJet,"nTrInJet[nJets]/I");
-  nt->Branch("trkSumPtInJet",trkSumPtInJet,"trkSumPtInJet[nJets]/F");
+  //nt->Branch("nTrInJet",nTrInJet,"nTrInJet[nJets]/I");
+  //nt->Branch("trkSumPtInJet",trkSumPtInJet,"trkSumPtInJet[nJets]/F");
+
   //nt->Branch("dr_TrJet",dr_TrJet,"dr_TrJet[nJets][nTracks]/F");
- //  nt->Branch("nHBHErhits",nHBHErhits,"nHBHErhits[nJets]/I");    
-//   nt->Branch("HBHEsumEt",HBHEsumEt,"HBHEsumEt[nJets]/F");
-//   nt->Branch("nEBrhits",nEBrhits,"nEBrhits[nJets]/I");    
-//   nt->Branch("EBsumEt",EBsumEt,"EBsumEt[nJets]/F");
-//   nt->Branch("nEErhits",nEErhits,"nEErhits[nJets]/I");    
-//   nt->Branch("EEsumEt",EEsumEt,"EEsumEt[nJets]/F");
-  nt->Branch("nPFobjs",nPFobjs,"nPFobjs[nJets]/I");    
-  nt->Branch("PFsumEt",PFsumEt,"PFsumEt[nJets]/F");
+  //nt->Branch("nHBHErhits",nHBHErhits,"nHBHErhits[nJets]/I");    
+  //nt->Branch("HBHEsumEt",HBHEsumEt,"HBHEsumEt[nJets]/F");
+  //nt->Branch("nEBrhits",nEBrhits,"nEBrhits[nJets]/I");    
+  //nt->Branch("EBsumEt",EBsumEt,"EBsumEt[nJets]/F");
+  //nt->Branch("nEErhits",nEErhits,"nEErhits[nJets]/I");    
+  //nt->Branch("EEsumEt",EEsumEt,"EEsumEt[nJets]/F");
+  if(jet_type=="Calo"){
+    nt->Branch("nTower_objs",nTower_objs,"nTower_objs[nJets]/I");    
+    nt->Branch("Tower_sumEt",Tower_sumEt,"Tower_sumEt[nJets]/F");
 
-  nt->Branch("nPFobjs_ring0",nPFobjs_ring0,"nPFobjs_ring0[nJets]/I");    
-  nt->Branch("PFsumEt_ring0",PFsumEt_ring0,"PFsumEt_ring0[nJets]/F");
-  nt->Branch("nPFobjs_ring1",nPFobjs_ring1,"nPFobjs_ring1[nJets]/I");    
-  nt->Branch("PFsumEt_ring1",PFsumEt_ring1,"PFsumEt_ring1[nJets]/F");
-  nt->Branch("nPFobjs_ring2",nPFobjs_ring2,"nPFobjs_ring2[nJets]/I");    
-  nt->Branch("PFsumEt_ring2",PFsumEt_ring2,"PFsumEt_ring2[nJets]/F");
-  nt->Branch("nPFobjs_ring3",nPFobjs_ring3,"nPFobjs_ring3[nJets]/I");    
-  nt->Branch("PFsumEt_ring3",PFsumEt_ring3,"PFsumEt_ring3[nJets]/F");
-  nt->Branch("nPFobjs_ring4",nPFobjs_ring4,"nPFobjs_ring4[nJets]/I");    
-  nt->Branch("PFsumEt_ring4",PFsumEt_ring4,"PFsumEt_ring4[nJets]/F");
-  nt->Branch("nPFobjs_ring5",nPFobjs_ring5,"nPFobjs_ring5[nJets]/I");    
-  nt->Branch("PFsumEt_ring5",PFsumEt_ring5,"PFsumEt_ring5[nJets]/F");
+    nt->Branch("nTower_objs_ring0",nTower_objs_ring0,"nTower_objs_ring0[nJets]/I");    
+    nt->Branch("Tower_sumEt_ring0",Tower_sumEt_ring0,"Tower_sumEt_ring0[nJets]/F");
+    nt->Branch("nTower_objs_ring1",nTower_objs_ring1,"nTower_objs_ring1[nJets]/I");    
+    nt->Branch("Tower_sumEt_ring1",Tower_sumEt_ring1,"Tower_sumEt_ring1[nJets]/F");
+    nt->Branch("nTower_objs_ring2",nTower_objs_ring2,"nTower_objs_ring2[nJets]/I");    
+    nt->Branch("Tower_sumEt_ring2",Tower_sumEt_ring2,"Tower_sumEt_ring2[nJets]/F");
+    nt->Branch("nTower_objs_ring3",nTower_objs_ring3,"nTower_objs_ring3[nJets]/I");    
+    nt->Branch("Tower_sumEt_ring3",Tower_sumEt_ring3,"Tower_sumEt_ring3[nJets]/F");
+    nt->Branch("nTower_objs_ring4",nTower_objs_ring4,"nTower_objs_ring4[nJets]/I");    
+    nt->Branch("Tower_sumEt_ring4",Tower_sumEt_ring4,"Tower_sumEt_ring4[nJets]/F");
+    nt->Branch("nTower_objs_ring5",nTower_objs_ring5,"nTower_objs_ring5[nJets]/I");    
+    nt->Branch("Tower_sumEt_ring5",Tower_sumEt_ring5,"Tower_sumEt_ring5[nJets]/F");
+  }else if(jet_type=="PF"){
+  
+    nt->Branch("nPFobjs",nPFobjs,"nPFobjs[nJets]/I");    
+    nt->Branch("PFsumEt",PFsumEt,"PFsumEt[nJets]/F");
 
-  nt->Branch("nPFchObjs_ring0",nPFchObjs_ring0,"nPFchObjs_ring0[nJets]/I");    
-  nt->Branch("PFchSumEt_ring0",PFchSumEt_ring0,"PFchSumEt_ring0[nJets]/F");
-  nt->Branch("nPFchObjs_ring1",nPFchObjs_ring1,"nPFchObjs_ring1[nJets]/I");    
-  nt->Branch("PFchSumEt_ring1",PFchSumEt_ring1,"PFchSumEt_ring1[nJets]/F");
-  nt->Branch("nPFchObjs_ring2",nPFchObjs_ring2,"nPFchObjs_ring2[nJets]/I");    
-  nt->Branch("PFchSumEt_ring2",PFchSumEt_ring2,"PFchSumEt_ring2[nJets]/F");
-  nt->Branch("nPFchObjs_ring3",nPFchObjs_ring3,"nPFchObjs_ring3[nJets]/I");    
-  nt->Branch("PFchSumEt_ring3",PFchSumEt_ring3,"PFchSumEt_ring3[nJets]/F");
-  nt->Branch("nPFchObjs_ring4",nPFchObjs_ring4,"nPFchObjs_ring4[nJets]/I");    
-  nt->Branch("PFchSumEt_ring4",PFchSumEt_ring4,"PFchSumEt_ring4[nJets]/F");
-  nt->Branch("nPFchObjs_ring5",nPFchObjs_ring5,"nPFchObjs_ring5[nJets]/I");    
-  nt->Branch("PFchSumEt_ring5",PFchSumEt_ring5,"PFchSumEt_ring5[nJets]/F");
+    nt->Branch("nPFobjs_ring0",nPFobjs_ring0,"nPFobjs_ring0[nJets]/I");    
+    nt->Branch("PFsumEt_ring0",PFsumEt_ring0,"PFsumEt_ring0[nJets]/F");
+    nt->Branch("nPFobjs_ring1",nPFobjs_ring1,"nPFobjs_ring1[nJets]/I");    
+    nt->Branch("PFsumEt_ring1",PFsumEt_ring1,"PFsumEt_ring1[nJets]/F");
+    nt->Branch("nPFobjs_ring2",nPFobjs_ring2,"nPFobjs_ring2[nJets]/I");    
+    nt->Branch("PFsumEt_ring2",PFsumEt_ring2,"PFsumEt_ring2[nJets]/F");
+    nt->Branch("nPFobjs_ring3",nPFobjs_ring3,"nPFobjs_ring3[nJets]/I");    
+    nt->Branch("PFsumEt_ring3",PFsumEt_ring3,"PFsumEt_ring3[nJets]/F");
+    nt->Branch("nPFobjs_ring4",nPFobjs_ring4,"nPFobjs_ring4[nJets]/I");    
+    nt->Branch("PFsumEt_ring4",PFsumEt_ring4,"PFsumEt_ring4[nJets]/F");
+    nt->Branch("nPFobjs_ring5",nPFobjs_ring5,"nPFobjs_ring5[nJets]/I");    
+    nt->Branch("PFsumEt_ring5",PFsumEt_ring5,"PFsumEt_ring5[nJets]/F");
 
+    nt->Branch("nPFchObjs_ring0",nPFchObjs_ring0,"nPFchObjs_ring0[nJets]/I");    
+    nt->Branch("PFchSumEt_ring0",PFchSumEt_ring0,"PFchSumEt_ring0[nJets]/F");
+    nt->Branch("nPFchObjs_ring1",nPFchObjs_ring1,"nPFchObjs_ring1[nJets]/I");    
+    nt->Branch("PFchSumEt_ring1",PFchSumEt_ring1,"PFchSumEt_ring1[nJets]/F");
+    nt->Branch("nPFchObjs_ring2",nPFchObjs_ring2,"nPFchObjs_ring2[nJets]/I");    
+    nt->Branch("PFchSumEt_ring2",PFchSumEt_ring2,"PFchSumEt_ring2[nJets]/F");
+    nt->Branch("nPFchObjs_ring3",nPFchObjs_ring3,"nPFchObjs_ring3[nJets]/I");    
+    nt->Branch("PFchSumEt_ring3",PFchSumEt_ring3,"PFchSumEt_ring3[nJets]/F");
+    nt->Branch("nPFchObjs_ring4",nPFchObjs_ring4,"nPFchObjs_ring4[nJets]/I");    
+    nt->Branch("PFchSumEt_ring4",PFchSumEt_ring4,"PFchSumEt_ring4[nJets]/F");
+    nt->Branch("nPFchObjs_ring5",nPFchObjs_ring5,"nPFchObjs_ring5[nJets]/I");    
+    nt->Branch("PFchSumEt_ring5",PFchSumEt_ring5,"PFchSumEt_ring5[nJets]/F");
+  }
+  /*
   nt->Branch("nTks_ring0",nTks_ring0,"nTks_ring0[nJets]/I");    
   nt->Branch("TkSumEt_ring0",TkSumEt_ring0,"TkSumEt_ring0[nJets]/F");
   nt->Branch("nTks_ring1",nTks_ring1,"nTks_ring1[nJets]/I");    
@@ -394,53 +504,74 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
   nt->Branch("outTrphi",&outTrphi,"outTrphi/F");
   nt->Branch("outTrpt",&outTrpt,"outTrpt/F");
   nt->Branch("dRinCone",dRinCone,"dRinCone[nJets][1000]");
-
+  */
 
   nt->Branch("ranConeEta",ranConeEta,"ranConeEta[200]/F");
   nt->Branch("ranConePhi",ranConePhi,"ranConePhi[200]/F");
-  nt->Branch("ranTrkSumPt",ranTrkSumPt,"ranTrkSumPt[200]/F");
-  nt->Branch("ranNtracks",ranNtracks,"ranNtracks[200]/I");
-  // nt->Branch("ranHBHEsumEt",ranHBHEsumEt,"ranHBHEsumEt[200]/F");
-//   nt->Branch("ranNHBHErhits",ranNHBHErhits,"ranNHBHErhits[200]/I");
-//   nt->Branch("ranEBsumEt",ranEBsumEt,"ranEBsumEt[200]/F");
-//   nt->Branch("ranNEBrhits",ranNEBrhits,"ranNEBrhits[200]/I");
-//   nt->Branch("ranEEsumEt",ranEEsumEt,"ranEEsumEt[200]/F");
-//   nt->Branch("ranNEErhits",ranNEErhits,"ranNEErhits[200]/I");
-  nt->Branch("ranPFsumEt",ranPFsumEt,"ranPFsumEt[200]/F");
-  nt->Branch("ranNPFobjs",ranNPFobjs,"ranNPFobjs[200]/I");
-  
-  nt->Branch("ranNPFobjs_ring0",ranNPFobjs_ring0,"ranNPFobjs_ring0[200]/I");    
-  nt->Branch("ranPFsumEt_ring0",ranPFsumEt_ring0,"ranPFsumEt_ring0[200]/F");
-  nt->Branch("ranNPFobjs_ring1",ranNPFobjs_ring1,"ranNPFobjs_ring1[200]/I");    
-  nt->Branch("ranPFsumEt_ring1",ranPFsumEt_ring1,"ranPFsumEt_ring1[200]/F");
-  nt->Branch("ranNPFobjs_ring2",ranNPFobjs_ring2,"ranNPFobjs_ring2[200]/I");    
-  nt->Branch("ranPFsumEt_ring2",ranPFsumEt_ring2,"ranPFsumEt_ring2[200]/F");
-  nt->Branch("ranNPFobjs_ring3",ranNPFobjs_ring3,"ranNPFobjs_ring3[200]/I");    
-  nt->Branch("ranPFsumEt_ring3",ranPFsumEt_ring3,"ranPFsumEt_ring3[200]/F");
-  nt->Branch("ranNPFobjs_ring4",ranNPFobjs_ring4,"ranNPFobjs_ring4[200]/I");    
-  nt->Branch("ranPFsumEt_ring4",ranPFsumEt_ring4,"ranPFsumEt_ring4[200]/F");
-  nt->Branch("ranNPFobjs_ring5",ranNPFobjs_ring5,"ranNPFobjs_ring5[200]/I");    
-  nt->Branch("ranPFsumEt_ring5",ranPFsumEt_ring5,"ranPFsumEt_ring5[200]/F");
+  //nt->Branch("ranTrkSumPt",ranTrkSumPt,"ranTrkSumPt[200]/F");
+  //nt->Branch("ranNtracks",ranNtracks,"ranNtracks[200]/I");
+  /*
+  nt->Branch("ranHBHEsumEt",ranHBHEsumEt,"ranHBHEsumEt[200]/F");
+  nt->Branch("ranNHBHErhits",ranNHBHErhits,"ranNHBHErhits[200]/I");
+  nt->Branch("ranEBsumEt",ranEBsumEt,"ranEBsumEt[200]/F");
+  nt->Branch("ranNEBrhits",ranNEBrhits,"ranNEBrhits[200]/I");
+  nt->Branch("ranEEsumEt",ranEEsumEt,"ranEEsumEt[200]/F");
+  nt->Branch("ranNEErhits",ranNEErhits,"ranNEErhits[200]/I");
+  */
 
-  nt->Branch("ranNPFchObjs_ring0",ranNPFchObjs_ring0,"ranNPFchObjs_ring0[200]/I");    
-  nt->Branch("ranPFchSumEt_ring0",ranPFchSumEt_ring0,"ranPFchSumEt_ring0[200]/F");
-  nt->Branch("ranNPFchObjs_ring1",ranNPFchObjs_ring1,"ranNPFchObjs_ring1[200]/I");    
-  nt->Branch("ranPFchSumEt_ring1",ranPFchSumEt_ring1,"ranPFchSumEt_ring1[200]/F");
-  nt->Branch("ranNPFchObjs_ring2",ranNPFchObjs_ring2,"ranNPFchObjs_ring2[200]/I");    
-  nt->Branch("ranPFchSumEt_ring2",ranPFchSumEt_ring2,"ranPFchSumEt_ring2[200]/F");
-  nt->Branch("ranNPFchObjs_ring3",ranNPFchObjs_ring3,"ranNPFchObjs_ring3[200]/I");    
-  nt->Branch("ranPFchSumEt_ring3",ranPFchSumEt_ring3,"ranPFchSumEt_ring3[200]/F");
-  nt->Branch("ranNPFchObjs_ring4",ranNPFchObjs_ring4,"ranNPFchObjs_ring4[200]/I");    
-  nt->Branch("ranPFchSumEt_ring4",ranPFchSumEt_ring4,"ranPFchSumEt_ring4[200]/F");
-  nt->Branch("ranNPFchObjs_ring5",ranNPFchObjs_ring5,"ranNPFchObjs_ring5[200]/I");    
-  nt->Branch("ranPFchSumEt_ring5",ranPFchSumEt_ring5,"ranPFchSumEt_ring5[200]/F");
-  //  Int_t ranNPFchObjs_ring0[1000];
-  //Float_t ranPFchSumEt_ring0[1000];
+  if(jet_type=="Calo"){
+    nt->Branch("ranTower_sumEt",ranTower_sumEt,"ranTower_sumEt[200]/F");
+    nt->Branch("ranNTower_objs",ranNTower_objs,"ranNTower_objs[200]/I");
+  
+    nt->Branch("ranNTower_objs_ring0",ranNTower_objs_ring0,"ranNTower_objs_ring0[200]/I");    
+    nt->Branch("ranTower_sumEt_ring0",ranTower_sumEt_ring0,"ranTower_sumEt_ring0[200]/F");
+    nt->Branch("ranNTower_objs_ring1",ranNTower_objs_ring1,"ranNTower_objs_ring1[200]/I");    
+    nt->Branch("ranTower_sumEt_ring1",ranTower_sumEt_ring1,"ranTower_sumEt_ring1[200]/F");
+    nt->Branch("ranNTower_objs_ring2",ranNTower_objs_ring2,"ranNTower_objs_ring2[200]/I");    
+    nt->Branch("ranTower_sumEt_ring2",ranTower_sumEt_ring2,"ranTower_sumEt_ring2[200]/F");
+    nt->Branch("ranNTower_objs_ring3",ranNTower_objs_ring3,"ranNTower_objs_ring3[200]/I");    
+    nt->Branch("ranTower_sumEt_ring3",ranTower_sumEt_ring3,"ranTower_sumEt_ring3[200]/F");
+    nt->Branch("ranNTower_objs_ring4",ranNTower_objs_ring4,"ranNTower_objs_ring4[200]/I");    
+    nt->Branch("ranTower_sumEt_ring4",ranTower_sumEt_ring4,"ranTower_sumEt_ring4[200]/F");
+    nt->Branch("ranNTower_objs_ring5",ranNTower_objs_ring5,"ranNTower_objs_ring5[200]/I");    
+    nt->Branch("ranTower_sumEt_ring5",ranTower_sumEt_ring5,"ranTower_sumEt_ring5[200]/F");
+  }else if(jet_type=="PF"){
+    nt->Branch("ranPFsumEt",ranPFsumEt,"ranPFsumEt[200]/F");
+    nt->Branch("ranNPFobjs",ranNPFobjs,"ranNPFobjs[200]/I");
+  
+    nt->Branch("ranNPFobjs_ring0",ranNPFobjs_ring0,"ranNPFobjs_ring0[200]/I");    
+    nt->Branch("ranPFsumEt_ring0",ranPFsumEt_ring0,"ranPFsumEt_ring0[200]/F");
+    nt->Branch("ranNPFobjs_ring1",ranNPFobjs_ring1,"ranNPFobjs_ring1[200]/I");    
+    nt->Branch("ranPFsumEt_ring1",ranPFsumEt_ring1,"ranPFsumEt_ring1[200]/F");
+    nt->Branch("ranNPFobjs_ring2",ranNPFobjs_ring2,"ranNPFobjs_ring2[200]/I");    
+    nt->Branch("ranPFsumEt_ring2",ranPFsumEt_ring2,"ranPFsumEt_ring2[200]/F");
+    nt->Branch("ranNPFobjs_ring3",ranNPFobjs_ring3,"ranNPFobjs_ring3[200]/I");    
+    nt->Branch("ranPFsumEt_ring3",ranPFsumEt_ring3,"ranPFsumEt_ring3[200]/F");
+    nt->Branch("ranNPFobjs_ring4",ranNPFobjs_ring4,"ranNPFobjs_ring4[200]/I");    
+    nt->Branch("ranPFsumEt_ring4",ranPFsumEt_ring4,"ranPFsumEt_ring4[200]/F");
+    nt->Branch("ranNPFobjs_ring5",ranNPFobjs_ring5,"ranNPFobjs_ring5[200]/I");    
+    nt->Branch("ranPFsumEt_ring5",ranPFsumEt_ring5,"ranPFsumEt_ring5[200]/F");
+
+    nt->Branch("ranNPFchObjs_ring0",ranNPFchObjs_ring0,"ranNPFchObjs_ring0[200]/I");    
+    nt->Branch("ranPFchSumEt_ring0",ranPFchSumEt_ring0,"ranPFchSumEt_ring0[200]/F");
+    nt->Branch("ranNPFchObjs_ring1",ranNPFchObjs_ring1,"ranNPFchObjs_ring1[200]/I");    
+    nt->Branch("ranPFchSumEt_ring1",ranPFchSumEt_ring1,"ranPFchSumEt_ring1[200]/F");
+    nt->Branch("ranNPFchObjs_ring2",ranNPFchObjs_ring2,"ranNPFchObjs_ring2[200]/I");    
+    nt->Branch("ranPFchSumEt_ring2",ranPFchSumEt_ring2,"ranPFchSumEt_ring2[200]/F");
+    nt->Branch("ranNPFchObjs_ring3",ranNPFchObjs_ring3,"ranNPFchObjs_ring3[200]/I");    
+    nt->Branch("ranPFchSumEt_ring3",ranPFchSumEt_ring3,"ranPFchSumEt_ring3[200]/F");
+    nt->Branch("ranNPFchObjs_ring4",ranNPFchObjs_ring4,"ranNPFchObjs_ring4[200]/I");    
+    nt->Branch("ranPFchSumEt_ring4",ranPFchSumEt_ring4,"ranPFchSumEt_ring4[200]/F");
+    nt->Branch("ranNPFchObjs_ring5",ranNPFchObjs_ring5,"ranNPFchObjs_ring5[200]/I");    
+    nt->Branch("ranPFchSumEt_ring5",ranPFchSumEt_ring5,"ranPFchSumEt_ring5[200]/F");
+  }
+  // Int_t ranNPFchObjs_ring0[1000];
+  // Float_t ranPFchSumEt_ring0[1000];
 
   TRandom3 myDice(314);
 
   cout<<"Right before the loop"<<endl;
-  // int Nevents = ak->GetEntries();
+  //int Nevents = ak->GetEntries();
 
   for(int iev = 0; iev < Nevents; ++iev)//loop over all the entries (events)
     {
@@ -464,6 +595,7 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
       // rhEB->GetEntry(iev);
       // hcal->GetEntry(iev);
       // ttrack->GetEntry(iev);
+      rhtower->GetEntry(iev);
       pflow->GetEntry(iev);
       //----------------------------------------------------------------------
       // Event variables, and HCAL noise cleaning
@@ -490,14 +622,14 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
       event = eventN;
       lumi = lumiS;
       bin = cBin;
-      maxHPDhits = HCALmaxhpdhits;
-      maxRBXhits = HCALmaxrbxhits;
-      ntrianglenoise = HCALntrianglenoise;
-      nspikenoise = HCALnspikenoise;
-      hasBadRBXTS4TS5 = HCALhasBadRBXTS4TS5;
+      // maxHPDhits = HCALmaxhpdhits;
+      // maxRBXhits = HCALmaxrbxhits;
+      // ntrianglenoise = HCALntrianglenoise;
+      // nspikenoise = HCALnspikenoise;
+      // hasBadRBXTS4TS5 = HCALhasBadRBXTS4TS5;
     
       nJets = nAKJets;
-      nTracks = nTrk;
+      // nTracks = nTrk;
       //nJets = 1; //for dijet studies
       for (int t=0; t<=nJets; t++){//Initialize and clear arrays
 	jpt[t] = -99;
@@ -505,14 +637,31 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
 	jphi[t] = -99;
 	jpu[t] = -99;
 	jrawpt[t] = -99;
-	nTrInJet[t] = 0;
-	trkSumPtInJet[t] = -99;
+	//nTrInJet[t] = 0;
+	//trkSumPtInJet[t] = -99;
 	// HBHEsumEt[t] = -99;
-// 	nHBHErhits[t] = 0;
-// 	EBsumEt[t] = -99;
-// 	nEBrhits[t] = 0;
-// 	EEsumEt[t] = -99;
-// 	nEErhits[t] = 0;
+ 	// nHBHErhits[t] = 0;
+ 	// EBsumEt[t] = -99;
+ 	// nEBrhits[t] = 0;
+ 	// EEsumEt[t] = -99;
+ 	// nEErhits[t] = 0;
+	
+	nTower_objs[t] = 0;
+	Tower_sumEt[t] =-99;
+	Tower_sumEt_ring0[t] = -99;
+	nTower_objs_ring0[t] = 0;
+	Tower_sumEt_ring1[t] = -99;
+	nTower_objs_ring1[t] = 0;
+	Tower_sumEt_ring2[t] = -99;
+	nTower_objs_ring2[t] = 0;
+	Tower_sumEt_ring3[t] = -99;
+	nTower_objs_ring3[t] = 0;
+	Tower_sumEt_ring4[t] = -99;
+	nTower_objs_ring4[t] = 0;
+	Tower_sumEt_ring5[t] = -99;
+	nTower_objs_ring5[t] = 0;
+	
+	
 	nPFobjs[t] = 0;
 	PFsumEt[t] =-99;
 	PFsumEt_ring0[t] = -99;
@@ -539,31 +688,47 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
 	nPFchObjs_ring4[t] = 0;
 	PFchSumEt_ring5[t] = -99;
 	nPFchObjs_ring5[t] = 0;
-	TkSumEt_ring0[t] = -99;
-	nTks_ring0[t] = 0;
-	TkSumEt_ring1[t] = -99;
-	nTks_ring1[t] = 0;
-	TkSumEt_ring2[t] = -99;
-	nTks_ring2[t] = 0;
-	TkSumEt_ring3[t] = -99;
-	nTks_ring3[t] = 0;
-	TkSumEt_ring4[t] = -99;
-	nTks_ring4[t] = 0;
-	TkSumEt_ring5[t] = -99;
-	nTks_ring5[t] = 0;
+	// TkSumEt_ring0[t] = -99;
+	// nTks_ring0[t] = 0;
+	// TkSumEt_ring1[t] = -99;
+	// nTks_ring1[t] = 0;
+	// TkSumEt_ring2[t] = -99;
+	// nTks_ring2[t] = 0;
+	// TkSumEt_ring3[t] = -99;
+	// nTks_ring3[t] = 0;
+	// TkSumEt_ring4[t] = -99;
+	// nTks_ring4[t] = 0;
+	// TkSumEt_ring5[t] = -99;
+	// nTks_ring5[t] = 0;
       }
    
       for (int qq =0; qq<nRandom; qq++){
 	ranConeEta[qq] =-99;
 	ranConePhi[qq] =-99;
-	ranTrkSumPt[qq] =-99;
-	ranNtracks[qq] =0;
-// 	ranHBHEsumEt[qq] =-99;
-// 	ranNHBHErhits[qq] =0;
-// 	ranEBsumEt[qq] =-99;
-// 	ranNEBrhits[qq] =0;
-// 	ranEEsumEt[qq] =-99;
-// 	ranNEErhits[qq] =0;
+	// ranTrkSumPt[qq] =-99;
+	// ranNtracks[qq] =0;
+ 	// ranHBHEsumEt[qq] =-99;
+ 	// ranNHBHErhits[qq] =0;
+ 	// ranEBsumEt[qq] =-99;
+ 	// ranNEBrhits[qq] =0;
+ 	// ranEEsumEt[qq] =-99;
+ 	// ranNEErhits[qq] =0;
+
+	ranNTower_objs[qq] = 0;
+	ranTower_sumEt[qq] =-99;
+	ranTower_sumEt_ring0[qq] = -99;
+	ranNTower_objs_ring0[qq] = 0;
+	ranTower_sumEt_ring1[qq] = -99;
+	ranNTower_objs_ring1[qq] = 0;
+	ranTower_sumEt_ring2[qq] = -99;
+	ranNTower_objs_ring2[qq] = 0;
+	ranTower_sumEt_ring3[qq] = -99;
+	ranNTower_objs_ring3[qq] = 0;
+	ranTower_sumEt_ring4[qq] = -99;
+	ranNTower_objs_ring4[qq] = 0;
+	ranTower_sumEt_ring5[qq] = -99;
+	ranNTower_objs_ring5[qq] = 0;
+	
 	ranNPFobjs[qq] = 0;
 	ranPFsumEt[qq] =-99;
 	ranPFsumEt_ring0[qq] = -99;
@@ -590,20 +755,22 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
 	ranNPFchObjs_ring4[qq] = 0;
 	ranPFchSumEt_ring5[qq] = -99;
 	ranNPFchObjs_ring5[qq] = 0;
-	ranTkSumEt_ring0[qq] = -99;
-	nRanTks_ring0[qq] = 0;
-	ranTkSumEt_ring1[qq] = -99;
-	nRanTks_ring1[qq] = 0;
-	ranTkSumEt_ring2[qq] = -99;
-	nRanTks_ring2[qq] = 0;
-	ranTkSumEt_ring3[qq] = -99;
-	nRanTks_ring3[qq] = 0;
-	ranTkSumEt_ring4[qq] = -99;
-	nRanTks_ring4[qq] = 0;
-	ranTkSumEt_ring5[qq] = -99;
-	nRanTks_ring5[qq] = 0;
+	// ranTkSumEt_ring0[qq] = -99;
+	// nRanTks_ring0[qq] = 0;
+	// ranTkSumEt_ring1[qq] = -99;
+	// nRanTks_ring1[qq] = 0;
+	// ranTkSumEt_ring2[qq] = -99;
+	// nRanTks_ring2[qq] = 0;
+	// ranTkSumEt_ring3[qq] = -99;
+	// nRanTks_ring3[qq] = 0;
+	// ranTkSumEt_ring4[qq] = -99;
+	// nRanTks_ring4[qq] = 0;
+	// ranTkSumEt_ring5[qq] = -99;
+	// nRanTks_ring5[qq] = 0;
       }
 
+      cout<<"Event = "<<iev<<endl;
+      
       //----------------------------------------------------------------------
       //  Now loop over the Jets
       //----------------------------------------------------------------------
@@ -621,6 +788,12 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
 	  if ( jteta[iJet] > fabs(ETACUT) ) continue;
 	  if ( jtpt[iJet] < PTCUT3 ) continue;
 
+	  
+	  cout<<"jet pt = "<<jpt[iJet]<<endl;
+	  cout<<"jet pu = "<<jpu[iJet]<<endl;
+	  cout<<"raw pt = "<<jrawpt[iJet]<<endl;
+	  cout<<"eta: "<<jeta[iJet]<<", phi: "<<jphi[iJet]<<endl;
+	  
 	  /*
 
 	  //----------------------------------------------------------------------
@@ -713,73 +886,123 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
 	  //
 	  */
 
+	  if(jet_type=="PF"){
+	    //----------------------------------------------------------------------
+	    //  Now loop over the Pflow candidates, and get the ones inside the jet	
+	    //----------------------------------------------------------------------
+	    double sumEtPF=0;
+	    Int_t PFCounter = 0;	  
+	    double ringSumEt[nRings]={0,0,0,0,0,0};
+	    Int_t ringCounter[nRings] ={0,0,0,0,0,0};
+	    double ringSumEtCh[nRings]={0,0,0,0,0,0};
+	    Int_t ringCounterCh[nRings] ={0,0,0,0,0,0};	  
+	    cout<<"no of PF candidates = "<<PF_n<<endl;
+	    for(int iPF = 0; iPF<PF_n; iPF++)
+	      {
+		if (PF_pt[iPF] < PF_TRACKPTCUT) continue;
+		if ( fabs(PF_eta[iPF] ) >= PF_TRACKETACUT ) continue;
+		double dRhitJetPF = sqrt(((PF_eta[iPF]-jteta[iJet])*(PF_eta[iPF]-jteta[iJet])) + ((PF_phi[iPF]-jtphi[iJet])*(PF_phi[iPF]-jtphi[iJet])));	  
+		if (dRhitJetPF<=JETRADIUS)
+		  {
+		    sumEtPF += PF_pt[iPF];
+		    PFCounter +=1;
+		    cout<<"PF pt ["<<iPF<<"] = "<<PF_pt[iPF]<<" with current sum: "<<sumEtPF<<endl;
+		  }	      
+		//For the JetShapes analysis get the energy in each ring in dR(\eta,\phi)
+		for (int iRing = 0; iRing<=nRings; iRing++)
+		  {
+		    if (dRhitJetPF> LOW_dR[iRing] && dRhitJetPF<= HI_dR[iRing])
+		      {
+			ringSumEt[iRing] += PF_pt[iPF];
+			ringCounter[iRing] +=1;
+			//these are the charged tracks
+			if ( PF_id[iPF] ==1 || PF_id[iPF]==2 || PF_id[iPF]==3 )
+			  {
+			    ringSumEtCh[iRing]+= PF_pt[iPF];
+			    ringCounterCh[iRing]+=1;
+			  }
+		      } 
+		  }	      
+	      }
 	  
-          //----------------------------------------------------------------------
-	  //  Now loop over the Pflow tracks, and get the ones inside the jet	
-	  //----------------------------------------------------------------------
-	  double sumEtPF=0;
-	  Int_t PFCounter = 0;	  
-	  double ringSumEt[nRings]={0,0,0,0,0,0};
-	  Int_t ringCounter[nRings] ={0,0,0,0,0,0};
-	  double ringSumEtCh[nRings]={0,0,0,0,0,0};
-	  Int_t ringCounterCh[nRings] ={0,0,0,0,0,0};	  
-	  for(int iPF = 0; iPF<PFn; iPF++)
-	    {
-	      if (PFpt[iPF] < PF_TRACKPTCUT) continue;
-	      if ( fabs(PFeta[iPF] ) >= PF_TRACKETACUT ) continue;
-	      double dRhitJetPF = sqrt(((PFeta[iPF]-jteta[iJet])*(PFeta[iPF]-jteta[iJet])) + (((PFphi[iPF]-jtphi[iJet])*(PFphi[iPF]-jtphi[iJet]))));	  
-	      if (dRhitJetPF<=JETRADIUS)
-		{
-		  sumEtPF += PFpt[iPF];
-		  PFCounter +=1;
-		  //cout<<"PFet ["<<iPF<<"] = "<<PFet[iPF]<<" with current sum: "<<sumEtPF<<endl;
-		}	      
- 	      //For the JetShapes analysis get the energy in each ring in dR(\eta,\phi)
-	      for (int iRing = 0; iRing<=nRings; iRing++)
-		{
-		  if (dRhitJetPF> LOW_dR[iRing] && dRhitJetPF<= HI_dR[iRing])
-		    {
- 		      ringSumEt[iRing] += PFpt[iPF];
- 		      ringCounter[iRing] +=1;
-		      //these are the charged tracks
- 		      if ( PFid[iPF] ==1 || PFid[iPF]==2 || PFid[iPF]==3 )
- 			{
- 			  ringSumEtCh[iRing]+= PFpt[iPF];
- 			  ringCounterCh[iRing]+=1;
- 			}
- 		    } 
- 		}
-	      
-	    }
-	  //Now gather up the sums for each jet	
-	  PFsumEt_ring0[iJet] = ringSumEt[0];
-	  PFsumEt_ring1[iJet] = ringSumEt[1];
-	  PFsumEt_ring2[iJet] = ringSumEt[2];
-	  PFsumEt_ring3[iJet] = ringSumEt[3];
-	  PFsumEt_ring4[iJet] = ringSumEt[4];
-	  PFsumEt_ring5[iJet] = ringSumEt[5];
-	  nPFobjs_ring0[iJet] = ringCounter[0];
-	  nPFobjs_ring1[iJet] = ringCounter[1];
-	  nPFobjs_ring2[iJet] = ringCounter[2];
-	  nPFobjs_ring3[iJet] = ringCounter[3];
-	  nPFobjs_ring4[iJet] = ringCounter[4];
-	  nPFobjs_ring5[iJet] = ringCounter[5];
-	  PFchSumEt_ring0[iJet] = ringSumEtCh[0];
-	  PFchSumEt_ring1[iJet] = ringSumEtCh[1];
-	  PFchSumEt_ring2[iJet] = ringSumEtCh[2];
-	  PFchSumEt_ring3[iJet] = ringSumEtCh[3];
-	  PFchSumEt_ring4[iJet] = ringSumEtCh[4];
-	  PFchSumEt_ring5[iJet] = ringSumEtCh[5];
-	  nPFchObjs_ring0[iJet] = ringCounterCh[0];
-	  nPFchObjs_ring1[iJet] = ringCounterCh[1];
-	  nPFchObjs_ring2[iJet] = ringCounterCh[2];
-	  nPFchObjs_ring3[iJet] = ringCounterCh[3];
-	  nPFchObjs_ring4[iJet] = ringCounterCh[4];
-	  nPFchObjs_ring5[iJet] = ringCounterCh[5];
-    	  PFsumEt[iJet] = sumEtPF;
-	  nPFobjs[iJet] = PFCounter;
+	    //Now gather up the sums for each jet	
+	    PFsumEt_ring0[iJet] = ringSumEt[0];
+	    PFsumEt_ring1[iJet] = ringSumEt[1];
+	    PFsumEt_ring2[iJet] = ringSumEt[2];
+	    PFsumEt_ring3[iJet] = ringSumEt[3];
+	    PFsumEt_ring4[iJet] = ringSumEt[4];
+	    PFsumEt_ring5[iJet] = ringSumEt[5];
+	    nPFobjs_ring0[iJet] = ringCounter[0];
+	    nPFobjs_ring1[iJet] = ringCounter[1];
+	    nPFobjs_ring2[iJet] = ringCounter[2];
+	    nPFobjs_ring3[iJet] = ringCounter[3];
+	    nPFobjs_ring4[iJet] = ringCounter[4];
+	    nPFobjs_ring5[iJet] = ringCounter[5];
+	    PFchSumEt_ring0[iJet] = ringSumEtCh[0];
+	    PFchSumEt_ring1[iJet] = ringSumEtCh[1];
+	    PFchSumEt_ring2[iJet] = ringSumEtCh[2];
+	    PFchSumEt_ring3[iJet] = ringSumEtCh[3];
+	    PFchSumEt_ring4[iJet] = ringSumEtCh[4];
+	    PFchSumEt_ring5[iJet] = ringSumEtCh[5];
+	    nPFchObjs_ring0[iJet] = ringCounterCh[0];
+	    nPFchObjs_ring1[iJet] = ringCounterCh[1];
+	    nPFchObjs_ring2[iJet] = ringCounterCh[2];
+	    nPFchObjs_ring3[iJet] = ringCounterCh[3];
+	    nPFchObjs_ring4[iJet] = ringCounterCh[4];
+	    nPFchObjs_ring5[iJet] = ringCounterCh[5];
+	    PFsumEt[iJet] = sumEtPF;
+	    cout<<"Event no = "<<iJet<<", sumEtPF = "<<sumEtPF<<endl;
+	    nPFobjs[iJet] = PFCounter;
 
+	  }else if(jet_type=="Calo"){
 
+	    //	  //----------------------------------------------------------------------
+	    // 	  //  Now loop over the recHits(Towers ), and get the ones inside the jet	
+	    // 	  //----------------------------------------------------------------------
+	    double sumEtTower=0;
+	    Int_t TowerCounter = 0;	  
+	    double ringTowerSumEt[nRings]={0,0,0,0,0,0};
+	    Int_t ringTowerCounter[nRings] ={0,0,0,0,0,0};
+	    for(int iTower = 0; iTower<Tower_n; iTower++)
+	      {
+		if (Tower_pt[iTower] < Tower_TRACKPTCUT) continue;
+		if ( fabs(Tower_eta[iTower] ) >= Tower_TRACKETACUT ) continue;
+		double dRhitJetTower = sqrt(((Tower_eta[iTower]-jteta[iJet])*(Tower_eta[iTower]-jteta[iJet])) + ((Tower_phi[iTower]-jtphi[iJet])*(Tower_phi[iTower]-jtphi[iJet])));	  
+		if (dRhitJetTower<=JETRADIUS)
+		  {
+		    sumEtTower += Tower_pt[iTower];
+		    TowerCounter +=1;
+		    //cout<<"Toweret ["<<iTower<<"] = "<<Toweret[iTower]<<" with current sum: "<<sumEtTower<<endl;
+		  }	      
+		//For the JetShapes analysis get the energy in each ring in dR(\eta,\phi)
+		for (int iRing = 0; iRing<=nRings; iRing++)
+		  {
+		    if (dRhitJetTower> LOW_dR[iRing] && dRhitJetTower<= HI_dR[iRing])
+		      {
+			ringTowerSumEt[iRing] += Tower_pt[iTower];
+			ringTowerCounter[iRing] +=1;
+		      } 
+		  }	      
+	      }
+	  
+	    //Now gather up the sums for each jet	
+	    Tower_sumEt_ring0[iJet] = ringTowerSumEt[0];
+	    Tower_sumEt_ring1[iJet] = ringTowerSumEt[1];
+	    Tower_sumEt_ring2[iJet] = ringTowerSumEt[2];
+	    Tower_sumEt_ring3[iJet] = ringTowerSumEt[3];
+	    Tower_sumEt_ring4[iJet] = ringTowerSumEt[4];
+	    Tower_sumEt_ring5[iJet] = ringTowerSumEt[5];
+	    nTower_objs_ring0[iJet] = ringTowerCounter[0];
+	    nTower_objs_ring1[iJet] = ringTowerCounter[1];
+	    nTower_objs_ring2[iJet] = ringTowerCounter[2];
+	    nTower_objs_ring3[iJet] = ringTowerCounter[3];
+	    nTower_objs_ring4[iJet] = ringTowerCounter[4];
+	    nTower_objs_ring5[iJet] = ringTowerCounter[5];
+
+	    Tower_sumEt[iJet] = sumEtTower;
+	    nTower_objs[iJet] = TowerCounter;
+
+	  }
 // 	  //----------------------------------------------------------------------
 // 	  //  Now loop over the recHits(HBHE), and get the ones inside the jet	
 // 	  //----------------------------------------------------------------------
@@ -845,10 +1068,14 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
       //----------------------------------------------------------------------
       //----------------------------------------------------------------------
       //----------------------------------------------------------------------  
+
+    
       for (int iRan =0 ; iRan<nRandom; iRan++ )
 	{
 	  float ranEta = myDice.Uniform(-2,2);
 	  float ranPhi = myDice.Uniform(-3.14159,3.13159);
+
+	  cout<<"ranEta = "<<ranEta<<", ranPhi = "<<ranPhi<<endl;
 
 	  /*
 
@@ -907,70 +1134,129 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
 	  //----------------------------------------------------------------------
 	  //  Now loop over the PFlow object, and get the ones inside the random cone	
 	  //----------------------------------------------------------------------
-	  double ranSumEtPF=0;
-	  Int_t ranPFCounter = 0;
-	  double ranRingSumEt[nRings] ={0,0,0,0,0,0};
-	  Int_t ranRingCounter[nRings] ={0,0,0,0,0,0};
-	  double ranRingSumEtCh[nRings] ={0,0,0,0,0,0};
-	  Int_t ranRingCounterCh[nRings] ={0,0,0,0,0,0};
-	  for(int iPF = 0; iPF<PFn; iPF++)
-	    {
-	      if (PFpt[iPF] < PF_TRACKPTCUT) continue;
-	      if (fabs(PFeta[iPF]) > PF_TRACKETACUT ) continue;
-	      double dR12 = sqrt(((PFeta[iPF]-ranEta)*(PFeta[iPF]-ranEta)) + (((PFphi[iPF]-ranPhi)*(PFphi[iPF]-ranPhi))));	  
-	      if (dR12<=JETRADIUS)
-		{
-		  ranSumEtPF += PFpt[iPF];
-		  ranPFCounter +=1;
-		  //cout<<"PFet ["<<iPF<<"] = "<<PFet[iPF]<<" with current sum: "<<sumEtPF<<endl;
-		}
-	      //For the JetShapes analysis get the energy in each ring in dR(\eta,\phi)
-	      for (int iRing = 0; iRing<=nRings; iRing++)
-		{
-		  if (dR12> LOW_dR[iRing] && dR12<= HI_dR[iRing])
-		    {
-		      ranRingSumEt[iRing] += PFpt[iPF];
-		      ranRingCounter[iRing] +=1;
-		      if (PFid[iPF] ==1 || PFid[iPF]==2 || PFid[iPF]==3)//these are the charged tracks
-			{
-			  ranRingSumEtCh[iRing]+= PFpt[iPF];
-			  ranRingCounterCh[iRing]+=1;
-			}
-		    }
-		}
-	    }
-	  //Now gather up the sums for each jet
 
-	  ranPFsumEt_ring0[iRan] = ranRingSumEt[0];
-	  ranPFsumEt_ring1[iRan] = ranRingSumEt[1];
-	  ranPFsumEt_ring2[iRan] = ranRingSumEt[2];
-	  ranPFsumEt_ring3[iRan] = ranRingSumEt[3];
-	  ranPFsumEt_ring4[iRan] = ranRingSumEt[4];
-	  ranPFsumEt_ring5[iRan] = ranRingSumEt[5];
+	  if(jet_type=="PF"){
 
-	  ranNPFobjs_ring0[iRan] = ranRingCounter[0];
-	  ranNPFobjs_ring1[iRan] = ranRingCounter[1];
-	  ranNPFobjs_ring2[iRan] = ranRingCounter[2];
-	  ranNPFobjs_ring3[iRan] = ranRingCounter[3];
-      	  ranNPFobjs_ring4[iRan] = ranRingCounter[4];
-	  ranNPFobjs_ring5[iRan] = ranRingCounter[5];
+	    double ranSumEtPF=0;
+	    Int_t ranPFCounter = 0;
+	    double ranRingSumEt[nRings] ={0,0,0,0,0,0};
+	    Int_t ranRingCounter[nRings] ={0,0,0,0,0,0};
+	    double ranRingSumEtCh[nRings] ={0,0,0,0,0,0};
+	    Int_t ranRingCounterCh[nRings] ={0,0,0,0,0,0};
+	    for(int iPF = 0; iPF<PF_n; iPF++)
+	      {
+		if (PF_pt[iPF] < PF_TRACKPTCUT) continue;
+		if (fabs(PF_eta[iPF]) > PF_TRACKETACUT ) continue;
+		double dR12 = sqrt(((PF_eta[iPF]-ranEta)*(PF_eta[iPF]-ranEta)) + (((PF_phi[iPF]-ranPhi)*(PF_phi[iPF]-ranPhi))));	  
+		if (dR12<=JETRADIUS)
+		  {
+		    ranSumEtPF += PF_pt[iPF];
+		    ranPFCounter +=1;
+		    cout<<"random cone PF_pt ["<<iPF<<"] = "<<PF_pt[iPF]<<" with current sum: "<<ranSumEtPF<<endl;
+		  }
+		//For the JetShapes analysis get the energy in each ring in dR(\eta,\phi)
+		for (int iRing = 0; iRing<=nRings; iRing++)
+		  {
+		    if (dR12> LOW_dR[iRing] && dR12<= HI_dR[iRing])
+		      {
+			ranRingSumEt[iRing] += PF_pt[iPF];
+			ranRingCounter[iRing] +=1;
+			if (PF_id[iPF] ==1 || PF_id[iPF]==2 || PF_id[iPF]==3)//these are the charged tracks
+			  {
+			    ranRingSumEtCh[iRing]+= PF_pt[iPF];
+			    ranRingCounterCh[iRing]+=1;
+			  }
+		      }
+		  }
+	      }
+	    //Now gather up the sums for each jet
 
-	  ranPFsumEt[iRan] = ranSumEtPF;
-	  ranNPFobjs[iRan] = ranPFCounter;
+	    ranPFsumEt_ring0[iRan] = ranRingSumEt[0];
+	    ranPFsumEt_ring1[iRan] = ranRingSumEt[1];
+	    ranPFsumEt_ring2[iRan] = ranRingSumEt[2];
+	    ranPFsumEt_ring3[iRan] = ranRingSumEt[3];
+	    ranPFsumEt_ring4[iRan] = ranRingSumEt[4];
+	    ranPFsumEt_ring5[iRan] = ranRingSumEt[5];
 
-	  ranPFchSumEt_ring0[iRan] = ranRingSumEtCh[0];
-	  ranPFchSumEt_ring1[iRan] = ranRingSumEtCh[1];
-	  ranPFchSumEt_ring2[iRan] = ranRingSumEtCh[2];
-	  ranPFchSumEt_ring3[iRan] = ranRingSumEtCh[3];
-	  ranPFchSumEt_ring4[iRan] = ranRingSumEtCh[4];
-	  ranPFchSumEt_ring5[iRan] = ranRingSumEtCh[5];
+	    ranNPFobjs_ring0[iRan] = ranRingCounter[0];
+	    ranNPFobjs_ring1[iRan] = ranRingCounter[1];
+	    ranNPFobjs_ring2[iRan] = ranRingCounter[2];
+	    ranNPFobjs_ring3[iRan] = ranRingCounter[3];
+	    ranNPFobjs_ring4[iRan] = ranRingCounter[4];
+	    ranNPFobjs_ring5[iRan] = ranRingCounter[5];
 
-	  ranNPFchObjs_ring0[iRan] = ranRingCounterCh[0];
-	  ranNPFchObjs_ring1[iRan] = ranRingCounterCh[1];
-	  ranNPFchObjs_ring2[iRan] = ranRingCounterCh[2];
-	  ranNPFchObjs_ring3[iRan] = ranRingCounterCh[3];
-	  ranNPFchObjs_ring4[iRan] = ranRingCounterCh[4];
-	  ranNPFchObjs_ring5[iRan] = ranRingCounterCh[5];
+	    ranPFsumEt[iRan] = ranSumEtPF;
+	    ranNPFobjs[iRan] = ranPFCounter;
+
+	    cout<<"Event no = "<<iev<<", sum of random PF candidates in the R=0."<<rad<<" = "<<ranSumEtPF<<endl;
+
+	    ranPFchSumEt_ring0[iRan] = ranRingSumEtCh[0];
+	    ranPFchSumEt_ring1[iRan] = ranRingSumEtCh[1];
+	    ranPFchSumEt_ring2[iRan] = ranRingSumEtCh[2];
+	    ranPFchSumEt_ring3[iRan] = ranRingSumEtCh[3];
+	    ranPFchSumEt_ring4[iRan] = ranRingSumEtCh[4];
+	    ranPFchSumEt_ring5[iRan] = ranRingSumEtCh[5];
+
+	    ranNPFchObjs_ring0[iRan] = ranRingCounterCh[0];
+	    ranNPFchObjs_ring1[iRan] = ranRingCounterCh[1];
+	    ranNPFchObjs_ring2[iRan] = ranRingCounterCh[2];
+	    ranNPFchObjs_ring3[iRan] = ranRingCounterCh[3];
+	    ranNPFchObjs_ring4[iRan] = ranRingCounterCh[4];
+	    ranNPFchObjs_ring5[iRan] = ranRingCounterCh[5];
+
+
+	  }else if(jet_type=="CALO"){
+
+
+	    double ranSumEtTower=0;
+	    Int_t ranTowerCounter = 0;
+	    double ranRingSumEt[nRings] ={0,0,0,0,0,0};
+	    Int_t ranRingCounter[nRings] ={0,0,0,0,0,0};
+	    double ranRingSumEtCh[nRings] ={0,0,0,0,0,0};
+	    Int_t ranRingCounterCh[nRings] ={0,0,0,0,0,0};
+	    for(int iTower = 0; iTower<Tower_n; iTower++)
+	      {
+		if (Tower_pt[iTower] < Tower_TRACKPTCUT) continue;
+		if (fabs(Tower_eta[iTower]) > Tower_TRACKETACUT ) continue;
+		double dR12 = sqrt(((Tower_eta[iTower]-ranEta)*(Tower_eta[iTower]-ranEta)) + (((Tower_phi[iTower]-ranPhi)*(Tower_phi[iTower]-ranPhi))));	  
+		if (dR12<=JETRADIUS)
+		  {
+		    ranSumEtTower += Tower_pt[iTower];
+		    ranTowerCounter +=1;
+		    //cout<<"Toweret ["<<iTower<<"] = "<<Toweret[iTower]<<" with current sum: "<<sumEtTower<<endl;
+		  }
+		//For the JetShapes analysis get the energy in each ring in dR(\eta,\phi)
+		for (int iRing = 0; iRing<=nRings; iRing++)
+		  {
+		    if (dR12> LOW_dR[iRing] && dR12<= HI_dR[iRing])
+		      {
+			ranRingSumEt[iRing] += Tower_pt[iTower];
+			ranRingCounter[iRing] +=1;
+		      }
+		  }
+	      }
+	    //Now gather up the sums for each jet
+
+	    ranTower_sumEt_ring0[iRan] = ranRingSumEt[0];
+	    ranTower_sumEt_ring1[iRan] = ranRingSumEt[1];
+	    ranTower_sumEt_ring2[iRan] = ranRingSumEt[2];
+	    ranTower_sumEt_ring3[iRan] = ranRingSumEt[3];
+	    ranTower_sumEt_ring4[iRan] = ranRingSumEt[4];
+	    ranTower_sumEt_ring5[iRan] = ranRingSumEt[5];
+
+	    ranNTower_objs_ring0[iRan] = ranRingCounter[0];
+	    ranNTower_objs_ring1[iRan] = ranRingCounter[1];
+	    ranNTower_objs_ring2[iRan] = ranRingCounter[2];
+	    ranNTower_objs_ring3[iRan] = ranRingCounter[3];
+	    ranNTower_objs_ring4[iRan] = ranRingCounter[4];
+	    ranNTower_objs_ring5[iRan] = ranRingCounter[5];
+
+	    ranTower_sumEt[iRan] = ranSumEtTower;
+	    ranNTower_objs[iRan] = ranTowerCounter;
+
+
+
+	  }
 // 	  //----------------------------------------------------------------------
 // 	  //  Now loop over the recHits(HBHE), and get the ones inside the random cone	
 // 	  //----------------------------------------------------------------------
@@ -1028,5 +1314,5 @@ void RAA_randomcone(double rad=3, int nMaxEv=10000, const char* TYPE="test"){
   cout<<"out of the loop"<<endl;  
   outf->Write();
   outf->Close();
-  return ;
+
 }

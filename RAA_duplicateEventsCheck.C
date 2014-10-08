@@ -69,10 +69,10 @@ void RAA_duplicateEventsCheck( int startfile = 0, int endfile = 1, int radius = 
   timer.Start();
 
   // Change to macro to run on condor since its taking a freaking long time. 
-  // 
+  // done! 
 
   std::string infile;
-  infile = "jet55or65_filelist.txt";
+  infile = "jetRAA_PbPb_forest_filelist.txt";
   
   std::ifstream instr(infile.c_str(),std::ifstream::in);
   std::string filename;
@@ -221,7 +221,7 @@ void RAA_duplicateEventsCheck( int startfile = 0, int endfile = 1, int radius = 
   // write the duplicate events to file. 
   
   ofstream outfile;
-  outfile.open(Form("pbpb_jet55or65_duplicate_events_loop_run_lumi_event_%d.txt",endfile));
+  outfile.open(Form("pbpb_new_jetRAA_forest_duplicate_events_run_lumi_event_%d.txt",endfile));
   
   Long64_t nentries = jetpbpb1->GetEntries();
 

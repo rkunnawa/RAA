@@ -217,7 +217,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
+void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
   
   TStopwatch timer;
   timer.Start();
@@ -874,8 +874,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo"){
         if(printDebug)hpbpb_matrix[k][j][i]->Print("base");
 	hpbpb_mcclosure_data[k][j][i]->Scale(1./(delta_eta[j]*1e3));
         hpbpb_mcclosure_data[k][j][i]->Write();
-        if(printDebug)hpbpb_mcclosure_data[k][j][i]->Print("base");
-	
+        if(printDebug)hpbpb_mcclosure_data[k][j][i]->Print("base");	
 	hpbpb_jtpu[k][j][i]->Write();
 	if(printDebug)hpbpb_jtpu[k][j][i]->Print();
 	hpbpb_jtpu_noScale[k][j][i]->Write();
