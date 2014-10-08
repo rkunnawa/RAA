@@ -40,8 +40,8 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   else if(type=="MC")
     FileA = TFile::Open("/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root");
   
-  TFile* outf = new TFile(Form("test_randomcone_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
-			  
+  TFile* outf = new TFile(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
+  
   //TFile *FileA = TFile::Open(Form("/net/hisrv0001/home/icali/hadoop/HIMinBiasUPC_skimmed/MinBias-reTracking-merged/MinBias_Merged_tracking_all.root"));
   //TString outname = "dataAKSkimNtupleRandomConeRings_v4_TkpTCut0_ak3dataMB.root"; 
   //TFile* outf = new TFile(outname,"recreate");
@@ -60,7 +60,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   Float_t TRACKPTCUT = 0.0; //
   Float_t TRACKETACUT = 2.0; //eta acceptance
   Float_t PF_TRACKPTCUT = 0.0; //
-  Float_t PF_TRACKETACUT = 1.0; //eta acceptance
+  Float_t PF_TRACKETACUT = 2.0; //eta acceptance
   Float_t Tower_TRACKPTCUT = 0.0; //
   Float_t Tower_TRACKETACUT = 2.0; //eta acceptance
   //bool debug = true;
@@ -70,10 +70,13 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   //const Int_t nRan = 100;    // number of random cones
   int nRandom = 100;
   // int nRan= 100; - not used here 
-  int Nevents = 1000;
+  int Nevents = 10;
   int nMarks = 50;
   //****************************************
   
+  // test histogram for ranPFsumEt
+  TH1F *test_ranpfsumet = new TH1F("test_ranpfsumet","",200,0,100);
+
   TTree* ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,rad,jet_type));
   // - TTree* ic      = (TTree*)FileA->Get("icPu5JetAnalyzer/t"); // - not there in the new forest 
   TTree* hlt     = (TTree*)FileA->Get("hltanalysis/HltTree");
@@ -1190,11 +1193,18 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 	    ranNPFobjs_ring4[iRan] = ranRingCounter[4];
 	    ranNPFobjs_ring5[iRan] = ranRingCounter[5];
 
+	    cout<<ranPFsumEt[iRan]<<", ";
+
 	    ranPFsumEt[iRan] = ranSumEtPF;
+
+	    cout<<ranPFsumEt[iRan]<<endl;
+
 	    ranNPFobjs[iRan] = ranPFCounter;
 
-	    //cout<<"Event no = "<<iev<<", sum of random PF candidates in the R=0."<<rad<<" = "<<ranSumEtPF<<endl;
+	    test_ranpfsumet->Fill(ranSumEtPF);
 
+	    //cout<<"Event no = "<<iev<<", sum of random PF candidates in the R=0."<<rad<<" = "<<ranSumEtPF<<endl;
+	  	
 	    ranPFchSumEt_ring0[iRan] = ranRingSumEtCh[0];
 	    ranPFchSumEt_ring1[iRan] = ranRingSumEtCh[1];
 	    ranPFchSumEt_ring2[iRan] = ranRingSumEtCh[2];
@@ -1259,8 +1269,6 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 	    ranTower_sumEt[iRan] = ranSumEtTower;
 	    ranNTower_objs[iRan] = ranTowerCounter;
 
-
-
 	  }
 // 	  //----------------------------------------------------------------------
 // 	  //  Now loop over the recHits(HBHE), and get the ones inside the random cone	
@@ -1310,12 +1318,23 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 // 	    }
 // 	  ranEEsumEt[iRan] = ranSumEtEE;
 // 	  ranNEErhits[iRan] = ranRecHitEECounter;
-	  
+	
 	}//Random number loop
-          
-      nt->Fill(); 
+
       //cout<<"done with this event "<<iev<<endl;
-    }  
+   
+      //for(int iRan = 0;iRan<nRandom;iRan++){
+	
+      //cout<<ranPFsumEt[iRan]<<", ";
+
+      //}
+      //cout<<endl;
+   
+      nt->Fill(); 
+      
+      
+    }
+  
   cout<<"out of the loop"<<endl;  
   outf->Write();
   outf->Close();

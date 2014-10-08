@@ -110,7 +110,7 @@ static const int list_radius[no_radius] = {1,2,3,4,5,6,7};
 
 using namespace std;
 
-void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
+void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "PF"){
 
   TStopwatch timer;
   timer.Start();
@@ -917,7 +917,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "Calo"){
   // Plotting the average energy subtracted in the Vs cone 
   if(algo=="Vs"){
 
-    TFile *fMCin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_akVsCalo_20141003.root");
+    TFile *fMCin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_akVsPF_20141007.root");
     TH1F *hPbPb_MC_jtpu[no_radius][nbins_eta][nbins_cent+1];
     
     for(int i = 0;i<=nbins_cent;i++){
