@@ -147,7 +147,7 @@ void makeMultiPanelCanvas(TCanvas*& canv,
     }
   }
 }
-
+/*
 void rescaleBins(TH1& h){
   for (int i =1; i<=h.GetNbinsX(); i++){//Skip bin=0 since it it is the underflow bin
     double oldBin = h.GetBinContent(i);
@@ -159,6 +159,25 @@ void rescaleBins(TH1& h){
   return;
 
 }
+*/
+
+// divide by bin width
+void divideBinWidth(TH1 *h)
+{
+	h->Sumw2();
+	for (int i=0;i<=h->GetNbinsX();i++)
+	{
+		Float_t val = h->GetBinContent(i);
+		Float_t valErr = h->GetBinError(i);
+		val/=h->GetBinWidth(i);
+		valErr/=h->GetBinWidth(i);
+		h->SetBinContent(i,val);
+		h->SetBinError(i,valErr);
+	}
+	h->GetXaxis()->CenterTitle();
+	h->GetYaxis()->CenterTitle();
+}
+
 void drawText(const char *text, float xp, float yp){
   TLatex *tex = new TLatex(xp,yp,text);
   tex->SetTextFont(63);
@@ -283,7 +302,7 @@ void LoopCorrRandomCone_MacroV6(){
   const char* trackPtCut = Form("min track pT= %4.2f",trkPtCut);
   bool doPrint = true;
   bool doData = true;
-  bool doMC = false;
+  bool doMC = true;
   bool do_c2 = false;
   bool do_c1 = true;
   TTree *akTreeMC[4];
@@ -297,9 +316,9 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_HYDJET.root"));
     // TFile *ak5MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_HYDJET.root"));
 
-    TFile *ak3MCFile = TFile::Open(Form("test_randomcone_MC_akVs3PF_20141007.root"));
-    TFile *ak4MCFile = TFile::Open(Form("test_randomcone_MC_akVs4PF_20141007.root"));
-    TFile *ak5MCFile = TFile::Open(Form("test_randomcone_MC_akVs5PF_20141007.root"));
+    TFile *ak3MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs3PF_20141008.root"));
+    TFile *ak4MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs4PF_20141008.root"));
+    TFile *ak5MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs5PF_20141008.root"));
     
     akTreeMC[0]   = (TTree*)ak3MCFile->Get("nt");
     akTreeMC[1]   = (TTree*)ak4MCFile->Get("nt");
@@ -311,9 +330,9 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_DATA.root"));
     // TFile *ak5dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_DATA.root"));
 
-    TFile *ak3dataFile = TFile::Open(Form("test_randomcone_data_akVs3PF_20141007.root"));
-    TFile *ak4dataFile = TFile::Open(Form("test_randomcone_data_akVs4PF_20141007.root"));
-    TFile *ak5dataFile = TFile::Open(Form("test_randomcone_data_akVs5PF_20141007.root"));
+    TFile *ak3dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs3PF_20141008.root"));
+    TFile *ak4dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs4PF_20141008.root"));
+    TFile *ak5dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs5PF_20141008.root"));
 
     akTreeData[0]   = (TTree*)ak3dataFile->Get("nt");
     akTreeData[1]   = (TTree*)ak4dataFile->Get("nt");
@@ -327,9 +346,13 @@ void LoopCorrRandomCone_MacroV6(){
     //akTreepAData[0]   = (TTree*)ak4pADataFile->Get("nt");
     //akTreePbPbData[0]   = (TTree*)ak4PbPbDataFile->Get("nt");
   }
-  const char* centLabel[] = {  "0005"   ,     "0510"       ,     "1030"        ,    "3050"         ,     "5070"        ,     "7090"       };
-  const char* cent[] =      {  "0-5%"   ,     "5-10%"      ,    "10-30%"       ,   "30-50%"        ,    "50-70%"       ,     "70-90%"     };
-  const char* centCuts[] =  {  "bin<=5" , "bin>5 && bin<=15" , "bin>15 && bin<=55" , "bin>55 && bin<=95", "bin>95 && bin<=135","bin>135 && bin<=175" };
+  //const char* centLabel[] = {  "0005"   ,     "0510"       ,     "1030"        ,    "3050"         ,     "5070"        ,     "7090"       };
+  //const char* cent[] =      {  "0-5%"   ,     "5-10%"      ,    "10-30%"       ,   "30-50%"        ,    "50-70%"       ,     "70-90%"     };
+  //const char* centCuts[] =  {  "bin<=5" , "bin>5 && bin<=15" , "bin>15 && bin<=55" , "bin>55 && bin<=95", "bin>95 && bin<=135","bin>135 && bin<=175" };
+
+  const char* centLabel[] = {"7090","5070","3050","1030","0510","0005"};
+  const char* cent[] =      {"70-90%","50-70%","30-50%","10-30%","5-10%","0-5%"};
+  const char* centCuts[] =  {  "bin>135 && bin<=175" , "bin>95 && bin<=135" , "bin>55 && bin<=95" , "bin>15 && bin<=55", "bin>5 && bin<=15","bin<=5" };
  
   //we might want to look at smaller centrality bins as well 
 
@@ -346,7 +369,7 @@ void LoopCorrRandomCone_MacroV6(){
   const int nCent = 6;
  
   cout<<"going to draw specific histograms"<<endl;
-
+  /*
   if (do_c2){
 
     const int nAlgos = 1;
@@ -426,7 +449,7 @@ void LoopCorrRandomCone_MacroV6(){
     }
   }
 
-
+  */
 
   if (do_c1){
 
@@ -453,12 +476,12 @@ void LoopCorrRandomCone_MacroV6(){
     const char* yTitle = "normalized counts";
     double Ymax = 10;
     double Ymin = 0.01;
-    int c1nBins = 20;
-    double c1xMax = 5;
-    double c1xMin = 0;
-    double c1FixMinX = 0.2;
+    int c1nBins = 200;
+    double c1xMax = 200;
+    double c1xMin = 5;
+    double c1FixMinX = 0;
   
-    double xAxisBins[21] = {0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1.0,1.4,1.8,2.2,2.6, 3.0,3.4,3.8,4.2,4.6,5.0};
+    //double xAxisBins[21] = {0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1.0,1.4,1.8,2.2,2.6, 3.0,3.4,3.8,4.2,4.6,5.0};
     TCanvas *c1MC = new TCanvas("c1MC","c1MC",1000,800);
     makeMultiPanelCanvas(c1MC,3,2,0.0,0.0,0.2,0.15,0.07);
     //Loop over the 6 centrality sections
@@ -470,99 +493,143 @@ void LoopCorrRandomCone_MacroV6(){
       leg1[i]->SetBorderSize(0);
       c1MC->cd(i+1);
       c1MC->cd(i+1)->SetLogy();
-      for (int ir = 0; ir<=nAlgos-1; ir++){
-	if(doMC){
-	  cout<<"algo "<<ir<<endl;
-	  //ranConeMC[i][ir] = new TH1D(Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
-	  ranConeMC[i][ir] = new TH1D(Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),c1nBins,xAxisBins);
-	  ranConeMC[i][ir]->Sumw2();
-	  akTreeMC[ir]->Draw(Form("%s>>sumPFch_%s_%s_MC",var,centLabel[i],varLabel[ir]),Form("%s && %s>%f",centCuts[i],var,c1FixMinX),"goff");
-	  cout<<" check1: content bin[7]: "<<ranConeMC[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeMC[i][ir]->GetBinError(i)<<" relative Error: "<<(ranConeMC[i][ir]->GetBinError(i))/(ranConeMC[i][ir]->GetBinContent(7))<<endl;
-	  ranConeMC[i][ir]->Scale(1/(ranConeMC[i][ir]->Integral(1,c1nBins)));
-	  cout<<" check2(after histo scale): content bin[7]: "<<ranConeMC[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeMC[i][ir]->GetBinError(i)<<" relative Error: "<<(ranConeMC[i][ir]->GetBinError(i))/(ranConeMC[i][ir]->GetBinContent(7))<<endl;
-	  rescaleBins(*ranConeMC[i][ir]);
-	  cout<<" check3(after bin scale): content bin[7]: "<<ranConeMC[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeMC[i][ir]->GetBinError(i)<<" relative Error: "<<(ranConeMC[i][ir]->GetBinError(i))/(ranConeMC[i][ir]->GetBinContent(7))<<endl;
-	  meanMC[i][ir] = ranConeMC[i][ir]->GetMean();
-	  meanErrMC[i][ir] = ranConeMC[i][ir]->GetMeanError();
-	  format1Dhisto(*ranConeMC[i][ir],-1,-1,color[ir],marker[0],color[ir],fill[ir],xTitle,yTitle);
-	  ranConeMC[i][ir]->SetMaximum(1);
-	  ranConeMC[i][ir]->SetMinimum(0.03);
-	}
-	if(doData ){
-	  //ranConeData[i][ir] = new TH1D(Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
-	  ranConeData[i][ir] = new TH1D(Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),c1nBins,xAxisBins);
-	  ranConeData[i][ir]->Sumw2();
-	  akTreeData[ir]->Draw(Form("%s>>sumPFch_%s_%s_data",var,centLabel[i],varLabel[ir]),Form("%s && %s>%f",centCuts[i],var,c1FixMinX),"goff");
-	  ranConeData[i][ir]->Scale(1/(ranConeData[i][ir]->Integral(1,c1nBins)));
-	  rescaleBins(*ranConeData[i][ir]);
-	  meanData[i][ir] = ranConeData[i][ir]->GetMean();
-	  meanErrData[i][ir] = ranConeData[i][ir]->GetMeanError();
-	  format1Dhisto(*ranConeData[i][ir],-1,-1,color[ir],marker[1],color[ir],fill[ir],xTitle,yTitle);
-	  ranConeData[i][ir]->SetMaximum(1);
-	  ranConeData[i][ir]->SetMinimum(0.03);
-	}
-	if( doMC ){
-	  TF1 *fMC=new TF1("fMC","[0]*exp(-0.5*((x-[1])/[2])^2)",c1FixMinX ,c1xMax);
-	  fMC->SetParameters(0.3,meanMC[i][ir],10);
-	  fMC->FixParameter(1,meanMC[i][ir]);
-	  ranConeMC[i][ir]->Fit("fMC","0");
-	  Double_t sigmafitMC=fMC->GetParameter(2);
-	  cout<<"sigmafitMC  "<<sigmafitMC<<endl;
-	  cout<<"i   "<<i<<" ir  "<<ir<<endl;
-	 
-	  if (ir==0) ranConeMC[i][ir]->Draw("");
-	  if (ir!=0) ranConeMC[i][ir]->Draw("same");	
-	  if (ir==0){ leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");}	  
-	  leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[0],meanMC[i][ir],meanErrMC[i][ir]),"lp");
-	  leg1[i]->Draw();	      
-	  drawText(cent[i], 0.23, 0.83);
-	  if (doData ){
-	    //	   TF1 *f1=new TF1("f1","gaus",4,150);
-	    TF1 *f1=new TF1("f1","[0]*exp(-0.5*((x-[1])/[2])^2)",4,150);
-	    f1->SetParameters(0.3,meanData[i][ir],10);
-	    f1->FixParameter(1,meanData[i][ir]);
-	   
-	    ranConeData[i][ir]->Fit("f1","0");
-	    Double_t sigmafit=f1->GetParameter(2);
-	    cout<<"sigma  "<<sigmafit<<endl;
-	    cout<<"i   "<<i<<" ir  "<<ir<<endl;
-	    sigmaarray[i][ir]=sigmafit;
-	    sigmaarrayerr[i][ir]=f1->GetParError(2);
-	    cout<<"test "<<sigmaarray[i][ir]<<endl;
-	    ranConeData[i][ir]->Draw("same");
-	    TF1 *f2=ranConeData[i][ir]->GetFunction("f1");
-	    f2->Draw("same");
-	    leg1[i]->AddEntry(ranConeData[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[1],meanData[i][ir],meanErrData[i][ir]),"lp");
-	    leg1[i]->Draw();	      
-	    drawText(cent[i], 0.23, 0.83);
-	 
-	  }
 
-	  /*	 if (ir==0) ranConeMC[i][ir]->Draw("same");
+      for (int ir = 0; ir<=nAlgos-1; ir++){
+	
+	cout<<"algo "<<ir<<endl; //this is basically which radius you want to look at. 3,4,5
+
+	// ********************************************************************
+	// Get the MC histograms 
+	// ********************************************************************
+
+	//ranConeMC[i][ir] = new TH1D(Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
+	ranConeMC[i][ir] = new TH1D(Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
+	ranConeMC[i][ir]->Sumw2();
+	akTreeMC[ir]->Draw(Form("%s>>sumPFch_%s_%s_MC",var,centLabel[i],varLabel[ir]),Form("%s && %s>%f",centCuts[i],var,c1FixMinX),"goff");
+	
+	ranConeMC[i][ir]->Print("base");
+
+	cout<<" check1: content bin[7]: "<<ranConeMC[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeMC[i][ir]->GetBinError(i)<<endl;;
+	//cout<<" relative Error: "<<(ranConeMC[i][ir]->GetBinError(i))/(ranConeMC[i][ir]->GetBinContent(7))<<endl;
+	
+	ranConeMC[i][ir]->Scale(1/(ranConeMC[i][ir]->Integral(1,c1nBins)));
+	
+	cout<<" check2(after histo scale): content bin[7]: "<<ranConeMC[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeMC[i][ir]->GetBinError(i)<<endl;;
+	//cout<<" relative Error: "<<(ranConeMC[i][ir]->GetBinError(i))/(ranConeMC[i][ir]->GetBinContent(7))<<endl;
+	
+	divideBinWidth(ranConeMC[i][ir]);
+	//rescaleBins(*ranConeMC[i][ir]);
+	
+	cout<<" check3(after bin scale): content bin[7]: "<<ranConeMC[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeMC[i][ir]->GetBinError(i)<<endl;;
+	//cout<<" relative Error: "<<(ranConeMC[i][ir]->GetBinError(i))/(ranConeMC[i][ir]->GetBinContent(7))<<endl;
+	
+	meanMC[i][ir] = ranConeMC[i][ir]->GetMean();
+	meanErrMC[i][ir] = ranConeMC[i][ir]->GetMeanError();
+	format1Dhisto(*ranConeMC[i][ir],-1,-1,color[ir],marker[0],color[ir],fill[ir],xTitle,yTitle);
+	//ranConeMC[i][ir]->SetMaximum(1);
+	//ranConeMC[i][ir]->SetMinimum(0.03);
+	
+	// ********************************************************************
+	// Get the data histograms 
+	// ********************************************************************
+
+	//ranConeData[i][ir] = new TH1D(Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
+	ranConeData[i][ir] = new TH1D(Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
+	ranConeData[i][ir]->Sumw2();
+	akTreeData[ir]->Draw(Form("%s>>sumPFch_%s_%s_data",var,centLabel[i],varLabel[ir]),Form("%s && %s>%f",centCuts[i],var,c1FixMinX),"goff");
+
+	ranConeData[i][ir]->Print("base");
+
+	cout<<" check1: content bin[7]: "<<ranConeData[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeData[i][ir]->GetBinError(i)<<endl;
+	//cout<<" relative Error: "<<(ranConeData[i][ir]->GetBinError(i))/(ranConeData[i][ir]->GetBinContent(7))<<endl;
+
+	ranConeData[i][ir]->Scale(1/(ranConeData[i][ir]->Integral(1,c1nBins)));
+	
+	cout<<" check2(after histo scale): content bin[7]: "<<ranConeData[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeData[i][ir]->GetBinError(i)<<endl;
+	//cout<<" relative Error: "<<(ranConeData[i][ir]->GetBinError(i))/(ranConeData[i][ir]->GetBinContent(7))<<endl;
+	
+	divideBinWidth(ranConeData[i][ir]);
+	//rescaleBins(*ranConeData[i][ir]);
+
+	cout<<" check3(after bin scale): content bin[7]: "<<ranConeData[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeData[i][ir]->GetBinError(i);
+	//cout<<" relative Error: "<<(ranConeData[i][ir]->GetBinError(i))/(ranConeData[i][ir]->GetBinContent(7))<<endl;
+
+	meanData[i][ir] = ranConeData[i][ir]->GetMean();
+	meanErrData[i][ir] = ranConeData[i][ir]->GetMeanError();
+	format1Dhisto(*ranConeData[i][ir],-1,-1,color[ir],marker[1],color[ir],fill[ir],xTitle,yTitle);
+	//ranConeData[i][ir]->SetMaximum(1);
+	//ranConeData[i][ir]->SetMinimum(0.03);
+	
+	// get the fitting functions for MC: 
+
+	// TF1 *fMC=new TF1("fMC","[0]*exp(-0.5*((x-[1])/[2])^2)",c1FixMinX ,c1xMax);
+	// fMC->SetParameters(0.3,meanMC[i][ir],10);
+	// fMC->FixParameter(1,meanMC[i][ir]);
+	// ranConeMC[i][ir]->Fit("fMC","0");
+	// Double_t sigmafitMC=fMC->GetParameter(2);
+	// cout<<"sigmafitMC  "<<sigmafitMC<<endl;
+	// cout<<"i   "<<i<<" ir  "<<ir<<endl;
+	 
+	if (ir==0) ranConeMC[i][ir]->Draw("");
+	if (ir!=0) ranConeMC[i][ir]->Draw("same");	
+	if (ir==0)
+	  leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");	  
+	
+	leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[0],meanMC[i][ir],meanErrMC[i][ir]),"lp");
+	leg1[i]->Draw();	      
+	drawText(cent[i], 0.23, 0.83);
+	
+	// fitting for data
+	// TF1 *f1=new TF1("f1","gaus",4,150);
+	// TF1 *f1=new TF1("f1","[0]*exp(-0.5*((x-[1])/[2])^2)",4,150);
+	// f1->SetParameters(0.3,meanData[i][ir],10);
+	// f1->FixParameter(1,meanData[i][ir]);
+	   
+	// ranConeData[i][ir]->Fit("f1","0");
+	// Double_t sigmafit=f1->GetParameter(2);
+	// cout<<"sigma  "<<sigmafit<<endl;
+	// cout<<"i   "<<i<<" ir  "<<ir<<endl;
+	// sigmaarray[i][ir]=sigmafit;
+	// sigmaarrayerr[i][ir]=f1->GetParError(2);
+	// cout<<"test "<<sigmaarray[i][ir]<<endl;
+	
+
+	ranConeData[i][ir]->Draw("same");
+	
+	//TF1 *f2=ranConeData[i][ir]->GetFunction("f1");
+
+	//f2->Draw("same");
+	
+	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[1],meanData[i][ir],meanErrData[i][ir]),"lp");
+	leg1[i]->Draw();	      
+	drawText(cent[i], 0.23, 0.83);
+	 
+
+	/*	 if (ir==0) ranConeMC[i][ir]->Draw("same");
 		 if (ir!=0) ranConeMC[i][ir]->Draw("same");	
 		 if (ir==0){      leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");}
        
 		 leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[0],meanMC[i][ir],meanErrMC[i][ir]),"lp");
 		 leg1[i]->Draw();	      
 		 drawText(cent[i], 0.23, 0.83);
-	  */
-	}
+	*/
+      
       }
-    }  
-    if (doPrint) c1MC->Print("JetRaa_PFSumEt_PtCut1.pdf");
-    if (doPrint) c1MC->Print("JetRaa_PFSumEt_PtCut1.root"); 
+    } 
+    if (doPrint) c1MC->Print("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_PtCut1.pdf");
+    if (doPrint) c1MC->Print("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_PtCut1.root"); 
 
-    for (int i=0; i<nCent; i++){
+    //for (int i=0; i<nCent; i++){
 
-      for(int ir=0; ir<3; ir++){
-	cout<<"cent  "<<i<<" algos  "<<ir<<"    "<<sigmaarray[i][ir]<<"    "<<sigmaarrayerr[i][ir]<<"\n"<<endl;
+      //for(int ir=0; ir<3; ir++){
+      //cout<<"cent  "<<i<<" algos  "<<ir<<"    "<<sigmaarray[i][ir]<<"    "<<sigmaarrayerr[i][ir]<<"\n"<<endl;
 	//cout<<"cent  "<<i<<" algos  "<<ir<<"    "<<sigmaarray[i][ir]<<"\n"<<endl;
-      }
+      //}
      
-    }
+    //}
    
 
   }
-  return;
+  //return;
  
 }

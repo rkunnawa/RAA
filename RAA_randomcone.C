@@ -48,7 +48,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 
   cout<<"The radius is : "<<rad<<endl;
   char *COLLTYPE = "PbPb";
-  cout<<"   COLLTYPE : "<<COLLTYPE<<endl;
+  cout<<"   COLLTYPE : "<<COLLTYPE<<" "<<type<<endl;
   
   //****** Analysis knobs *****************
   Float_t JETRADIUS = (Float_t)rad/10;
@@ -70,12 +70,12 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   //const Int_t nRan = 100;    // number of random cones
   int nRandom = 100;
   // int nRan= 100; - not used here 
-  int Nevents = 10;
-  int nMarks = 50;
+  int Nevents = 1000;
+  int nMarks = 100;
   //****************************************
   
   // test histogram for ranPFsumEt
-  TH1F *test_ranpfsumet = new TH1F("test_ranpfsumet","",200,0,100);
+  //TH1F *test_ranpfsumet = new TH1F("test_ranpfsumet","",200,0,100);
 
   TTree* ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,rad,jet_type));
   // - TTree* ic      = (TTree*)FileA->Get("icPu5JetAnalyzer/t"); // - not there in the new forest 
@@ -405,6 +405,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   nt->Branch("jpt",jpt,"jpt[nJets]/F");
   nt->Branch("jpu",jpu,"jpu[nJets]/F");
   nt->Branch("jrawpt",jrawpt,"jrawpt[nJets]/F");
+  nt->Branch("nRandom",&nRandom,"nRandom/I");
   //nt->Branch("nTracks",&nTracks,"nTracks/I");
   //nt->Branch("treta",treta,"treta[nTracks]/F");
   //nt->Branch("trphi",trphi,"trphi[nTracks]/F");
@@ -523,50 +524,50 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   */
 
   if(jet_type=="Calo"){
-    nt->Branch("ranTower_sumEt",ranTower_sumEt,"ranTower_sumEt[200]/F");
-    nt->Branch("ranNTower_objs",ranNTower_objs,"ranNTower_objs[200]/I");
+    nt->Branch("ranTower_sumEt",ranTower_sumEt,"ranTower_sumEt[nRandom]/F");
+    nt->Branch("ranNTower_objs",ranNTower_objs,"ranNTower_objs[nRandom]/I");
   
-    nt->Branch("ranNTower_objs_ring0",ranNTower_objs_ring0,"ranNTower_objs_ring0[200]/I");    
-    nt->Branch("ranTower_sumEt_ring0",ranTower_sumEt_ring0,"ranTower_sumEt_ring0[200]/F");
-    nt->Branch("ranNTower_objs_ring1",ranNTower_objs_ring1,"ranNTower_objs_ring1[200]/I");    
-    nt->Branch("ranTower_sumEt_ring1",ranTower_sumEt_ring1,"ranTower_sumEt_ring1[200]/F");
-    nt->Branch("ranNTower_objs_ring2",ranNTower_objs_ring2,"ranNTower_objs_ring2[200]/I");    
-    nt->Branch("ranTower_sumEt_ring2",ranTower_sumEt_ring2,"ranTower_sumEt_ring2[200]/F");
-    nt->Branch("ranNTower_objs_ring3",ranNTower_objs_ring3,"ranNTower_objs_ring3[200]/I");    
-    nt->Branch("ranTower_sumEt_ring3",ranTower_sumEt_ring3,"ranTower_sumEt_ring3[200]/F");
-    nt->Branch("ranNTower_objs_ring4",ranNTower_objs_ring4,"ranNTower_objs_ring4[200]/I");    
-    nt->Branch("ranTower_sumEt_ring4",ranTower_sumEt_ring4,"ranTower_sumEt_ring4[200]/F");
-    nt->Branch("ranNTower_objs_ring5",ranNTower_objs_ring5,"ranNTower_objs_ring5[200]/I");    
-    nt->Branch("ranTower_sumEt_ring5",ranTower_sumEt_ring5,"ranTower_sumEt_ring5[200]/F");
+    nt->Branch("ranNTower_objs_ring0",ranNTower_objs_ring0,"ranNTower_objs_ring0[nRandom]/I");    
+    nt->Branch("ranTower_sumEt_ring0",ranTower_sumEt_ring0,"ranTower_sumEt_ring0[nRandom]/F");
+    nt->Branch("ranNTower_objs_ring1",ranNTower_objs_ring1,"ranNTower_objs_ring1[nRandom]/I");    
+    nt->Branch("ranTower_sumEt_ring1",ranTower_sumEt_ring1,"ranTower_sumEt_ring1[nRandom]/F");
+    nt->Branch("ranNTower_objs_ring2",ranNTower_objs_ring2,"ranNTower_objs_ring2[nRandom]/I");    
+    nt->Branch("ranTower_sumEt_ring2",ranTower_sumEt_ring2,"ranTower_sumEt_ring2[nRandom]/F");
+    nt->Branch("ranNTower_objs_ring3",ranNTower_objs_ring3,"ranNTower_objs_ring3[nRandom]/I");    
+    nt->Branch("ranTower_sumEt_ring3",ranTower_sumEt_ring3,"ranTower_sumEt_ring3[nRandom]/F");
+    nt->Branch("ranNTower_objs_ring4",ranNTower_objs_ring4,"ranNTower_objs_ring4[nRandom]/I");    
+    nt->Branch("ranTower_sumEt_ring4",ranTower_sumEt_ring4,"ranTower_sumEt_ring4[nRandom]/F");
+    nt->Branch("ranNTower_objs_ring5",ranNTower_objs_ring5,"ranNTower_objs_ring5[nRandom]/I");    
+    nt->Branch("ranTower_sumEt_ring5",ranTower_sumEt_ring5,"ranTower_sumEt_ring5[nRandom]/F");
   }else if(jet_type=="PF"){
-    nt->Branch("ranPFsumEt",ranPFsumEt,"ranPFsumEt[200]/F");
-    nt->Branch("ranNPFobjs",ranNPFobjs,"ranNPFobjs[200]/I");
+    nt->Branch("ranPFsumEt",ranPFsumEt,"ranPFsumEt[nRandom]/F");
+    nt->Branch("ranNPFobjs",ranNPFobjs,"ranNPFobjs[nRandom]/I");
   
-    nt->Branch("ranNPFobjs_ring0",ranNPFobjs_ring0,"ranNPFobjs_ring0[200]/I");    
-    nt->Branch("ranPFsumEt_ring0",ranPFsumEt_ring0,"ranPFsumEt_ring0[200]/F");
-    nt->Branch("ranNPFobjs_ring1",ranNPFobjs_ring1,"ranNPFobjs_ring1[200]/I");    
-    nt->Branch("ranPFsumEt_ring1",ranPFsumEt_ring1,"ranPFsumEt_ring1[200]/F");
-    nt->Branch("ranNPFobjs_ring2",ranNPFobjs_ring2,"ranNPFobjs_ring2[200]/I");    
-    nt->Branch("ranPFsumEt_ring2",ranPFsumEt_ring2,"ranPFsumEt_ring2[200]/F");
-    nt->Branch("ranNPFobjs_ring3",ranNPFobjs_ring3,"ranNPFobjs_ring3[200]/I");    
-    nt->Branch("ranPFsumEt_ring3",ranPFsumEt_ring3,"ranPFsumEt_ring3[200]/F");
-    nt->Branch("ranNPFobjs_ring4",ranNPFobjs_ring4,"ranNPFobjs_ring4[200]/I");    
-    nt->Branch("ranPFsumEt_ring4",ranPFsumEt_ring4,"ranPFsumEt_ring4[200]/F");
-    nt->Branch("ranNPFobjs_ring5",ranNPFobjs_ring5,"ranNPFobjs_ring5[200]/I");    
-    nt->Branch("ranPFsumEt_ring5",ranPFsumEt_ring5,"ranPFsumEt_ring5[200]/F");
+    nt->Branch("ranNPFobjs_ring0",ranNPFobjs_ring0,"ranNPFobjs_ring0[nRandom]/I");    
+    nt->Branch("ranPFsumEt_ring0",ranPFsumEt_ring0,"ranPFsumEt_ring0[nRandom]/F");
+    nt->Branch("ranNPFobjs_ring1",ranNPFobjs_ring1,"ranNPFobjs_ring1[nRandom]/I");    
+    nt->Branch("ranPFsumEt_ring1",ranPFsumEt_ring1,"ranPFsumEt_ring1[nRandom]/F");
+    nt->Branch("ranNPFobjs_ring2",ranNPFobjs_ring2,"ranNPFobjs_ring2[nRandom]/I");    
+    nt->Branch("ranPFsumEt_ring2",ranPFsumEt_ring2,"ranPFsumEt_ring2[nRandom]/F");
+    nt->Branch("ranNPFobjs_ring3",ranNPFobjs_ring3,"ranNPFobjs_ring3[nRandom]/I");    
+    nt->Branch("ranPFsumEt_ring3",ranPFsumEt_ring3,"ranPFsumEt_ring3[nRandom]/F");
+    nt->Branch("ranNPFobjs_ring4",ranNPFobjs_ring4,"ranNPFobjs_ring4[nRandom]/I");    
+    nt->Branch("ranPFsumEt_ring4",ranPFsumEt_ring4,"ranPFsumEt_ring4[nRandom]/F");
+    nt->Branch("ranNPFobjs_ring5",ranNPFobjs_ring5,"ranNPFobjs_ring5[nRandom]/I");    
+    nt->Branch("ranPFsumEt_ring5",ranPFsumEt_ring5,"ranPFsumEt_ring5[nRandom]/F");
 
-    nt->Branch("ranNPFchObjs_ring0",ranNPFchObjs_ring0,"ranNPFchObjs_ring0[200]/I");    
-    nt->Branch("ranPFchSumEt_ring0",ranPFchSumEt_ring0,"ranPFchSumEt_ring0[200]/F");
-    nt->Branch("ranNPFchObjs_ring1",ranNPFchObjs_ring1,"ranNPFchObjs_ring1[200]/I");    
-    nt->Branch("ranPFchSumEt_ring1",ranPFchSumEt_ring1,"ranPFchSumEt_ring1[200]/F");
-    nt->Branch("ranNPFchObjs_ring2",ranNPFchObjs_ring2,"ranNPFchObjs_ring2[200]/I");    
-    nt->Branch("ranPFchSumEt_ring2",ranPFchSumEt_ring2,"ranPFchSumEt_ring2[200]/F");
-    nt->Branch("ranNPFchObjs_ring3",ranNPFchObjs_ring3,"ranNPFchObjs_ring3[200]/I");    
-    nt->Branch("ranPFchSumEt_ring3",ranPFchSumEt_ring3,"ranPFchSumEt_ring3[200]/F");
-    nt->Branch("ranNPFchObjs_ring4",ranNPFchObjs_ring4,"ranNPFchObjs_ring4[200]/I");    
-    nt->Branch("ranPFchSumEt_ring4",ranPFchSumEt_ring4,"ranPFchSumEt_ring4[200]/F");
-    nt->Branch("ranNPFchObjs_ring5",ranNPFchObjs_ring5,"ranNPFchObjs_ring5[200]/I");    
-    nt->Branch("ranPFchSumEt_ring5",ranPFchSumEt_ring5,"ranPFchSumEt_ring5[200]/F");
+    nt->Branch("ranNPFchObjs_ring0",ranNPFchObjs_ring0,"ranNPFchObjs_ring0[nRandom]/I");    
+    nt->Branch("ranPFchSumEt_ring0",ranPFchSumEt_ring0,"ranPFchSumEt_ring0[nRandom]/F");
+    nt->Branch("ranNPFchObjs_ring1",ranNPFchObjs_ring1,"ranNPFchObjs_ring1[nRandom]/I");    
+    nt->Branch("ranPFchSumEt_ring1",ranPFchSumEt_ring1,"ranPFchSumEt_ring1[nRandom]/F");
+    nt->Branch("ranNPFchObjs_ring2",ranNPFchObjs_ring2,"ranNPFchObjs_ring2[nRandom]/I");    
+    nt->Branch("ranPFchSumEt_ring2",ranPFchSumEt_ring2,"ranPFchSumEt_ring2[nRandom]/F");
+    nt->Branch("ranNPFchObjs_ring3",ranNPFchObjs_ring3,"ranNPFchObjs_ring3[nRandom]/I");    
+    nt->Branch("ranPFchSumEt_ring3",ranPFchSumEt_ring3,"ranPFchSumEt_ring3[nRandom]/F");
+    nt->Branch("ranNPFchObjs_ring4",ranNPFchObjs_ring4,"ranNPFchObjs_ring4[nRandom]/I");    
+    nt->Branch("ranPFchSumEt_ring4",ranPFchSumEt_ring4,"ranPFchSumEt_ring4[nRandom]/F");
+    nt->Branch("ranNPFchObjs_ring5",ranNPFchObjs_ring5,"ranNPFchObjs_ring5[nRandom]/I");    
+    nt->Branch("ranPFchSumEt_ring5",ranPFchSumEt_ring5,"ranPFchSumEt_ring5[nRandom]/F");
   }
   // Int_t ranNPFchObjs_ring0[1000];
   // Float_t ranPFchSumEt_ring0[1000];
@@ -1193,15 +1194,15 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
 	    ranNPFobjs_ring4[iRan] = ranRingCounter[4];
 	    ranNPFobjs_ring5[iRan] = ranRingCounter[5];
 
-	    cout<<ranPFsumEt[iRan]<<", ";
+	    //cout<<ranPFsumEt[iRan]<<", ";
 
 	    ranPFsumEt[iRan] = ranSumEtPF;
 
-	    cout<<ranPFsumEt[iRan]<<endl;
+	    //cout<<ranPFsumEt[iRan]<<endl;
 
 	    ranNPFobjs[iRan] = ranPFCounter;
 
-	    test_ranpfsumet->Fill(ranSumEtPF);
+	    //test_ranpfsumet->Fill(ranSumEtPF);
 
 	    //cout<<"Event no = "<<iev<<", sum of random PF candidates in the R=0."<<rad<<" = "<<ranSumEtPF<<endl;
 	  	
@@ -1331,7 +1332,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
       //cout<<endl;
    
       nt->Fill(); 
-      
+    
       
     }
   
