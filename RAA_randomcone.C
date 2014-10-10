@@ -40,7 +40,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   else if(type=="MC")
     FileA = TFile::Open("/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root");
   
-  TFile* outf = new TFile(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
+  TFile* outf = new TFile(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
   
   //TFile *FileA = TFile::Open(Form("/net/hisrv0001/home/icali/hadoop/HIMinBiasUPC_skimmed/MinBias-reTracking-merged/MinBias_Merged_tracking_all.root"));
   //TString outname = "dataAKSkimNtupleRandomConeRings_v4_TkpTCut0_ak3dataMB.root"; 
@@ -55,12 +55,12 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   //Float_t PTCUT1 = 120;      //leading jet
   //Float_t PTCUT2 = 50;       //away jet
   Float_t PTCUT3 = 20;       //perp jets
-  Float_t ETACUT = 2.0;      //eta acceptance
+  Float_t ETACUT = 3.0;      //eta acceptance
   //Float_t PHICUT = 0.05;     //dijets phi angle (in PI radians)
   Float_t TRACKPTCUT = 0.0; //
   Float_t TRACKETACUT = 2.0; //eta acceptance
   Float_t PF_TRACKPTCUT = 0.0; //
-  Float_t PF_TRACKETACUT = 2.0; //eta acceptance
+  Float_t PF_TRACKETACUT = 3.0; //eta acceptance
   Float_t Tower_TRACKPTCUT = 0.0; //
   Float_t Tower_TRACKETACUT = 2.0; //eta acceptance
   //bool debug = true;
@@ -70,8 +70,8 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   //const Int_t nRan = 100;    // number of random cones
   int nRandom = 100;
   // int nRan= 100; - not used here 
-  int Nevents = 1000;
-  int nMarks = 100;
+  int Nevents = 10000;
+  int nMarks = 1000;
   //****************************************
   
   // test histogram for ranPFsumEt

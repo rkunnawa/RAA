@@ -945,13 +945,13 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "PF"){
 
     for(int j = 0;j<nbins_eta;j++){
 
-      cPbPb_MC_jtpu[j] = new TCanvas(Form("cPbPb_MC_jtpu_%s",etaWidth[j]),Form("energy subtracted from Jets in the Vs algorithmin the range %s",etaWidth[j]),1200,1000);
+      cPbPb_MC_jtpu[j] = new TCanvas(Form("cPbPb_MC_jtpu_%s",etaWidth[j]),Form("energy subtracted from Jets in the Vs algorithmin the range %s",etaWidth[j]),1400,1200);
       makeMultiPanelCanvas(cPbPb_MC_jtpu[j],3,2,0.0,0.0,0.2,0.15,0.07);
       TLegend *LPbPb_MC_jtpu[nbins_cent];
 
       for(int i = 0;i<nbins_cent;i++){
 
-	LPbPb_MC_jtpu[i] = myLegend(0.40,0.65,0.50,0.85);
+	LPbPb_MC_jtpu[i] = myLegend(0.55,0.70,0.85,0.90);
 
 	cPbPb_MC_jtpu[j]->cd(nbins_cent-i)->SetLogy();
 	//cPbPb_MC_jtpu[j]->cd(i+1)->SetLogx();
@@ -962,7 +962,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "PF"){
 	for(int k = 1;k<5;k++){
 
 	  hPbPb_MC_jtpu[k][j][i]->SetMarkerStyle(20+k);
-	  hPbPb_MC_jtpu[k][j][i]->SetMarkerColor(1+k);
+	  hPbPb_MC_jtpu[k][j][i]->SetMarkerColor(k);
 	  hPbPb_MC_jtpu[k][j][i]->SetAxisRange(5,250,"X");
 	  hPbPb_MC_jtpu[k][j][i]->SetAxisRange(1,3.5e3,"Y");
 	  makeHistTitle(hPbPb_MC_jtpu[k][j][i]," ","Subtracted p_{T} (GeV/c) from Jet","counts");
@@ -989,9 +989,9 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "PF"){
 
 	}//radius loop
 	
-	LPbPb_MC_jtpu[i]->SetTextSize(0.04);
+	LPbPb_MC_jtpu[i]->SetTextSize(0.03);
 	LPbPb_MC_jtpu[i]->Draw();
-	drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.87,20);
+	drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.87,0.95,20);
 
       }//centrality loop
       cPbPb_MC_jtpu[j]->cd(1);
@@ -1018,6 +1018,7 @@ void RAA_plot(int radius = 3, char *algo = "Vs", char *jet_type = "PF"){
     }
     */
 
+    // plot from the Hydjet and MB data the jtpu variable as a function of centrality 
     
   }// random cone plotting if statement only for Vs so far
 

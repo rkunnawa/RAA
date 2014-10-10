@@ -40,6 +40,7 @@
 #include "TLatex.h"
 #include "TMath.h"
 #include "TLine.h"
+#include "Headers/plot.h"
 
 #define PI 3.14159;
 
@@ -295,6 +296,8 @@ void LoopCorrRandomCone_MacroV6(){
 
   gROOT->ProcessLine(".x jorge_rootlogon.C");
 
+  TDatime date;
+
   //  gROOT->ProcessLine(".x betterColors.C");
 
   double trkPtCut = 0;//2,0
@@ -316,9 +319,9 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_HYDJET.root"));
     // TFile *ak5MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_HYDJET.root"));
 
-    TFile *ak3MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs3PF_20141008.root"));
-    TFile *ak4MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs4PF_20141008.root"));
-    TFile *ak5MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs5PF_20141008.root"));
+    TFile *ak3MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_MC_akVs3PF_20141009.root"));
+    TFile *ak4MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_MC_akVs4PF_20141009.root"));
+    TFile *ak5MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_MC_akVs5PF_20141009.root"));
     
     akTreeMC[0]   = (TTree*)ak3MCFile->Get("nt");
     akTreeMC[1]   = (TTree*)ak4MCFile->Get("nt");
@@ -330,9 +333,9 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_DATA.root"));
     // TFile *ak5dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_DATA.root"));
 
-    TFile *ak3dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs3PF_20141008.root"));
-    TFile *ak4dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs4PF_20141008.root"));
-    TFile *ak5dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs5PF_20141008.root"));
+    TFile *ak3dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_data_akVs3PF_20141009.root"));
+    TFile *ak4dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_data_akVs4PF_20141009.root"));
+    TFile *ak5dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_data_akVs5PF_20141009.root"));
 
     akTreeData[0]   = (TTree*)ak3dataFile->Get("nt");
     akTreeData[1]   = (TTree*)ak4dataFile->Get("nt");
@@ -461,36 +464,58 @@ void LoopCorrRandomCone_MacroV6(){
     TH1D * ranConeData[nCent][nAlgos];
    
     const char* var     = "ranPFsumEt";
+
+    TLegend* leg2[nCent];
+    TH1D * jtpuMC[nCent][nAlgos];
+    TH1D * jtpuData[nCent][nAlgos];
+   
+    const char* var2 = "jpu";
+
     const char* varLabel[nAlgos] = { "R=0.3","R=0.4","R=0.5" };
     const char* hType[2] = {"MC    ","DataMB"};
    
     double marker [2] = {20,25};//,21,25};//22,26};
-    double color  [nAlgos] = {1,2,4};//,2,4};
+    double color  [nAlgos] = {2,3,4};//,2,4};
     double fill   [nAlgos] = {0,0,0};//,0,0};
     double meanMC[nCent][nAlgos];
     double meanErrMC[nCent][nAlgos]; 
     double meanData[nCent][nAlgos];
     double meanErrData[nCent][nAlgos];
+
+    double meanMC2[nCent][nAlgos];
+    double meanErrMC2[nCent][nAlgos]; 
+    double meanData2[nCent][nAlgos];
+    double meanErrData2[nCent][nAlgos];
    
-    const char* xTitle = "sumPF E_{T}";
+    const char* xTitle = "Random Cone sumPF E_{T}";
     const char* yTitle = "normalized counts";
     double Ymax = 10;
     double Ymin = 0.01;
     int c1nBins = 200;
-    double c1xMax = 200;
+    double c1xMax = 250;
     double c1xMin = 5;
     double c1FixMinX = 0;
+
+    const char* xTitle2 = "Subtracted p_{T} from Jets";
+    const char* yTitle2 = "normalized counts";
+    //double Ymax = 10;
+    //double Ymin = 0.01;
+    //int c1nBins = 200;
+    //double c1xMax = 250;
+    //double c1xMin = 5;
+    //double c1FixMinX = 0;
+  
   
     //double xAxisBins[21] = {0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1.0,1.4,1.8,2.2,2.6, 3.0,3.4,3.8,4.2,4.6,5.0};
-    TCanvas *c1MC = new TCanvas("c1MC","c1MC",1000,800);
+    TCanvas *c1MC = new TCanvas("c1MC","c1MC",1400,1200);
     makeMultiPanelCanvas(c1MC,3,2,0.0,0.0,0.2,0.15,0.07);
     //Loop over the 6 centrality sections
     for (int i=0; i<nCent; i++){
       cout<<"centrality = "<<i<<endl;
-      leg1[i] = new TLegend(0.41,0.70,0.73,0.90);//top right
-      leg1[i]->SetFillColor(0);
-      leg1[i]->SetTextSize(0.028);
-      leg1[i]->SetBorderSize(0);
+      leg1[i] = myLegend(0.50,0.70,0.80,0.90);//top right
+      //leg1[i]->SetFillColor(0);
+      leg1[i]->SetTextSize(0.03);
+      //leg1[i]->SetBorderSize(0);
       c1MC->cd(i+1);
       c1MC->cd(i+1)->SetLogy();
 
@@ -503,9 +528,9 @@ void LoopCorrRandomCone_MacroV6(){
 	// ********************************************************************
 
 	//ranConeMC[i][ir] = new TH1D(Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
-	ranConeMC[i][ir] = new TH1D(Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
+	ranConeMC[i][ir] = new TH1D(Form("sumPF_%s_%s_MC",centLabel[i],varLabel[ir]),Form("sumPF_%s_%s_MC",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
 	ranConeMC[i][ir]->Sumw2();
-	akTreeMC[ir]->Draw(Form("%s>>sumPFch_%s_%s_MC",var,centLabel[i],varLabel[ir]),Form("%s && %s>%f",centCuts[i],var,c1FixMinX),"goff");
+	akTreeMC[ir]->Draw(Form("%s>>sumPF_%s_%s_MC",var,centLabel[i],varLabel[ir]),Form("%s && %s>%f",centCuts[i],var,c1FixMinX),"goff");
 	
 	ranConeMC[i][ir]->Print("base");
 
@@ -534,9 +559,9 @@ void LoopCorrRandomCone_MacroV6(){
 	// ********************************************************************
 
 	//ranConeData[i][ir] = new TH1D(Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
-	ranConeData[i][ir] = new TH1D(Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
+	ranConeData[i][ir] = new TH1D(Form("sumPF_%s_%s_data",centLabel[i],varLabel[ir]),Form("sumPF_%s_%s_data",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
 	ranConeData[i][ir]->Sumw2();
-	akTreeData[ir]->Draw(Form("%s>>sumPFch_%s_%s_data",var,centLabel[i],varLabel[ir]),Form("%s && %s>%f",centCuts[i],var,c1FixMinX),"goff");
+	akTreeData[ir]->Draw(Form("%s>>sumPF_%s_%s_data",var,centLabel[i],varLabel[ir]),Form("%s && %s>%f",centCuts[i],var,c1FixMinX),"goff");
 
 	ranConeData[i][ir]->Print("base");
 
@@ -551,7 +576,7 @@ void LoopCorrRandomCone_MacroV6(){
 	divideBinWidth(ranConeData[i][ir]);
 	//rescaleBins(*ranConeData[i][ir]);
 
-	cout<<" check3(after bin scale): content bin[7]: "<<ranConeData[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeData[i][ir]->GetBinError(i);
+	cout<<" check3(after bin scale): content bin[7]: "<<ranConeData[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<ranConeData[i][ir]->GetBinError(i)<<endl;
 	//cout<<" relative Error: "<<(ranConeData[i][ir]->GetBinError(i))/(ranConeData[i][ir]->GetBinContent(7))<<endl;
 
 	meanData[i][ir] = ranConeData[i][ir]->GetMean();
@@ -572,12 +597,12 @@ void LoopCorrRandomCone_MacroV6(){
 	 
 	if (ir==0) ranConeMC[i][ir]->Draw("");
 	if (ir!=0) ranConeMC[i][ir]->Draw("same");	
-	if (ir==0)
-	  leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");	  
+	//if (ir==0)
+	  //leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");	  
 	
 	leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[0],meanMC[i][ir],meanErrMC[i][ir]),"lp");
 	leg1[i]->Draw();	      
-	drawText(cent[i], 0.23, 0.83);
+	drawText(cent[i], 0.87, 0.95,20);
 	
 	// fitting for data
 	// TF1 *f1=new TF1("f1","gaus",4,150);
@@ -602,7 +627,7 @@ void LoopCorrRandomCone_MacroV6(){
 	
 	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[1],meanData[i][ir],meanErrData[i][ir]),"lp");
 	leg1[i]->Draw();	      
-	drawText(cent[i], 0.23, 0.83);
+	//drawText(cent[i], 0.83, 0.23);
 	 
 
 	/*	 if (ir==0) ranConeMC[i][ir]->Draw("same");
@@ -616,8 +641,157 @@ void LoopCorrRandomCone_MacroV6(){
       
       }
     } 
-    if (doPrint) c1MC->Print("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_PtCut1.pdf");
-    if (doPrint) c1MC->Print("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_PtCut1.root"); 
+
+    c1MC->cd(1);
+    putCMSSim(0.1,0.95);
+
+    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_n3_eta_p3_%d.pdf",date.GetDate()));
+    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_n3_eta_p3_%d.root",date.GetDate())); 
+
+
+    // make the jtpu plot from MB hydjet and data. 
+    TCanvas *c2MC = new TCanvas("c2MC","c2MC",1400,1200);
+    makeMultiPanelCanvas(c2MC,3,2,0.0,0.0,0.2,0.15,0.07);
+    //Loop over the 6 centrality sections
+    for (int i=0; i<nCent; i++){
+      cout<<"centrality = "<<i<<endl;
+      leg2[i] = myLegend(0.50,0.70,0.80,0.90);//top right
+      //leg1[i]->SetFillColor(0);
+      leg2[i]->SetTextSize(0.03);
+      //leg1[i]->SetBorderSize(0);
+      c2MC->cd(i+1);
+      c2MC->cd(i+1)->SetLogy();
+
+      for (int ir = 0; ir<=nAlgos-1; ir++){
+	
+	cout<<"algo "<<ir<<endl; //this is basically which radius you want to look at. 3,4,5
+
+	// ********************************************************************
+	// Get the MC histograms 
+	// ********************************************************************
+
+	//ranConeMC[i][ir] = new TH1D(Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_MC",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
+	jtpuMC[i][ir] = new TH1D(Form("jtpu_%s_%s_MC",centLabel[i],varLabel[ir]),Form("jtpu_%s_%s_MC",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
+	jtpuMC[i][ir]->Sumw2();
+	akTreeMC[ir]->Draw(Form("%s>>jtpu_%s_%s_MC",var2,centLabel[i],varLabel[ir]),Form("%s && %s>%f",centCuts[i],var2,c1FixMinX),"goff");
+	
+	jtpuMC[i][ir]->Print("base");
+
+	cout<<" check1: content bin[7]: "<<jtpuMC[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<jtpuMC[i][ir]->GetBinError(i)<<endl;;
+	//cout<<" relative Error: "<<(jtpuMC[i][ir]->GetBinError(i))/(jtpuMC[i][ir]->GetBinContent(7))<<endl;
+	
+	jtpuMC[i][ir]->Scale(1/(jtpuMC[i][ir]->Integral(1,c1nBins)));
+	
+	cout<<" check2(after histo scale): content bin[7]: "<<jtpuMC[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<jtpuMC[i][ir]->GetBinError(i)<<endl;;
+	//cout<<" relative Error: "<<(jtpuMC[i][ir]->GetBinError(i))/(jtpuMC[i][ir]->GetBinContent(7))<<endl;
+	
+	divideBinWidth(jtpuMC[i][ir]);
+	//rescaleBins(*jtpuMC[i][ir]);
+	
+	cout<<" check3(after bin scale): content bin[7]: "<<jtpuMC[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<jtpuMC[i][ir]->GetBinError(i)<<endl;;
+	//cout<<" relative Error: "<<(jtpuMC[i][ir]->GetBinError(i))/(jtpuMC[i][ir]->GetBinContent(7))<<endl;
+	
+	meanMC2[i][ir] = jtpuMC[i][ir]->GetMean();
+	meanErrMC2[i][ir] = jtpuMC[i][ir]->GetMeanError();
+	format1Dhisto(*jtpuMC[i][ir],-1,-1,color[ir],marker[0],color[ir],fill[ir],xTitle2,yTitle2);
+	//jtpuMC[i][ir]->SetMaximum(1);
+	//jtpuMC[i][ir]->SetMinimum(0.03);
+	
+	// ********************************************************************
+	// Get the data histograms 
+	// ********************************************************************
+
+	//jtpuData[i][ir] = new TH1D(Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),Form("sumPFch_%s_%s_data",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
+	jtpuData[i][ir] = new TH1D(Form("jtpu_%s_%s_data",centLabel[i],varLabel[ir]),Form("sumPF_%s_%s_data",centLabel[i],varLabel[ir]),c1nBins,c1xMin,c1xMax);
+	jtpuData[i][ir]->Sumw2();
+	akTreeData[ir]->Draw(Form("%s>>jtpu_%s_%s_data",var2,centLabel[i],varLabel[ir]),Form("%s && %s>%f",centCuts[i],var2,c1FixMinX),"goff");
+
+	jtpuData[i][ir]->Print("base");
+
+	cout<<" check1: content bin[7]: "<<jtpuData[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<jtpuData[i][ir]->GetBinError(i)<<endl;
+	//cout<<" relative Error: "<<(jtpuData[i][ir]->GetBinError(i))/(jtpuData[i][ir]->GetBinContent(7))<<endl;
+
+	jtpuData[i][ir]->Scale(1/(jtpuData[i][ir]->Integral(1,c1nBins)));
+	
+	cout<<" check2(after histo scale): content bin[7]: "<<jtpuData[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<jtpuData[i][ir]->GetBinError(i)<<endl;
+	//cout<<" relative Error: "<<(jtpuData[i][ir]->GetBinError(i))/(jtpuData[i][ir]->GetBinContent(7))<<endl;
+	
+	divideBinWidth(jtpuData[i][ir]);
+	//rescaleBins(*jtpuData[i][ir]);
+
+	cout<<" check3(after bin scale): content bin[7]: "<<jtpuData[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<jtpuData[i][ir]->GetBinError(i)<<endl;
+	//cout<<" relative Error: "<<(jtpuData[i][ir]->GetBinError(i))/(jtpuData[i][ir]->GetBinContent(7))<<endl;
+
+	meanData2[i][ir] = jtpuData[i][ir]->GetMean();
+	meanErrData2[i][ir] = jtpuData[i][ir]->GetMeanError();
+	format1Dhisto(*jtpuData[i][ir],-1,-1,color[ir],marker[1],color[ir],fill[ir],xTitle2,yTitle2);
+	//jtpuData[i][ir]->SetMaximum(1);
+	//jtpuData[i][ir]->SetMinimum(0.03);
+	
+	// get the fitting functions for MC: 
+
+	// TF1 *fMC=new TF1("fMC","[0]*exp(-0.5*((x-[1])/[2])^2)",c1FixMinX ,c1xMax);
+	// fMC->SetParameters(0.3,meanMC[i][ir],10);
+	// fMC->FixParameter(1,meanMC[i][ir]);
+	// jtpuMC[i][ir]->Fit("fMC","0");
+	// Double_t sigmafitMC=fMC->GetParameter(2);
+	// cout<<"sigmafitMC  "<<sigmafitMC<<endl;
+	// cout<<"i   "<<i<<" ir  "<<ir<<endl;
+	 
+	if (ir==0) jtpuMC[i][ir]->Draw("");
+	if (ir!=0) jtpuMC[i][ir]->Draw("same");	
+	//if (ir==0)
+	  //leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");	  
+	
+	leg2[i]->AddEntry(jtpuMC[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[0],meanMC2[i][ir],meanErrMC2[i][ir]),"lp");
+	leg2[i]->Draw();	      
+	drawText(cent[i], 0.87, 0.95,20);
+	
+	// fitting for data
+	// TF1 *f1=new TF1("f1","gaus",4,150);
+	// TF1 *f1=new TF1("f1","[0]*exp(-0.5*((x-[1])/[2])^2)",4,150);
+	// f1->SetParameters(0.3,meanData[i][ir],10);
+	// f1->FixParameter(1,meanData[i][ir]);
+	   
+	// jtpuData[i][ir]->Fit("f1","0");
+	// Double_t sigmafit=f1->GetParameter(2);
+	// cout<<"sigma  "<<sigmafit<<endl;
+	// cout<<"i   "<<i<<" ir  "<<ir<<endl;
+	// sigmaarray[i][ir]=sigmafit;
+	// sigmaarrayerr[i][ir]=f1->GetParError(2);
+	// cout<<"test "<<sigmaarray[i][ir]<<endl;
+	
+
+	jtpuData[i][ir]->Draw("same");
+	
+	//TF1 *f2=jtpuData[i][ir]->GetFunction("f1");
+
+	//f2->Draw("same");
+	
+	leg2[i]->AddEntry(jtpuData[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[1],meanData2[i][ir],meanErrData2[i][ir]),"lp");
+	leg2[i]->Draw();	      
+	//drawText(cent[i], 0.83, 0.23);
+	 
+
+	/*	 if (ir==0) ranConeMC[i][ir]->Draw("same");
+		 if (ir!=0) ranConeMC[i][ir]->Draw("same");	
+		 if (ir==0){      leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");}
+       
+		 leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[0],meanMC[i][ir],meanErrMC[i][ir]),"lp");
+		 leg1[i]->Draw();	      
+		 drawText(cent[i], 0.23, 0.83);
+	*/
+      
+      }
+    } 
+
+    c2MC->cd(1);
+    putCMSSim(0.1,0.95);
+
+    if (doPrint) c2MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_jtpu_n3_eta_p3_%d.pdf",date.GetDate()));
+    if (doPrint) c2MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_jtpu_n3_eta_p3_%d.root",date.GetDate())); 
+
+
 
     //for (int i=0; i<nCent; i++){
 
@@ -630,6 +804,8 @@ void LoopCorrRandomCone_MacroV6(){
    
 
   }
+
+  
   //return;
  
 }

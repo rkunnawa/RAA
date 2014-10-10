@@ -72,28 +72,28 @@ void RAA_duplicateEventsCheck( int startfile = 0, int endfile = 1, int radius = 
   // done! 
 
   std::string infile;
-  infile = "jetRAA_PbPb_forest_filelist.txt";
+  //infile = "jetRAA_PbPb_forest_filelist.txt";
   
-  std::ifstream instr(infile.c_str(),std::ifstream::in);
+  //std::ifstream instr(infile.c_str(),std::ifstream::in);
   std::string filename;
   //int nFiles = 11;
   
   //just to read the files till the start number
-  cout<<"reading from "<<startfile<<" to "<<endfile<<endl;
+  //cout<<"reading from "<<startfile<<" to "<<endfile<<endl;
   
-  for(int ifile = 0;ifile<startfile;ifile++){
-    instr>>filename;
-  }
+  //for(int ifile = 0;ifile<startfile;ifile++){
+  //  instr>>filename;
+  //}
   
-  for(int ifile = startfile;ifile<endfile;ifile++){
-    instr>>filename;
-    cout<<"File: "<<filename<<endl;  
-  }  
+  //for(int ifile = startfile;ifile<endfile;ifile++){
+  //  instr>>filename;
+  //  cout<<"File: "<<filename<<endl;  
+  //}  
   
+  filename = "/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root";
+
   DuplicateEvents dupEvt(filename.c_str());
   dupEvt.MakeList();
-
- 
 
   //i dont need any of the following stuff since the DuplicateEvents class will do all that for me.  
   // on second thought looks like i need that. :) 
