@@ -4,7 +4,7 @@ counter=0
 incrementer=1
 
 destination=/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/
-filelist=jetRAA_PbPb_forest_filelist.txt
+filelist=jetRAA_PbPb_filelist.txt
 #filelist2=jet80_filelist.txt
 #filelist=wxie_MinBiasUPC_all.txt
 #filelist=pPbMCBForestList.txt

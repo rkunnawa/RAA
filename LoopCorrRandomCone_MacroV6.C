@@ -353,9 +353,13 @@ void LoopCorrRandomCone_MacroV6(){
   //const char* cent[] =      {  "0-5%"   ,     "5-10%"      ,    "10-30%"       ,   "30-50%"        ,    "50-70%"       ,     "70-90%"     };
   //const char* centCuts[] =  {  "bin<=5" , "bin>5 && bin<=15" , "bin>15 && bin<=55" , "bin>55 && bin<=95", "bin>95 && bin<=135","bin>135 && bin<=175" };
 
-  const char* centLabel[] = {"7090","5070","3050","1030","0510","0005"};
-  const char* cent[] =      {"70-90%","50-70%","30-50%","10-30%","5-10%","0-5%"};
-  const char* centCuts[] =  {  "bin>135 && bin<=175" , "bin>95 && bin<=135" , "bin>55 && bin<=95" , "bin>15 && bin<=55", "bin>5 && bin<=15","bin<=5" };
+  //const char* centLabel[] = {"7090","5070","3050","1030","0510","0005"};
+  //const char* cent[] =      {"70-90%","50-70%","30-50%","10-30%","5-10%","0-5%"};
+  //const char* centCuts[] =  {  "bin>140 && bin<=180" , "bin>100 && bin<=140" , "bin>60 && bin<=100" , "bin>20 && bin<=60", "bin>10 && bin<=20","bin<=10" };
+
+  const char *centLabel[] = {"7090","5070","4050","3040","2030","1520","1015","0610","0406","0204","0102","0001"};
+  const char *cent[] = {"70-90%","50-70%","40-50%","30-40%","20-30%","15-20%","10-15%","6-10%","4-6%","2-4%","1-2%","0-1%"};
+  const char *centCuts[] = {"bin>140 && bin<=180","bin>100 && bin<=140","bin>80 && bin<=100","bin>60 && bin<=80","bin>40 && bin<=60", "bin>30 && bin<=40","bin>20 && bin<=30", "bin>12 && bin>=20","bin>8 && bin<=12","bin>4 && bin<=8","bin>2 && bin<=4","bin>0 && bin<=2"};
  
   //we might want to look at smaller centrality bins as well 
 
@@ -369,7 +373,7 @@ void LoopCorrRandomCone_MacroV6(){
   //const char* centCuts[] =  {  "bin>28&&bin<=30" , "bin>30 &&bin<=32" , "bin>32 &&bin<=34" , "bin>34 &&bin<=36", "bin>36 &&bin<=38","bin>38&&bin<=40" };
 
 
-  const int nCent = 6;
+  const int nCent = 12;
  
   cout<<"going to draw specific histograms"<<endl;
   /*
@@ -508,7 +512,7 @@ void LoopCorrRandomCone_MacroV6(){
   
     //double xAxisBins[21] = {0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1.0,1.4,1.8,2.2,2.6, 3.0,3.4,3.8,4.2,4.6,5.0};
     TCanvas *c1MC = new TCanvas("c1MC","c1MC",1400,1200);
-    makeMultiPanelCanvas(c1MC,3,2,0.0,0.0,0.2,0.15,0.07);
+    makeMultiPanelCanvas(c1MC,4,3,0.0,0.0,0.2,0.15,0.07);
     //Loop over the 6 centrality sections
     for (int i=0; i<nCent; i++){
       cout<<"centrality = "<<i<<endl;
@@ -600,9 +604,9 @@ void LoopCorrRandomCone_MacroV6(){
 	//if (ir==0)
 	  //leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");	  
 	
-	leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[0],meanMC[i][ir],meanErrMC[i][ir]),"lp");
+	leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [%5.2f #pm %5.2f]",varLabel[ir],hType[0],meanMC[i][ir],meanErrMC[i][ir]),"lp");
 	leg1[i]->Draw();	      
-	drawText(cent[i], 0.87, 0.95,20);
+	drawText(cent[i], 0.83, 0.95,20);
 	
 	// fitting for data
 	// TF1 *f1=new TF1("f1","gaus",4,150);
@@ -625,7 +629,7 @@ void LoopCorrRandomCone_MacroV6(){
 
 	//f2->Draw("same");
 	
-	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[1],meanData[i][ir],meanErrData[i][ir]),"lp");
+	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s [%5.2f #pm %5.2f ]",hType[1],meanData[i][ir],meanErrData[i][ir]),"lp");
 	leg1[i]->Draw();	      
 	//drawText(cent[i], 0.83, 0.23);
 	 
@@ -651,7 +655,7 @@ void LoopCorrRandomCone_MacroV6(){
 
     // make the jtpu plot from MB hydjet and data. 
     TCanvas *c2MC = new TCanvas("c2MC","c2MC",1400,1200);
-    makeMultiPanelCanvas(c2MC,3,2,0.0,0.0,0.2,0.15,0.07);
+    makeMultiPanelCanvas(c2MC,4,3,0.0,0.0,0.2,0.15,0.07);
     //Loop over the 6 centrality sections
     for (int i=0; i<nCent; i++){
       cout<<"centrality = "<<i<<endl;
@@ -743,7 +747,7 @@ void LoopCorrRandomCone_MacroV6(){
 	//if (ir==0)
 	  //leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");	  
 	
-	leg2[i]->AddEntry(jtpuMC[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[0],meanMC2[i][ir],meanErrMC2[i][ir]),"lp");
+	leg2[i]->AddEntry(jtpuMC[i][ir],Form("%s %s [%5.2f #pm %5.2f]",varLabel[ir],hType[0],meanMC2[i][ir],meanErrMC2[i][ir]),"lp");
 	leg2[i]->Draw();	      
 	drawText(cent[i], 0.87, 0.95,20);
 	
@@ -768,7 +772,7 @@ void LoopCorrRandomCone_MacroV6(){
 
 	//f2->Draw("same");
 	
-	leg2[i]->AddEntry(jtpuData[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[1],meanData2[i][ir],meanErrData2[i][ir]),"lp");
+	leg2[i]->AddEntry(jtpuData[i][ir],Form("%s %s [%5.2f #pm %5.2f]",hType[1],meanData2[i][ir],meanErrData2[i][ir]),"lp");
 	leg2[i]->Draw();	      
 	//drawText(cent[i], 0.83, 0.23);
 	 

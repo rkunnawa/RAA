@@ -38,8 +38,10 @@ public:
     evts.clear();
     occurence.clear();
     int run,evt;
+    //float vz;
     t->SetBranchAddress("run",&run);
     t->SetBranchAddress("evt",&evt);
+    //t->SetBranchAddress("vz",&vz);
     for(int i = 0;i<t->GetEntries();i++){
       t->GetEntry(i);
       if(i%100000==0) cout<<i<<" / "<<t->GetEntries()<<" run: "<<run<<" evt: "<<evt<<endl;
@@ -67,34 +69,34 @@ void RAA_duplicateEventsCheck( int startfile = 0, int endfile = 1, int radius = 
   //TH1::SetDefaultSumw2();
   TStopwatch timer;
   timer.Start();
-
+  
   // Change to macro to run on condor since its taking a freaking long time. 
   // done! 
-
-  std::string infile;
-  //infile = "jetRAA_PbPb_forest_filelist.txt";
   
-  //std::ifstream instr(infile.c_str(),std::ifstream::in);
+  std::string infile;
+  infile = "jetRAA_PbPb_filelist.txt";
+  
+  std::ifstream instr(infile.c_str(),std::ifstream::in);
   std::string filename;
   //int nFiles = 11;
   
   //just to read the files till the start number
-  //cout<<"reading from "<<startfile<<" to "<<endfile<<endl;
+  cout<<"reading from "<<startfile<<" to "<<endfile<<endl;
   
-  //for(int ifile = 0;ifile<startfile;ifile++){
-  //  instr>>filename;
-  //}
+  for(int ifile = 0;ifile<startfile;ifile++){
+    instr>>filename;
+  }
   
-  //for(int ifile = startfile;ifile<endfile;ifile++){
-  //  instr>>filename;
-  //  cout<<"File: "<<filename<<endl;  
-  //}  
+  for(int ifile = startfile;ifile<endfile;ifile++){
+    instr>>filename;
+    cout<<"File: "<<filename<<endl;  
+  }  
   
-  filename = "/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root";
-
+  //filename = "/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root";
+  
   DuplicateEvents dupEvt(filename.c_str());
   dupEvt.MakeList();
-
+  
   //i dont need any of the following stuff since the DuplicateEvents class will do all that for me.  
   // on second thought looks like i need that. :) 
   
@@ -105,12 +107,12 @@ void RAA_duplicateEventsCheck( int startfile = 0, int endfile = 1, int radius = 
   TTree *hltpbpb1 = (TTree*)fin->Get("hltanalysis/HltTree");
   TTree *skmpbpb1 = (TTree*)fin->Get("skimanalysis/HltTree");
   TTree *trgpbpb1 = (TTree*)fin->Get("hltobject/jetObjTree");
-
+  
   jetpbpb1->AddFriend(evtpbpb1);
   jetpbpb1->AddFriend(hltpbpb1);
   jetpbpb1->AddFriend(skmpbpb1);
   jetpbpb1->AddFriend(trgpbpb1);
-
+  
   //file 1: 
   // jet tree
   int nrefe_1;
@@ -230,14 +232,14 @@ void RAA_duplicateEventsCheck( int startfile = 0, int endfile = 1, int radius = 
     jetpbpb1->GetEntry(ievt);
 
     if(dupEvt.occurence[ievt] >= 2) {
-
+      
       outfile<<ievt<<" "<<run_1<<" "<<lumi_1<<" "<<evt_1<<" "<<endl;
-
+      
     }
     
   }
-
+  
   outfile.close();
-
-
+  
+  
 }
