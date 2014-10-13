@@ -357,9 +357,22 @@ void LoopCorrRandomCone_MacroV6(){
   //const char* cent[] =      {"70-90%","50-70%","30-50%","10-30%","5-10%","0-5%"};
   //const char* centCuts[] =  {  "bin>140 && bin<=180" , "bin>100 && bin<=140" , "bin>60 && bin<=100" , "bin>20 && bin<=60", "bin>10 && bin<=20","bin<=10" };
 
-  const char *centLabel[] = {"7090","5070","4050","3040","2030","1520","1015","0610","0406","0204","0102","0001"};
-  const char *cent[] = {"70-90%","50-70%","40-50%","30-40%","20-30%","15-20%","10-15%","6-10%","4-6%","2-4%","1-2%","0-1%"};
-  const char *centCuts[] = {"bin>140 && bin<=180","bin>100 && bin<=140","bin>80 && bin<=100","bin>60 && bin<=80","bin>40 && bin<=60", "bin>30 && bin<=40","bin>20 && bin<=30", "bin>12 && bin>=20","bin>8 && bin<=12","bin>4 && bin<=8","bin>2 && bin<=4","bin>0 && bin<=2"};
+  const char *centLabel[] = {
+    "7090","5070","4050","3040",
+    "2030","1520","1015","0610",
+    "0406","0204","0102","0001"
+  };
+  
+  const char *cent[] = {
+    "70-90%","50-70%","40-50%","30-40%",
+    "20-30%","15-20%","10-15%","6-10%",
+    "4-6%","2-4%","1-2%","0-1%"};
+  
+  const char *centCuts[] = {
+    "bin>140 && bin<=180","bin>100 && bin<=140","bin>80 && bin<=100","bin>60 && bin<=80",
+    "bin>40 && bin<=60", "bin>30 && bin<=40","bin>20 && bin<=30", "bin>12 && bin>=20",
+    "bin>8 && bin<=12","bin>4 && bin<=8","bin>2 && bin<=4","bin>0 && bin<=2"
+  };
  
   //we might want to look at smaller centrality bins as well 
 
