@@ -319,9 +319,9 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_HYDJET.root"));
     // TFile *ak5MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_HYDJET.root"));
 
-    TFile *ak3MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_MC_akVs3PF_20141009.root"));
-    TFile *ak4MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_MC_akVs4PF_20141009.root"));
-    TFile *ak5MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_MC_akVs5PF_20141009.root"));
+    TFile *ak3MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs3PF_20141008.root"));
+    TFile *ak4MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs4PF_20141008.root"));
+    TFile *ak5MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs5PF_20141008.root"));
     
     akTreeMC[0]   = (TTree*)ak3MCFile->Get("nt");
     akTreeMC[1]   = (TTree*)ak4MCFile->Get("nt");
@@ -333,9 +333,9 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_DATA.root"));
     // TFile *ak5dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_DATA.root"));
 
-    TFile *ak3dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_data_akVs3PF_20141009.root"));
-    TFile *ak4dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_data_akVs4PF_20141009.root"));
-    TFile *ak5dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_data_akVs5PF_20141009.root"));
+    TFile *ak3dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs3PF_20141008.root"));
+    TFile *ak4dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs4PF_20141008.root"));
+    TFile *ak5dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs5PF_20141008.root"));
 
     akTreeData[0]   = (TTree*)ak3dataFile->Get("nt");
     akTreeData[1]   = (TTree*)ak4dataFile->Get("nt");
@@ -370,7 +370,7 @@ void LoopCorrRandomCone_MacroV6(){
   
   const char *centCuts[] = {
     "bin>140 && bin<=180","bin>100 && bin<=140","bin>80 && bin<=100","bin>60 && bin<=80",
-    "bin>40 && bin<=60", "bin>30 && bin<=40","bin>20 && bin<=30", "bin>12 && bin>=20",
+    "bin>40 && bin<=60", "bin>30 && bin<=40","bin>20 && bin<=30", "bin>12 && bin<=20",
     "bin>8 && bin<=12","bin>4 && bin<=8","bin>2 && bin<=4","bin>0 && bin<=2"
   };
  
@@ -514,7 +514,7 @@ void LoopCorrRandomCone_MacroV6(){
     double c1FixMinX = 0;
 
     const char* xTitle2 = "Subtracted p_{T} from Jets";
-    const char* yTitle2 = "normalized counts";
+    const char* yTitle2 = "counts";
     //double Ymax = 10;
     //double Ymin = 0.01;
     //int c1nBins = 200;
@@ -635,11 +635,11 @@ void LoopCorrRandomCone_MacroV6(){
 	// sigmaarrayerr[i][ir]=f1->GetParError(2);
 	// cout<<"test "<<sigmaarray[i][ir]<<endl;
 	
-
+	
 	ranConeData[i][ir]->Draw("same");
 	
 	//TF1 *f2=ranConeData[i][ir]->GetFunction("f1");
-
+	
 	//f2->Draw("same");
 	
 	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s [%5.2f #pm %5.2f ]",hType[1],meanData[i][ir],meanErrData[i][ir]),"lp");
@@ -661,9 +661,10 @@ void LoopCorrRandomCone_MacroV6(){
 
     c1MC->cd(1);
     putCMSSim(0.1,0.95);
+    drawText("-2<#eta<2",0.5,0.5,20);
 
-    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_n3_eta_p3_%d.pdf",date.GetDate()));
-    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_n3_eta_p3_%d.root",date.GetDate())); 
+    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_12cent_n2_eta_p2_%d.pdf",date.GetDate()));
+    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_12cent_n2_eta_p2_%d.root",date.GetDate())); 
 
 
     // make the jtpu plot from MB hydjet and data. 
@@ -728,7 +729,7 @@ void LoopCorrRandomCone_MacroV6(){
 	cout<<" check1: content bin[7]: "<<jtpuData[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<jtpuData[i][ir]->GetBinError(i)<<endl;
 	//cout<<" relative Error: "<<(jtpuData[i][ir]->GetBinError(i))/(jtpuData[i][ir]->GetBinContent(7))<<endl;
 
-	jtpuData[i][ir]->Scale(1/(jtpuData[i][ir]->Integral(1,c1nBins)));
+	//jtpuData[i][ir]->Scale(1/(jtpuData[i][ir]->Integral(1,c1nBins)));
 	
 	cout<<" check2(after histo scale): content bin[7]: "<<jtpuData[i][ir]->GetBinContent(7)<<"   err bin[7]: "<<jtpuData[i][ir]->GetBinError(i)<<endl;
 	//cout<<" relative Error: "<<(jtpuData[i][ir]->GetBinError(i))/(jtpuData[i][ir]->GetBinContent(7))<<endl;
@@ -805,8 +806,8 @@ void LoopCorrRandomCone_MacroV6(){
     c2MC->cd(1);
     putCMSSim(0.1,0.95);
 
-    if (doPrint) c2MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_jtpu_n3_eta_p3_%d.pdf",date.GetDate()));
-    if (doPrint) c2MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_jtpu_n3_eta_p3_%d.root",date.GetDate())); 
+    if (doPrint) c2MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_jtpu_12cent_n2_eta_p2_%d.pdf",date.GetDate()));
+    if (doPrint) c2MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_jtpu_12cent_n2_eta_p2_%d.root",date.GetDate())); 
 
 
 
