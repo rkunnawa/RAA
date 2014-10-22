@@ -19,6 +19,8 @@
 // And it looks like we have to separate the pp side from this macro due to condor job submission - Done
 // July 25 - add in the capability to read different radii and eta widths in the same macro. 
 
+// Oct 21 - Now that we have the new data forest files which are with made with the triggers: jet55 or jet65 or jet80 we only need one file loop.
+
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -53,11 +55,13 @@
 //static const int nbins_pt = 29;
 //static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
 
-//only for the jet80 merged file
-static const int job_no = 11;
-static const double boundaries_loopno_job[job_no+1] = {0,100000,200000,300000,400000,50000,600000,700000,800000,900000,1000000,1152308};
+//only for the jet80 merged file - not necessary now 
+//static const int job_no = 11;
+//static const double boundaries_loopno_job[job_no+1] = {0,100000,200000,300000,400000,50000,600000,700000,800000,900000,1000000,1152308};
 
-static const double boundaries_fileno_job[job_no+1] = {0, 413, 826, 1239, 1652, 2065, 2478, 2891, 3304, 3717, 4130, 4542};
+//static const double boundaries_fileno_job[job_no+1] = {0, 413, 826, 1239, 1652, 2065, 2478, 2891, 3304, 3717, 4130, 4542};
+
+
 
 static const int nbins_pt = 39;
 static const double boundaries_pt[nbins_pt+1] = {
@@ -72,40 +76,54 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 
-static const int nbins_eta = 10;
+/*
+static const int nbins_eta = 15;
 static const double boundaries_eta[nbins_eta][2] = {
-  {-1.0,+1.0},
-  {-2.0,+2.0},
-  {-2.5,-2.0},
-  {-2.0,-1.5},
-  {-1.5,-1.0},
-  {-1.0,-0.5},
-  {-0.5,+0.5},
-  {+0.5,+1.0},
-  {+1.0,+1.5},
-  {+1.5,+2.0}
+  {-1.0,+1.0}, {-2.0,+2.0}, {-3.0,+3.0},
+  {-3.0,-2.5}, {-2.5,-2.0}, {-2.0,-1.5}, 
+  {-1.5,-1.0}, {-1.0,-0.5}, {-0.5,0}, {0,+0.5}, 
+  {+0.5,+1.0}, {+1.0,+1.5}, {+1.5,+2.0}, 
+  {+2.0,+2.5}, {+2.5,+3.0}
 };
 
 static const double delta_eta[nbins_eta] = {
-  2.0, 4.0, 
-  0.5, 0.5, 
-  0.5, 0.5, 
-  1.0, 0.5,
+  2.0, 4.0, 6.0, 
+  0.5, 0.5, 0.5, 
+  0.5, 0.5, 0.5, 0.5, 
+  0.5, 0.5, 0.5, 
   0.5, 0.5
 };
 
 static const char etaWidth [nbins_eta][256] = {
-  "n10_eta_p10","n20_eta_p20","n25_eta_n20","n20_eta_n15",
-  "n15_eta_n10","n10_eta_n05","n05_eta_p05","p05_eta_p10",
-  "p10_eta_p15","p15_eta_p20"
+  "n10_eta_p10","n20_eta_p20","n30_eta_p30",
+  "n30_eta_n25","n25_eta_n20","n20_eta_n15",
+  "n15_eta_n10","n10_eta_n05","n05_eta_0","0_eta_p05",
+  "p05_eta_p10","p10_eta_p15","p15_eta_p20",
+  "p20_eta_p25","p25_eta_p30"
+};
+*/
+static const int nbins_eta = 1;
+static const double boundaries_eta[nbins_eta][2] = {
+  {-2.0,+2.0}
+};
+
+static const double delta_eta[nbins_eta] = {
+  4.0
+};
+
+static const char etaWidth [nbins_eta][256] = {
+  "n20_eta_p20"
 };
 
 static const int nbins_cent = 6;
 static Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 5 to get your actual centrality
 static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8 ,362.24}; //last one is for 0-200 bin. 
 
-static const int no_radius = 3;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3,4,5};
+//static const int no_radius = 3;//necessary for the RAA analysis  
+//static const int list_radius[no_radius] = {2,3,4};
+
+static const int no_radius = 1;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {3};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -196,17 +214,17 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", char *jet_type = "Calo"){
+void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", char *jet_type = "PF"){
 
   TH1::SetDefaultSumw2();
-  gStyle->SetOptStat(0);
+  //gStyle->SetOptStat(0);
 
   TStopwatch timer;
   timer.Start();
  
   cout<<"Running for Algo = "<<algo<<" "<<jet_type<<endl;
   
-  bool printDebug = false;
+  bool printDebug = true;
 
   // number convension:
   // 0 - MB
@@ -217,16 +235,17 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 
   // Now im going to change the file reading here for PbPb to look at the unmerged files through condor. 
   std::string infile1;
-  infile1 = "jet55or65_filelist.txt";
+  //infile1 = "jet55or65_filelist.txt";
+  infile1 = "jetRAA_PbPb_data_forest.txt";
   
-  std::string infile2;
-  infile2 = "jet80_filelist.txt";
+  //std::string infile2;
+  //infile2 = "jet80_filelist.txt";
 
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
 
-  std::ifstream instr2(infile2.c_str(),std::ifstream::in);
-  std::string filename2;
+  //std::ifstream instr2(infile2.c_str(),std::ifstream::in);
+  //std::string filename2;
 
   cout<<"reading from "<<startfile<<" to "<<endfile<<endl;
   
@@ -234,14 +253,14 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     instr1>>filename1;
   }
 
-  for(int ifile = 0;ifile<boundaries_fileno_job[startfile];ifile++){
-    instr2>>filename2;
-  }
+  //for(int ifile = 0;ifile<boundaries_fileno_job[startfile];ifile++){
+  //  instr2>>filename2;
+  //}
  
   const int N = 5;
     
   TChain *jetpbpb1[N][no_radius];
-  TChain *jetpbpb2[N][no_radius];
+  //TChain *jetpbpb2[N][no_radius];
   
   string dir[N][no_radius];
   
@@ -288,36 +307,36 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 
   
 
-  for(int k = 0;k<no_radius;k++){
-    for(int t = 0;t<N;t++){
-      jetpbpb2[t][k] = new TChain(string(dir[t][k]+"/"+trees[t]).data());
-    }//tree loop ends
-  }// radius loop ends
+  // for(int k = 0;k<no_radius;k++){
+  //   for(int t = 0;t<N;t++){
+  //     jetpbpb2[t][k] = new TChain(string(dir[t][k]+"/"+trees[t]).data());
+  //   }//tree loop ends
+  // }// radius loop ends
 
-  for(int ifile = boundaries_fileno_job[startfile];ifile<boundaries_fileno_job[endfile];ifile++){
-  //for(int ifile = 0;ifile<10;ifile++){
+  // for(int ifile = boundaries_fileno_job[startfile];ifile<boundaries_fileno_job[endfile];ifile++){
+  // //for(int ifile = 0;ifile<10;ifile++){
     
-    instr2>>filename2;
-    if(printDebug)cout<<"File: "<<filename2<<endl;
+  //   instr2>>filename2;
+  //   if(printDebug)cout<<"File: "<<filename2<<endl;
 
-    for(int k = 0;k<no_radius;k++){
+  //   for(int k = 0;k<no_radius;k++){
 
-      for(int t = 0;t<N;t++){
+  //     for(int t = 0;t<N;t++){
 
-      //jetpbpb2[i] = new TChain(string(dir[i]+"/"+trees[i]).data()) ;
-      jetpbpb2[t][k]->Add(filename2.c_str());
-      //cout << "Tree loaded  " << string(dir[i]+"/"+trees[i]).data() << endl;
-      //cout << "Entries : " << jetpbpb2[i]->GetEntries() << endl;
+  //     //jetpbpb2[i] = new TChain(string(dir[i]+"/"+trees[i]).data()) ;
+  //     jetpbpb2[t][k]->Add(filename2.c_str());
+  //     //cout << "Tree loaded  " << string(dir[i]+"/"+trees[i]).data() << endl;
+  //     //cout << "Entries : " << jetpbpb2[i]->GetEntries() << endl;
 
-      }//tree loop ends
-    }// radius loop ends
-    //jetpbpb1->Add(filename.c_str());
-    //hltpbpb1->Add(filename.c_str());
-    //skmpbpb1->Add(filename.c_str());
-    //hltobjpbpb1->Add(filename.c_str());
-    //evtpbpb1->Add(filename.c_str());
-    //cout<<"Entries = "<<jetpbpb1->GetEntries()<<endl;
-  }// file loop ends
+  //     }//tree loop ends
+  //   }// radius loop ends
+  //   //jetpbpb1->Add(filename.c_str());
+  //   //hltpbpb1->Add(filename.c_str());
+  //   //skmpbpb1->Add(filename.c_str());
+  //   //hltobjpbpb1->Add(filename.c_str());
+  //   //evtpbpb1->Add(filename.c_str());
+  //   //cout<<"Entries = "<<jetpbpb1->GetEntries()<<endl;
+  // }// file loop ends
 
   for(int k = 0;k<no_radius;k++){
     jetpbpb1[2][k]->AddFriend(jetpbpb1[0][k]);
@@ -325,17 +344,17 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     jetpbpb1[2][k]->AddFriend(jetpbpb1[3][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[4][k]);
 
-    jetpbpb2[2][k]->AddFriend(jetpbpb2[0][k]);
-    jetpbpb2[2][k]->AddFriend(jetpbpb2[1][k]);
-    jetpbpb2[2][k]->AddFriend(jetpbpb2[3][k]);
-    jetpbpb2[2][k]->AddFriend(jetpbpb2[4][k]);
+    // jetpbpb2[2][k]->AddFriend(jetpbpb2[0][k]);
+    // jetpbpb2[2][k]->AddFriend(jetpbpb2[1][k]);
+    // jetpbpb2[2][k]->AddFriend(jetpbpb2[3][k]);
+    // jetpbpb2[2][k]->AddFriend(jetpbpb2[4][k]);
 
   }// radius loop ends
  
   // Ok this should now work. 
 
-  if(printDebug)cout<<"total no of entries in the Jet55or65 tree = "<<jetpbpb1[2][0]->GetEntries()<<endl;
-  if(printDebug)cout<<"total no of entries in the Jet80 Tree     = "<<jetpbpb2[2][0]->GetEntries()<<endl;
+  cout<<"total no of entries in the combined forest files = "<<jetpbpb1[2][0]->GetEntries()<<endl;
+  //  if(printDebug)cout<<"total no of entries in the Jet80 Tree     = "<<jetpbpb2[2][0]->GetEntries()<<endl;
 
   //these were for doing it from the forests directly without the proper JEC's 
   //add the centrality cuts: 
@@ -730,61 +749,61 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   float trgObj_phi_1;
   float trgObj_mass_1;
   
-  //file 2: 
-  // jet tree
-  int nrefe_2;
-  float pt_2[1000];
-  //float old_pt3[1000];
-  float raw_2[1000];
-  float eta_2[1000];
-  float eta_2_CM[1000];
-  float phi_2[1000];
-  float chMax_2[1000];
-  float trkMax_2[1000];
-  float chSum_2[1000];
-  float phSum_2[1000];
-  float neSum_2[1000];
-  float trkSum_2[1000];
-  float phMax_2[1000];
-  float neMax_2[1000];
+  // //file 2: 
+  // // jet tree
+  // int nrefe_2;
+  // float pt_2[1000];
+  // //float old_pt3[1000];
+  // float raw_2[1000];
+  // float eta_2[1000];
+  // float eta_2_CM[1000];
+  // float phi_2[1000];
+  // float chMax_2[1000];
+  // float trkMax_2[1000];
+  // float chSum_2[1000];
+  // float phSum_2[1000];
+  // float neSum_2[1000];
+  // float trkSum_2[1000];
+  // float phMax_2[1000];
+  // float neMax_2[1000];
 
-  // event tree
-  int evt_2;
-  int run_2;
-  int lumi_2;
-  int hiBin_2;
-  float vx_2;
-  float vy_2;
-  float vz_2;
-  int hiNtracks_2;
-  float hiHFminus_2;
-  float hiHFplus_2;
-  float hiHFplusEta4_2;
-  float hiHFminusEta4_2;
-  int pcollisionEventSelection_2;
-  int pHBHENoiseFilter_2;
-  int pprimaryvertexFilter_2;
-  int pVertexFilterCutGplus_2;
+  // // event tree
+  // int evt_2;
+  // int run_2;
+  // int lumi_2;
+  // int hiBin_2;
+  // float vx_2;
+  // float vy_2;
+  // float vz_2;
+  // int hiNtracks_2;
+  // float hiHFminus_2;
+  // float hiHFplus_2;
+  // float hiHFplusEta4_2;
+  // float hiHFminusEta4_2;
+  // int pcollisionEventSelection_2;
+  // int pHBHENoiseFilter_2;
+  // int pprimaryvertexFilter_2;
+  // int pVertexFilterCutGplus_2;
 
-  // trigger tree
-  int L1_MB_2;
-  int L1_MB_p_2;
-  int jetMB_2;
-  int jet55_2;
-  int jet65_2;
-  int jet80_2;
-  int jetMB_p_2;
-  int jet55_p_2;
-  int jet65_p_2;
-  int jet80_p_2;
+  // // trigger tree
+  // int L1_MB_2;
+  // int L1_MB_p_2;
+  // int jetMB_2;
+  // int jet55_2;
+  // int jet65_2;
+  // int jet80_2;
+  // int jetMB_p_2;
+  // int jet55_p_2;
+  // int jet65_p_2;
+  // int jet80_p_2;
 
 
-  // trigger object tree - this contains the maximum value of the particular trigger object. 
-  float trgObj_id_2;
-  float trgObj_pt_2;
-  float trgObj_eta_2;
-  float trgObj_phi_2;
-  float trgObj_mass_2;
+  // // trigger object tree - this contains the maximum value of the particular trigger object. 
+  // float trgObj_id_2;
+  // float trgObj_pt_2;
+  // float trgObj_eta_2;
+  // float trgObj_phi_2;
+  // float trgObj_mass_2;
   
   
 //   //set the branch addresses:  - one of the most boring parts of the code: 
@@ -897,54 +916,54 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     jetpbpb1[2][k]->SetBranchAddress("phi",&trgObj_phi_1);
     jetpbpb1[2][k]->SetBranchAddress("mass",&trgObj_mass_1);
 
-    //set the branch addresses:  - one of the most boring parts of the code: 
-    jetpbpb2[2][k]->SetBranchAddress("evt",&evt_2);
-    jetpbpb2[2][k]->SetBranchAddress("run",&run_2);
-    jetpbpb2[2][k]->SetBranchAddress("lumi",&lumi_2);
-    jetpbpb2[2][k]->SetBranchAddress("hiBin",&hiBin_2);
-    jetpbpb2[2][k]->SetBranchAddress("vz",&vz_2);
-    jetpbpb2[2][k]->SetBranchAddress("vx",&vx_2);
-    jetpbpb2[2][k]->SetBranchAddress("vy",&vy_2);
-    jetpbpb2[2][k]->SetBranchAddress("hiNtracks",&hiNtracks_2);
-    jetpbpb2[2][k]->SetBranchAddress("hiHFminus",&hiHFminus_2);
-    jetpbpb2[2][k]->SetBranchAddress("hiHFplus",&hiHFplus_2);
-    jetpbpb2[2][k]->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4_2);
-    jetpbpb2[2][k]->SetBranchAddress("hiHFminusEta4",&hiHFminusEta4_2);
-    jetpbpb2[2][k]->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection_2);
-    jetpbpb2[2][k]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter_2);
-    //jetpbpb2[2][k]->SetBranchAddress("pprimaryvertexFilter",&pprimaryvertexFilter_2);
-    //jetpbpb2[2][k]->SetBranchAddress("pVertexFilterCutGplus",&pVertexFilterCutGplus_2);
+    // //set the branch addresses:  - one of the most boring parts of the code: 
+    // jetpbpb2[2][k]->SetBranchAddress("evt",&evt_2);
+    // jetpbpb2[2][k]->SetBranchAddress("run",&run_2);
+    // jetpbpb2[2][k]->SetBranchAddress("lumi",&lumi_2);
+    // jetpbpb2[2][k]->SetBranchAddress("hiBin",&hiBin_2);
+    // jetpbpb2[2][k]->SetBranchAddress("vz",&vz_2);
+    // jetpbpb2[2][k]->SetBranchAddress("vx",&vx_2);
+    // jetpbpb2[2][k]->SetBranchAddress("vy",&vy_2);
+    // jetpbpb2[2][k]->SetBranchAddress("hiNtracks",&hiNtracks_2);
+    // jetpbpb2[2][k]->SetBranchAddress("hiHFminus",&hiHFminus_2);
+    // jetpbpb2[2][k]->SetBranchAddress("hiHFplus",&hiHFplus_2);
+    // jetpbpb2[2][k]->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4_2);
+    // jetpbpb2[2][k]->SetBranchAddress("hiHFminusEta4",&hiHFminusEta4_2);
+    // jetpbpb2[2][k]->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection_2);
+    // jetpbpb2[2][k]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter_2);
+    // //jetpbpb2[2][k]->SetBranchAddress("pprimaryvertexFilter",&pprimaryvertexFilter_2);
+    // //jetpbpb2[2][k]->SetBranchAddress("pVertexFilterCutGplus",&pVertexFilterCutGplus_2);
   
-    jetpbpb2[2][k]->SetBranchAddress("nref",&nrefe_2);
-    jetpbpb2[2][k]->SetBranchAddress("jtpt",&pt_2);
-    jetpbpb2[2][k]->SetBranchAddress("jteta",&eta_2);
-    jetpbpb2[2][k]->SetBranchAddress("jtphi",&phi_2);
-    jetpbpb2[2][k]->SetBranchAddress("rawpt",&raw_2);
-    jetpbpb2[2][k]->SetBranchAddress("chargedMax",&chMax_2);
-    jetpbpb2[2][k]->SetBranchAddress("chargedSum",&chSum_2);
-    jetpbpb2[2][k]->SetBranchAddress("trackMax",&trkMax_2);
-    jetpbpb2[2][k]->SetBranchAddress("trackSum",&trkSum_2);
-    jetpbpb2[2][k]->SetBranchAddress("photonMax",&phMax_2);
-    jetpbpb2[2][k]->SetBranchAddress("photonSum",&phSum_2);
-    jetpbpb2[2][k]->SetBranchAddress("neutralMax",&neMax_2);
-    jetpbpb2[2][k]->SetBranchAddress("neutralSum",&neSum_2);
+    // jetpbpb2[2][k]->SetBranchAddress("nref",&nrefe_2);
+    // jetpbpb2[2][k]->SetBranchAddress("jtpt",&pt_2);
+    // jetpbpb2[2][k]->SetBranchAddress("jteta",&eta_2);
+    // jetpbpb2[2][k]->SetBranchAddress("jtphi",&phi_2);
+    // jetpbpb2[2][k]->SetBranchAddress("rawpt",&raw_2);
+    // jetpbpb2[2][k]->SetBranchAddress("chargedMax",&chMax_2);
+    // jetpbpb2[2][k]->SetBranchAddress("chargedSum",&chSum_2);
+    // jetpbpb2[2][k]->SetBranchAddress("trackMax",&trkMax_2);
+    // jetpbpb2[2][k]->SetBranchAddress("trackSum",&trkSum_2);
+    // jetpbpb2[2][k]->SetBranchAddress("photonMax",&phMax_2);
+    // jetpbpb2[2][k]->SetBranchAddress("photonSum",&phSum_2);
+    // jetpbpb2[2][k]->SetBranchAddress("neutralMax",&neMax_2);
+    // jetpbpb2[2][k]->SetBranchAddress("neutralSum",&neSum_2);
 
-    //jetpbpb2[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_2);
-    //jetpbpb2[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_2);
-    //jetpbpb2[2][k]->SetBranchAddress("L1_ZeroBias",&L1_MB_2);
-    //jetpbpb2[2][k]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_2);
-    jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet55_v1",&jet55_2);
-    jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_2);
-    jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet65_v1",&jet65_2);
-    jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_2);
-    jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet80_v1",&jet80_2);
-    jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_2);
+    // //jetpbpb2[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_2);
+    // //jetpbpb2[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_2);
+    // //jetpbpb2[2][k]->SetBranchAddress("L1_ZeroBias",&L1_MB_2);
+    // //jetpbpb2[2][k]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_2);
+    // jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet55_v1",&jet55_2);
+    // jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_2);
+    // jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet65_v1",&jet65_2);
+    // jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_2);
+    // jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet80_v1",&jet80_2);
+    // jetpbpb2[2][k]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_2);
 
-    jetpbpb2[2][k]->SetBranchAddress("id",&trgObj_id_2);
-    jetpbpb2[2][k]->SetBranchAddress("pt",&trgObj_pt_2);
-    jetpbpb2[2][k]->SetBranchAddress("eta",&trgObj_eta_2);
-    jetpbpb2[2][k]->SetBranchAddress("phi",&trgObj_phi_2);
-    jetpbpb2[2][k]->SetBranchAddress("mass",&trgObj_mass_2);
+    // jetpbpb2[2][k]->SetBranchAddress("id",&trgObj_id_2);
+    // jetpbpb2[2][k]->SetBranchAddress("pt",&trgObj_pt_2);
+    // jetpbpb2[2][k]->SetBranchAddress("eta",&trgObj_eta_2);
+    // jetpbpb2[2][k]->SetBranchAddress("phi",&trgObj_phi_2);
+    // jetpbpb2[2][k]->SetBranchAddress("mass",&trgObj_mass_2);
   
   }//radius loop
 
@@ -971,11 +990,19 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 
 
   //declare the histograms needed for the hpbpb_TrigObj80, hpbpb_TrigObj65, hpbpb_TrigObj55, hpbpb_TrigObjMB, hpbpb_TrigComb;
+
   TH1F *hpbpb_TrgObj80[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObj65[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObj55[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObjMB[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObjComb[no_radius][nbins_eta][nbins_cent+1];
+  //test histograms for the spectra alone 
+  TH1F *hpbpb_Jet80[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet65[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet55[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet65_noJet80[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet55_noJet65_80[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_JetComb_old[no_radius][nbins_eta][nbins_cent+1];
 
   for(int k = 0;k<no_radius;k++){
 
@@ -988,6 +1015,13 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
         hpbpb_TrgObj55[k][j][i] = new TH1F(Form("hpbpb_TrgObj55_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Trig Object > 55 and < 65 and Jet 55 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
         hpbpb_TrgObjMB[k][j][i] = new TH1F(Form("hpbpb_TrgObjMB_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from MB file R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
         hpbpb_TrgObjComb[k][j][i] = new TH1F(Form("hpbpb_TrgObjComb_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Trig Combined Spectra using 14007 method R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt,boundaries_pt);
+	
+	hpbpb_Jet80[k][j][i] = new TH1F(Form("hpbpb_Jet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Jet 80 trigger alone R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
+	hpbpb_Jet65[k][j][i] = new TH1F(Form("hpbpb_Jet65_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Jet 65 trigger alone R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
+	hpbpb_Jet55[k][j][i] = new TH1F(Form("hpbpb_Jet55_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Jet 55 trigger alone R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
+	hpbpb_Jet65_noJet80[k][j][i] = new TH1F(Form("hpbpb_Jet65_noJet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra for Jet65 and not Jet80 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
+	hpbpb_Jet55_noJet65_80[k][j][i] = new TH1F(Form("hpbpb_Jet55_noJet65_80_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra for Jet55 and not Jet65 and not Jet80 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
+	hpbpb_JetComb_old[k][j][i] = new TH1F(Form("hpbpb_JetComb_oldR%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Combined spectra using old method R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
 
       }//cent bin loop
 
@@ -997,12 +1031,20 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       hpbpb_TrgObjMB[k][j][nbins_cent] = new TH1F(Form("hpbpb_TrgObjMB_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra from MB file R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
       hpbpb_TrgObjComb[k][j][nbins_cent] = new TH1F(Form("hpbpb_TrgObjComb_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Trig combined spectra using 14007 method R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt,boundaries_pt);
     
+      hpbpb_Jet80[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet80 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
+      hpbpb_Jet65[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet65_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet65 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
+      hpbpb_Jet55[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet55_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet55 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
+
+      hpbpb_Jet65_noJet80[k][j][nbins_cent] = new TH1F(Form("hpbbp_Jet65_noJet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra for Jet65 and not Jet80 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
+      hpbpb_Jet55_noJet65_80[k][j][nbins_cent] = new TH1F(Form("hpbbp_Jet55_noJet65_80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra for Jet55 and not Jet65 and not Jet80 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
+      hpbpb_JetComb_old[k][j][nbins_cent] = new TH1F(Form("hpbpb_JetComb_old_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Combined spectra using the old method R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
+
     }//eta bin loop  
 
   }//radius loop
 
   //loop for the MB tree. 
-  //empty for now. 
+  //empty for now - need to fix that once we have the MB data.  
   
   
   
@@ -1011,13 +1053,13 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     if(printDebug)cout<<"Running data reading for R = "<<list_radius[k]<<endl;
     // loop for the jetpbpb1[2] tree 
     Long64_t nentries_jet55or65 = jetpbpb1[2][k]->GetEntries();
-    if(printDebug)cout<<"nentries_jet55or65 = "<<nentries_jet55or65<<endl;
+    if(printDebug)cout<<"nentries_jet55or65or80 = "<<nentries_jet55or65<<endl;
     if(printDebug)nentries_jet55or65 = 2;
 
     for(int jentry = 0;jentry<nentries_jet55or65;jentry++){
     
       jetpbpb1[2][k]->GetEntry(jentry);
-      if(printDebug && jentry%100000==0)cout<<"Jet 55or65 file"<<endl;
+      //if(printDebug && jentry%100000==0)cout<<"Jet 55or65 file"<<endl;
       if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<endl;
 
       // get the stuff required for the trigger turn on curve later. in a separate loop till i understand how to put this in here. 
@@ -1028,26 +1070,74 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       for(int j = 0;j<nbins_eta;j++){
 
         if(pHBHENoiseFilter_1 && pcollisionEventSelection_1 && (vz_1<15)) {
-    
+		
+	  if(printDebug)cout<<" trigger object pt =  "<<trgObj_pt_1<<endl;
+	  if(printDebug)cout<<" jet80 = "<<jet80_1<<endl;
+	  if(printDebug)cout<<" jet65 = "<<jet65_1<<endl;
+	  if(printDebug)cout<<" jet55 = "<<jet55_1<<endl;
+	  if(printDebug)cout<<" nrefe = "<<nrefe_1<<endl;
+
           for(int g = 0;g<nrefe_1;g++){
 
             if(/*put your favourite QA cut here*/chMax_1[g]/pt_1[g]>0.01){
 
               if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
 
-                if(jet55_1 && trgObj_pt_1>=55 && trgObj_pt_1<65){
+                if(jet55_1==1) {
+		  if(trgObj_pt_1>=55 && trgObj_pt_1<65){
+		    hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
+		    hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+		  }
+		  hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
+		  hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+		  if((jet65_1==0) && (jet80_1==0)){
+		    hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
+		    hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+		  }
+                }else if(jet65_1==1) {
+		  if(trgObj_pt_1>=65 && trgObj_pt_1<80){
+		    hpbpb_TrgObj65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
+		    hpbpb_TrgObj65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+		  }
+		  hpbpb_Jet65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
+		  hpbpb_Jet65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+		  if(jet80_1==0){
+		    hpbpb_Jet65_noJet80[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
+		    hpbpb_Jet65_noJet80[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+		  }
+                }else if(jet80_1==1) {
+		  if(trgObj_pt_1>=80){
+		    hpbpb_TrgObj80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
+		    hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
+		  }
+		  hpbpb_Jet80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
+		  hpbpb_Jet80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
+		}
 
-                  hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-                  hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+		// if(jet80_1) {
+		//   hpbpb_Jet80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
+		//   hpbpb_Jet80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
+		// }//Jet80 trigger selection
 
-                }//55 trg obj selection
+		// if(jet65_1) {
+		//   hpbpb_Jet65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
+		//   hpbpb_Jet65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+		// }//Jet65 trigger selection
 
-                if(jet65_1 && trgObj_pt_1>=65 && trgObj_pt_1<80){
+		// if(jet55_1) {
+		//   hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
+		//   hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+		// }//Jet55 trigger selection
 
-                  hpbpb_TrgObj65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
-                  hpbpb_TrgObj65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+		// if(jet65_1 && !jet80_1){
+		//   hpbpb_Jet65_noJet80[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
+		//   hpbpb_Jet65_noJet80[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+		// }//jet65 and not Jet80 selection 
 
-                }//65 trg Obj selection
+		// if(jet55_1 && !jet65_1 && !jet80_1){
+		//   hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
+		//   hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+		// }//jet55 and not Jet65 and not Jet80 selection 
 
               }//eta selection
 
@@ -1060,53 +1150,53 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       }//eta bin loop
     
     }//nentries_jet55or65 loop
-  
-    //loop for jetpbpb2[2] tree
-    Long64_t nentries_jet80or95 = jetpbpb2[2][k]->GetEntries();
-    if(printDebug)cout<<"nentries_jet80or95 = "<<nentries_jet80or95<<endl;
-    if(printDebug)nentries_jet80or95 = 2;
-
-    for(int jentry = 0;jentry<nentries_jet80or95;jentry++){
     
-      jetpbpb2[2][k]->GetEntry(jentry);
-      if(printDebug && jentry%100000==0)cout<<"Jet 80or95 file"<<endl;
-      if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_2<<", run = "<<run_2<<endl;
+    // //loop for jetpbpb2[2] tree
+  //   Long64_t nentries_jet80or95 = jetpbpb2[2][k]->GetEntries();
+  //   if(printDebug)cout<<"nentries_jet80or95 = "<<nentries_jet80or95<<endl;
+  //   if(printDebug)nentries_jet80or95 = 2;
 
-      //
-      int centBin = findBin(hiBin_2);//tells us the centrality of the event
-      if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
-
-      for(int j = 0;j<nbins_eta;j++){
-
-        if(pHBHENoiseFilter_2 && pcollisionEventSelection_2 && (vz_2<15)) {
+  //   for(int jentry = 0;jentry<nentries_jet80or95;jentry++){
     
-          for(int g = 0;g<nrefe_2;g++){
+  //     jetpbpb2[2][k]->GetEntry(jentry);
+  //     if(printDebug && jentry%100000==0)cout<<"Jet 80or95 file"<<endl;
+  //     if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_2<<", run = "<<run_2<<endl;
 
-            if(/*put your favourite QA cut here*/chMax_2[g]/pt_2[g]>0.01){
+  //     //
+  //     int centBin = findBin(hiBin_2);//tells us the centrality of the event
+  //     if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
 
-              if(eta_2[g]>=boundaries_eta[j][0] && eta_2[g]<boundaries_eta[j][1]){
+  //     for(int j = 0;j<nbins_eta;j++){
 
-                if(jet80_2 && trgObj_pt_2>=80){
-
-                  hpbpb_TrgObj80[k][j][centBin]->Fill(pt_2[g],jet80_p_2);
-                  hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_2[g],jet80_p_2);
-
-                }//80 trg obj selection
-
-              }//eta selection
-
-            }//qa cut selection
-
-          }//jet loop
-
-        }//event selection cuts
-
-      }//eta bin loop  
+  //       if(pHBHENoiseFilter_2 && pcollisionEventSelection_2 && (vz_2<15)) {
     
-    }//nentries_jet80or95 loop
-  
+  //         for(int g = 0;g<nrefe_2;g++){
+
+  //           if(/*put your favourite QA cut here*/chMax_2[g]/pt_2[g]>0.01){
+
+  //             if(eta_2[g]>=boundaries_eta[j][0] && eta_2[g]<boundaries_eta[j][1]){
+
+  //               if(jet80_2 && trgObj_pt_2>=80){
+
+  //                 hpbpb_TrgObj80[k][j][centBin]->Fill(pt_2[g],jet80_p_2);
+  //                 hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_2[g],jet80_p_2);
+
+  //               }//80 trg obj selection
+
+  //             }//eta selection
+
+  //           }//qa cut selection
+
+  //         }//jet loop
+
+  //       }//event selection cuts
+
+  //     }//eta bin loop  
+    
+  //   }//nentries_jet80or95 loop
+    
   }//radius loop. 
-
+  
   TDatime date;
 
   //declare the output file
@@ -1129,8 +1219,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 	//not dividing by ncoll here. will do that in the plotting macro under RAA. 
 
 	hpbpb_TrgObj80[k][j][i]->Scale(1./(delta_eta[j]*149.427*1e6));
-	hpbpb_TrgObj65[k][j][i]->Scale(1./(delta_eta[j]*139.571*0.308*1e6));//*0.308 is due to the ~31% dataset which was forested at that time. 
-	hpbpb_TrgObj55[k][j][i]->Scale(1./(delta_eta[j]*75.086*0.308*1e6));
+	hpbpb_TrgObj65[k][j][i]->Scale(1./(delta_eta[j]*139.571*1e6));//*0.308 is due to the ~31% dataset which was forested at that time - not needed now since we are using the full dataset. 
+	hpbpb_TrgObj55[k][j][i]->Scale(1./(delta_eta[j]*75.086*1e6));
 
 	divideBinWidth(hpbpb_TrgObj80[k][j][i]);
 	divideBinWidth(hpbpb_TrgObj65[k][j][i]);
@@ -1140,6 +1230,26 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
         hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj65[k][j][i]);
         hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj55[k][j][i]);
 
+	// old method histograms, just as a test: 
+
+	hpbpb_Jet80[k][j][i]->Scale(1./delta_eta[j]);
+	hpbpb_Jet65[k][j][i]->Scale(1./delta_eta[j]);
+	hpbpb_Jet55[k][j][i]->Scale(1./delta_eta[j]);
+
+	hpbpb_Jet65_noJet80[k][j][i]->Scale(1./delta_eta[j]);
+	hpbpb_Jet55_noJet65_80[k][j][i]->Scale(1./delta_eta[j]);
+	
+	divideBinWidth(hpbpb_Jet80[k][j][i]);
+	divideBinWidth(hpbpb_Jet65[k][j][i]);
+	divideBinWidth(hpbpb_Jet55[k][j][i]);
+
+	divideBinWidth(hpbpb_Jet65_noJet80[k][j][i]);
+	divideBinWidth(hpbpb_Jet55_noJet65_80[k][j][i]);
+	
+	hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet80[k][j][i]);
+	hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet65_noJet80[k][j][i]);
+	hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet55_noJet65_80[k][j][i]);
+
         hpbpb_TrgObjComb[k][j][i]->Write();
         if(printDebug)hpbpb_TrgObjComb[k][j][i]->Print();
         hpbpb_TrgObj80[k][j][i]->Write();
@@ -1148,6 +1258,20 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
         if(printDebug)hpbpb_TrgObj65[k][j][i]->Print();
         hpbpb_TrgObj55[k][j][i]->Write();
         if(printDebug)hpbpb_TrgObj55[k][j][i]->Print();
+
+	hpbpb_Jet80[k][j][i]->Write();
+	if(printDebug)hpbpb_Jet80[k][j][i]->Print();
+	hpbpb_Jet65[k][j][i]->Write();
+	if(printDebug)hpbpb_Jet65[k][j][i]->Print();
+	hpbpb_Jet55[k][j][i]->Write();
+	if(printDebug)hpbpb_Jet55[k][j][i]->Print();
+
+	hpbpb_Jet65_noJet80[k][j][i]->Write();
+	if(printDebug)hpbpb_Jet65_noJet80[k][j][i]->Print();
+	hpbpb_Jet55_noJet65_80[k][j][i]->Write();
+	if(printDebug)hpbpb_Jet55_noJet65_80[k][j][i]->Print();
+	hpbpb_JetComb_old[k][j][i]->Write();
+	if(printDebug)hpbpb_JetComb_old[k][j][i]->Print();
 
       }//cent bins loop
 
