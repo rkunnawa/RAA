@@ -76,7 +76,7 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 
-/*
+
 static const int nbins_eta = 15;
 static const double boundaries_eta[nbins_eta][2] = {
   {-1.0,+1.0}, {-2.0,+2.0}, {-3.0,+3.0},
@@ -101,7 +101,8 @@ static const char etaWidth [nbins_eta][256] = {
   "p05_eta_p10","p10_eta_p15","p15_eta_p20",
   "p20_eta_p25","p25_eta_p30"
 };
-*/
+
+/*
 static const int nbins_eta = 1;
 static const double boundaries_eta[nbins_eta][2] = {
   {-2.0,+2.0}
@@ -114,16 +115,17 @@ static const double delta_eta[nbins_eta] = {
 static const char etaWidth [nbins_eta][256] = {
   "n20_eta_p20"
 };
+*/
 
 static const int nbins_cent = 6;
 static Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 5 to get your actual centrality
 static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8 ,362.24}; //last one is for 0-200 bin. 
 
-//static const int no_radius = 3;//necessary for the RAA analysis  
-//static const int list_radius[no_radius] = {2,3,4};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
-static const int no_radius = 1;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3};
+//static const int no_radius = 1;//necessary for the RAA analysis  
+//static const int list_radius[no_radius] = {3};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -214,7 +216,7 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", char *jet_type = "PF"){
+void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Vs", char *jet_type = "PF"){
 
   TH1::SetDefaultSumw2();
   //gStyle->SetOptStat(0);
@@ -224,7 +226,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
  
   cout<<"Running for Algo = "<<algo<<" "<<jet_type<<endl;
   
-  bool printDebug = true;
+  bool printDebug = false;
 
   // number convension:
   // 0 - MB
@@ -279,7 +281,14 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     "HiTree",
     "jetObjTree"
   };
-
+  
+  //this loop is to assign the tree values before we go into the file loop. 
+  for(int k = 0;k<no_radius;k++){
+    for(int t = 0;t<N;t++){
+      jetpbpb1[t][k] = new TChain(string(dir[t][k]+"/"+trees[t]).data());
+    }//tree loop ends
+  }// radius loop ends
+  
   for(int ifile = startfile;ifile<endfile;ifile++){
     
     instr1>>filename1;
@@ -287,14 +296,14 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     for(int k = 0;k<no_radius;k++){
 
       for(int t = 0;t<N;t++){
-
-      jetpbpb1[t][k] = new TChain(string(dir[t][k]+"/"+trees[t]).data()) ;
-      jetpbpb1[t][k]->Add(filename1.c_str());
-      if(printDebug)cout << "Tree loaded  " << string(dir[t][k]+"/"+trees[t]).data() << endl;
-      if(printDebug)cout << "Entries : " << jetpbpb1[t][k]->GetEntries() << endl;
-
+	
+	//jetpbpb1[t][k] = new TChain(string(dir[t][k]+"/"+trees[t]).data()) ;
+	jetpbpb1[t][k]->Add(filename1.c_str());
+	if(printDebug)cout << "Tree loaded  " << string(dir[t][k]+"/"+trees[t]).data() << endl;
+	if(printDebug)cout << "Entries : " << jetpbpb1[t][k]->GetEntries() << endl;
+	
       }// tree loop ends
-
+      
       //jetpbpb1->Add(filename.c_str());
       //hltpbpb1->Add(filename.c_str());
       //skmpbpb1->Add(filename.c_str());
@@ -302,9 +311,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       //evtpbpb1->Add(filename.c_str());
       //cout<<"Entries = "<<jetpbpb1->GetEntries()<<endl;
     }// radius loop ends
-
+    
   }// file loop ends
-
+  
   
 
   // for(int k = 0;k<no_radius;k++){
@@ -1061,7 +1070,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       jetpbpb1[2][k]->GetEntry(jentry);
       //if(printDebug && jentry%100000==0)cout<<"Jet 55or65 file"<<endl;
       if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<endl;
-
+      
       // get the stuff required for the trigger turn on curve later. in a separate loop till i understand how to put this in here. 
 
       int centBin = findBin(hiBin_1);//tells us the centrality of the event. 
@@ -1070,7 +1079,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       for(int j = 0;j<nbins_eta;j++){
 
         if(pHBHENoiseFilter_1 && pcollisionEventSelection_1 && (vz_1<15)) {
-		
+
 	  if(printDebug)cout<<" trigger object pt =  "<<trgObj_pt_1<<endl;
 	  if(printDebug)cout<<" jet80 = "<<jet80_1<<endl;
 	  if(printDebug)cout<<" jet65 = "<<jet65_1<<endl;
@@ -1082,7 +1091,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
             if(/*put your favourite QA cut here*/chMax_1[g]/pt_1[g]>0.01){
 
               if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
-
+		
                 if(jet55_1==1) {
 		  if(trgObj_pt_1>=55 && trgObj_pt_1<65){
 		    hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);

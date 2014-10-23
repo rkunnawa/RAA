@@ -17,6 +17,8 @@
 //            jets      : iteration variable: g;       number of iterations: no of jets in Data[k][h];
 //            p_T       : defined just below as nbins_pt with 39 bins. to match our NLO and jet RpA analysis bins. 
 
+// Oct 23 - removed the cuts from the MC -> like the noisefilter etc... 
+
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -116,8 +118,8 @@ static const char etaWidth[nbins_eta][256] = {
 //static const int list_radius[no_radius] = {3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
-static const int no_radius = 7; 
-static const int list_radius[no_radius] = {1,2,3,4,5,6,7};
+static const int no_radius = 3; 
+static const int list_radius[no_radius] = {2,3,4};
 
 static const int nbins_cent = 6;
 static const Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 2.5 to get your actual centrality % (old 2011 data) 
@@ -616,7 +618,8 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
         //double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/entries[h];
 	
         if(fabs(data[k][h]->vz)>15) continue;
-	if(!data[k][h]->pcollisionEventSelection || !data[k][h]->pHBHENoiseFilter) continue;
+	if(!data[k][h]->pcollisionEventSelection) continue;
+	//if(!data[k][h]->pHBHENoiseFilter) continue;
 
         int cBin = hCentMC[k]->FindBin(data[k][h]->bin)-1;
         //int cBin = nbins_cent-1;
@@ -769,9 +772,10 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
         double weight_cent=1;
         double weight_pt=1;
         double weight_vz=1;
-        //if(!dataPP[k][h]->pPAcollisionEventSelectionPA || !dataPP[k][h]->pHBHENoiseFilter) continue;
+        
+	//if(!dataPP[k][h]->pPAcollisionEventSelectionPA) continue;
 	//for now the MC doesnt have pPAcollisionEventSelectionPA so dont search for it. 
-	if(!dataPP[k][h]->pHBHENoiseFilter) continue;
+	//if(!dataPP[k][h]->pHBHENoiseFilter) continue;
 
         weight_vz = fVzPP->Eval(dataPP[k][h]->vz);
         //if (weight_vz>5||weight_vz<0.5) cout <<dataPP[k][h]->vz<<" "<<weight_vz<<endl;
