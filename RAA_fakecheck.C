@@ -87,7 +87,7 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   TStopwatch timer;
   timer.Start();
 
-  bool printDebug = true;
+  bool printDebug = false;
 
   if(printDebug) cout<<"Radius = "<<radius<<" and Algo = "<<algo<<" "<<jet_type<<endl;
 
@@ -95,7 +95,7 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   // 
 
   std::string infile;
-  infile = "jet55or65_filelist.txt";
+  infile = "jetRAA_PbPb_data_forest.txt";
   
   std::ifstream instr(infile.c_str(),std::ifstream::in);
   std::string filename;
@@ -317,7 +317,7 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   //TH1F jet55_trg55,jet55_trg_evtSel,jet55only_trg55_evtSel,jet55_trg55_evtSel_QA1,jet55_trg55_evtSel_QA2,jet55_trg55_evtSel_QA3,jet55_trg55_evtSel_qalCut1_qalCut2,jet55_trg55_evtSel_qalCut1_qalCut3,jet55_trg55_evtSel_qalCut3_qalCut2;
   //TH1F jet65,jet65_evtSel,jet65only_evtSel,jet65_evtSel_qalCut1,jet65_evtSel_qalCut3,jet65_evtSel_qalCut3,jet65_evtSel_qalCut1_qalCut3,jet65_evtSel_qalCut1_qalCut2,jet65_evtSel_qalCut3_qalCut2;
   //TH1F jet65_
-
+  
   
   //if(printDebug) cout<<"total # of entries = "<<ch[2]->GetEntries()<<endl;
   /*
@@ -617,8 +617,8 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   fout.Close();
   
   timer.Stop();
-  if(printDebug) cout<<"Real time(min) = "<<(Float_t)timer.RealTime()/60<<endl;
-  if(printDebug) cout<<"CPU time(min)  = "<<(Float_t)timer.CpuTime()/60<<endl;
-  if(printDebug) cout<<"All done"<<endl;
+  cout<<"Real time(min) = "<<(Float_t)timer.RealTime()/60<<endl;
+  cout<<"CPU time(min)  = "<<(Float_t)timer.CpuTime()/60<<endl;
+  cout<<"All done"<<endl;
 
 }

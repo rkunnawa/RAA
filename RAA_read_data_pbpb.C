@@ -21,6 +21,8 @@
 
 // Oct 21 - Now that we have the new data forest files which are with made with the triggers: jet55 or jet65 or jet80 we only need one file loop.
 
+// OCt 27th - still have to run the lumi calculator for the triggers using the lumi mask files. Since we lost some files during the processing (~1%).
+
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -216,25 +218,27 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Vs", char *jet_type = "PF"){
+void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Pu", char *jet_type = "PF"){
 
   TH1::SetDefaultSumw2();
   //gStyle->SetOptStat(0);
-
+  
   TStopwatch timer;
   timer.Start();
- 
+
+  TDatime date;
+  
   cout<<"Running for Algo = "<<algo<<" "<<jet_type<<endl;
   
   bool printDebug = false;
-
+  
   // number convension:
   // 0 - MB
   // 1 - 55 or 65
   // 2 - 80 or 95 
   // 80 is the unprescaled trigger - yes
   // 
-
+  
   // Now im going to change the file reading here for PbPb to look at the unmerged files through condor. 
   std::string infile1;
   //infile1 = "jet55or65_filelist.txt";
@@ -984,11 +988,14 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Vs", c
   // and these files will have the following structure: 
   // run lumi evt HLTobjpt HLTobjeta HLTobjphi hibin jtpt jteta jtphi
 
-  //ofstream fHLT_80,fHLT_65,fHLT_55,fHLT_high;
+  //ofstream fHLT_80,fHLT_65,fHLT_55;
+  ofstream fHLT_high[no_radius];
   //fHLT_80.open(Form("pbpb_%s_R%d_max_trgObj_80_jets.txt",algo,radius));
   //fHLT_65.open(Form("pbpb_%s_R%d_80_max_trgObj_65_jets.txt",algo,radius));
   //fHLT_55.open(Form("pbpb_%s_R%d_65_max_trgObj_55_jets.txt",algo,radius));
-  //fHLT_high.open(Form("pbpb_%s_R%d_abnormal_highpt_jets_maxtrigObj_jtpt_less_0.3.txt",algo,radius));
+  for(int k = 0;k<no_radius;k++){
+    fHLT_high[k].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pbpb_%s_R%d_abnormal_jets_%d_%d.txt",algo,list_radius[k],date.GetDate(),endfile));
+  }
   // the actual cut we are going to be using is 
   // TMath::Max(chargedMax,neutralMax)/(TMath::Max(chargedSum,neutralSum))<0.975
   // which is pretty much the same as doing the one mentioned above.  
@@ -1088,7 +1095,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Vs", c
 
           for(int g = 0;g<nrefe_1;g++){
 
-            if(/*put your favourite QA cut here*/chMax_1[g]/pt_1[g]>0.01){
+            if(/*put your favourite QA cut here*/(chMax_1[g]/pt_1[g]>0.01) /*&& (pt_1[g]<3*trgObj_pt_1)*/){
 
               if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
 		
@@ -1096,6 +1103,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Vs", c
 		  if(trgObj_pt_1>=55 && trgObj_pt_1<65){
 		    hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
 		    hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+		    
+		    if(pt_1[g]>3*trgObj_pt_1){
+		      fHLT_high[k]<<evt_1<<", "<<run_1<<" "<<lumi_1<<" "<<vz_1<<" "<<trgObj_pt_1<<" "<<pt_1[g]<<" "<<eta_1[g]<<" "<<endl;
+		    }
+
 		  }
 		  hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
 		  hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
@@ -1160,6 +1172,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Vs", c
     
     }//nentries_jet55or65 loop
     
+    
     // //loop for jetpbpb2[2] tree
   //   Long64_t nentries_jet80or95 = jetpbpb2[2][k]->GetEntries();
   //   if(printDebug)cout<<"nentries_jet80or95 = "<<nentries_jet80or95<<endl;
@@ -1203,10 +1216,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Vs", c
   //     }//eta bin loop  
     
   //   }//nentries_jet80or95 loop
+
+    fHLT_high[k].close();
     
   }//radius loop. 
   
-  TDatime date;
 
   //declare the output file
   TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
@@ -1292,6 +1306,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Vs", c
 
   f.Close();
 
+  //fHLT_high.write();
 
   timer.Stop();
   cout<<"Macro finished: "<<endl;

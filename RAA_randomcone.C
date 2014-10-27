@@ -606,7 +606,8 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
       //----------------------------------------------------------------------
       
       CES = pCES;
-      if (CES==0 || pHBHENoiseFilter==0 || fabs(vz)>15) continue; // since this is only for PbPb
+      //if (CES==0 || pHBHENoiseFilter==0 || fabs(vz)>15) continue; // since this is only for PbPb
+      if (CES==0 || fabs(vz)>15) continue; // since this is only for PbPb
       
       //if ( (COLLTYPE=="PbPb") && (CES==0)  ) continue;
       
