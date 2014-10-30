@@ -98,7 +98,7 @@ TH1F *functionHist(TF1 *f, TH1F* h,char *fHistname){
 }
 
 
-void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
+void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "PF"){
 
   TStopwatch timer; 
   timer.Start();
@@ -112,9 +112,9 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   
   TDatime date;//this is just here to get them to run optimized. 
 
-  TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%s%s_20140912.root",algo,jet_type));
-  TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%s_20140912.root",jet_type));
-  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%s%s_20140912.root",algo,jet_type));
+  TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%s%s_20141029.root",algo,jet_type));
+  TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%s_20140829.root",jet_type));
+  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_mc_ak%s%s_20141030.root",algo,jet_type));
 
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
   // for the above condition, i might have to play with the date stamp. 
@@ -156,12 +156,16 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
   for(int i = 0;i<=nbins_cent;i++){
     if(printDebug) cout<<"cent_"<<i<<endl;
     dPbPb_TrgComb[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObjComb_R%d_n20_eta_p20_cent%d",radius,i));
+    dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
     dPbPb_TrgComb[i]->Print("base");
     dPbPb_Trg80[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj80_R%d_n20_eta_p20_cent%d",radius,i));
+    dPbPb_Trg80[i]->Scale(4*145.156*1e6);
     dPbPb_Trg80[i]->Print("base");
     dPbPb_Trg65[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj65_R%d_n20_eta_p20_cent%d",radius,i));
+    dPbPb_Trg65[i]->Scale(4*145.156*1e6);
     dPbPb_Trg65[i]->Print("base");
     dPbPb_Trg55[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj55_R%d_n20_eta_p20_cent%d",radius,i));
+    dPbPb_Trg55[i]->Scale(4*145.156*1e6);
     dPbPb_Trg55[i]->Print("base");
 
     /*
@@ -833,6 +837,10 @@ void RAA_analyze(int radius = 3, char* algo = "Vs", char *jet_type = "Calo"){
     uPbPb_Bayes[i]->Write();
     uPbPb_BinByBin[i]->Write();
     dPbPb_TrgComb[i]->Write();
+    dPbPb_Trg80[i]->Write();
+    dPbPb_Trg65[i]->Write();
+    dPbPb_Trg55[i]->Write();
+
     mPbPb_ResponseNorm[i]->Write();
     mPbPb_Response[i]->Write();
     mPbPb_Matrix[i]->Write();
