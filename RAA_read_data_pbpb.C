@@ -63,8 +63,6 @@
 
 //static const double boundaries_fileno_job[job_no+1] = {0, 413, 826, 1239, 1652, 2065, 2478, 2891, 3304, 3717, 4130, 4542};
 
-
-
 static const int nbins_pt = 39;
 static const double boundaries_pt[nbins_pt+1] = {
   3, 4, 5, 7, 9, 12, 
@@ -103,8 +101,8 @@ static const char etaWidth [nbins_eta][256] = {
   "p05_eta_p10","p10_eta_p15","p15_eta_p20",
   "p20_eta_p25","p25_eta_p30"
 };
-
 /*
+
 static const int nbins_eta = 1;
 static const double boundaries_eta[nbins_eta][2] = {
   {-2.0,+2.0}
@@ -117,8 +115,8 @@ static const double delta_eta[nbins_eta] = {
 static const char etaWidth [nbins_eta][256] = {
   "n20_eta_p20"
 };
-*/
 
+*/
 static const int nbins_cent = 6;
 static Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 5 to get your actual centrality
 static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8 ,362.24}; //last one is for 0-200 bin. 
@@ -141,10 +139,12 @@ void divideBinWidth(TH1 *h)
   for (int i=0;i<=h->GetNbinsX();i++){
     Float_t val = h->GetBinContent(i);
     Float_t valErr = h->GetBinError(i);
-    val/=h->GetBinWidth(i);
-    valErr/=h->GetBinWidth(i);
-    h->SetBinContent(i,val);
-    h->SetBinError(i,valErr);
+    if(val!=0){
+      val/=h->GetBinWidth(i);
+      valErr/=h->GetBinWidth(i);
+      h->SetBinContent(i,val);
+      h->SetBinError(i,valErr);
+    }  
   }
   h->GetXaxis()->CenterTitle();
   h->GetYaxis()->CenterTitle();
@@ -218,7 +218,7 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Pu", char *jet_type = "PF"){
+void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", char *jet_type = "PF"){
 
   TH1::SetDefaultSumw2();
   //gStyle->SetOptStat(0);
@@ -1062,7 +1062,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Pu", c
   //loop for the MB tree. 
   //empty for now - need to fix that once we have the MB data.  
   
-  
+  if(printDebug)hpbpb_TrgObj80[0][0][0]->Print("base");
   
   for(int k = 0;k<no_radius;k++){
 
@@ -1081,6 +1081,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Pu", c
       // get the stuff required for the trigger turn on curve later. in a separate loop till i understand how to put this in here. 
 
       int centBin = findBin(hiBin_1);//tells us the centrality of the event. 
+      if(printDebug)cout<<"cent bin = "<<centBin<<endl;
       if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
 
       for(int j = 0;j<nbins_eta;j++){
@@ -1099,19 +1100,19 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Pu", c
 
               if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
 		
-                if(jet55_1==1) {
-		  if(trgObj_pt_1>=55 && trgObj_pt_1<65){
+                if(jet55_1==1) { // passes the jet55 trigger
+		  if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
 		    hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
 		    hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
 		    
-		    if(pt_1[g]>3*trgObj_pt_1){
-		      fHLT_high[k]<<evt_1<<", "<<run_1<<" "<<lumi_1<<" "<<vz_1<<" "<<trgObj_pt_1<<" "<<pt_1[g]<<" "<<eta_1[g]<<" "<<endl;
+		    if(pt_1[g]>3*trgObj_pt_1){ // get an idea of the event information from these large pt jets 
+		      fHLT_high[k]<<evt_1<<" "<<run_1<<" "<<lumi_1<<" "<<vz_1<<" "<<trgObj_pt_1<<" "<<pt_1[g]<<" "<<eta_1[g]<<" "<<endl;
 		    }
 
 		  }
 		  hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
 		  hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-		  if((jet65_1==0) && (jet80_1==0)){
+		  if((jet65_1==0) && (jet80_1==0)){ // this is to just check
 		    hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
 		    hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
 		  }
@@ -1234,27 +1235,27 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Pu", c
       for(int i = 0;i<=nbins_cent;i++){
 
 	//divide by delta eta, delta pt, luminosity seen by the triggers and ncoll ... and that will give us cross section/ncoll. 
-	// lumi seen by the respective triggers. 
-	// Jet65 - 139.571 ub-1
-	// Jet55 - 75.086 ub-1 
-	// Jet80 - 149.427 ub-1 
+	// lumi seen by the respective triggers. - https://twiki.cern.ch/twiki/bin/viewauth/CMS/HIJetRAA#Luminosity_Cross_check_for_HIJet
+	// once we include the prescl then we have to normalize w.r.t the hightest lumi trigger which would have a prescl of 1 - in this case its the jet80 trigger. 
 
 	//not dividing by ncoll here. will do that in the plotting macro under RAA. 
-
-	hpbpb_TrgObj80[k][j][i]->Scale(1./(delta_eta[j]*149.427*1e6));
-	hpbpb_TrgObj65[k][j][i]->Scale(1./(delta_eta[j]*139.571*1e6));//*0.308 is due to the ~31% dataset which was forested at that time - not needed now since we are using the full dataset. 
-	hpbpb_TrgObj55[k][j][i]->Scale(1./(delta_eta[j]*75.086*1e6));
+	
+	hpbpb_TrgObj80[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
+	hpbpb_TrgObj65[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
+	hpbpb_TrgObj55[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
+	
+	// divide by bin width is doing something very weird. Its making histograms which are empty get 40 entries from somewhere. (TH1.Print Name  = hpbpb_TrgObj80_R3_n20_eta_p20_cent2, Entries= 40, Total sum= 0 example)
 
 	divideBinWidth(hpbpb_TrgObj80[k][j][i]);
 	divideBinWidth(hpbpb_TrgObj65[k][j][i]);
 	divideBinWidth(hpbpb_TrgObj55[k][j][i]);
-
+	
         hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj80[k][j][i]);
         hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj65[k][j][i]);
         hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj55[k][j][i]);
 
 	// old method histograms, just as a test: 
-
+	
 	hpbpb_Jet80[k][j][i]->Scale(1./delta_eta[j]);
 	hpbpb_Jet65[k][j][i]->Scale(1./delta_eta[j]);
 	hpbpb_Jet55[k][j][i]->Scale(1./delta_eta[j]);
@@ -1272,7 +1273,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Pu", c
 	hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet80[k][j][i]);
 	hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet65_noJet80[k][j][i]);
 	hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet55_noJet65_80[k][j][i]);
-
+	
+	
         hpbpb_TrgObjComb[k][j][i]->Write();
         if(printDebug)hpbpb_TrgObjComb[k][j][i]->Print();
         hpbpb_TrgObj80[k][j][i]->Write();
