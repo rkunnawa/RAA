@@ -60,25 +60,25 @@ using namespace std;
 static const int nbins_pt = 29;
 static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
 
-
-
 //static const double boundaries_run_job[job_no+1] = {};
 
 // divide by bin width
 void divideBinWidth(TH1 *h)
 {
-	h->Sumw2();
-	for (int i=0;i<=h->GetNbinsX();i++)
-	{
-		Float_t val = h->GetBinContent(i);
-		Float_t valErr = h->GetBinError(i);
-		val/=h->GetBinWidth(i);
-		valErr/=h->GetBinWidth(i);
-		h->SetBinContent(i,val);
-		h->SetBinError(i,valErr);
-	}
-	h->GetXaxis()->CenterTitle();
-	h->GetYaxis()->CenterTitle();
+  h->Sumw2();
+  for (int i=0;i<=h->GetNbinsX();i++)
+    {
+      Float_t val = h->GetBinContent(i);
+      Float_t valErr = h->GetBinError(i);
+      if(val!=0){
+	val/=h->GetBinWidth(i);
+	valErr/=h->GetBinWidth(i);
+	h->SetBinContent(i,val);
+	h->SetBinError(i,valErr);
+      }
+    }
+  h->GetXaxis()->CenterTitle();
+  h->GetYaxis()->CenterTitle();
 }
 
 void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *algo = "Vs", char *jet_type = "PF"){
@@ -87,7 +87,7 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   TStopwatch timer;
   timer.Start();
 
-  bool printDebug = false;
+  bool printDebug = true;
 
   if(printDebug) cout<<"Radius = "<<radius<<" and Algo = "<<algo<<" "<<jet_type<<endl;
 
@@ -150,8 +150,7 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   //TChain *skmpbpb1 = new TChain("skimanalysis/HltTree");
   //TChain *hltobjpbpb1 = new TChain("hltobject/jetObjTree");
   
-  //for(int i = 0;i<N;i++)       ch[i] = new TChain(string(dir[i]+"/"+trees[i]).data());
-
+  for(int i = 0;i<N;i++)       ch[i] = new TChain(string(dir[i]+"/"+trees[i]).data());
 
   for(int ifile = startfile;ifile<endfile;ifile++){
     
@@ -159,11 +158,10 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
     if(printDebug) cout<<"File: "<<ifile<<" = "<<filename<<endl;
 
     for(int i = 0;i<N;i++){
-      ch[i] = new TChain(string(dir[i]+"/"+trees[i]).data());
+      //ch[i] = new TChain(string(dir[i]+"/"+trees[i]).data());
       ch[i]->Add(filename.c_str());
       if(printDebug) cout << "Tree loaded  " << string(dir[i]+"/"+trees[i]).data() << endl;
       if(printDebug) cout << "Entries : " << ch[i]->GetEntries() << endl;
-
     }
 
     //jetpbpb1->Add(filename.c_str());
@@ -219,7 +217,6 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   //if(printDebug) cout<<"testing if HLT tree knows that branch, no of entries there = "<<hltpbpb1->GetEntries("HLT_HIJet55_v1")<<endl;
   //if(printDebug) cout<<"# of events which satisfy Jet55 but fail Jet65 and Jet80 = "<<ch[2]->GetEntries("HLT_HIJet55_v1&&!HLT_HIJet65_v1&&!HLT_HIJet80_v1")<<endl;
   
-
   TDatime date;
 
   // declare the output file here: 
@@ -336,9 +333,9 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   */
   //ch[2]->Project("total","hiBin");
   
-  if(printDebug) cout<<"with evtSel added  = "<<ch[2]->GetEntries(evtSel)<<endl;
+  //cout<<"with evtSel added  = "<<ch[2]->GetEntries(evtSel)<<endl;
   //ch[2]->Project("evtSel","hiBin",);
-  if(printDebug) cout<<"with evtSel added  = "<<ch[2]->GetEntries(evtSel)<<endl;
+  //if(printDebug) cout<<"with evtSel added  = "<<ch[2]->GetEntries(evtSel)<<endl;
   //ch[2]->Project("evtSel","hiBin",evtSel);
   /*
   if(printDebug) cout<<"with jet55"<<" = "<<ch[2]->GetEntries(jet55)<<endl;
@@ -362,9 +359,10 @@ void RAA_fakecheck(int startfile = 0, int endfile = 1, int radius = 3, char *alg
   if(printDebug) cout<<"jet55 and evtSel and QA2_3 = "<<ch[2]->GetEntries(jet55&&evtSel&&qalCut2&&qalCut3)<<endl;
   //ch[2]->Project("jet55_evtSel_QA3_QA2","hiBin",jet55&&evtSel&&qalCut3&&qalCut2);
 
-
-  if(printDebug) cout<<"with jet55 and trgObjpt selection"<<" = "<<ch[2]->GetEntries(jet55&&trg55)<<endl;
+  */
+  //cout<<"with jet55 and trgObjpt selection"<<" = "<<ch[2]->GetEntries(jet55&&trg55)<<endl;
   //ch[2]->Project("jet55_trg55","hiBin",jet55&&trg55);
+  /*
   if(printDebug) cout<<"with evtSel and Jet55 and trgobjpt added = "<<ch[2]->GetEntries(jet55&&trg55&&evtSel)<<endl;
   //ch[2]->Project("jet55_trg55_evtSel","hiBin",jet55&&trg55&&evtSel);
   if(printDebug) cout<<"with Jet55_only and trgObjpt and evtSel added = "<<ch[2]->GetEntries(jet55only&&trg55&&evtSel)<<endl;

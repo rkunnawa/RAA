@@ -366,57 +366,57 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
   Double_t xsectionPP[nbinsPP_pthat+1];
   
   boundariesPP_pthat[0]=15;
-  fileNamePP_pthat[0] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat15_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[0] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_15_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[0]= 0.2034;
   //  entries[0] = 71680;  
   
   boundariesPP_pthat[1]=30;
-  fileNamePP_pthat[1] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat30_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[1] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_30_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[1]= 0.01075;
   //entries[1] = 52160;
   
   boundariesPP_pthat[2]=50;
-  fileNamePP_pthat[2] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat50_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[2] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_50_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[2]= 0.001025;
   // entries[2] = 50240;
   
   boundariesPP_pthat[3]=80;
-  fileNamePP_pthat[3] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat80_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[3] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_80_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[3]= 9.8650e-05;
   // entries[3] = 52160;
   
   boundariesPP_pthat[4]=120;
-  fileNamePP_pthat[4] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat120_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[4] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_120_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[4]= 1.1290e-05;
   // entries[4] = 53760;
 
   boundariesPP_pthat[5] = 170;
-  fileNamePP_pthat[5] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat170_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[5] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_170_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[5]= 1.4650e-06;
   //entries[5] = 53120;
   
   boundariesPP_pthat[6]=220;
-  fileNamePP_pthat[6] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat220_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[6] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_220_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[6]= 2.8370e-07;
   // entries[6] = 54080;
   
   boundariesPP_pthat[7]=280;
-  fileNamePP_pthat[7] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat280_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[7] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_280_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[7]= 5.3230e-08;
   // entries[7] = 53120;
   
   boundariesPP_pthat[8]=370;
-  fileNamePP_pthat[8] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat370_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[8] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_370_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[8]= 5.9340e-09;
   //entries[8] = 52800;
   
   boundariesPP_pthat[9]=460;
-  fileNamePP_pthat[9] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat460_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[9] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_460_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[9]= 8.1250e-10;
   //entries[9] = 54080;
   
   boundariesPP_pthat[10]=540;
-  fileNamePP_pthat[10] = "/mnt/hadoop/cms/store/user/rkunnawa/53X_Production/pp_official_MC_merged_files/HiForest_pp_official_MC_pthat540_53X_STARTHI53_V28_5_3_16_trk8_Jet28_merged.root";
+  fileNamePP_pthat[10] = "/export/d00/scratch/rkunnawa/HiForest_pp_Offical_MC_pthat_540_53X_STARTHI53_V28_5_3_20_override_ppJEC2014_Pawan_28Oct2014.root";
   xsectionPP[10]= 1.4670e-10;
   //entries[10] = 53440;  
   
@@ -773,8 +773,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
         double weight_pt=1;
         double weight_vz=1;
         
-	//if(!dataPP[k][h]->pPAcollisionEventSelectionPA) continue;
-	//for now the MC doesnt have pPAcollisionEventSelectionPA so dont search for it. 
+	if(!dataPP[k][h]->pPAcollisionEventSelectionPA) continue;
 	//if(!dataPP[k][h]->pHBHENoiseFilter) continue;
 
         weight_vz = fVzPP->Eval(dataPP[k][h]->vz);
