@@ -1126,8 +1126,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Vs", c
 
       }//eta bins loop
 
-      hpbpb_Npix_cut[k][centBin]->Fill(hiNpix_1,jetCounter);
-      hpbpb_Npix_cut[k][nbins_cent]->Fill(hiNpix_1,jetCounter);
+      if(printDebug)cout<<"pixel hit = "<<hiNpix_1<<", jet counter = "<<jetCounter<<endl;
+      hpbpb_Npix_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
+      hpbpb_Npix_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);
 
       // apply the correct supernova selection cut rejection here: 
       if(hiNpix_1 > 38000 - 50*jetCounter++){

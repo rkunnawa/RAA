@@ -135,6 +135,19 @@ static const Double_t ncoll[nbins_cent] = { 1660, 1310, 745, 251, 62.8, 10.8 };
 //static const char *algoNameGen[nAlgos] = { "", "icPu5", "akPu2PF", "akVs3PF", "akPu4PF", "akPu2PF", "akPu3PF", "akPu4PF" };
 //static const char *BinLabel[BinLabelN] = {"100-110", "110-120", "120-130", "130-140", "140-150", "150-160", "160-170", "170-180", "180-200", "200-240","240-300" };
 
+int findBin(int hiBin){
+  int binNo = 0;
+
+  for(int i = 0;i<nbins_cent;i++){
+    if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
+      binNo = i;
+      break;
+    }
+  }
+
+  return binNo;
+}
+
 
 // divide by bin width
 void divideBinWidth(TH1 *h){
@@ -687,7 +700,10 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
 	if(!data[k][h]->pcollisionEventSelection) continue;
 	//if(!data[k][h]->pHBHENoiseFilter) continue;
 	
-        int cBin = hCentMC[k]->FindBin(data[k][h]->bin)-1;
+	//cout<<"hiBin = "<<data[k][h]->bin<<endl;
+	//cout<<"my findbin function = "<<findBin(data[k][h]->bin)<<endl;
+	//cout<<"old findbin function = "<<hCentMC[k]->FindBin(data[k][h]->bin)-1<<endl;
+        int cBin = findBin(data[k][h]->bin);
         //int cBin = nbins_cent-1;
         double weight_cent=1;
         double weight_pt=1;
@@ -708,7 +724,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
 	  for(int g = 0;g<data[k][h]->njets;g++){
 
 	    if(data[k][h]->jteta[g] >= boundaries_eta[j][0] && data[k][h]->jteta[g] < boundaries_eta[j][1]){
-	      cout<<"jtpt = "<<data[k][h]->jtpt[g]<<endl;
+	      //cout<<"jtpt = "<<data[k][h]->jtpt[g]<<endl;
 	      if(data[k][h]->jtpt[g]>=50) jetCounter++;
 	      
 	    }// eta selection loop
@@ -717,10 +733,10 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
 
 	}//eta bins loop
 
-	if(printDebug)cout<<"hiNpix = "<<data[k][h]->hiNpix<<", NJets = "<<jetCounter<<endl;
-
-	hpbpb_Npix_cut[k][cBin]->Fill(data[k][h]->hiNpix,jetCounter);
-	hpbpb_Npix_cut[k][nbins_cent]->Fill(data[k][h]->hiNpix,jetCounter);	
+	//if(printDebug)cout<<"hiNpix = "<<data[k][h]->hiNpix<<", NJets = "<<jetCounter<<endl;
+	if(printDebug)cout<<cBin<<endl;
+	hpbpb_Npix_cut[k][cBin]->Fill(jetCounter,data[k][h]->hiNpix);
+	hpbpb_Npix_cut[k][nbins_cent]->Fill(jetCounter,data[k][h]->hiNpix);	
 
 	//data[k][h]->tJet->Draw(Form("hiNpix:Sum$(jtpt>50&&abs(jteta)<2)>>hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],cBin),"","goff");
 
