@@ -221,7 +221,7 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", char *jet_type = "PF"){
+void RAA_read_data_pbpb(int startfile = 0, int endfile = 2, char *algo = "Vs", char *jet_type = "PF"){
 
   TH1::SetDefaultSumw2();
   //gStyle->SetOptStat(0);
@@ -1086,6 +1086,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     if(printDebug)cout<<"nentries_jet55or65or80 = "<<nentries_jet55or65<<endl;
     //if(printDebug)nentries_jet55or65 = 2;
 
+    // fill the no of pixel vs no of jets histogram here 
+    //jetpbpb1[2][k]->Draw(Form("hiNpix:Sum$(jtpt>50&&abs(jteta)<2)>>hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],centBin),"pcollisionEventSelection&&pHBHENoiseFilter","goff");
+    //jetpbpb1[2][k]->Project(Form("hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),"hiNpix:Sum$(jtpt>50&&abs(jteta)<2)","pcollisionEventSelection&&pHBHENoiseFilter");
+    
     for(int jentry = 0;jentry<nentries_jet55or65;jentry++){
     
       jetpbpb1[2][k]->GetEntry(jentry);
@@ -1095,11 +1099,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       // get the stuff required for the trigger turn on curve later. in a separate loop till i understand how to put this in here. 
 
       int centBin = findBin(hiBin_1);//tells us the centrality of the event. 
-      if(printDebug)cout<<"cent bin = "<<centBin<<endl;
-      if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
-
-      // fill the no of pixel vs no of jets histogram here 
-      jetpbpb1[2][k]->Draw(Form("hiNpix:Sum$(jtpt>50&&abs(jteta)<2)>>hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],centBin),"pcollisionEventSelection&&pHBHENoiseFilter","col");      
+      //if(printDebug)cout<<"cent bin = "<<centBin<<endl;
+      //if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
 
       if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0 || (vz_1>15)) continue; 
       
@@ -1108,20 +1109,39 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       // if(printDebug)cout<<" jet65 = "<<jet65_1<<endl;
       // if(printDebug)cout<<" jet55 = "<<jet55_1<<endl;
       // if(printDebug)cout<<" nrefe = "<<nrefe_1<<endl;
-		
-      // apply the supernova events cut rejection here: 
-      if(hiNpix_1 > 38000 - 50*nrefe_1){
-	if(printDebug) cout<<"removed this supernova event"<<endl;
-	continue;
-      }
-	
+
+      int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
+
       for(int j = 0;j<nbins_eta;j++){
 	  
 	for(int g = 0;g<nrefe_1;g++){
 	    
-	  if(/*put your favourite QA cut here*/(chMax_1[g]/pt_1[g]>0.01) /*&& (pt_1[g]<3*trgObj_pt_1)*/){
+	  if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
+	      
+	    if(pt_1[g]>=50) jetCounter++;
 
-	    if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
+	  }//eta selection cut
+
+	}// jet loop
+
+      }//eta bins loop
+
+      hpbpb_Npix_cut[k][centBin]->Fill(hiNpix_1,jetCounter);
+      hpbpb_Npix_cut[k][nbins_cent]->Fill(hiNpix_1,jetCounter);
+
+      // apply the correct supernova selection cut rejection here: 
+      if(hiNpix_1 > 38000 - 50*jetCounter++){
+	if(printDebug) cout<<"removed this supernova event"<<endl;
+	continue;
+      }
+
+      for(int j = 0;j<nbins_eta;j++){
+
+	for(int g = 0;g<nrefe_1;g++){
+	  
+	  if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
+	    
+	    if(/*put your favourite QA cut here*/(chMax_1[g]/pt_1[g]>0.01) /*&& (pt_1[g]<3*trgObj_pt_1)*/){
 		
 	      if(jet55_1==1) { // passes the jet55 trigger
 		if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
@@ -1183,10 +1203,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 	      //   hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
 	      // }//jet55 and not Jet65 and not Jet80 selection 
 
-	    }//eta selection
-
-	  }//qa cut selection
-
+	      
+	    }//qa cut selection
+	  
+	  }//eta selection
+	  
 	}//jet loop
 
       }//eta bin loop
@@ -1260,9 +1281,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 
 	//not dividing by ncoll here. will do that in the plotting macro under RAA. 
 	
-	hpbpb_TrgObj80[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
-	hpbpb_TrgObj65[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
-	hpbpb_TrgObj55[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
+	//hpbpb_TrgObj80[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
+	//hpbpb_TrgObj65[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
+	//hpbpb_TrgObj55[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
 	
 	// divide by bin width is doing something very weird. Its making histograms which are empty get 40 entries from somewhere - fixed that issue due to empty bins being divided by bin width. 
 

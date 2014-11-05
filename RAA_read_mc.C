@@ -19,6 +19,8 @@
 
 // Oct 23 - removed the cuts from the MC -> like the noisefilter etc... 
 
+// Nov 4th - added the supernova event cut rejection based on the no of hits in the pixel. 
+
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -159,7 +161,8 @@ public:
     tSkim = (TTree*)tFile->Get("skimanalysis/HltTree");
     tJet = (TTree*)tFile->Get(jetTree);
     tJet->SetBranchAddress("jtpt" , jtpt );
-    if(isPbPb )tJet->SetBranchAddress("jtpu", jtpu );
+    if(isPbPb)tJet->SetBranchAddress("jtpu", jtpu );
+    if(isPbPb)tEvt->SetBranchAddress("hiNpix",&hiNpix);
     tJet->SetBranchAddress("rawpt", rawpt);
     tJet->SetBranchAddress("trackMax" , trackMax );
     tJet->SetBranchAddress("chargedMax",chargedMax);
@@ -184,6 +187,7 @@ public:
     else tSkim->SetBranchAddress("pPAcollisionEventSelectionPA",&pPAcollisionEventSelectionPA);
     tJet->AddFriend(tEvt);
     tJet->AddFriend(tSkim);
+    
   };
   TFile *tFile;
   TTree *tJet;
@@ -207,6 +211,7 @@ public:
   float subid[1000];
   float vz;
   float pthat;
+  int hiNpix;
   int njets;
   int ngen;
   int bin;     
@@ -446,12 +451,12 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
   //TH1F *hpp_eta[no_radius][nbins_eta], *hpp_phi[no_radius][nbins_eta];
   TH1F *hpp_eta_full[no_radius], *hpp_phi_full[no_radius];
   TH1F *hpp_eta_full_noScale[no_radius], *hpp_phi_full_noScale[no_radius];
-
+  
   TH1F *hCentMC[no_radius];
   
   TH1F *hVzMC[no_radius];
   TH1F *hVzPPMC[no_radius];
-
+  
   TH1F *hPtHat[no_radius];
   TH1F *hPtHatRaw[no_radius];
   TH1F *hPtHatPP[no_radius];
@@ -462,7 +467,10 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
 
   TH1F *hPbPb_pthat_fine_noScale[no_radius];
   TH1F *hPP_pthat_fine_noScale[no_radius];
-  
+
+  // histograms for the supernova cut rejection 
+  TH2F *hpbpb_Npix_cut[no_radius][nbins_cent+1]; 
+
 
   for(int k = 0;k<no_radius;k++){
     //cout<<"radius = "<<list_radius[k]<<endl;
@@ -538,6 +546,13 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
     hpp_phi_full_noScale[k] = new TH1F(Form("hpp_phi_full_noScale_R%d",list_radius[k]),Form("PP phi distribution for noScale R=%d",list_radius[k]),400,-4,+4);
 
 
+    for(int i = 0;i<nbins_cent;i++){
+      hpbpb_Npix_cut[k][i] = new TH2F(Form("hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],i),Form("Number of pixels hit per no of jets R%d n20_eta_p20 %2.0f - %2.0f cent",list_radius[k],5*boundaries_cent[i],5*boundaries_cent[i+1]),50,0,50,100,0,60000);
+    }
+    
+    hpbpb_Npix_cut[k][nbins_cent] = new TH2F(Form("hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),Form("Number of pixels hit per no of jets R%d n20_eta_p20 0-200cent",list_radius[k]),50,0,50,100,0,60000);
+    
+    
   }// radii loop
 
   // Setup jet data branches - this will be 2D with [radius][pthat-file], but the histogram here is just 1D with [radius]
@@ -571,11 +586,52 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
   // checking the histograms to see if something is filled. 
   if(printDebug)hPtHatRaw[0]->Print("base");
   if(printDebug)hPtHatRawPP[0]->Print("base");
+
   
   for(int k = 0;k<no_radius;k++){
     if(printDebug)cout<<"Filling MC for radius = "<<list_radius[k]<<endl;
     // fill PbPb MC 
     if(printDebug)cout<<"Filling PbPb MC"<<endl;
+
+    // //setup test trees to get this hiNpix vs njets histogram here:
+    
+    // const int N = 3;
+    
+    // TChain *jetTree[N];
+    // //TChain *jetpbpb2[N][no_radius];
+  
+    // string dir[N];
+  
+    // dir[0] = "skimanalysis";
+    // dir[1] = Form("ak%s%d%sJetAnalyzer",algo,list_radius[k],jet_type);
+    // dir[2] = "hiEvtAnalyzer";
+    
+    // string trees[N] = {
+    //   "HltTree",
+    //   "t",
+    //   "HiTree",
+    // }; 
+    
+    // //this loop is to assign the tree values before we go into the file loop. 
+    // for(int t = 0;t<N;t++){
+    //   jetTree[t] = new TChain(string(dir[t]+"/"+trees[t]).data());
+    // }//tree loop ends
+    
+    // for(int ifile = 0;ifile<nbins_pthat;ifile++){
+    //   for(int t = 0;t<N;t++){
+    // 	jetTree[t]->Add(fileName_pthat[ifile]);
+    //   }
+    //   cout<<"entries added to the loop = "<<jetTree[0]->GetEntries()<<endl;
+    // }
+
+    // TCut centWeight="((pcollisionEventSelection&&pHBHENoiseFilter))";
+    // jetTree[1]->AddFriend(jetTree[0]);
+    // jetTree[1]->AddFriend(jetTree[2]);
+    
+    // // put the supernova events histogram here: 
+    // jetTree[1]->Draw(Form("hiNpix:Sum$(jtpt>50&&abs(jteta)<2)>>hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),centWeight,"col");    
+    
+
     for (int h=0;h<nbins_pthat;h++) {
       if (xsection[h]==0) continue;
       if(printDebug)cout <<"Loading pthat"<<boundaries_pthat[h]<<" sample, cross section = "<<xsection[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundaries_pthat[h],boundaries_pthat[h+1])<<endl;
@@ -595,17 +651,17 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
       double fentries = el->GetN();
       if(printDebug)cout<<"tree entries: "<<data[k][h]->tJet->GetEntries()<<" elist: "<<fentries<<endl;
       delete el;
+      int test_counter = 0; 
 
-      int test_counter = 0;
-     
-      for (Long64_t jentry=0; jentry<data[k][h]->tJet->GetEntries();jentry++) {
-	//for (Long64_t jentry=0; jentry<100;jentry++) {
+      //for (Long64_t jentry=0; jentry<data[k][h]->tJet->GetEntries();jentry++) {
+      for (Long64_t jentry=0; jentry<10;jentry++) {
 	
         //cout<<"hi"<<endl;
         data[k][h]->tEvt->GetEntry(jentry);
         data[k][h]->tJet->GetEntry(jentry);
-        //data[k][h]->tGenJet->GetEntry(jentry);
-        if(data[k][h]->pthat > boundaries_pthat[h] && data[k][h]->pthat < boundaries_pthat[h+1]) test_counter++;
+        data[k][h]->tSkim->GetEntry(jentry);
+        
+	if(data[k][h]->pthat > boundaries_pthat[h] && data[k][h]->pthat < boundaries_pthat[h+1]) test_counter++;
 
         //remember this cut is there because there was some rediculous values of pthats of -1 in the private production forests
         //if(jentry%100==0)cout<<"pthat of that event = "<<data[k][h]->pthat<<endl;
@@ -617,7 +673,6 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
 	double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/fentries;
 	//if(printDebug && jentry%1000==0)cout<<"scale = "<<xsection[pthatBin-1]<<" - "<<xsection[pthatBin]<<" / "<<fentries<<" = "<<scale<<endl;
       
-
         //cout<<xsection[pthatBin-1]-xsection[pthatBin]<<endl;
         //cout<<"nentries = "<<hPtHatRaw->GetBinContent(pthatBin)<<endl;
         //double scale_old = (double)(xsection[pthatBin-1]-xsection[pthatBin])/hPtHatRaw[k]->GetBinContent(pthatBin);
@@ -631,7 +686,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
         if(fabs(data[k][h]->vz)>15) continue;
 	if(!data[k][h]->pcollisionEventSelection) continue;
 	//if(!data[k][h]->pHBHENoiseFilter) continue;
-
+	
         int cBin = hCentMC[k]->FindBin(data[k][h]->bin)-1;
         //int cBin = nbins_cent-1;
         double weight_cent=1;
@@ -645,7 +700,38 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
 	  cout<<"RED FLAG RED FLAG RED FLAG"<<endl;
 	  continue;
 	}
+
+	int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
 	
+	for(int j = 0;j<nbins_eta;j++){
+
+	  for(int g = 0;g<data[k][h]->njets;g++){
+
+	    if(data[k][h]->jteta[g] >= boundaries_eta[j][0] && data[k][h]->jteta[g] < boundaries_eta[j][1]){
+	      cout<<"jtpt = "<<data[k][h]->jtpt[g]<<endl;
+	      if(data[k][h]->jtpt[g]>=50) jetCounter++;
+	      
+	    }// eta selection loop
+
+	  }//jet loop
+
+	}//eta bins loop
+
+	if(printDebug)cout<<"hiNpix = "<<data[k][h]->hiNpix<<", NJets = "<<jetCounter<<endl;
+
+	hpbpb_Npix_cut[k][cBin]->Fill(data[k][h]->hiNpix,jetCounter);
+	hpbpb_Npix_cut[k][nbins_cent]->Fill(data[k][h]->hiNpix,jetCounter);	
+
+	//data[k][h]->tJet->Draw(Form("hiNpix:Sum$(jtpt>50&&abs(jteta)<2)>>hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],cBin),"","goff");
+
+	//hpbpb_Npix_cut[k][cBin]->Fill(data[k][h]->hiNpix,sum$())
+
+	// apply the supernova events cut rejection here: 
+	if(data[k][h]->hiNpix > 38000 - 50*jetCounter){
+	  //if(printDebug) cout<<"removed this supernova event"<<endl;
+	  continue;
+	}
+
 	hPbPb_pthat_fine[k]->Fill(data[k][h]->pthat,weight_vz*scale);
 	hPbPb_pthat_fine_noScale[k]->Fill(data[k][h]->pthat);
         hCentMC[k]->Fill(data[k][h]->bin,scale*weight_cent*weight_vz);
@@ -971,6 +1057,13 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF"){
     if(printDebug)hPP_pthat_fine_noScale[k]->Print("base");
     hPP_pthat_fine_noScale[k]->Write();
 
+    for(int i = 0;i<=nbins_cent;i++){
+      
+      hpbpb_Npix_cut[k][i]->Print("base");
+      hpbpb_Npix_cut[k][i]->Write();
+      
+    }
+    
   }// radius loop
 
   
