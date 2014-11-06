@@ -82,7 +82,7 @@ void putCMSPrel(double x=0.17, double y=0.96, double size=0.04){
 }
 
 
-void putCMSSim(double x=0.1, double y=0.9, double size=0.04){
+void putCMSSim(double x=0.17, double y=0.96, double size=0.04){
   TLatex *tex=0;
   tex = new TLatex(x,y,"CMS Simulation");
   tex->SetTextSize(size);
