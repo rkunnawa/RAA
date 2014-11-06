@@ -1225,8 +1225,8 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
 	  if(cut>1.01)cout<<"Cut value = "<<cut<<endl;
 	  
 	  
-	  //if(/*put your favourite QA cut here*/((chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g] + eSum_1[g])/pt_1[g]>1.01)){
-	  if(1>0){
+	  if(/*put your favourite QA cut here*/((chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g] + eSum_1[g])/pt_1[g]>1.01)){
+	    //if(1>0){ // just to check without the cut. 
 	    //cout<<"passed the cut"<<endl;
 	    if(jet55_1==1) { // passes the jet55 trigger
 	      if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
