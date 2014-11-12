@@ -46,6 +46,7 @@
 #include <TStopwatch.h>
 #include <TRandom3.h>
 #include <TChain.h>
+#include <TNtuple.h>
 #include <TProfile.h>
 #include <TStopwatch.h>
 #include <TCut.h>
@@ -221,7 +222,7 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu", char *jet_type = "PF"){
+void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "PF"){
 
   TH1::SetDefaultSumw2();
   //gStyle->SetOptStat(0);
@@ -233,7 +234,7 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
   
   cout<<"Running for Algo = "<<algo<<" "<<jet_type<<endl;
   
-  bool printDebug = true;
+  bool printDebug = false;
   
   // number convension:
   // 0 - MB
@@ -730,6 +731,7 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
   float muMax_1[1000];
   float eSum_1[1000];
   float muSum_1[1000];
+  float jtpu_1[1000];
 
   // event tree
   int evt_1;
@@ -753,11 +755,13 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
   // trigger tree
   int L1_MB_1;
   int L1_MB_p_1;
+  int L1_sj36_1;
   int jetMB_1;
   int jet55_1;
   int jet65_1;
   int jet80_1;
   int jetMB_p_1;
+  int L1_sj36_p_1;
   int jet55_p_1;
   int jet65_p_1;
   int jet80_p_1;
@@ -912,6 +916,7 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
     jetpbpb1[2][k]->SetBranchAddress("jteta",&eta_1);
     jetpbpb1[2][k]->SetBranchAddress("jtphi",&phi_1);
     jetpbpb1[2][k]->SetBranchAddress("rawpt",&raw_1);
+    jetpbpb1[2][k]->SetBranchAddress("jtpu",&jtpu_1);
     jetpbpb1[2][k]->SetBranchAddress("chargedMax",&chMax_1);
     jetpbpb1[2][k]->SetBranchAddress("chargedSum",&chSum_1);
     jetpbpb1[2][k]->SetBranchAddress("trackMax",&trkMax_1);
@@ -935,6 +940,8 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_1);
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1",&jet80_1);
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND",&L1_sj36_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND_Prescl",&L1_sj36_p_1);
 
     jetpbpb1[2][k]->SetBranchAddress("id",&trgObj_id_1);
     jetpbpb1[2][k]->SetBranchAddress("pt",&trgObj_pt_1);
@@ -1002,14 +1009,14 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
   // run lumi evt HLTobjpt HLTobjeta HLTobjphi hibin jtpt jteta jtphi
 
   //ofstream fHLT_80,fHLT_65,fHLT_55;
-  ofstream fHLT_high[no_radius];
+  //ofstream fHLT_high[no_radius];
   //fHLT_80.open(Form("pbpb_%s_R%d_max_trgObj_80_jets.txt",algo,radius));
   //fHLT_65.open(Form("pbpb_%s_R%d_80_max_trgObj_65_jets.txt",algo,radius));
   //fHLT_55.open(Form("pbpb_%s_R%d_65_max_trgObj_55_jets.txt",algo,radius));
-  for(int k = 0;k<no_radius;k++){
-    fHLT_high[k].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pbpb_%s_R%d_abnormal_jets_%d_%d.txt",algo,list_radius[k],date.GetDate(),endfile));
+  //for(int k = 0;k<no_radius;k++){
+  //fHLT_high[k].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pbpb_%s_R%d_abnormal_jets_%d_%d.txt",algo,list_radius[k],date.GetDate(),endfile));
     //fHLT_high[k].open(Form("/export/d00/scratch/rkunnawa/rootfiles/pbpb_%s_R%d_abnormal_jets_%d_%d.txt",algo,list_radius[k],date.GetDate(),endfile));
-  }
+  //}
   // the actual cut we are going to be using is 
   // TMath::Max(chargedMax,neutralMax)/(TMath::Max(chargedSum,neutralSum))<0.975
   // which is pretty much the same as doing the one mentioned above.  
@@ -1132,6 +1139,25 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
     
   }//radius loop
 
+  Float_t cut1 = 0;
+  Float_t cut2 = 0;
+  Float_t cut3 = 0;
+  Float_t cut4 = 0,cut5 = 0;
+
+  TH1F* hCut1 = new TH1F("hCut1","chMax/jtpt",100,0,10);
+  TH1F* hCut2 = new TH1F("hCut2","neMax/Max(chSum,neSum)",100,0,10);
+  TH1F* hCut3 = new TH1F("hCut3","(chSum+phSum+neSum+muSum+eSum-jtpu)/jtpt",100,0,10);
+  TH1F* hCut4 = new TH1F("hCut4","(chSum+phSum+neSum+muSum+eSum)/(0.5*rawpt)",100,0,10);
+  TH1F* hCut5 = new TH1F("hCut5","neMax/(neMax+chMax+phMax)",100,0,10);
+  TH1F* hEvents = new TH1F("hEvents","",2,0,1);
+  TH1F* hJets = new TH1F("hJets","",2,0,1);
+  Float_t pt = 0;
+  Float_t chMax = 0,chSum = 0,phMax = 0,phSum = 0, neMax = 0, neSum = 0, muSum = 0, muMax = 0, eSum = 0, eMax = 0;
+  Float_t cent = 0;
+
+  TNtuple *jets_ID = new TNtuple("jets_ID","","cut1:cut2:cut3:cut4:cut5:pt:jtpu:l1sl36:l1sl36_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
+  Float_t arrayValues[27];
+
   //loop for the MB tree. 
   //empty for now - need to fix that once we have the MB data.  
   
@@ -1156,11 +1182,11 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
       if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<endl;
       
       // get the stuff required for the trigger turn on curve later. in a separate loop till i understand how to put this in here. 
-
+      
       int centBin = findBin(hiBin_1);//tells us the centrality of the event. 
       //if(printDebug)cout<<"cent bin = "<<centBin<<endl;
       //if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
-
+      
       if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0 || (vz_1>15)) continue; 
       
       // if(printDebug)cout<<" trigger object pt =  "<<trgObj_pt_1<<endl;
@@ -1170,99 +1196,154 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
       // if(printDebug)cout<<" nrefe = "<<nrefe_1<<endl;
       
       int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
-	
+      
       //if(algo=="Vs"){
-
-	for(int j = 0;j<nbins_eta;j++){
+      
+      for(int j = 0;j<nbins_eta;j++){
 	  
-	  for(int g = 0;g<nrefe_1;g++){
+	for(int g = 0;g<nrefe_1;g++){
 	    
-	    if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
+	  if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
 	      
-	      if(pt_1[g]>=50) jetCounter++;
-
-	    }//eta selection cut
-
-	  }// jet loop
-
-	}//eta bins loop
-
-	//if(printDebug)cout<<"pixel hit = "<<hiNpix_1<<", jet counter = "<<jetCounter<<endl;
-	hpbpb_Npix_before_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
-	hpbpb_Npix_before_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);	
+	    if(pt_1[g]>=50) jetCounter++;
+	    
+	  }//eta selection cut
+	  
+	}// jet loop
 	
-	// apply the correct supernova selection cut rejection here: 
-	if(hiNpix_1 > 38000 - 500*jetCounter){
-	  if(printDebug) cout<<"removed this supernova event"<<endl;
-	  continue;
-	}
-	
-	hpbpb_Npix_after_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
-	hpbpb_Npix_after_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);
-	//}//if Vs search for supernova events. 
+      }//eta bins loop
+      
+      //if(printDebug)cout<<"pixel hit = "<<hiNpix_1<<", jet counter = "<<jetCounter<<endl;
+      hpbpb_Npix_before_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
+      hpbpb_Npix_before_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);	
+      
+      // apply the correct supernova selection cut rejection here: 
+      if(hiNpix_1 > 38000 - 500*jetCounter){
+	if(printDebug) cout<<"removed this supernova event"<<endl;
+	continue;
+      }
+      
+      hpbpb_Npix_after_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
+      hpbpb_Npix_after_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);
+      //}//if Vs search for supernova events. 
+      
+      hEvents->Fill(1);
       
       for(int j = 0;j<nbins_eta;j++){
 	
 	for(int g = 0;g<nrefe_1;g++){
 	  
-	    
 	  //if(/*put your favourite QA cut here*/(chMax_1[g]/pt_1[g]>0.05) && (chMax_1[g]/pt_1[g]<1.00)){
+	  
+	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
+	  
+	  if(raw_1[g] < 20) continue;
+	  
+	  if(printDebug)cout<<"jet variables:  "<<endl;
+	  if(printDebug)cout<<"chSum = "<<chSum_1[g]<<endl;
+	  if(printDebug)cout<<"phSum = "<<phSum_1[g]<<endl;
+	  if(printDebug)cout<<"neSum = "<<neSum_1[g]<<endl;
+	  if(printDebug)cout<<"muSum = "<<muSum_1[g]<<endl;
+	  if(printDebug)cout<<"eSum  = "<<eSum_1[g]<<endl;
+	  if(printDebug)cout<<"jtpt  = "<<pt_1[g]<<endl;
+	  if(printDebug)cout<<"rawpT = "<<raw_1[g]<<endl;
+	  if(printDebug)cout<<"jtpu  = "<<jtpu_1[g]<<endl;
+	  cut3 = (float)(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g] + eSum_1[g] - jtpu_1[g])/(pt_1[g]);
+	  cut1 = (float)chMax_1[g]/(pt_1[g]);
+	  cut2 = (float)neMax_1[g]/TMath::Max(chSum_1[g],neSum_1[g]);
+	  cut4 = (float)(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g] + eSum_1[g])/(0.5*raw_1[g]);
+	  cut5 = (float)neMax_1[g]/(neMax_1[g] + chMax_1[g] + phMax_1[g]);
+	  if(printDebug)cout<<"Cut1 value = "<<cut1<<endl;
+	  if(printDebug)cout<<"Cut2 value = "<<cut2<<endl;
+	  if(printDebug)cout<<"Cut3 value = "<<cut3<<endl;
+	  if(printDebug)cout<<"Cut4 value = "<<cut4<<endl;
+	  if(printDebug)cout<<"Cut4 value = "<<cut5<<endl;
+	  
+	  //hCut3->Fill(cut3);
+	  //hCut5->Fill(cut5);
+	  //hCut4->Fill(cut4);
+	  //hCut2->Fill(cut2);
+	  //hCut1->Fill(cut1);
+
+	  pt = pt_1[g];
+	  cent = centBin;
+	  chMax = chMax_1[g];
+	  chSum = chSum_1[g];
+	  phMax = phMax_1[g];
+	  phSum = phSum_1[g];
+	  neMax = neMax_1[g];
+	  neSum = neSum_1[g];
+	  muMax = muMax_1[g];
+	  muSum = muSum_1[g];
+	  eMax = eMax_1[g];
+	  eSum = eSum_1[g];
+
+	  arrayValues[0] = cut1;
+	  arrayValues[1] = cut2;
+	  arrayValues[2] = cut3;
+	  arrayValues[3] = cut4;
+	  arrayValues[4] = cut5;
+	  arrayValues[5] = pt;
+	  arrayValues[6] = jtpu_1[g];
+	  arrayValues[7] = L1_sj36_1;
+	  arrayValues[8] = L1_sj36_p_1;
+	  arrayValues[9] = jet55_1;
+	  arrayValues[10] = jet55_p_1;
+	  arrayValues[11] = jet65_1;
+	  arrayValues[12] = jet65_p_1;
+	  arrayValues[13] = jet80_1;
+	  arrayValues[14] = jet80_p_1;
+	  arrayValues[15] = trgObj_pt_1;
+	  arrayValues[16] = cent;
+	  arrayValues[17] = chMax;
+	  arrayValues[18] = chSum;
+	  arrayValues[19] = phMax;
+	  arrayValues[20] = phSum;
+	  arrayValues[21] = neMax;
+	  arrayValues[22] = neSum;
+	  arrayValues[23] = muMax;
+	  arrayValues[24] = muSum;
+	  arrayValues[25] = eMax;
+	  arrayValues[26] = eSum;
+
+	  jets_ID->Fill(arrayValues);
+
+	  if(/*put your favourite QA cut here*/cut1>0.05 && cut1<1.00){
 	  //if(/*put your favourite QA cut here*/(neMax_1[g]/TMath::Max(chSum_1[g],neSum_1[g])>0.00) && (neMax_1[g]/TMath::Max(chSum_1[g],neSum_1[g])<0.97)){
 
-	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
-
-	  if(raw_1[g] < 25) continue;
-	    
-	  // cout<<"jet variables:  "<<endl;
-	  // cout<<"chSum = "<<chSum_1[g]<<endl;
-	  // cout<<"phSum = "<<phSum_1[g]<<endl;
-	  // cout<<"neSum = "<<neSum_1[g]<<endl;
-	  // cout<<"muSum = "<<muSum_1[g]<<endl;
-	  // cout<<"eSum = "<<eSum_1[g]<<endl;
-	  // cout<<"jtpt = "<<pt_1[g]<<endl;
-	  // cout<<"rawpT = "<<raw_1[g]<<endl;
-	  float cut = (float)(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g] + eSum_1[g])/pt_1[g];
-	  if(cut>1.01)cout<<"Cut value = "<<cut<<endl;
-	  
-	  
-	  if(/*put your favourite QA cut here*/((chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g] + eSum_1[g])/pt_1[g]>1.01)){
 	    //if(1>0){ // just to check without the cut. 
 	    //cout<<"passed the cut"<<endl;
-	    if(jet55_1==1) { // passes the jet55 trigger
-	      if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
-		hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-		hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+
+	    hJets->Fill(1);
+
+	    if(jet80_1==1 && L1_sj36_1==1) {
+	      if(trgObj_pt_1>=80){
+		hpbpb_TrgObj80[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
+		hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
 		
 		if(jetCounter>=7){
-		  hpbpb_TrgObj55_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-		  hpbpb_TrgObj55_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+		  hpbpb_TrgObj80_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
+		  hpbpb_TrgObj80_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
 		}
 		if(jetCounter<7){
-		  hpbpb_TrgObj55_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-		  hpbpb_TrgObj55_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-		}
-		if(pt_1[g]>3*trgObj_pt_1){ // get an idea of the event information from these large pt jets 
-		  fHLT_high[k]<<evt_1<<" "<<run_1<<" "<<lumi_1<<" "<<vz_1<<" "<<centBin<<" "<<trgObj_pt_1<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<pt_1[g]<<" "<<raw_1[g]<<" "<<eta_1[g]<<" "<<phi_1[g]<<" "<<endl;
+		  hpbpb_TrgObj80_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
+		  hpbpb_TrgObj80_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
 		}
 	      }
-	      // hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-	      // hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-	      // if((jet65_1==0) && (jet80_1==0)){ // this is to just check
-	      //   hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-	      //   hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-	      // }
-	    }else if(jet65_1==1) {
+	      // hpbpb_Jet80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
+	      // hpbpb_Jet80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
+	    }else if(jet65_1==1 && L1_sj36_1==1) {
 	      if(trgObj_pt_1>=65 && trgObj_pt_1<80){
-		hpbpb_TrgObj65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
-		hpbpb_TrgObj65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+		hpbpb_TrgObj65[k][j][centBin]->Fill(pt_1[g],jet65_p_1*L1_sj36_p_1);
+		hpbpb_TrgObj65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1*L1_sj36_p_1);
 		
 		if(jetCounter>=7){
-		  hpbpb_TrgObj65_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
-		  hpbpb_TrgObj65_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+		  hpbpb_TrgObj65_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet65_p_1*L1_sj36_p_1);
+		  hpbpb_TrgObj65_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1*L1_sj36_p_1);
 		}
 		if(jetCounter<7){
-		  hpbpb_TrgObj65_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
-		  hpbpb_TrgObj65_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+		  hpbpb_TrgObj65_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet65_p_1*L1_sj36_p_1);
+		  hpbpb_TrgObj65_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1*L1_sj36_p_1);
 		}
 	      }
 	      // hpbpb_Jet65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
@@ -1271,23 +1352,29 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
 	      //   hpbpb_Jet65_noJet80[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
 	      //   hpbpb_Jet65_noJet80[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
 	      // }
-	    }else if(jet80_1==1) {
-	      if(trgObj_pt_1>=80){
-		hpbpb_TrgObj80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
-		hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
-		  
+	    }else if(jet55_1==1 && L1_sj36_1==1) { // passes the jet55 trigger
+	      if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
+		hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		
 		if(jetCounter>=7){
-		  hpbpb_TrgObj80_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
-		  hpbpb_TrgObj80_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
+		  hpbpb_TrgObj55_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		  hpbpb_TrgObj55_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
 		}
 		if(jetCounter<7){
-		  hpbpb_TrgObj80_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
-		  hpbpb_TrgObj80_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
+		  hpbpb_TrgObj55_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		  hpbpb_TrgObj55_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
 		}
-
+		//if(pt_1[g]>3*trgObj_pt_1){ // get an idea of the event information from these large pt jets 
+		//  fHLT_high[k]<<evt_1<<" "<<run_1<<" "<<lumi_1<<" "<<vz_1<<" "<<centBin<<" "<<trgObj_pt_1<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<pt_1[g]<<" "<<raw_1[g]<<" "<<eta_1[g]<<" "<<phi_1[g]<<" "<<endl;
+		//}
 	      }
-	      // hpbpb_Jet80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
-	      // hpbpb_Jet80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
+	      // hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
+	      // hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+	      // if((jet65_1==0) && (jet80_1==0)){ // this is to just check
+	      //   hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
+	      //   hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+	      // }
 	    }
 
 	    // if(jet80_1) {
@@ -1320,8 +1407,6 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
 	    
 	}//jet loop
 	  
-	  
-      
       }//eta bin loop
     
     }//nentries_jet55or65 loop
@@ -1371,13 +1456,13 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
     
   //   }//nentries_jet80or95 loop
 
-    fHLT_high[k].close();
+    //fHLT_high[k].close();
     
   }//radius loop. 
   
   
   //declare the output file
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_testComb4_cut1_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   //TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   
   f.cd();
@@ -1493,7 +1578,21 @@ void RAA_read_data_pbpb(int startfile = 780, int endfile = 781, char *algo = "Pu
     }
 
   }//radius loop
-  
+
+  //hCut1->Write();
+  //hCut2->Write();
+  //hCut3->Write();
+  //hCut4->Write();
+  //hCut5->Write();
+
+  //hEvents->Write();
+  //hJets->Write();
+  jets_ID->Write();
+
+  if(printDebug)jets_ID->Print();
+  if(printDebug)hEvents->Print();
+  if(printDebug)hJets->Print();
+
   f.Write();
 
   f.Close();

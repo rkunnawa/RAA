@@ -151,7 +151,8 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TFile *fin; 
   
   //if(location=="MIT") 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfo_ak%s%d%s_20141106.root",algo,radius,jet_type));
+  // fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfo_ak%s%d%s_20141106.root",algo,radius,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_testComb2_cut3_test_20141109.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
   
@@ -195,6 +196,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     dPbPb_Trg80[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObj80_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_Trg65[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObj65_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_Trg55[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObj55_R%d_n20_eta_p20_cent%d",radius,i));    
+    /*
     mPbPb_Reco[i] = (TH1F*)fin->Get(Form("hpbpb_reco_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Gen[i] = (TH1F*)fin->Get(Form("hpbpb_gen_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_ResponseNorm[i] = (TH2F*)fin->Get(Form("mPbPb_ResponseNorm_cent%d",i));
@@ -213,9 +215,9 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       uPbPb_BayesianIter[j][i] = (TH1F*)fin->Get(Form("uPbPb_BayesianIter%d_cent%d",j,i));
       uPbPb_MC_BayesianIter[j][i] = (TH1F*)fin->Get(Form("uPbPb_MC_BayesianIter%d_cent%d",j,i));
     }
-
+    */
   }
-
+  /*
   dPP_Comb = (TH1F*)fin->Get(Form("hpp_TrgComb_R%d_n20_eta_p20",radius));
   mPP_ResponseNorm = (TH2F*)fin->Get(Form("mPP_ResponseNorm",radius));	
   mPP_mcclosure_data = (TH1F*)fin->Get(Form("mPP_mcclosure_data",radius));
@@ -234,9 +236,13 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   }
 
+  */
+
+
+  
   // get histograms from the MC file. 
-  TFile *fMCin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_ak%s%s_20141105.root",algo,jet_type));
-  TFile *fDatain = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_20141106.root",algo,jet_type));
+  TFile *fMCin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_ak%s%s_20141110.root",algo,jet_type));
+  TFile *fDatain = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_testComb2_cut2_20141108.root",algo,jet_type));
 
   TH1F *hPbPb_MC_jtpu[no_radius][nbins_eta][nbins_cent+1];
  
@@ -279,7 +285,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hpbpb_pt_Njet_l7[i] = (TH1F*)fMCin->Get(Form("hpbpb_pt_Njet_l7_R%d_n20_eta_p20_cent%d",radius,i));
     hpbpb_pt_Njet_l7[i]->Print("base");
     
-    
+    /*
     hpbpb_TrgObj80_nJet_g7[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObj80_nJet_g7_R%d_n20_eta_p20_cent%d",radius,i));
     hpbpb_TrgObj80_nJet_g7[i]->Print("base");
     hpbpb_TrgObj65_nJet_g7[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObj65_nJet_g7_R%d_n20_eta_p20_cent%d",radius,i));
@@ -298,12 +304,12 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hpbpb_TrgObjComb_nJet_l7[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObjComb_nJet_l7_R%d_n20_eta_p20_cent%d",radius,i));
     hpbpb_TrgObjComb_nJet_l7[i]->Print("base");
     
-
+    */
     for(int k = 0;k<no_radius;k++){
       
       for(int j = 0;j<nbins_eta;j++){
 	
-	hPbPb_MC_jtpu[k][j][i] = (TH1F*)fMCin->Get(Form("hpbpb_jtpu_noScale_R%d_%s_cent%d",list_radius[k],etaWidth[j],i));
+	//hPbPb_MC_jtpu[k][j][i] = (TH1F*)fMCin->Get(Form("hpbpb_jtpu_noScale_R%d_%s_cent%d",list_radius[k],etaWidth[j],i));
 	
 	
       }//eta bins loop  
@@ -311,7 +317,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     
   }//radius loop
   
-
+  
   //Ok now that we have loaded all the histograms we need - lets start making the plots 
   Double_t scaleFactor[nbins_cent+1] = {1,1e-1,1e-2,1e-3,1e-4,1e-5,1e-6};
 
@@ -1035,7 +1041,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   */
-  
+  /*
   // Plotting the trigObj spectra from individual triggers vs the combined triggers. 
   TCanvas *cDataMerge = new TCanvas("cDataMerge","",1000,800);
   makeMultiPanelCanvas(cDataMerge,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -1046,7 +1052,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     cDataMerge->cd(nbins_cent-i)->SetLogy();
     cDataMerge->cd(nbins_cent-i)->SetLogx();
 
-    makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","#frac{d^{2} N}{d#eta dp_{T}}");
+    makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","#frac{d^{2} N}{dp_{T}}");
     //dPbPb_TrgComb[i]->Scale(1e-6)
     dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("rebin_pbpb_meas_cent%d",i),boundaries_pt);
     divideBinWidth(dPbPb_TrgComb[i]);
@@ -1089,10 +1095,11 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.95,15);
-  drawText("|#eta|<2, |vz|<15, chMax/jtpt>0.01",0.25,0.61,16);
-  cDataMerge->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  drawText("|#eta|<2, |vz|<15, 0.00 < cut3 < 1.01",0.25,0.61,16);
+  drawText("pCES, HBHE",0.55,0.51,16);
+  cDataMerge->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_cut3_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
-  
+  */
   
   /*
     
@@ -1194,7 +1201,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  /*
+  
   // plotting the hiNpix vs NJets(pT>50 and |eta|<2) for each centrality bin. 
   TCanvas *cSupernova_data = new TCanvas("cSupernova_data","",1000,800);
   makeMultiPanelCanvas(cSupernova_data,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -1220,7 +1227,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hpbpb_Npix_before_cut_data[i]->Draw("col");
 
     lineSupernova_data->Draw();
-    lineSupernova_data_2->Draw();
+    //lineSupernova_data_2->Draw();
     drawText("Data",0.6,0.2,16);
     drawText("|vz|<15, pCES, HBHE",0.45,0.75,16);
     drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.2,16);
@@ -1230,8 +1237,9 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   putCMSPrel();
   drawText("Full dataset Jet55 or Jet65 or Jet80",0.3,0.85,16);
   cSupernova_data->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-
-    // plotting the hiNpix vs NJets(pT>50 and |eta|<2) for each centrality bin. for MC
+  
+  
+  // plotting the hiNpix vs NJets(pT>50 and |eta|<2) for each centrality bin. for MC
   TCanvas *cSupernova_mc = new TCanvas("cSupernova_mc","",1000,800);
   makeMultiPanelCanvas(cSupernova_mc,3,2,0.0,0.0,0.2,0.15,0.07);
 
@@ -1255,7 +1263,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hpbpb_Npix_before_cut_mc[i]->Draw("col");
 
     lineSupernova_mc->Draw();
-    lineSupernova_mc_2->Draw();
+    //lineSupernova_mc_2->Draw();
     drawText("MC",0.6,0.2,16);
     drawText("|vz|<15, pCES, HBHE",0.45,0.75,16);
     drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.2,16);
