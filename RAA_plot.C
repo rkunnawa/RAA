@@ -147,12 +147,32 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
   
+  //Boolean Variables for the several plots: 
+  bool doSpectra = false;
+  bool doPbPbIterSys = false;
+  bool doPPIterSys = false;
+  bool doRAA = false;
+  bool doPbPbMCClosure = false;
+  bool doPPMCClosure = false;
+  bool doPbPbDatavsMC = false;
+  bool doPPDatavsMC = false;
+  bool doPbPbNormRes = false;
+  bool doPPNormRes = false;
+  bool doPbPbsigma = false;
+  bool doPPsigma = false;
+  bool doGenSpectra = false;
+  bool doPbPbTrgComb = true;
+  bool doPPTrgComb = false;
+  bool doRandomCone = false;
+  bool doSupernova = false;
+  bool doSupernovaContributionData = false;
+  bool doSupernovaContributionMC = false;
   
   TFile *fin; 
   
   //if(location=="MIT") 
   // fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfo_ak%s%d%s_20141106.root",algo,radius,jet_type));
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_testComb2_cut3_test_20141109.root",algo,jet_type));
+  fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
   
@@ -243,9 +263,9 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   // get histograms from the MC file. 
   TFile *fMCin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_ak%s%s_20141110.root",algo,jet_type));
   TFile *fDatain = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_testComb2_cut2_20141108.root",algo,jet_type));
-
+  
   TH1F *hPbPb_MC_jtpu[no_radius][nbins_eta][nbins_cent+1];
- 
+  
   TH1F *hpbpb_TrgObj80_nJet_g7[nbins_cent+1];
   TH1F *hpbpb_TrgObj65_nJet_g7[nbins_cent+1];
   TH1F *hpbpb_TrgObj55_nJet_g7[nbins_cent+1];
@@ -271,8 +291,8 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   
   for(int i = 0;i<=nbins_cent;i++){
     
-    hpbpb_Npix_before_cut_data[i] = (TH2F*)fDatain->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,i));
-    hpbpb_Npix_after_cut_data[i] = (TH2F*)fDatain->Get(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",radius,i));
+    hpbpb_Npix_before_cut_data[i] = (TH2F*)fin->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,i));
+    hpbpb_Npix_after_cut_data[i] = (TH2F*)fin->Get(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",radius,i));
     hpbpb_Npix_before_cut_data[i]->Print("base");
     hpbpb_Npix_after_cut_data[i]->Print("base");
     hpbpb_Npix_before_cut_mc[i] = (TH2F*)fMCin->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,i));
@@ -324,1153 +344,1181 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  /*  
-  // plot 0 - PbPb and pp Unfolded Spectra compared with Data(measured) and MC Spectra. in a 2 by 1 canvas. with the PbPb doing the multiply by powers of 10. unfolded in black circles, MC in black (dotted) line, measured in red open boxes. 
+  if(doSpectra){  
+    // plot 0 - PbPb and pp Unfolded Spectra compared with Data(measured) and MC Spectra. in a 2 by 1 canvas. with the PbPb doing the multiply by powers of 10. unfolded in black circles, MC in black (dotted) line, measured in red open boxes. 
   
-  TCanvas *cSpectra = new TCanvas("cSpectra","PbPb and PP spectra",1000,1000);
-  cSpectra->Divide(2,1);
+    TCanvas *cSpectra = new TCanvas("cSpectra","PbPb and PP spectra",1000,1000);
+    cSpectra->Divide(2,1);
   
-  cSpectra->cd(1);
-  cSpectra->cd(1)->SetLogy();
-  cSpectra->cd(1)->SetLogx();
-  //cSpectra->Set
+    cSpectra->cd(1);
+    cSpectra->cd(1)->SetLogy();
+    cSpectra->cd(1)->SetLogx();
+    //cSpectra->Set
   
-  TLegend *PbPbSpectra = myLegend(0.4,0.65,0.85,0.9);
+    TLegend *PbPbSpectra = myLegend(0.4,0.65,0.85,0.9);
   
-  for(int i = 0;i<=nbins_cent;i++){
+    for(int i = 0;i<=nbins_cent;i++){
     
-    uPbPb_Bayes[i]->Scale(1./(scaleFactor[i]));
-    dPbPb_TrgComb[i]->Scale(1./(scaleFactor[i]));
-    mPbPb_Reco[i]->Scale(1./(scaleFactor[i]));
+      uPbPb_Bayes[i]->Scale(1./(scaleFactor[i]));
+      dPbPb_TrgComb[i]->Scale(1./(scaleFactor[i]));
+      mPbPb_Reco[i]->Scale(1./(scaleFactor[i]));
 
-    uPbPb_Bayes[i]->SetMarkerStyle(20);
-    uPbPb_Bayes[i]->SetMarkerColor(i+1);
-    if(i==0){
-      uPbPb_Bayes[i]->SetAxisRange(1e-15,1e5,"Y");
-      uPbPb_Bayes[i]->SetAxisRange(30,600,"X");
-      makeHistTitle(uPbPb_Bayes[i],"","Jet p_{T} (GeV/c)","arbitrary for now");
-      uPbPb_Bayes[i]->Draw();
-    }else 
+      uPbPb_Bayes[i]->SetMarkerStyle(20);
+      uPbPb_Bayes[i]->SetMarkerColor(i+1);
+      if(i==0){
+	uPbPb_Bayes[i]->SetAxisRange(1e-15,1e5,"Y");
+	uPbPb_Bayes[i]->SetAxisRange(30,600,"X");
+	makeHistTitle(uPbPb_Bayes[i],"","Jet p_{T} (GeV/c)","arbitrary for now");
+	uPbPb_Bayes[i]->Draw();
+      }else 
+	uPbPb_Bayes[i]->Draw("same");
+
+      dPbPb_TrgComb[i]->SetMarkerStyle(25);
+      dPbPb_TrgComb[i]->SetMarkerColor(i+1);
+      dPbPb_TrgComb[i]->Draw("same");
+
+      mPbPb_Reco[i]->SetMarkerStyle(27);
+      mPbPb_Reco[i]->SetMarkerColor(i+1);
+      mPbPb_Reco[i]->Draw("same");
+
+    }
+
+    for(int i = nbins_cent;i>=0;i--){
+      if(i<nbins_cent)
+	PbPbSpectra->AddEntry(uPbPb_Bayes[i],Form("%2.0f - %2.0f cent * 10^{%d}",5*boundaries_cent[i],5*boundaries_cent[i+1],i),"pl");
+      else 
+	PbPbSpectra->AddEntry(uPbPb_Bayes[i],Form("0 - 200 cent x 10^{%d} x 10^{6}",i),"pl");
+    }
+
+    PbPbSpectra->SetTextSize(0.04);
+    PbPbSpectra->Draw();
+    putCMSPrel();
+    drawText("PbPb",0.2,0.8,20);
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.9,20);
+    drawText("#frac{chMax}{jtpt}>0.01",0.15,0.2,20);
+
+    cSpectra->cd(2);						
+    cSpectra->cd(2)->SetLogy();
+    cSpectra->cd(2)->SetLogx();
+    makeHistTitle(uPP_Bayes,"","Jet p_{T} (GeV/c)","arbitrary for now");
+    uPP_Bayes->SetMarkerStyle(20);
+    uPP_Bayes->SetMarkerColor(kBlack);
+    uPP_Bayes->SetAxisRange(30,600,"X");
+    uPP_Bayes->Draw();
+
+    drawText("#frac{chMax}{jtpt}>0.01",0.15,0.2,20);
+    drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.45,0.9,20);
+    drawText("2.76 TeV, |#eta|<2, |vz|<15",0,0.9,20);
+    drawText("pp",0.3,0.8,20);
+  
+    dPP_Comb->SetMarkerStyle(25);
+    dPP_Comb->SetMarkerColor(kBlack);
+    dPP_Comb->Draw("same");
+  
+    mPP_Reco->SetMarkerStyle(27);
+    mPP_Reco->SetMarkerColor(kBlack);
+    mPP_Reco->Draw("same");
+  
+    TLegend *Spectra = myLegend(0.53,0.65,0.85,0.9);
+    Spectra->AddEntry(uPP_Bayes,"Bayesian","pl");
+    Spectra->AddEntry(dPP_Comb,"Measured","pl");
+    Spectra->AddEntry(mPP_Reco,"MC Reco","pl");
+    Spectra->SetTextSize(0.04);
+    Spectra->Draw();
+  
+    cSpectra->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/Unfolded_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+
+  
+    //rescale the histograms which were scaled: 
+  
+
+    for(int i = 0;i<=nbins_cent;i++){
+    
+      uPbPb_Bayes[i]->Scale(scaleFactor[i]);
+      dPbPb_TrgComb[i]->Scale(scaleFactor[i]);
+      mPbPb_Reco[i]->Scale(scaleFactor[i]);
+
+    }
+
+  }
+ 
+  
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  if(doPbPbIterSys){
+    //plot 1 - PbPb iteration systematics. 
+    // this will be a 3 by 2 panel plot showing bayesian for PbPb. per centrality bin. 
+    // divide different unfolding iterations with iteration 4 - the nominal one. 
+    TCanvas *cIterSysPbPb = new TCanvas("cIterSysPbPb","PbPb Iteration systematics",1200,800);
+    makeMultiPanelCanvasWithGap(cIterSysPbPb,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+
+    // line at 1
+    TLine *linePbPb_iter = new TLine(30,1,500,1);
+    linePbPb_iter->SetLineStyle(2);
+    linePbPb_iter->SetLineWidth(2);
+  
+    TLegend *PbPb_itersys = myLegend(0.63,0.75,0.85,0.9);
+  
+    for(int i = 0;i<nbins_cent;i++){
+      cIterSysPbPb->cd(nbins_cent-i);
+
+      for(int j = 2;j<7;j++){
+  		
+	uPbPb_BayesianIter[j][i]->Divide(uPbPb_Bayes[i]);
+	uPbPb_BayesianIter[j][i]->SetMarkerStyle(2);
+	uPbPb_BayesianIter[j][i]->SetMarkerColor(j);
+	uPbPb_BayesianIter[j][i]->SetAxisRange(30,500,"X");
+	uPbPb_BayesianIter[j][i]->SetAxisRange(0,2,"Y");
+	if(j==2){
+	  makeHistTitle(uPbPb_BayesianIter[j][i]," ","Jet p_{T} (GeV/c)","Ratio (Unfolded/Nominal)");
+	  uPbPb_BayesianIter[j][i]->Draw();
+	}else if(j==4);
+	else {
+	  uPbPb_BayesianIter[j][i]->Draw("same");
+	}
+	if(i==0 && j!=4) PbPb_itersys->AddEntry(uPbPb_BayesianIter[j][i],Form("Iteration %d",j),"pl");
+
+      }
+
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+      linePbPb_iter->Draw();
+
+    }
+    PbPb_itersys->Draw();
+
+    cIterSysPbPb->cd(1);
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, radius),0.2,0.23,20);
+    drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+
+    cIterSysPbPb->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_iteration_systematics_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  if(doPPIterSys){
+    //plot 2 - pp iteration systematics 
+    // this is just one panel plot showing bayesian for pp. 
+    TCanvas *cIterSysPP = new TCanvas("cIterSysPP","PP Iteration systematics",600,400);
+
+    TLegend *PP_itersys = myLegend(0.53,0.65,0.85,0.9);
+    TLine *linePP_iter = new TLine(30,1,500,1);
+    linePP_iter->SetLineStyle(2);
+    linePP_iter->SetLineWidth(2);
+
+    for(int i = 2;i<7;i++){
+      uPP_BayesianIter[i]->Divide(uPP_Bayes);
+      uPP_BayesianIter[i]->SetMarkerStyle(2);
+      uPP_BayesianIter[i]->SetMarkerColor(i);
+      uPP_BayesianIter[i]->SetAxisRange(30,500,"X");
+      uPP_BayesianIter[i]->SetAxisRange(0,2,"Y");
+      uPP_BayesianIter[i]->SetXTitle("Jet p_{T} (GeV/c)");
+      uPP_BayesianIter[i]->SetYTitle("Ratio (unfolded/Nominal)");
+      uPP_BayesianIter[i]->SetTitle(" ");
+      uPP_BayesianIter[i]->GetXaxis()->CenterTitle();
+      uPP_BayesianIter[i]->GetYaxis()->CenterTitle();
+      if(i==2){
+	//makeHistTitle(uPP_BayesianIter[i]," ","Jet p_{T} (GeV/c)","Ratio (unfolded/Nominal)");
+	uPP_BayesianIter[i]->Draw();
+      }else if(i==4);
+      else uPP_BayesianIter[i]->Draw("same");
+      if(i!=4)PP_itersys->AddEntry(uPP_BayesianIter[i],Form("Iteration %d",i),"pl");
+    }
+    linePP_iter->Draw();
+    PP_itersys->Draw();
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type,radius),0.2,0.23,20);
+    drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+
+    cIterSysPP->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_iteration_systematics_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  if(doRAA){
+    //plot 3 - RAA 
+    // again this will be a 6 panel plot. showing measured, unfolded Bayesian, and unfolded Bin By Bin methods. 
+    TCanvas *cRAA = new TCanvas("cRAA","RAA",1200,800);
+    makeMultiPanelCanvasWithGap(cRAA,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+
+    TLegend *tRAA = myLegend(0.45,0.75,0.85,0.9);
+    TLine *lineRAA = new TLine(30,1,500,1);
+    lineRAA->SetLineStyle(2);
+    lineRAA->SetLineWidth(2);
+
+    for(int i = 0;i<nbins_cent;i++){
+
+      cRAA->cd(nbins_cent-i);
+
+      RAA_measured[i]->SetMarkerColor(kBlack);
+      RAA_measured[i]->SetMarkerStyle(24);
+      makeHistTitle(RAA_measured[i],"","Jet p_{T} (GeV/c)","R_{AA}");
+      RAA_measured[i]->SetAxisRange(30,500,"X");
+      RAA_measured[i]->SetAxisRange(0,1.5,"Y");
+      RAA_measured[i]->Draw();
+
+      RAA_bayesian[i]->SetMarkerColor(kRed);
+      RAA_bayesian[i]->SetMarkerStyle(33);
+      RAA_bayesian[i]->Draw("same");
+
+      RAA_binbybin[i]->SetMarkerStyle(29);
+      RAA_binbybin[i]->SetMarkerColor(kBlue);
+      RAA_binbybin[i]->Draw("same");
+
+      lineRAA->Draw();
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
+
+    }
+
+    tRAA->AddEntry(RAA_measured[0],"No Unfolding","pl");
+    tRAA->AddEntry(RAA_bayesian[0],"Bayesian","pl");
+    tRAA->AddEntry(RAA_binbybin[0],"BinbyBin","pl");
+    tRAA->SetTextSize(0.04);
+
+    cRAA->cd(6);
+    tRAA->Draw();
+    cRAA->cd(1);
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,20);
+    drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+
+    cRAA->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  if(doPbPbMCClosure){
+    //plot 4 - PbPb MC closure test 
+    // this will also be a 6 panel plot showing bayesian iteration 4 and binbybin divided by measured which is actually the MC
+    TCanvas *cPbPbMCclosure = new TCanvas("cPbPbMCclosure","PbPb MC closure test",1200,800);
+    makeMultiPanelCanvas(cPbPbMCclosure,3,2,0.0,0.0,0.2,0.15,0.07);
+
+    TLine *linePbPb_mcclosure = new TLine(30,1,500,1);
+    linePbPb_mcclosure->SetLineStyle(2);
+    linePbPb_mcclosure->SetLineWidth(2);
+
+    TH1F *hMCClosurePbPb_Meas[nbins_cent+1], *hMCClosurePbPb_Bayesian[nbins_cent+1], *hMCClosurePbPb_BinByBin[nbins_cent+1];
+    for(int i = 0;i<nbins_cent;i++){
+
+      cPbPbMCclosure->cd(nbins_cent-i);
+      //hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_Reco[i]->Clone(Form("hMCClosurePbPb_Meas_cent%d",i));
+      hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_mcclosure_data[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_Meas_cent%d",i),boundaries_pt);
+      hMCClosurePbPb_Bayesian[i] = (TH1F*)uPbPb_MC_Bayes[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_Bayesian_cent%d",i),boundaries_pt);
+      hMCClosurePbPb_BinByBin[i] = (TH1F*)uPbPb_MC_BinByBin[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_BinByBin_cent%d",i),boundaries_pt);
+
+      mPbPb_mcclosure_gen[i] = (TH1F*)mPbPb_mcclosure_gen[i]->Rebin(nbins_pt,Form("mc_pbpb_mcclosure_gen_cent%d",i),boundaries_pt);
+
+      hMCClosurePbPb_Meas[i]->Divide(mPbPb_mcclosure_gen[i]);
+      hMCClosurePbPb_Bayesian[i]->Divide(mPbPb_mcclosure_gen[i]);
+      hMCClosurePbPb_BinByBin[i]->Divide(mPbPb_mcclosure_gen[i]);
+
+      // hMCClosurePbPb_Meas[i]->Scale(2);
+      // hMCClosurePbPb_Bayesian[i]->Scale(2);
+      // hMCClosurePbPb_BinByBin[i]->Scale(2);
+
+      makeHistTitle(hMCClosurePbPb_Meas[i]," ","Jet p_{T} (GeV/c)","Reco/Truth");
+      hMCClosurePbPb_Meas[i]->SetMarkerStyle(24);
+      hMCClosurePbPb_Meas[i]->SetMarkerColor(kBlack);
+      hMCClosurePbPb_Meas[i]->SetAxisRange(30,500,"X");
+      hMCClosurePbPb_Meas[i]->SetAxisRange(0,2,"Y");
+      hMCClosurePbPb_Meas[i]->Draw();
+
+      hMCClosurePbPb_Bayesian[i]->SetMarkerStyle(20);
+      hMCClosurePbPb_Bayesian[i]->SetMarkerColor(kBlack);
+      hMCClosurePbPb_Bayesian[i]->Draw("same");
+
+      hMCClosurePbPb_BinByBin[i]->SetMarkerColor(kRed);
+      hMCClosurePbPb_BinByBin[i]->SetMarkerStyle(33);
+      hMCClosurePbPb_BinByBin[i]->Draw("same");
+
+      linePbPb_mcclosure->Draw();
+      drawText(Form("%2.0f-%2.0f %",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.2,16);
+
+    }
+
+    cPbPbMCclosure->cd(1);
+    TLegend *pbpbmcclosure = myLegend(0.53,0.65,0.85,0.9);
+    pbpbmcclosure->AddEntry(hMCClosurePbPb_Meas[0],"PbPb no unfolding","pl");
+    pbpbmcclosure->AddEntry(hMCClosurePbPb_Bayesian[0],"PbPb Bayesian 4 Iter","pl");
+    pbpbmcclosure->AddEntry(hMCClosurePbPb_BinByBin[0],"PbPb BinbyBin","pl");
+    pbpbmcclosure->Draw();
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.6,0.31,16);
+  
+    cPbPbMCclosure->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_mc_closure_test_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  if(doPPMCClosure){
+    //plot 5 - PP MC closure test
+    TCanvas * cPPMCclosure = new TCanvas("cPPMCclosure","PP MC closure test",600,600);
+    //TH1F *hMCClosurePP_Meas = (TH1F*)mPP_Reco->Clone("hMCClosurePP_Meas");
+    TH1F *hMCClosurePP_Meas = (TH1F*)mPP_mcclosure_data->Clone("hMCClosurePP_Meas");
+    TH1F *hMCClosurePP_Bayesian = (TH1F*)uPP_MC_Bayes->Clone("hMCClosurePP_Bayesian");
+    TH1F *hMCClosurePP_BinbyBin = (TH1F*)uPP_MC_BinByBin->Clone("hMCClosurePP_BinbyBin");
+
+    TLine *linePP_mcclosure = new TLine(30,1,500,1);
+    linePP_mcclosure->SetLineStyle(2);
+    linePP_mcclosure->SetLineWidth(2);
+
+    hMCClosurePP_Bayesian->Divide(mPP_mcclosure_data);
+    hMCClosurePP_Meas->Divide(mPP_mcclosure_data);
+    hMCClosurePP_BinbyBin->Divide(mPP_mcclosure_data);
+
+    hMCClosurePP_Meas->SetAxisRange(30,500,"X");
+    hMCClosurePP_Meas->SetAxisRange(0,2,"Y");
+
+    hMCClosurePP_Meas->SetMarkerStyle(24);
+    hMCClosurePP_Meas->SetMarkerColor(kBlack);
+
+    hMCClosurePP_Meas->SetTitle(" ");
+    hMCClosurePP_Meas->SetXTitle("Jet p_{T} (GeV/c)");
+    hMCClosurePP_Meas->SetYTitle("Reco/Truth");
+  
+    hMCClosurePP_Meas->GetXaxis()->CenterTitle();
+    hMCClosurePP_Meas->GetYaxis()->CenterTitle();
+
+    hMCClosurePP_Meas->Draw();
+
+    hMCClosurePP_Bayesian->SetMarkerStyle(33);
+    hMCClosurePP_Bayesian->SetMarkerColor(kRed);
+    hMCClosurePP_Bayesian->Draw("same");
+
+    hMCClosurePP_BinbyBin->SetMarkerStyle(29);
+    hMCClosurePP_BinbyBin->SetMarkerColor(kBlue);
+    hMCClosurePP_BinbyBin->Draw("same");
+
+    TLegend *ppmcclosure = myLegend(0.53,0.65,0.85,0.9);
+    ppmcclosure->AddEntry(hMCClosurePP_Meas,"pp no unfolding","pl");
+    ppmcclosure->AddEntry(hMCClosurePP_Bayesian,"pp Bayesian","pl");
+    ppmcclosure->AddEntry(hMCClosurePP_BinbyBin,"pp BinbyBin","pl");
+    ppmcclosure->Draw();
+
+    linePP_mcclosure->Draw();
+
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
+    drawText("|#eta|<2, |vz|<15",0.6,0.31,22);
+  
+    cPPMCclosure->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_mc_closure_test_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  if(doPbPbDatavsMC){
+    //plot 6 - data vs MC for PbPb 
+    // i want to make it like ratio plots for each centrality class. and plot the unfolded ratio as well. 
+    // so i want a line at 1, and 2 overlayed plots showing measured/Gen ratio and unfo/gen ratio. 
+    TCanvas *cPbPb_data_vs_mc = new TCanvas("cPbPb_data_vs_mc","PbPb data vs mc",1200,800);
+    makeMultiPanelCanvasWithGap(cPbPb_data_vs_mc,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+
+    TH1F *PbPb_meas_vs_mc[nbins_cent+1];
+    TH1F *PbPb_unfo_vs_mc[nbins_cent+1];
+
+    TLine *linePbPb_data_vs_mc = new TLine(30,1,500,1);
+    linePbPb_data_vs_mc->SetLineStyle(2);
+    linePbPb_data_vs_mc->SetLineWidth(2);
+
+
+    for(int i = 0;i<nbins_cent;i++){
+
+      cPbPb_data_vs_mc->cd(nbins_cent-i);
+      cPbPb_data_vs_mc->cd(nbins_cent-i)->SetLogy();
+
+      PbPb_meas_vs_mc[i] = (TH1F*)dPbPb_TrgComb[i]->Clone("PbPb_meas_vs_mc");
+      PbPb_unfo_vs_mc[i] = (TH1F*)uPbPb_Bayes[i]->Clone("PbPb_unfo_vs_mc");
+
+      PbPb_meas_vs_mc[i]->Divide(mPbPb_Reco[i]);
+      PbPb_unfo_vs_mc[i]->Divide(mPbPb_Reco[i]);
+
+      makeHistTitle(PbPb_meas_vs_mc[i]," ","Jet p_{T} (GeV/c)", "#frac{data}{MC RECO}");
+      PbPb_meas_vs_mc[i]->SetMarkerStyle(25);
+      PbPb_meas_vs_mc[i]->SetMarkerColor(kBlack);
+      PbPb_meas_vs_mc[i]->SetAxisRange(30,800,"X");
+      PbPb_meas_vs_mc[i]->SetAxisRange(0,1e8,"Y");
+      PbPb_meas_vs_mc[i]->Draw();
+
+      PbPb_unfo_vs_mc[i]->SetMarkerStyle(27);
+      PbPb_unfo_vs_mc[i]->SetMarkerColor(kBlue);
+      PbPb_unfo_vs_mc[i]->Draw("same");
+
+      linePbPb_data_vs_mc->Draw();
+    
+      drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
+
+    }
+
+    cPbPb_data_vs_mc->cd(1);
+    TLegend *PbPb_datavsmc = myLegend(0.53,0.65,0.85,0.9);
+    PbPb_datavsmc->AddEntry(PbPb_meas_vs_mc[0],"no unfolding","pl");
+    PbPb_datavsmc->AddEntry(PbPb_unfo_vs_mc[0],"Bayesian 4 Iter","pl");
+    PbPb_datavsmc->Draw();
+
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,20);
+    drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+
+    cPbPb_data_vs_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_vs_mc_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  if(doPPDatavsMC){
+    //plot7 - data vs MC for pp
+    // made similar to above. 
+    TCanvas *cPP_data_vs_mc = new TCanvas("cPP_data_vs_mc","PP data vs MC",600,600);
+
+    TH1F *PP_meas_vs_mc = (TH1F*)dPP_Comb->Clone("PP_meas_vs_mc");
+    TH1F *PP_unfo_vs_mc = (TH1F*)uPP_Bayes->Clone("PP_unfo_vs_mc");
+  
+    TLine *linePP_data_vs_mc = new TLine(30,1,500,1);
+    linePP_data_vs_mc->SetLineStyle(2);
+    linePP_data_vs_mc->SetLineWidth(2);
+
+    PP_meas_vs_mc->Divide(mPP_Reco);
+    PP_unfo_vs_mc->Divide(mPP_Reco);
+
+    //makeHistTitle(PP_meas_vs_mc," ","Jet p_{T} (GeV/c)","#frac{data}{MC RECO}");
+
+    PP_meas_vs_mc->SetTitle(" ");
+    PP_meas_vs_mc->SetXTitle("Jet p_{T} (GeV/c)");
+    PP_meas_vs_mc->SetYTitle("#frac{data}{MC RECO}");
+    PP_meas_vs_mc->GetXaxis()->CenterTitle();
+    PP_meas_vs_mc->GetYaxis()->CenterTitle();  
+
+    PP_meas_vs_mc->SetMarkerStyle(25);
+    PP_meas_vs_mc->SetMarkerColor(kBlack);
+    PP_meas_vs_mc->Draw();
+    PP_unfo_vs_mc->SetMarkerStyle(27);
+    PP_unfo_vs_mc->SetMarkerColor(kBlue);
+    PP_unfo_vs_mc->Draw("same");
+
+    linePP_data_vs_mc->Draw();
+
+    TLegend *PP_datavsmc = myLegend(0.53,0.65,0.85,0.9);
+    PP_datavsmc->AddEntry(PP_meas_vs_mc,"no unfolding","pl");
+    PP_datavsmc->AddEntry(PP_unfo_vs_mc,"Bayesian 4 Iter","pl");
+    PP_datavsmc->SetTextSize(0.02);
+    PP_datavsmc->Draw();
+
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
+    drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+
+    cPP_data_vs_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_data_vs_mc_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  
+  if(doPbPbNormRes){
+    //plot8 - normalized Response Matrix for PbPb. 
+    TCanvas *cPbPb_NormResMat = new TCanvas("cPbPb_NormResMat","Normalized Response Matrix for PbPb",1200,800);
+    makeMultiPanelCanvasWithGap(cPbPb_NormResMat,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  
+    TLine *linePbPb_Res = new TLine(15,15,1000,1000);
+    linePbPb_Res->SetLineStyle(2);
+    linePbPb_Res->SetLineWidth(2);
+
+    for(int i = 0;i<nbins_cent;i++){
+      cPbPb_NormResMat->cd(nbins_cent-i);
+      cPbPb_NormResMat->cd(nbins_cent-i)->SetLogy();
+      cPbPb_NormResMat->cd(nbins_cent-i)->SetLogx();
+      cPbPb_NormResMat->cd(nbins_cent-i)->SetLogz();
+
+      makeHistTitle(mPbPb_ResponseNorm[i]," ","Gen p_{T} (GeV/c)","Reco p_{T} (GeV/c)");
+
+      mPbPb_ResponseNorm[i]->SetAxisRange(1e-10,1,"Z");
+      mPbPb_ResponseNorm[i]->SetAxisRange(15,800,"X");
+      mPbPb_ResponseNorm[i]->SetAxisRange(15,800,"Y");
+   
+      mPbPb_ResponseNorm[i]->Draw("colz");
+    
+      linePbPb_Res->Draw();
+      drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
+
+    }
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.2,0.25,20);
+    drawText("|#eta|<2, |vz|<15",0.6,0.31,16);
+    drawText("chMax/jtpt>0.01",0.6,0.4,16);
+    cPbPb_NormResMat->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_normalized_response_matrix_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  if(doPPNormRes){
+    //plot9 - normalized response matrix for pp
+    TCanvas *cPP_NormResMat = new TCanvas("cPP_NormResMat","Normalized Response Matrix fr PP",600,600);
+    cPP_NormResMat->SetLogy();
+    cPP_NormResMat->SetLogx();
+    cPP_NormResMat->SetLogz();
+
+    TLine *linePP_Res = new TLine(15,15,1000,1000);
+    linePP_Res->SetLineStyle(2);
+    linePP_Res->SetLineWidth(2);
+
+    //makeHistTitle(mPP_ResponseNorm," ","Gen p_{T} (GeV/c)","Reco p_{T} (GeV/c)");
+
+    mPP_ResponseNorm->SetAxisRange(1e-10,1,"Z");
+    mPP_ResponseNorm->SetAxisRange(15,800,"X");
+    mPP_ResponseNorm->SetAxisRange(15,800,"Y");
+
+    mPP_ResponseNorm->SetTitle(" ");
+    mPP_ResponseNorm->SetXTitle("Gen p_{T} (GeV/c)");
+    mPP_ResponseNorm->SetYTitle("Reco p_{T} (GeV/c)");
+    mPP_ResponseNorm->GetXaxis()->CenterTitle();
+    mPP_ResponseNorm->GetYaxis()->CenterTitle();
+
+    mPP_ResponseNorm->Draw("colz");
+
+    linePP_Res->Draw();
+
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
+    drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+    cPP_NormResMat->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_normalized_response_matrix_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  if(doPbPbsigma){
+    //plot10 - Cross section for PbPb - in proper units per centrality bin.  
+    TCanvas *cPbPb_sigma = new TCanvas("cPbPb_sigma","PbPb inclusive jet invariant cross section",1200,800);
+    makeMultiPanelCanvas(cPbPb_sigma,3,2,0.0,0.0,0.2,0.15,0.07); 
+
+    for(int i = 0;i<nbins_cent;i++){
+
+      cPbPb_sigma->cd(nbins_cent-i);
+      cPbPb_sigma->cd(nbins_cent-i)->SetLogy();
+      cPbPb_sigma->cd(nbins_cent-i)->SetLogx();
+
+      makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","#frac{d^{2} N}{d#eta dp_{T}}");
+      //dPbPb_TrgComb[i]->Scale(1e-6)
+      dPbPb_TrgComb[i]->SetMarkerStyle(24);
+      dPbPb_TrgComb[i]->SetMarkerColor(kBlack);
+      dPbPb_TrgComb[i]->SetAxisRange(1e-2,1e8,"Y");
+      dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("rebin_measured_cent%d",i),boundaries_pt);
+      divideBinWidth(dPbPb_TrgComb[i]);
+      dPbPb_TrgComb[i]->SetAxisRange(30,500,"X");
+      dPbPb_TrgComb[i]->Draw();
+    
+      uPbPb_Bayes[i]->SetMarkerStyle(20);
+      uPbPb_Bayes[i]->SetMarkerColor(kBlack);
+      uPbPb_Bayes[i] = (TH1F*)uPbPb_Bayes[i]->Rebin(nbins_pt,Form("rebin_bayes_cent%d",i),boundaries_pt);
+      divideBinWidth(uPbPb_Bayes[i]);
       uPbPb_Bayes[i]->Draw("same");
 
-    dPbPb_TrgComb[i]->SetMarkerStyle(25);
-    dPbPb_TrgComb[i]->SetMarkerColor(i+1);
-    dPbPb_TrgComb[i]->Draw("same");
+      //uPbPb_BinByBin[i]->Scale(1e-6);
+      uPbPb_BinByBin[i]->SetMarkerStyle(33);
+      uPbPb_BinByBin[i]->SetMarkerColor(kRed);
+      uPbPb_BinByBin[i] = (TH1F*)uPbPb_BinByBin[i]->Rebin(nbins_pt,Form("rebin_binbybin_cent%d",i),boundaries_pt);
+      divideBinWidth(uPbPb_BinByBin[i]);
+      uPbPb_BinByBin[i]->Draw("same");
 
-    mPbPb_Reco[i]->SetMarkerStyle(27);
-    mPbPb_Reco[i]->SetMarkerColor(i+1);
-    mPbPb_Reco[i]->Draw("same");
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+    }
 
+    cPbPb_sigma->cd(1);
+    TLegend *PbPb_sigma = myLegend(0.53,0.75,0.8,0.9);
+    PbPb_sigma->AddEntry(dPbPb_TrgComb[0],"No Unfolding","pl");
+    PbPb_sigma->AddEntry(uPbPb_Bayes[0],"Bayesian 4 Iter","pl");
+    PbPb_sigma->AddEntry(uPbPb_BinByBin[0],"BinByBin","pl");
+    PbPb_sigma->SetTextSize(0.04);
+    PbPb_sigma->Draw();
+
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.55,0.65,16);
+    //drawText("Spectra with NJet(p_{T}>50) < 7",0.55,0.55,16);
+
+    cPbPb_sigma->cd(2);
+    drawText("|#eta|<2, chMax/jtpt>0.01",0.45,0.655,16);
+    drawText("|vz|<15, pCES, HBHE",0.45,0.55,16);
+    drawText("hiNpix_1 > 38000 - 500*NJet",0.45,0.45,16);
+
+    cPbPb_sigma->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_invariant_cross_section_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  
+  if(doPPsigma){
+    //plot 11 - cross section for PP 
+    TCanvas *cPP_sigma = new TCanvas("cPP_sigma","PP inclusive jet invariant cross section",600,400);
+    cPP_sigma->SetLogy();
+    cPP_sigma->SetLogy();
 
-  for(int i = nbins_cent;i>=0;i--){
-    if(i<nbins_cent)
-      PbPbSpectra->AddEntry(uPbPb_Bayes[i],Form("%2.0f - %2.0f cent * 10^{%d}",5*boundaries_cent[i],5*boundaries_cent[i+1],i),"pl");
-    else 
-      PbPbSpectra->AddEntry(uPbPb_Bayes[i],Form("0 - 200 cent x 10^{%d} x 10^{6}",i),"pl");
+    dPP_Comb->SetMarkerStyle(24);
+    dPP_Comb->SetMarkerColor(kBlack);
+    dPP_Comb->SetTitle(" ");
+    dPP_Comb->SetXTitle("Jet p_{T} (GeV/c)");
+    dPP_Comb->SetYTitle("#frac{d^2 #sigma}{d#eta dp_{T}} something barns");
+    dPP_Comb->SetAxisRange(30,500,"X");
+    dPP_Comb->Draw();
+
+    uPP_Bayes->SetMarkerColor(kRed);
+    uPP_Bayes->SetMarkerStyle(33);
+    uPP_Bayes->Draw("same");
+
+    uPP_BinByBin->SetMarkerStyle(29);
+    uPP_BinByBin->SetMarkerColor(kBlue);
+    uPP_BinByBin->Draw("same");
+
+    TLegend *PP_sigma = myLegend(0.53,0.65,0.85,0.9);
+    PP_sigma->AddEntry(dPP_Comb,"No Unfolding","pl");
+    PP_sigma->AddEntry(uPP_Bayes,"Bayesian 4 Iter","pl");
+    PP_sigma->AddEntry(uPP_BinByBin,"BinByBin","pl");
+    PP_sigma->SetTextSize(0.04);
+    PP_sigma->Draw();
+
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
+    drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+    cPP_sigma->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_invariant_cross_section_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
   }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  
+  if(doGenSpectra){
+    // plot 12 - Gen Spectra for PbPb and pp. 
+  
+    TCanvas *cGenSpectra = new TCanvas("cGenSpectra","Generator Level Spectra for PbPb and pp",1400,1000);
+  
+    cGenSpectra->Divide(1,1);
+  
+    cGenSpectra->cd(1);
+    cGenSpectra->cd(1)->SetLogy();
+    cGenSpectra->cd(1)->SetLogx();
+    //cSpectra->Set
+    //Double_t scaleFactor[nbins_cent+1] = {1,1e-1,1e-2,1e-3,1e-4,1e-5,1e-6};
 
-  PbPbSpectra->SetTextSize(0.04);
-  PbPbSpectra->Draw();
-  putCMSPrel();
-  drawText("PbPb",0.2,0.8,20);
-  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.9,20);
-  drawText("#frac{chMax}{jtpt}>0.01",0.15,0.2,20);
+    TLegend *PbPbGenSpectra = myLegend(0.4,0.65,0.85,0.9);
 
-  cSpectra->cd(2);						
-  cSpectra->cd(2)->SetLogy();
-  cSpectra->cd(2)->SetLogx();
-  makeHistTitle(uPP_Bayes,"","Jet p_{T} (GeV/c)","arbitrary for now");
-  uPP_Bayes->SetMarkerStyle(20);
-  uPP_Bayes->SetMarkerColor(kBlack);
-  uPP_Bayes->SetAxisRange(30,600,"X");
-  uPP_Bayes->Draw();
-
-  drawText("#frac{chMax}{jtpt}>0.01",0.15,0.2,20);
-  drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.45,0.9,20);
-  drawText("2.76 TeV, |#eta|<2, |vz|<15",0,0.9,20);
-  drawText("pp",0.3,0.8,20);
-  
-  dPP_Comb->SetMarkerStyle(25);
-  dPP_Comb->SetMarkerColor(kBlack);
-  dPP_Comb->Draw("same");
-  
-  mPP_Reco->SetMarkerStyle(27);
-  mPP_Reco->SetMarkerColor(kBlack);
-  mPP_Reco->Draw("same");
-  
-  TLegend *Spectra = myLegend(0.53,0.65,0.85,0.9);
-  Spectra->AddEntry(uPP_Bayes,"Bayesian","pl");
-  Spectra->AddEntry(dPP_Comb,"Measured","pl");
-  Spectra->AddEntry(mPP_Reco,"MC Reco","pl");
-  Spectra->SetTextSize(0.04);
-  Spectra->Draw();
-  
-  cSpectra->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/Unfolded_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-
-  
-  //rescale the histograms which were scaled: 
-  
-
-  for(int i = 0;i<=nbins_cent;i++){
+    for(int i = 0;i<=nbins_cent;i++){
     
-    uPbPb_Bayes[i]->Scale(scaleFactor[i]);
-    dPbPb_TrgComb[i]->Scale(scaleFactor[i]);
-    mPbPb_Reco[i]->Scale(scaleFactor[i]);
+      mPbPb_Gen[i]->Scale(1./scaleFactor[i]);
+      mPbPb_Reco[i]->Scale(1./scaleFactor[i]); 
 
-  }
+      mPbPb_Gen[i]->SetMarkerStyle(28);
+      mPbPb_Gen[i]->SetMarkerColor(i+1);
 
-  
- 
-  
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-  //plot 1 - PbPb iteration systematics. 
-  // this will be a 3 by 2 panel plot showing bayesian for PbPb. per centrality bin. 
-  // divide different unfolding iterations with iteration 4 - the nominal one. 
-  TCanvas *cIterSysPbPb = new TCanvas("cIterSysPbPb","PbPb Iteration systematics",1200,800);
-  makeMultiPanelCanvasWithGap(cIterSysPbPb,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+      if(i==0){
+	mPbPb_Gen[i]->SetAxisRange(1e-15,1e5,"Y");
+	mPbPb_Gen[i]->SetAxisRange(15,600,"X");
+	makeHistTitle(mPbPb_Gen[i],"","MC: Jet p_{T} (GeV/c)","arbitrary for now");
+	mPbPb_Gen[i]->Draw();
+      }else 
+	mPbPb_Gen[i]->Draw("same");
 
-  // line at 1
-  TLine *linePbPb_iter = new TLine(30,1,500,1);
-  linePbPb_iter->SetLineStyle(2);
-  linePbPb_iter->SetLineWidth(2);
-  
-  TLegend *PbPb_itersys = myLegend(0.63,0.75,0.85,0.9);
-  
-  for(int i = 0;i<nbins_cent;i++){
-    cIterSysPbPb->cd(nbins_cent-i);
-
-    for(int j = 2;j<7;j++){
-  		
-      uPbPb_BayesianIter[j][i]->Divide(uPbPb_Bayes[i]);
-      uPbPb_BayesianIter[j][i]->SetMarkerStyle(2);
-      uPbPb_BayesianIter[j][i]->SetMarkerColor(j);
-      uPbPb_BayesianIter[j][i]->SetAxisRange(30,500,"X");
-      uPbPb_BayesianIter[j][i]->SetAxisRange(0,2,"Y");
-      if(j==2){
-	makeHistTitle(uPbPb_BayesianIter[j][i]," ","Jet p_{T} (GeV/c)","Ratio (Unfolded/Nominal)");
-	uPbPb_BayesianIter[j][i]->Draw();
-      }else if(j==4);
-      else {
-	uPbPb_BayesianIter[j][i]->Draw("same");
-      }
-      if(i==0 && j!=4) PbPb_itersys->AddEntry(uPbPb_BayesianIter[j][i],Form("Iteration %d",j),"pl");
+      mPbPb_Reco[i]->SetMarkerStyle(29);
+      mPbPb_Reco[i]->SetMarkerColor(i+1);
+      mPbPb_Reco[i]->Draw("same");
 
     }
 
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
-    linePbPb_iter->Draw();
+    for(int i = nbins_cent;i>=0;i--){
+      if(i<nbins_cent)
+	PbPbGenSpectra->AddEntry(mPbPb_Gen[i],Form("%2.0f - %2.0f cent * 10^{%d}",5*boundaries_cent[i],5*boundaries_cent[i+1],i),"pl");
+      else 
+	PbPbGenSpectra->AddEntry(mPbPb_Gen[i],Form("0-200 cent * 10^{%d}",i),"pl");
+    }
 
-  }
-  PbPb_itersys->Draw();
-
-  cIterSysPbPb->cd(1);
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-
-  cIterSysPbPb->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_iteration_systematics_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    PbPbGenSpectra->SetTextSize(0.04);
+    PbPbGenSpectra->Draw();
+    putCMSSim();
+    drawText("PbPb",0.2,0.8,20);
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.9,20);
+    drawText("#frac{chMax}{jtpt}>0.01",0.15,0.2,20);
   
+    // cGenSpectra->cd(2);						
+    // cGenSpectra->cd(2)->SetLogy();
+    // cGenSpectra->cd(2)->SetLogx();
+    // makeHistTitle(mPP_Gen,"","MC: Jet p_{T} (GeV/c)","arbitrary for now");
+    // mPP_Gen->SetMarkerStyle(28);
+    // mPP_Gen->SetMarkerColor(kBlack);
+    // mPP_Gen->SetAxisRange(1e-14,1,"Y");
+    // mPP_Gen->SetAxisRange(15,600,"X");
+    // mPP_Gen->Draw();
   
-  //plot 2 - pp iteration systematics 
-  // this is just one panel plot showing bayesian for pp. 
-  TCanvas *cIterSysPP = new TCanvas("cIterSysPP","PP Iteration systematics",600,400);
-
-  TLegend *PP_itersys = myLegend(0.53,0.65,0.85,0.9);
-  TLine *linePP_iter = new TLine(30,1,500,1);
-  linePP_iter->SetLineStyle(2);
-  linePP_iter->SetLineWidth(2);
-
-  for(int i = 2;i<7;i++){
-    uPP_BayesianIter[i]->Divide(uPP_Bayes);
-    uPP_BayesianIter[i]->SetMarkerStyle(2);
-    uPP_BayesianIter[i]->SetMarkerColor(i);
-    uPP_BayesianIter[i]->SetAxisRange(30,500,"X");
-    uPP_BayesianIter[i]->SetAxisRange(0,2,"Y");
-    uPP_BayesianIter[i]->SetXTitle("Jet p_{T} (GeV/c)");
-    uPP_BayesianIter[i]->SetYTitle("Ratio (unfolded/Nominal)");
-    uPP_BayesianIter[i]->SetTitle(" ");
-    uPP_BayesianIter[i]->GetXaxis()->CenterTitle();
-    uPP_BayesianIter[i]->GetYaxis()->CenterTitle();
-    if(i==2){
-      //makeHistTitle(uPP_BayesianIter[i]," ","Jet p_{T} (GeV/c)","Ratio (unfolded/Nominal)");
-      uPP_BayesianIter[i]->Draw();
-    }else if(i==4);
-    else uPP_BayesianIter[i]->Draw("same");
-    if(i!=4)PP_itersys->AddEntry(uPP_BayesianIter[i],Form("Iteration %d",i),"pl");
-  }
-  linePP_iter->Draw();
-  PP_itersys->Draw();
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type,radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-
-  cIterSysPP->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_iteration_systematics_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // drawText("#frac{chMax}{jtpt}>0.01",0.15,0.2,20);
+    // drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.45,0.9,20);
   
+    drawText("2.76 TeV, |#eta|<2, |vz|<15",0,0.9,20);
+    //drawText("pp",0.3,0.8,20);
+
+    // 
+    // mPP_Reco->SetMarkerStyle(29);
+    // mPP_Reco->SetMarkerColor(kBlack);
+    // mPP_Reco->Draw("same");
   
-  //plot 3 - RAA 
-  // again this will be a 6 panel plot. showing measured, unfolded Bayesian, and unfolded Bin By Bin methods. 
-  TCanvas *cRAA = new TCanvas("cRAA","RAA",1200,800);
-  makeMultiPanelCanvasWithGap(cRAA,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
-
-  TLegend *tRAA = myLegend(0.45,0.75,0.85,0.9);
-  TLine *lineRAA = new TLine(30,1,500,1);
-  lineRAA->SetLineStyle(2);
-  lineRAA->SetLineWidth(2);
-
-  for(int i = 0;i<nbins_cent;i++){
-
-    cRAA->cd(nbins_cent-i);
-
-    RAA_measured[i]->SetMarkerColor(kBlack);
-    RAA_measured[i]->SetMarkerStyle(24);
-    makeHistTitle(RAA_measured[i],"","Jet p_{T} (GeV/c)","R_{AA}");
-    RAA_measured[i]->SetAxisRange(30,500,"X");
-    RAA_measured[i]->SetAxisRange(0,1.5,"Y");
-    RAA_measured[i]->Draw();
-
-    RAA_bayesian[i]->SetMarkerColor(kRed);
-    RAA_bayesian[i]->SetMarkerStyle(33);
-    RAA_bayesian[i]->Draw("same");
-
-    RAA_binbybin[i]->SetMarkerStyle(29);
-    RAA_binbybin[i]->SetMarkerColor(kBlue);
-    RAA_binbybin[i]->Draw("same");
-
-    lineRAA->Draw();
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
-
-  }
-
-  tRAA->AddEntry(RAA_measured[0],"No Unfolding","pl");
-  tRAA->AddEntry(RAA_bayesian[0],"Bayesian","pl");
-  tRAA->AddEntry(RAA_binbybin[0],"BinbyBin","pl");
-  tRAA->SetTextSize(0.04);
-
-  cRAA->cd(6);
-  tRAA->Draw();
-  cRAA->cd(1);
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-
-  cRAA->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-  
-  //plot 4 - PbPb MC closure test 
-  // this will also be a 6 panel plot showing bayesian iteration 4 and binbybin divided by measured which is actually the MC
-  TCanvas *cPbPbMCclosure = new TCanvas("cPbPbMCclosure","PbPb MC closure test",1200,800);
-  makeMultiPanelCanvas(cPbPbMCclosure,3,2,0.0,0.0,0.2,0.15,0.07);
-
-  TLine *linePbPb_mcclosure = new TLine(30,1,500,1);
-  linePbPb_mcclosure->SetLineStyle(2);
-  linePbPb_mcclosure->SetLineWidth(2);
-
-  TH1F *hMCClosurePbPb_Meas[nbins_cent+1], *hMCClosurePbPb_Bayesian[nbins_cent+1], *hMCClosurePbPb_BinByBin[nbins_cent+1];
-  for(int i = 0;i<nbins_cent;i++){
-
-    cPbPbMCclosure->cd(nbins_cent-i);
-    //hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_Reco[i]->Clone(Form("hMCClosurePbPb_Meas_cent%d",i));
-    hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_mcclosure_data[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_Meas_cent%d",i),boundaries_pt);
-    hMCClosurePbPb_Bayesian[i] = (TH1F*)uPbPb_MC_Bayes[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_Bayesian_cent%d",i),boundaries_pt);
-    hMCClosurePbPb_BinByBin[i] = (TH1F*)uPbPb_MC_BinByBin[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_BinByBin_cent%d",i),boundaries_pt);
-
-    mPbPb_mcclosure_gen[i] = (TH1F*)mPbPb_mcclosure_gen[i]->Rebin(nbins_pt,Form("mc_pbpb_mcclosure_gen_cent%d",i),boundaries_pt);
-
-    hMCClosurePbPb_Meas[i]->Divide(mPbPb_mcclosure_gen[i]);
-    hMCClosurePbPb_Bayesian[i]->Divide(mPbPb_mcclosure_gen[i]);
-    hMCClosurePbPb_BinByBin[i]->Divide(mPbPb_mcclosure_gen[i]);
-
-    // hMCClosurePbPb_Meas[i]->Scale(2);
-    // hMCClosurePbPb_Bayesian[i]->Scale(2);
-    // hMCClosurePbPb_BinByBin[i]->Scale(2);
-
-    makeHistTitle(hMCClosurePbPb_Meas[i]," ","Jet p_{T} (GeV/c)","Reco/Truth");
-    hMCClosurePbPb_Meas[i]->SetMarkerStyle(24);
-    hMCClosurePbPb_Meas[i]->SetMarkerColor(kBlack);
-    hMCClosurePbPb_Meas[i]->SetAxisRange(30,500,"X");
-    hMCClosurePbPb_Meas[i]->SetAxisRange(0,2,"Y");
-    hMCClosurePbPb_Meas[i]->Draw();
-
-    hMCClosurePbPb_Bayesian[i]->SetMarkerStyle(20);
-    hMCClosurePbPb_Bayesian[i]->SetMarkerColor(kBlack);
-    hMCClosurePbPb_Bayesian[i]->Draw("same");
-
-    hMCClosurePbPb_BinByBin[i]->SetMarkerColor(kRed);
-    hMCClosurePbPb_BinByBin[i]->SetMarkerStyle(33);
-    hMCClosurePbPb_BinByBin[i]->Draw("same");
-
-    linePbPb_mcclosure->Draw();
-    drawText(Form("%2.0f-%2.0f %",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.2,16);
-
-  }
-
-  cPbPbMCclosure->cd(1);
-  TLegend *pbpbmcclosure = myLegend(0.53,0.65,0.85,0.9);
-  pbpbmcclosure->AddEntry(hMCClosurePbPb_Meas[0],"PbPb no unfolding","pl");
-  pbpbmcclosure->AddEntry(hMCClosurePbPb_Bayesian[0],"PbPb Bayesian 4 Iter","pl");
-  pbpbmcclosure->AddEntry(hMCClosurePbPb_BinByBin[0],"PbPb BinbyBin","pl");
-  pbpbmcclosure->Draw();
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,16);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,16);
-  
-  cPbPbMCclosure->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_mc_closure_test_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-
-  //plot 5 - PP MC closure test
-  TCanvas * cPPMCclosure = new TCanvas("cPPMCclosure","PP MC closure test",600,600);
-  //TH1F *hMCClosurePP_Meas = (TH1F*)mPP_Reco->Clone("hMCClosurePP_Meas");
-  TH1F *hMCClosurePP_Meas = (TH1F*)mPP_mcclosure_data->Clone("hMCClosurePP_Meas");
-  TH1F *hMCClosurePP_Bayesian = (TH1F*)uPP_MC_Bayes->Clone("hMCClosurePP_Bayesian");
-  TH1F *hMCClosurePP_BinbyBin = (TH1F*)uPP_MC_BinByBin->Clone("hMCClosurePP_BinbyBin");
-
-  TLine *linePP_mcclosure = new TLine(30,1,500,1);
-  linePP_mcclosure->SetLineStyle(2);
-  linePP_mcclosure->SetLineWidth(2);
-
-  hMCClosurePP_Bayesian->Divide(mPP_mcclosure_data);
-  hMCClosurePP_Meas->Divide(mPP_mcclosure_data);
-  hMCClosurePP_BinbyBin->Divide(mPP_mcclosure_data);
-
-  hMCClosurePP_Meas->SetAxisRange(30,500,"X");
-  hMCClosurePP_Meas->SetAxisRange(0,2,"Y");
-
-  hMCClosurePP_Meas->SetMarkerStyle(24);
-  hMCClosurePP_Meas->SetMarkerColor(kBlack);
-
-  hMCClosurePP_Meas->SetTitle(" ");
-  hMCClosurePP_Meas->SetXTitle("Jet p_{T} (GeV/c)");
-  hMCClosurePP_Meas->SetYTitle("Reco/Truth");
-  
-  hMCClosurePP_Meas->GetXaxis()->CenterTitle();
-  hMCClosurePP_Meas->GetYaxis()->CenterTitle();
-
-  hMCClosurePP_Meas->Draw();
-
-  hMCClosurePP_Bayesian->SetMarkerStyle(33);
-  hMCClosurePP_Bayesian->SetMarkerColor(kRed);
-  hMCClosurePP_Bayesian->Draw("same");
-
-  hMCClosurePP_BinbyBin->SetMarkerStyle(29);
-  hMCClosurePP_BinbyBin->SetMarkerColor(kBlue);
-  hMCClosurePP_BinbyBin->Draw("same");
-
-  TLegend *ppmcclosure = myLegend(0.53,0.65,0.85,0.9);
-  ppmcclosure->AddEntry(hMCClosurePP_Meas,"pp no unfolding","pl");
-  ppmcclosure->AddEntry(hMCClosurePP_Bayesian,"pp Bayesian","pl");
-  ppmcclosure->AddEntry(hMCClosurePP_BinbyBin,"pp BinbyBin","pl");
-  ppmcclosure->Draw();
-
-  linePP_mcclosure->Draw();
-
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,22);
-  
-  cPPMCclosure->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_mc_closure_test_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-  
-  //plot 6 - data vs MC for PbPb 
-  // i want to make it like ratio plots for each centrality class. and plot the unfolded ratio as well. 
-  // so i want a line at 1, and 2 overlayed plots showing measured/Gen ratio and unfo/gen ratio. 
-  TCanvas *cPbPb_data_vs_mc = new TCanvas("cPbPb_data_vs_mc","PbPb data vs mc",1200,800);
-  makeMultiPanelCanvasWithGap(cPbPb_data_vs_mc,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
-
-  TH1F *PbPb_meas_vs_mc[nbins_cent+1];
-  TH1F *PbPb_unfo_vs_mc[nbins_cent+1];
-
-  TLine *linePbPb_data_vs_mc = new TLine(30,1,500,1);
-  linePbPb_data_vs_mc->SetLineStyle(2);
-  linePbPb_data_vs_mc->SetLineWidth(2);
-
-
-  for(int i = 0;i<nbins_cent;i++){
-
-    cPbPb_data_vs_mc->cd(nbins_cent-i);
-    cPbPb_data_vs_mc->cd(nbins_cent-i)->SetLogy();
-
-    PbPb_meas_vs_mc[i] = (TH1F*)dPbPb_TrgComb[i]->Clone("PbPb_meas_vs_mc");
-    PbPb_unfo_vs_mc[i] = (TH1F*)uPbPb_Bayes[i]->Clone("PbPb_unfo_vs_mc");
-
-    PbPb_meas_vs_mc[i]->Divide(mPbPb_Reco[i]);
-    PbPb_unfo_vs_mc[i]->Divide(mPbPb_Reco[i]);
-
-    makeHistTitle(PbPb_meas_vs_mc[i]," ","Jet p_{T} (GeV/c)", "#frac{data}{MC RECO}");
-    PbPb_meas_vs_mc[i]->SetMarkerStyle(25);
-    PbPb_meas_vs_mc[i]->SetMarkerColor(kBlack);
-    PbPb_meas_vs_mc[i]->SetAxisRange(30,800,"X");
-    PbPb_meas_vs_mc[i]->SetAxisRange(0,1e8,"Y");
-    PbPb_meas_vs_mc[i]->Draw();
-
-    PbPb_unfo_vs_mc[i]->SetMarkerStyle(27);
-    PbPb_unfo_vs_mc[i]->SetMarkerColor(kBlue);
-    PbPb_unfo_vs_mc[i]->Draw("same");
-
-    linePbPb_data_vs_mc->Draw();
-    
-    drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
-
-  }
-
-  cPbPb_data_vs_mc->cd(1);
-  TLegend *PbPb_datavsmc = myLegend(0.53,0.65,0.85,0.9);
-  PbPb_datavsmc->AddEntry(PbPb_meas_vs_mc[0],"no unfolding","pl");
-  PbPb_datavsmc->AddEntry(PbPb_unfo_vs_mc[0],"Bayesian 4 Iter","pl");
-  PbPb_datavsmc->Draw();
-
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-
-  cPbPb_data_vs_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_vs_mc_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  /*
-  
-  //plot7 - data vs MC for pp
-  // made similar to above. 
-  TCanvas *cPP_data_vs_mc = new TCanvas("cPP_data_vs_mc","PP data vs MC",600,600);
-
-  TH1F *PP_meas_vs_mc = (TH1F*)dPP_Comb->Clone("PP_meas_vs_mc");
-  TH1F *PP_unfo_vs_mc = (TH1F*)uPP_Bayes->Clone("PP_unfo_vs_mc");
-  
-  TLine *linePP_data_vs_mc = new TLine(30,1,500,1);
-  linePP_data_vs_mc->SetLineStyle(2);
-  linePP_data_vs_mc->SetLineWidth(2);
-
-  PP_meas_vs_mc->Divide(mPP_Reco);
-  PP_unfo_vs_mc->Divide(mPP_Reco);
-
-  //makeHistTitle(PP_meas_vs_mc," ","Jet p_{T} (GeV/c)","#frac{data}{MC RECO}");
-
-  PP_meas_vs_mc->SetTitle(" ");
-  PP_meas_vs_mc->SetXTitle("Jet p_{T} (GeV/c)");
-  PP_meas_vs_mc->SetYTitle("#frac{data}{MC RECO}");
-  PP_meas_vs_mc->GetXaxis()->CenterTitle();
-  PP_meas_vs_mc->GetYaxis()->CenterTitle();  
-
-  PP_meas_vs_mc->SetMarkerStyle(25);
-  PP_meas_vs_mc->SetMarkerColor(kBlack);
-  PP_meas_vs_mc->Draw();
-  PP_unfo_vs_mc->SetMarkerStyle(27);
-  PP_unfo_vs_mc->SetMarkerColor(kBlue);
-  PP_unfo_vs_mc->Draw("same");
-
-  linePP_data_vs_mc->Draw();
-
-  TLegend *PP_datavsmc = myLegend(0.53,0.65,0.85,0.9);
-  PP_datavsmc->AddEntry(PP_meas_vs_mc,"no unfolding","pl");
-  PP_datavsmc->AddEntry(PP_unfo_vs_mc,"Bayesian 4 Iter","pl");
-  PP_datavsmc->SetTextSize(0.02);
-  PP_datavsmc->Draw();
-
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-
-  cPP_data_vs_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_data_vs_mc_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-  
-  
-  //plot8 - normalized Response Matrix for PbPb. 
-  TCanvas *cPbPb_NormResMat = new TCanvas("cPbPb_NormResMat","Normalized Response Matrix for PbPb",1200,800);
-  makeMultiPanelCanvasWithGap(cPbPb_NormResMat,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
-  
-  TLine *linePbPb_Res = new TLine(15,15,1000,1000);
-  linePbPb_Res->SetLineStyle(2);
-  linePbPb_Res->SetLineWidth(2);
-
-  for(int i = 0;i<nbins_cent;i++){
-    cPbPb_NormResMat->cd(nbins_cent-i);
-    cPbPb_NormResMat->cd(nbins_cent-i)->SetLogy();
-    cPbPb_NormResMat->cd(nbins_cent-i)->SetLogx();
-    cPbPb_NormResMat->cd(nbins_cent-i)->SetLogz();
-
-    makeHistTitle(mPbPb_ResponseNorm[i]," ","Gen p_{T} (GeV/c)","Reco p_{T} (GeV/c)");
-
-    mPbPb_ResponseNorm[i]->SetAxisRange(1e-10,1,"Z");
-    mPbPb_ResponseNorm[i]->SetAxisRange(15,800,"X");
-    mPbPb_ResponseNorm[i]->SetAxisRange(15,800,"Y");
-   
-    mPbPb_ResponseNorm[i]->Draw("colz");
-    
-    linePbPb_Res->Draw();
-    drawText(Form("%2.0f-%2.0f%%",5*boundaries_cent[i],5*boundaries_cent[i+1]),0.8,0.9,20);
-
-  }
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.2,0.25,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,16);
-  drawText("chMax/jtpt>0.01",0.6,0.4,16);
-  cPbPb_NormResMat->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_normalized_response_matrix_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-  
-  //plot9 - normalized response matrix for pp
-  TCanvas *cPP_NormResMat = new TCanvas("cPP_NormResMat","Normalized Response Matrix fr PP",600,600);
-  cPP_NormResMat->SetLogy();
-  cPP_NormResMat->SetLogx();
-  cPP_NormResMat->SetLogz();
-
-  TLine *linePP_Res = new TLine(15,15,1000,1000);
-  linePP_Res->SetLineStyle(2);
-  linePP_Res->SetLineWidth(2);
-
-  //makeHistTitle(mPP_ResponseNorm," ","Gen p_{T} (GeV/c)","Reco p_{T} (GeV/c)");
-
-  mPP_ResponseNorm->SetAxisRange(1e-10,1,"Z");
-  mPP_ResponseNorm->SetAxisRange(15,800,"X");
-  mPP_ResponseNorm->SetAxisRange(15,800,"Y");
-
-  mPP_ResponseNorm->SetTitle(" ");
-  mPP_ResponseNorm->SetXTitle("Gen p_{T} (GeV/c)");
-  mPP_ResponseNorm->SetYTitle("Reco p_{T} (GeV/c)");
-  mPP_ResponseNorm->GetXaxis()->CenterTitle();
-  mPP_ResponseNorm->GetYaxis()->CenterTitle();
-
-  mPP_ResponseNorm->Draw("colz");
-
-  linePP_Res->Draw();
-
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cPP_NormResMat->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_normalized_response_matrix_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-  
-  //plot10 - Cross section for PbPb - in proper units per centrality bin.  
-  TCanvas *cPbPb_sigma = new TCanvas("cPbPb_sigma","PbPb inclusive jet invariant cross section",1200,800);
-  makeMultiPanelCanvas(cPbPb_sigma,3,2,0.0,0.0,0.2,0.15,0.07); 
-
-  for(int i = 0;i<nbins_cent;i++){
-
-    cPbPb_sigma->cd(nbins_cent-i);
-    cPbPb_sigma->cd(nbins_cent-i)->SetLogy();
-    cPbPb_sigma->cd(nbins_cent-i)->SetLogx();
-
-    makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","#frac{d^{2} N}{d#eta dp_{T}}");
-    //dPbPb_TrgComb[i]->Scale(1e-6)
-    dPbPb_TrgComb[i]->SetMarkerStyle(24);
-    dPbPb_TrgComb[i]->SetMarkerColor(kBlack);
-    dPbPb_TrgComb[i]->SetAxisRange(1e-2,1e8,"Y");
-    dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("rebin_measured_cent%d",i),boundaries_pt);
-    divideBinWidth(dPbPb_TrgComb[i]);
-    dPbPb_TrgComb[i]->SetAxisRange(30,500,"X");
-    dPbPb_TrgComb[i]->Draw();
-    
-    uPbPb_Bayes[i]->SetMarkerStyle(20);
-    uPbPb_Bayes[i]->SetMarkerColor(kBlack);
-    uPbPb_Bayes[i] = (TH1F*)uPbPb_Bayes[i]->Rebin(nbins_pt,Form("rebin_bayes_cent%d",i),boundaries_pt);
-    divideBinWidth(uPbPb_Bayes[i]);
-    uPbPb_Bayes[i]->Draw("same");
-
-    //uPbPb_BinByBin[i]->Scale(1e-6);
-    uPbPb_BinByBin[i]->SetMarkerStyle(33);
-    uPbPb_BinByBin[i]->SetMarkerColor(kRed);
-    uPbPb_BinByBin[i] = (TH1F*)uPbPb_BinByBin[i]->Rebin(nbins_pt,Form("rebin_binbybin_cent%d",i),boundaries_pt);
-    divideBinWidth(uPbPb_BinByBin[i]);
-    uPbPb_BinByBin[i]->Draw("same");
-
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
-  }
-
-  cPbPb_sigma->cd(1);
-  TLegend *PbPb_sigma = myLegend(0.53,0.75,0.8,0.9);
-  PbPb_sigma->AddEntry(dPbPb_TrgComb[0],"No Unfolding","pl");
-  PbPb_sigma->AddEntry(uPbPb_Bayes[0],"Bayesian 4 Iter","pl");
-  PbPb_sigma->AddEntry(uPbPb_BinByBin[0],"BinByBin","pl");
-  PbPb_sigma->SetTextSize(0.04);
-  PbPb_sigma->Draw();
-
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.55,0.65,16);
-  //drawText("Spectra with NJet(p_{T}>50) < 7",0.55,0.55,16);
-
-  cPbPb_sigma->cd(2);
-  drawText("|#eta|<2, chMax/jtpt>0.01",0.45,0.655,16);
-  drawText("|vz|<15, pCES, HBHE",0.45,0.55,16);
-  drawText("hiNpix_1 > 38000 - 500*NJet",0.45,0.45,16);
-
-  cPbPb_sigma->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_invariant_cross_section_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-  
-  
-  //plot 11 - cross section for PP 
-  TCanvas *cPP_sigma = new TCanvas("cPP_sigma","PP inclusive jet invariant cross section",600,400);
-  cPP_sigma->SetLogy();
-  cPP_sigma->SetLogy();
-
-  dPP_Comb->SetMarkerStyle(24);
-  dPP_Comb->SetMarkerColor(kBlack);
-  dPP_Comb->SetTitle(" ");
-  dPP_Comb->SetXTitle("Jet p_{T} (GeV/c)");
-  dPP_Comb->SetYTitle("#frac{d^2 #sigma}{d#eta dp_{T}} something barns");
-  dPP_Comb->SetAxisRange(30,500,"X");
-  dPP_Comb->Draw();
-
-  uPP_Bayes->SetMarkerColor(kRed);
-  uPP_Bayes->SetMarkerStyle(33);
-  uPP_Bayes->Draw("same");
-
-  uPP_BinByBin->SetMarkerStyle(29);
-  uPP_BinByBin->SetMarkerColor(kBlue);
-  uPP_BinByBin->Draw("same");
-
-  TLegend *PP_sigma = myLegend(0.53,0.65,0.85,0.9);
-  PP_sigma->AddEntry(dPP_Comb,"No Unfolding","pl");
-  PP_sigma->AddEntry(uPP_Bayes,"Bayesian 4 Iter","pl");
-  PP_sigma->AddEntry(uPP_BinByBin,"BinByBin","pl");
-  PP_sigma->SetTextSize(0.04);
-  PP_sigma->Draw();
-
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cPP_sigma->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_invariant_cross_section_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-  
-  
-  // plot 12 - Gen Spectra for PbPb and pp. 
-  
-  TCanvas *cGenSpectra = new TCanvas("cGenSpectra","Generator Level Spectra for PbPb and pp",1400,1000);
-  
-  cGenSpectra->Divide(1,1);
-  
-  cGenSpectra->cd(1);
-  cGenSpectra->cd(1)->SetLogy();
-  cGenSpectra->cd(1)->SetLogx();
-  //cSpectra->Set
-  //Double_t scaleFactor[nbins_cent+1] = {1,1e-1,1e-2,1e-3,1e-4,1e-5,1e-6};
-
-  TLegend *PbPbGenSpectra = myLegend(0.4,0.65,0.85,0.9);
-
-  for(int i = 0;i<=nbins_cent;i++){
-    
-    mPbPb_Gen[i]->Scale(1./scaleFactor[i]);
-    mPbPb_Reco[i]->Scale(1./scaleFactor[i]); 
-
-    mPbPb_Gen[i]->SetMarkerStyle(28);
-    mPbPb_Gen[i]->SetMarkerColor(i+1);
-
-    if(i==0){
-      mPbPb_Gen[i]->SetAxisRange(1e-15,1e5,"Y");
-      mPbPb_Gen[i]->SetAxisRange(15,600,"X");
-      makeHistTitle(mPbPb_Gen[i],"","MC: Jet p_{T} (GeV/c)","arbitrary for now");
-      mPbPb_Gen[i]->Draw();
-    }else 
-      mPbPb_Gen[i]->Draw("same");
-
-    mPbPb_Reco[i]->SetMarkerStyle(29);
-    mPbPb_Reco[i]->SetMarkerColor(i+1);
-    mPbPb_Reco[i]->Draw("same");
-
-  }
-
-  for(int i = nbins_cent;i>=0;i--){
-    if(i<nbins_cent)
-      PbPbGenSpectra->AddEntry(mPbPb_Gen[i],Form("%2.0f - %2.0f cent * 10^{%d}",5*boundaries_cent[i],5*boundaries_cent[i+1],i),"pl");
-    else 
-      PbPbGenSpectra->AddEntry(mPbPb_Gen[i],Form("0-200 cent * 10^{%d}",i),"pl");
-  }
-
-  PbPbGenSpectra->SetTextSize(0.04);
-  PbPbGenSpectra->Draw();
-  putCMSSim();
-  drawText("PbPb",0.2,0.8,20);
-  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.9,20);
-  drawText("#frac{chMax}{jtpt}>0.01",0.15,0.2,20);
-  
-  // cGenSpectra->cd(2);						
-  // cGenSpectra->cd(2)->SetLogy();
-  // cGenSpectra->cd(2)->SetLogx();
-  // makeHistTitle(mPP_Gen,"","MC: Jet p_{T} (GeV/c)","arbitrary for now");
-  // mPP_Gen->SetMarkerStyle(28);
-  // mPP_Gen->SetMarkerColor(kBlack);
-  // mPP_Gen->SetAxisRange(1e-14,1,"Y");
-  // mPP_Gen->SetAxisRange(15,600,"X");
-  // mPP_Gen->Draw();
-  
-  // drawText("#frac{chMax}{jtpt}>0.01",0.15,0.2,20);
-  // drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.45,0.9,20);
-  
-  drawText("2.76 TeV, |#eta|<2, |vz|<15",0,0.9,20);
-  //drawText("pp",0.3,0.8,20);
-
-  // 
-  // mPP_Reco->SetMarkerStyle(29);
-  // mPP_Reco->SetMarkerColor(kBlack);
-  // mPP_Reco->Draw("same");
-  
-  // TLegend *GenSpectra = myLegend(0.15,0.3,0.35,0.5);
-  // GenSpectra->AddEntry(mPP_Gen,"MC GenJet - refpt","pl");
-  // GenSpectra->AddEntry(mPP_Reco,"MC RecoJet - jtpt","pl");
-  // GenSpectra->SetTextSize(0.04);
-  // GenSpectra->Draw();
-  // 
-
-  cGenSpectra->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/MC_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    // TLegend *GenSpectra = myLegend(0.15,0.3,0.35,0.5);
+    // GenSpectra->AddEntry(mPP_Gen,"MC GenJet - refpt","pl");
+    // GenSpectra->AddEntry(mPP_Reco,"MC RecoJet - jtpt","pl");
+    // GenSpectra->SetTextSize(0.04);
+    // GenSpectra->Draw();
+    // 
+
+    cGenSpectra->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/MC_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
  
-  //unscale the gen and reco histograms: 
-  for(int i = 0;i<=nbins_cent;i++){ 
-    mPbPb_Gen[i]->Scale(1./scaleFactor[i]);
-    mPbPb_Reco[i]->Scale(1./scaleFactor[i]); 
+    //unscale the gen and reco histograms: 
+    for(int i = 0;i<=nbins_cent;i++){ 
+      mPbPb_Gen[i]->Scale(1./scaleFactor[i]);
+      mPbPb_Reco[i]->Scale(1./scaleFactor[i]); 
+    }
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  if(doPbPbTrgComb){
+    // Plotting the trigObj spectra from individual triggers vs the combined triggers. 
+    TCanvas *cDataMerge = new TCanvas("cDataMerge","",1000,800);
+    makeMultiPanelCanvas(cDataMerge,3,2,0.0,0.0,0.2,0.15,0.07);
+
+    for(int i = 0;i<nbins_cent;i++){
+
+      cDataMerge->cd(nbins_cent-i);
+      cDataMerge->cd(nbins_cent-i)->SetLogy();
+      cDataMerge->cd(nbins_cent-i)->SetLogx();
+
+      makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","#frac{d^{2} N}{dp_{T}}");
+      //dPbPb_TrgComb[i]->Scale(1e-6)
+      dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("rebin_pbpb_meas_cent%d",i),boundaries_pt);
+      divideBinWidth(dPbPb_TrgComb[i]);
+      dPbPb_TrgComb[i]->SetMarkerStyle(25);
+      dPbPb_TrgComb[i]->SetMarkerColor(kBlack);
+      dPbPb_TrgComb[i]->SetAxisRange(1e-2,1e8,"Y");
+      dPbPb_TrgComb[i]->SetAxisRange(30,500,"X");
+      dPbPb_TrgComb[i]->Draw();
+
+      dPbPb_Trg80[i]->SetMarkerStyle(20);
+      dPbPb_Trg80[i]->SetMarkerColor(kRed);
+      dPbPb_Trg80[i] = (TH1F*)dPbPb_Trg80[i]->Rebin(nbins_pt,Form("rebin_measured_80_cent%d",i),boundaries_pt);
+      divideBinWidth(dPbPb_Trg80[i]);
+      dPbPb_Trg80[i]->Draw("same");
+
+      dPbPb_Trg65[i]->SetMarkerStyle(20);
+      dPbPb_Trg65[i]->SetMarkerColor(kBlue);
+      dPbPb_Trg65[i] = (TH1F*)dPbPb_Trg65[i]->Rebin(nbins_pt,Form("rebin_measured_65_cent%d",i),boundaries_pt);
+      divideBinWidth(dPbPb_Trg65[i]);
+      dPbPb_Trg65[i]->Draw("same");
+
+      dPbPb_Trg55[i]->SetMarkerStyle(20);
+      dPbPb_Trg55[i]->SetMarkerColor(kGreen);
+      dPbPb_Trg55[i] = (TH1F*)dPbPb_Trg55[i]->Rebin(nbins_pt,Form("rebin_measured_55_cent%d",i),boundaries_pt);
+      divideBinWidth(dPbPb_Trg55[i]);
+      dPbPb_Trg55[i]->Draw("same");
+
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+    
+    }
+
+    cDataMerge->cd(1);
+    TLegend *PbPb_dataMerge = myLegend(0.53,0.75,0.8,0.9);
+    PbPb_dataMerge->AddEntry(dPbPb_TrgComb[0],"Combined","pl");
+    PbPb_dataMerge->AddEntry(dPbPb_Trg80[0],"Jet80","pl");
+    PbPb_dataMerge->AddEntry(dPbPb_Trg65[0],"Jet65","pl");
+    PbPb_dataMerge->AddEntry(dPbPb_Trg55[0],"Jet55","pl");
+    PbPb_dataMerge->SetTextSize(0.04);
+    PbPb_dataMerge->Draw();
+
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.95,15);
+    drawText("|#eta|<2, |vz|<15, 0.05<cut1<1",0.25,0.61,16);
+    drawText("pCES, HBHE",0.55,0.51,16);
+    cDataMerge->cd(2);
+    drawText("L1_SingleJet36 added to triggers",0.22,0.83,15);
+    //drawText("cut4: #frac{#sum #left(ch+nu+ph+mu+e#right)}{0.5*raw p_{T}}",0.22,0.83,15);
+    drawText("cut1: #frac{chMax}{jet p_{T}}",0.22,0.73,15);
+    cDataMerge->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_cut1_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  if(doPPTrgComb){
+    // Plotting the trigger combination for the pp dataset 
+
+
   }
   
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  */
-  /*
-  // Plotting the trigObj spectra from individual triggers vs the combined triggers. 
-  TCanvas *cDataMerge = new TCanvas("cDataMerge","",1000,800);
-  makeMultiPanelCanvas(cDataMerge,3,2,0.0,0.0,0.2,0.15,0.07);
-
-  for(int i = 0;i<nbins_cent;i++){
-
-    cDataMerge->cd(nbins_cent-i);
-    cDataMerge->cd(nbins_cent-i)->SetLogy();
-    cDataMerge->cd(nbins_cent-i)->SetLogx();
-
-    makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","#frac{d^{2} N}{dp_{T}}");
-    //dPbPb_TrgComb[i]->Scale(1e-6)
-    dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("rebin_pbpb_meas_cent%d",i),boundaries_pt);
-    divideBinWidth(dPbPb_TrgComb[i]);
-    dPbPb_TrgComb[i]->SetMarkerStyle(25);
-    dPbPb_TrgComb[i]->SetMarkerColor(kBlack);
-    dPbPb_TrgComb[i]->SetAxisRange(1e-2,1e8,"Y");
-    dPbPb_TrgComb[i]->SetAxisRange(30,500,"X");
-    dPbPb_TrgComb[i]->Draw();
-
-    dPbPb_Trg80[i]->SetMarkerStyle(20);
-    dPbPb_Trg80[i]->SetMarkerColor(kRed);
-    dPbPb_Trg80[i] = (TH1F*)dPbPb_Trg80[i]->Rebin(nbins_pt,Form("rebin_measured_80_cent%d",i),boundaries_pt);
-    divideBinWidth(dPbPb_Trg80[i]);
-    dPbPb_Trg80[i]->Draw("same");
-
-    dPbPb_Trg65[i]->SetMarkerStyle(20);
-    dPbPb_Trg65[i]->SetMarkerColor(kBlue);
-    dPbPb_Trg65[i] = (TH1F*)dPbPb_Trg65[i]->Rebin(nbins_pt,Form("rebin_measured_65_cent%d",i),boundaries_pt);
-    divideBinWidth(dPbPb_Trg65[i]);
-    dPbPb_Trg65[i]->Draw("same");
-
-    dPbPb_Trg55[i]->SetMarkerStyle(20);
-    dPbPb_Trg55[i]->SetMarkerColor(kGreen);
-    dPbPb_Trg55[i] = (TH1F*)dPbPb_Trg55[i]->Rebin(nbins_pt,Form("rebin_measured_55_cent%d",i),boundaries_pt);
-    divideBinWidth(dPbPb_Trg55[i]);
-    dPbPb_Trg55[i]->Draw("same");
-
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
-    
-  }
-
-  cDataMerge->cd(1);
-  TLegend *PbPb_dataMerge = myLegend(0.53,0.75,0.8,0.9);
-  PbPb_dataMerge->AddEntry(dPbPb_TrgComb[0],"Combined","pl");
-  PbPb_dataMerge->AddEntry(dPbPb_Trg80[0],"Jet80","pl");
-  PbPb_dataMerge->AddEntry(dPbPb_Trg65[0],"Jet65","pl");
-  PbPb_dataMerge->AddEntry(dPbPb_Trg55[0],"Jet55","pl");
-  PbPb_dataMerge->SetTextSize(0.04);
-  PbPb_dataMerge->Draw();
-
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.95,15);
-  drawText("|#eta|<2, |vz|<15, 0.00 < cut3 < 1.01",0.25,0.61,16);
-  drawText("pCES, HBHE",0.55,0.51,16);
-  cDataMerge->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_cut3_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-
-  */
-  
-  /*
     
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // Plotting the average energy subtracted in the Vs cone 
-  if(algo=="Vs"){
+
+  if(doRandomCone){
+
+    // Plotting the average energy subtracted in the Vs cone 
+    if(algo=="Vs"){
 
 
-    TCanvas *cPbPb_MC_jtpu[nbins_eta];
+      TCanvas *cPbPb_MC_jtpu[nbins_eta];
 
-    TF1 *fMC[no_radius][nbins_eta][nbins_cent];
-    double c1FixMinX = 0.2;
-    double c1xMax = 5;
+      TF1 *fMC[no_radius][nbins_eta][nbins_cent];
+      double c1FixMinX = 0.2;
+      double c1xMax = 5;
 
-    double fit_mean[no_radius][nbins_eta][nbins_cent];
-    double fit_mean_err[no_radius][nbins_eta][nbins_cent];
+      double fit_mean[no_radius][nbins_eta][nbins_cent];
+      double fit_mean_err[no_radius][nbins_eta][nbins_cent];
 
-    for(int j = 0;j<nbins_eta;j++){
+      for(int j = 0;j<nbins_eta;j++){
 
-      cPbPb_MC_jtpu[j] = new TCanvas(Form("cPbPb_MC_jtpu_%s",etaWidth[j]),Form("energy subtracted from Jets in the Vs algorithmin the range %s",etaWidth[j]),1400,1200);
-      makeMultiPanelCanvas(cPbPb_MC_jtpu[j],3,2,0.0,0.0,0.2,0.15,0.07);
-      TLegend *LPbPb_MC_jtpu[nbins_cent];
+	cPbPb_MC_jtpu[j] = new TCanvas(Form("cPbPb_MC_jtpu_%s",etaWidth[j]),Form("energy subtracted from Jets in the Vs algorithmin the range %s",etaWidth[j]),1400,1200);
+	makeMultiPanelCanvas(cPbPb_MC_jtpu[j],3,2,0.0,0.0,0.2,0.15,0.07);
+	TLegend *LPbPb_MC_jtpu[nbins_cent];
 
-      for(int i = 0;i<nbins_cent;i++){
+	for(int i = 0;i<nbins_cent;i++){
 
-	LPbPb_MC_jtpu[i] = myLegend(0.55,0.70,0.85,0.90);
+	  LPbPb_MC_jtpu[i] = myLegend(0.55,0.70,0.85,0.90);
 
-	cPbPb_MC_jtpu[j]->cd(nbins_cent-i)->SetLogy();
-	//cPbPb_MC_jtpu[j]->cd(i+1)->SetLogx();
-	//cPbPb_MC_jtpu[j]->cd(i+1)->SetGridy();
-	cPbPb_MC_jtpu[j]->cd(nbins_cent-i)->SetGridx();
-	cPbPb_MC_jtpu[j]->cd(nbins_cent-i);
+	  cPbPb_MC_jtpu[j]->cd(nbins_cent-i)->SetLogy();
+	  //cPbPb_MC_jtpu[j]->cd(i+1)->SetLogx();
+	  //cPbPb_MC_jtpu[j]->cd(i+1)->SetGridy();
+	  cPbPb_MC_jtpu[j]->cd(nbins_cent-i)->SetGridx();
+	  cPbPb_MC_jtpu[j]->cd(nbins_cent-i);
 
-	for(int k = 1;k<5;k++){
+	  for(int k = 1;k<5;k++){
 
-	  hPbPb_MC_jtpu[k][j][i]->SetMarkerStyle(20+k);
-	  hPbPb_MC_jtpu[k][j][i]->SetMarkerColor(k);
-	  hPbPb_MC_jtpu[k][j][i]->SetAxisRange(5,250,"X");
-	  hPbPb_MC_jtpu[k][j][i]->SetAxisRange(1,3.5e3,"Y");
-	  makeHistTitle(hPbPb_MC_jtpu[k][j][i]," ","Subtracted p_{T} (GeV/c) from Jet","counts");
+	    hPbPb_MC_jtpu[k][j][i]->SetMarkerStyle(20+k);
+	    hPbPb_MC_jtpu[k][j][i]->SetMarkerColor(k);
+	    hPbPb_MC_jtpu[k][j][i]->SetAxisRange(5,250,"X");
+	    hPbPb_MC_jtpu[k][j][i]->SetAxisRange(1,3.5e3,"Y");
+	    makeHistTitle(hPbPb_MC_jtpu[k][j][i]," ","Subtracted p_{T} (GeV/c) from Jet","counts");
 	 
-	  fMC[k][j][i] = new TF1(Form("fMC_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),"[0]*exp(-0.5*((x-[1])/[2])^2)",5,250);
-	  //fMC[k][j][i]->SetParameters(0.3,hPbPb_MC_jtpu[k][j][i]->GetMean(),10);
-	  //fMC[k][j][i]->FixParameter(1,hPbPb_MC_jtpu[k][j][i]->GetMean());
+	    fMC[k][j][i] = new TF1(Form("fMC_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),"[0]*exp(-0.5*((x-[1])/[2])^2)",5,250);
+	    //fMC[k][j][i]->SetParameters(0.3,hPbPb_MC_jtpu[k][j][i]->GetMean(),10);
+	    //fMC[k][j][i]->FixParameter(1,hPbPb_MC_jtpu[k][j][i]->GetMean());
 
-	  hPbPb_MC_jtpu[k][j][i]->Fit(Form("fMC_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),"0");
+	    hPbPb_MC_jtpu[k][j][i]->Fit(Form("fMC_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),"0");
 	  
-	  fit_mean[k][j][i] = fMC[k][j][i]->GetParameter(2);
-	  fit_mean_err[k][j][i] = fMC[k][j][i]->GetParError(2);
+	    fit_mean[k][j][i] = fMC[k][j][i]->GetParameter(2);
+	    fit_mean_err[k][j][i] = fMC[k][j][i]->GetParError(2);
 
-	  // this fit values doesnt look reasonable??? 
+	    // this fit values doesnt look reasonable??? 
 
-	  if(k==1)
-	    hPbPb_MC_jtpu[k][j][i]->Draw();
-	  else 
-	    hPbPb_MC_jtpu[k][j][i]->Draw("same");
+	    if(k==1)
+	      hPbPb_MC_jtpu[k][j][i]->Draw();
+	    else 
+	      hPbPb_MC_jtpu[k][j][i]->Draw("same");
 	  
-	  //LPbPb_MC_jtpu[i]->AddEntry(,"","");
-	  LPbPb_MC_jtpu[i]->AddEntry(hPbPb_MC_jtpu[k][j][i],Form("R=0.%d #bar{p_{T}}:%5.2f #pm %5.2f",list_radius[k],hPbPb_MC_jtpu[k][j][i]->GetMean(),hPbPb_MC_jtpu[k][j][i]->GetMeanError()),"pl");
-	  //LPbPb_MC_jtpu[i]->AddEntry("",Form("Fit mean:%5.2f #pm %5.2f",fit_mean[k][j][i],fit_mean_err[k][j][i]),"");
+	    //LPbPb_MC_jtpu[i]->AddEntry(,"","");
+	    LPbPb_MC_jtpu[i]->AddEntry(hPbPb_MC_jtpu[k][j][i],Form("R=0.%d #bar{p_{T}}:%5.2f #pm %5.2f",list_radius[k],hPbPb_MC_jtpu[k][j][i]->GetMean(),hPbPb_MC_jtpu[k][j][i]->GetMeanError()),"pl");
+	    //LPbPb_MC_jtpu[i]->AddEntry("",Form("Fit mean:%5.2f #pm %5.2f",fit_mean[k][j][i],fit_mean_err[k][j][i]),"");
 
-	}//radius loop
+	  }//radius loop
 	
-	LPbPb_MC_jtpu[i]->SetTextSize(0.03);
-	LPbPb_MC_jtpu[i]->Draw();
-	drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.87,0.95,20);
+	  LPbPb_MC_jtpu[i]->SetTextSize(0.03);
+	  LPbPb_MC_jtpu[i]->Draw();
+	  drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.87,0.95,20);
 
-      }//centrality loop
-      cPbPb_MC_jtpu[j]->cd(1);
-      putCMSSim();
-      cPbPb_MC_jtpu[j]->cd(nbins_cent);
-      drawText(Form("Anti-k_{T} %s %s",algo,jet_type),0.5,0.55,16);
-      drawText(Form("%s |vz|<15",etaWidth[j]),0.5,0.60,16);
+	}//centrality loop
+	cPbPb_MC_jtpu[j]->cd(1);
+	putCMSSim();
+	cPbPb_MC_jtpu[j]->cd(nbins_cent);
+	drawText(Form("Anti-k_{T} %s %s",algo,jet_type),0.5,0.55,16);
+	drawText(Form("%s |vz|<15",etaWidth[j]),0.5,0.60,16);
       
-      cPbPb_MC_jtpu[j]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/bkg_energy_subtracted_%s_ak%s_%s_%d.pdf",etaWidth[j],algo,jet_type,date.GetDate()),"RECREATE");
+	cPbPb_MC_jtpu[j]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/bkg_energy_subtracted_%s_ak%s_%s_%d.pdf",etaWidth[j],algo,jet_type,date.GetDate()),"RECREATE");
 
-    }//eta bins loop for the canvas
+      }//eta bins loop for the canvas
 
     
-    // TCanvas *cMeanVsEta[4];
-    // TH1F *hPbPb_MC_jtpu_mean_vs_eta[4];
-    // hPbPb_MC_jtpu_mean_vs_eta[k] = new TH1F(Form("hPbPb_MC_jtpu_mean_vs_eta_R%d",list_radius[k]),"",12,-3,+3);
+      // TCanvas *cMeanVsEta[4];
+      // TH1F *hPbPb_MC_jtpu_mean_vs_eta[4];
+      // hPbPb_MC_jtpu_mean_vs_eta[k] = new TH1F(Form("hPbPb_MC_jtpu_mean_vs_eta_R%d",list_radius[k]),"",12,-3,+3);
 
-    // for(int k = 1;k<5;k++){
+      // for(int k = 1;k<5;k++){
       
-    //   cMeanVsEta[k-1] = new TCanvas(Form("cMeanVsEta_R%d",list_radius[k]),"",800,600);
-    //   for(int n = 0;n<12;n++){
-    // 	hPbPb_MC_jtpu_mean_vs_eta[k]->SetBin;
-    //   }
-    }
+      //   cMeanVsEta[k-1] = new TCanvas(Form("cMeanVsEta_R%d",list_radius[k]),"",800,600);
+      //   for(int n = 0;n<12;n++){
+      // 	hPbPb_MC_jtpu_mean_vs_eta[k]->SetBin;
+      //   }
+   
     
 
     // plot from the Hydjet and MB data the jtpu variable as a function of centrality 
     
-  }// random cone plotting if statement only for Vs so far
-
-  */
-
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-  // plotting the hiNpix vs NJets(pT>50 and |eta|<2) for each centrality bin. 
-  TCanvas *cSupernova_data = new TCanvas("cSupernova_data","",1000,800);
-  makeMultiPanelCanvas(cSupernova_data,3,2,0.0,0.0,0.2,0.15,0.07);
-  //makeMultiPanelCanvasWithGap(cSupernova_data,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
-
-  //TLine *lineSupernova_data = new TLine(0,38000,50,35500);
-  TLine *lineSupernova_data = new TLine(0,38000,50,13000);
-  lineSupernova_data->SetLineStyle(2);
-  lineSupernova_data->SetLineWidth(2);
-
-  TLine *lineSupernova_data_2 = new TLine(0,38000,50,35500);
-  lineSupernova_data_2->SetLineStyle(2);
-  lineSupernova_data_2->SetLineWidth(2);
-  lineSupernova_data_2->SetLineColor(kRed);
-
-  for(int i = 0;i<nbins_cent;i++){
-
-    cSupernova_data->cd(nbins_cent-i);
-    
-    hpbpb_Npix_before_cut_data[i]->SetYTitle("No of Pixels");
-    hpbpb_Npix_before_cut_data[i]->SetXTitle("No of Jets (p_{T}>50 GeV/c, |#eta|<2)");
-    hpbpb_Npix_before_cut_data[i]->SetTitle(" ");
-    hpbpb_Npix_before_cut_data[i]->Draw("col");
-
-    lineSupernova_data->Draw();
-    //lineSupernova_data_2->Draw();
-    drawText("Data",0.6,0.2,16);
-    drawText("|vz|<15, pCES, HBHE",0.45,0.75,16);
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.2,16);
+    }// random cone plotting if statement only for Vs so far
 
   }
-  cSupernova_data->cd(1);
-  putCMSPrel();
-  drawText("Full dataset Jet55 or Jet65 or Jet80",0.3,0.85,16);
-  cSupernova_data->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  
-  
-  // plotting the hiNpix vs NJets(pT>50 and |eta|<2) for each centrality bin. for MC
-  TCanvas *cSupernova_mc = new TCanvas("cSupernova_mc","",1000,800);
-  makeMultiPanelCanvas(cSupernova_mc,3,2,0.0,0.0,0.2,0.15,0.07);
 
-  //TLine *lineSupernova_mc = new TLine(0,38000,50,35500);
-  TLine *lineSupernova_mc = new TLine(0,38000,50,13000);
-  lineSupernova_mc->SetLineStyle(2);
-  lineSupernova_mc->SetLineWidth(2);
-
-  TLine *lineSupernova_mc_2 = new TLine(0,38000,50,35500);
-  lineSupernova_mc_2->SetLineStyle(2);
-  lineSupernova_mc_2->SetLineWidth(2);
-  lineSupernova_mc_2->SetLineColor(kRed);
-
-  for(int i = 0;i<nbins_cent;i++){
-
-    cSupernova_mc->cd(nbins_cent-i);
-    
-    hpbpb_Npix_before_cut_mc[i]->SetYTitle("No of Pixels");
-    hpbpb_Npix_before_cut_mc[i]->SetTitle(" ");
-    hpbpb_Npix_before_cut_mc[i]->SetXTitle("No of Jets (p_{T}>50 GeV/c, |#eta|<2)");
-    hpbpb_Npix_before_cut_mc[i]->Draw("col");
-
-    lineSupernova_mc->Draw();
-    //lineSupernova_mc_2->Draw();
-    drawText("MC",0.6,0.2,16);
-    drawText("|vz|<15, pCES, HBHE",0.45,0.75,16);
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.2,16);
-  }
-  cSupernova_mc->cd(1);
-  putCMSSim();
-  drawText("Pythia + HYDJET",0.3,0.85,16);
-  cSupernova_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_mc_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  /*
-  
-  // make the plot which shows the contribution of the cut. 
-  TCanvas *cpT_njet_gl7[nbins_cent+1];
+  if(doSupernova){
+    // plotting the hiNpix vs NJets(pT>50 and |eta|<2) for each centrality bin. 
+    TCanvas *cSupernova_data = new TCanvas("cSupernova_data","",1000,800);
+    makeMultiPanelCanvas(cSupernova_data,3,2,0.0,0.0,0.2,0.15,0.07);
+    //makeMultiPanelCanvasWithGap(cSupernova_data,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
 
-  for(int i = 0;i<=nbins_cent;i++){
-    cpT_njet_gl7[i] = new TCanvas(Form("cpT_njet_gl7_cent%d",i),"",1000,1000);
+    //TLine *lineSupernova_data = new TLine(0,38000,50,35500);
+    TLine *lineSupernova_data = new TLine(0,38000,50,13000);
+    lineSupernova_data->SetLineStyle(2);
+    lineSupernova_data->SetLineWidth(2);
+
+    TLine *lineSupernova_data_2 = new TLine(0,38000,50,35500);
+    lineSupernova_data_2->SetLineStyle(2);
+    lineSupernova_data_2->SetLineWidth(2);
+    lineSupernova_data_2->SetLineColor(kRed);
+
+    for(int i = 0;i<nbins_cent;i++){
+
+      cSupernova_data->cd(nbins_cent-i);
     
-    makeMultiPanelCanvas(cpT_njet_gl7[i],2,2,0.0,0.0,0.2,0.15,0.07);    
-    cpT_njet_gl7[i]->cd(1);
-    cpT_njet_gl7[i]->cd(1)->SetLogy();
-    cpT_njet_gl7[i]->cd(1)->SetGridx();
+      hpbpb_Npix_before_cut_data[i]->SetYTitle("No of Pixels");
+      hpbpb_Npix_before_cut_data[i]->SetXTitle("No of Jets (p_{T}>50 GeV/c, |#eta|<2)");
+      hpbpb_Npix_before_cut_data[i]->SetTitle(" ");
+      hpbpb_Npix_before_cut_data[i]->Draw("col");
 
-    makeHistTitle(dPbPb_Trg55[i]," ","Jet p_{T} (GeV/c)","counts/dp_{T}");
-    dPbPb_Trg55[i] = (TH1F*)dPbPb_Trg55[i]->Rebin(nbins_pt,Form("rebin_trgobj55_cent%d",i),boundaries_pt);
-    divideBinWidth(dPbPb_Trg55[i]);
-    hpbpb_TrgObj55_nJet_l7[i] = (TH1F*)hpbpb_TrgObj55_nJet_l7[i]->Rebin(nbins_pt,Form("rebin_trgobj55_l7_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_TrgObj55_nJet_l7[i]);
-    hpbpb_TrgObj55_nJet_g7[i] = (TH1F*)hpbpb_TrgObj55_nJet_g7[i]->Rebin(nbins_pt,Form("rebin_trgobj55_g7_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_TrgObj55_nJet_g7[i]);
+      lineSupernova_data->Draw();
+      //lineSupernova_data_2->Draw();
+      drawText("Data",0.6,0.2,16);
+      drawText("|vz|<15, pCES, HBHE",0.45,0.75,16);
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.2,16);
 
-    dPbPb_Trg55[i]->SetMarkerColor(kBlack);
-    dPbPb_Trg55[i]->SetMarkerStyle(25);
-    dPbPb_Trg55[i]->SetAxisRange(30,400,"X");
-    dPbPb_Trg55[i]->SetAxisRange(1e-2,1e8,"Y");
-    dPbPb_Trg55[i]->Draw();
-
-    hpbpb_TrgObj55_nJet_l7[i]->SetMarkerColor(kBlack);
-    hpbpb_TrgObj55_nJet_l7[i]->SetMarkerStyle(20);
-    hpbpb_TrgObj55_nJet_l7[i]->Draw("same");
-    
-    hpbpb_TrgObj55_nJet_g7[i]->SetMarkerColor(kRed);
-    hpbpb_TrgObj55_nJet_g7[i]->SetMarkerStyle(20);
-    hpbpb_TrgObj55_nJet_g7[i]->Draw("same");
-    
-    drawText("Jet55, 55<TrgObjpT<65",0.5,0.65,16);
-
-    TLegend *PbPb_lg7 = myLegend(0.5,0.75,0.75,0.9);
-    PbPb_lg7->AddEntry(dPbPb_Trg55[i],"Total","pl");
-    PbPb_lg7->AddEntry(hpbpb_TrgObj55_nJet_l7[i],"NJet < 7 (Jet pT>50)","pl");
-    PbPb_lg7->AddEntry(hpbpb_TrgObj55_nJet_g7[i],"NJet > 7 (Jet pT>50)","pl");
-    PbPb_lg7->SetTextSize(0.04);
-    PbPb_lg7->Draw();
-
+    }
+    cSupernova_data->cd(1);
     putCMSPrel();
-    if(i!=nbins_cent)drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);
-    else drawText("0-100 %",0.75,0.9,20);
-    drawText("|#eta|<2, chMax/jtpt>0.01",0.5,0.55,16);
-    drawText("|vz|<15, pCES, HBHE",0.5,0.45,16);
-    drawText("hiNpix_1 > 38000 - 500*NJet",0.5,0.35,16);
+    drawText("Full dataset Jet55 or Jet65 or Jet80",0.3,0.85,16);
+    cSupernova_data->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  
+  
+    // plotting the hiNpix vs NJets(pT>50 and |eta|<2) for each centrality bin. for MC
+    TCanvas *cSupernova_mc = new TCanvas("cSupernova_mc","",1000,800);
+    makeMultiPanelCanvas(cSupernova_mc,3,2,0.0,0.0,0.2,0.15,0.07);
 
-    cpT_njet_gl7[i]->cd(2);
-    cpT_njet_gl7[i]->cd(2)->SetLogy();
-    cpT_njet_gl7[i]->cd(2)->SetGridx();
+    //TLine *lineSupernova_mc = new TLine(0,38000,50,35500);
+    TLine *lineSupernova_mc = new TLine(0,38000,50,13000);
+    lineSupernova_mc->SetLineStyle(2);
+    lineSupernova_mc->SetLineWidth(2);
 
-    makeHistTitle(dPbPb_Trg65[i]," ","Jet p_{T} (GeV/c)","counts/dp_{T}");
-    dPbPb_Trg65[i] = (TH1F*)dPbPb_Trg65[i]->Rebin(nbins_pt,Form("rebin_trgobj65_cent%d",i),boundaries_pt);
-    divideBinWidth(dPbPb_Trg65[i]);
-    hpbpb_TrgObj65_nJet_l7[i] = (TH1F*)hpbpb_TrgObj65_nJet_l7[i]->Rebin(nbins_pt,Form("rebin_trgobj65_l7_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_TrgObj65_nJet_l7[i]);
-    hpbpb_TrgObj65_nJet_g7[i] = (TH1F*)hpbpb_TrgObj65_nJet_g7[i]->Rebin(nbins_pt,Form("rebin_trgobj65_g7_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_TrgObj65_nJet_g7[i]);
+    TLine *lineSupernova_mc_2 = new TLine(0,38000,50,35500);
+    lineSupernova_mc_2->SetLineStyle(2);
+    lineSupernova_mc_2->SetLineWidth(2);
+    lineSupernova_mc_2->SetLineColor(kRed);
 
-    dPbPb_Trg65[i]->SetMarkerColor(kBlack);
-    dPbPb_Trg65[i]->SetMarkerStyle(25);
-    dPbPb_Trg65[i]->SetAxisRange(30,400,"X");
-    dPbPb_Trg65[i]->SetAxisRange(1e-2,1e8,"Y");
-    dPbPb_Trg65[i]->Draw();
+    for(int i = 0;i<nbins_cent;i++){
 
-    hpbpb_TrgObj65_nJet_l7[i]->SetMarkerColor(kBlack);
-    hpbpb_TrgObj65_nJet_l7[i]->SetMarkerStyle(20);
-    hpbpb_TrgObj65_nJet_l7[i]->Draw("same");
+      cSupernova_mc->cd(nbins_cent-i);
     
-    hpbpb_TrgObj65_nJet_g7[i]->SetMarkerColor(kRed);
-    hpbpb_TrgObj65_nJet_g7[i]->SetMarkerStyle(20);
-    hpbpb_TrgObj65_nJet_g7[i]->Draw("same");
+      hpbpb_Npix_before_cut_mc[i]->SetYTitle("No of Pixels");
+      hpbpb_Npix_before_cut_mc[i]->SetTitle(" ");
+      hpbpb_Npix_before_cut_mc[i]->SetXTitle("No of Jets (p_{T}>50 GeV/c, |#eta|<2)");
+      hpbpb_Npix_before_cut_mc[i]->Draw("col");
 
-    drawText("Jet65, 65<TrgObjpT<80",0.5,0.65,16);
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.55,16);
-
-    cpT_njet_gl7[i]->cd(3);
-    cpT_njet_gl7[i]->cd(3)->SetLogy();
-    cpT_njet_gl7[i]->cd(3)->SetGridx();
-
-    makeHistTitle(dPbPb_Trg80[i]," ","Jet p_{T} (GeV/c)","counts/dp_{T}");
-    dPbPb_Trg80[i] = (TH1F*)dPbPb_Trg80[i]->Rebin(nbins_pt,Form("rebin_trgobj80_cent%d",i),boundaries_pt);
-    divideBinWidth(dPbPb_Trg80[i]);
-    hpbpb_TrgObj80_nJet_l7[i] = (TH1F*)hpbpb_TrgObj80_nJet_l7[i]->Rebin(nbins_pt,Form("rebin_trgobj80_l7_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_TrgObj80_nJet_l7[i]);
-    hpbpb_TrgObj80_nJet_g7[i] = (TH1F*)hpbpb_TrgObj80_nJet_g7[i]->Rebin(nbins_pt,Form("rebin_trgobj80_g7_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_TrgObj80_nJet_g7[i]);
-
-    dPbPb_Trg80[i]->SetMarkerColor(kBlack);
-    dPbPb_Trg80[i]->SetMarkerStyle(25);
-    dPbPb_Trg80[i]->SetAxisRange(30,400,"X");
-    dPbPb_Trg80[i]->SetAxisRange(1e-2,1e8,"Y");
-    dPbPb_Trg80[i]->Draw();
-
-    hpbpb_TrgObj80_nJet_l7[i]->SetMarkerColor(kBlack);
-    hpbpb_TrgObj80_nJet_l7[i]->SetMarkerStyle(20);
-    hpbpb_TrgObj80_nJet_l7[i]->Draw("same");
-    
-    hpbpb_TrgObj80_nJet_g7[i]->SetMarkerColor(kRed);
-    hpbpb_TrgObj80_nJet_g7[i]->SetMarkerStyle(20);
-    hpbpb_TrgObj80_nJet_g7[i]->Draw("same");
-
-    drawText("Jet80, 80<TrgObjpT",0.5,0.65,16);
-
-    cpT_njet_gl7[i]->cd(4);
-    cpT_njet_gl7[i]->cd(4)->SetLogy();
-    cpT_njet_gl7[i]->cd(4)->SetGridx();
-
-    makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","counts/dp_{T}");
-    dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("rebin_trgobjComb_cent%d",i),boundaries_pt);
-    divideBinWidth(dPbPb_TrgComb[i]);
-    hpbpb_TrgObjComb_nJet_l7[i] = (TH1F*)hpbpb_TrgObjComb_nJet_l7[i]->Rebin(nbins_pt,Form("rebin_trgobjComb_l7_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_TrgObjComb_nJet_l7[i]);
-    hpbpb_TrgObjComb_nJet_g7[i] = (TH1F*)hpbpb_TrgObjComb_nJet_g7[i]->Rebin(nbins_pt,Form("rebin_trgobjComb_g7_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_TrgObjComb_nJet_g7[i]);
-
-    dPbPb_TrgComb[i]->SetMarkerColor(kBlack);
-    dPbPb_TrgComb[i]->SetMarkerStyle(25);
-    dPbPb_TrgComb[i]->SetAxisRange(30,400,"X");
-    dPbPb_TrgComb[i]->SetAxisRange(1e-2,1e8,"Y");
-    dPbPb_TrgComb[i]->Draw();
-
-    hpbpb_TrgObjComb_nJet_l7[i]->SetMarkerColor(kBlack);
-    hpbpb_TrgObjComb_nJet_l7[i]->SetMarkerStyle(20);
-    hpbpb_TrgObjComb_nJet_l7[i]->Draw("same");
-    
-    hpbpb_TrgObjComb_nJet_g7[i]->SetMarkerColor(kRed);
-    hpbpb_TrgObjComb_nJet_g7[i]->SetMarkerStyle(20);
-    hpbpb_TrgObjComb_nJet_g7[i]->Draw("same");
-
-    drawText("Jet Trigger Combined",0.5,0.65,16);
-
-    cpT_njet_gl7[i]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_spectra_nJetcut_ak%s%d%s_cent%d_%d.pdf",algo,radius,jet_type,i,date.GetDate()),"RECREATE");
-
-  }//cent loop
-  */
-
+      lineSupernova_mc->Draw();
+      //lineSupernova_mc_2->Draw();
+      drawText("MC",0.6,0.2,16);
+      drawText("|vz|<15, pCES, HBHE",0.45,0.75,16);
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.2,16);
+    }
+    cSupernova_mc->cd(1);
+    putCMSSim();
+    drawText("Pythia + HYDJET",0.3,0.85,16);
+    cSupernova_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_mc_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  
+  }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // make the same plot as above, showing the contributions from the NJet>7 vs NJet<7 for MC.
-  /*
-  TCanvas *cMC_njet_lg7 = new TCanvas("nMC_njet_lg7","",1000,800);
-  makeMultiPanelCanvas(cMC_njet_lg7,3,2,0.0,0.0,0.2,0.15,0.07);
+  
+  if(doSupernovaContributionData){
+    // make the plot which shows the contribution of the cut. 
+    TCanvas *cpT_njet_gl7[nbins_cent+1];
 
-  for(int i = 0;i<nbins_cent;i++){
-
-    cMC_njet_lg7->cd(nbins_cent-i);
-    cMC_njet_lg7->cd(nbins_cent-i)->SetLogy();
+    for(int i = 0;i<=nbins_cent;i++){
+      cpT_njet_gl7[i] = new TCanvas(Form("cpT_njet_gl7_cent%d",i),"",1000,1000);
     
-    mPbPb_Reco[i] = (TH1F*)mPbPb_Reco[i]->Rebin(nbins_pt,Form("rebin_mc_jtpt_cent%d",i),boundaries_pt);
-    divideBinWidth(mPbPb_Reco[i]);
-    mPbPb_Reco[i]->Scale(4);
-    hpbpb_pt_Njet_l7[i] = (TH1F*)hpbpb_pt_Njet_l7[i]->Rebin(nbins_pt,Form("rebin_mc_jtpt_l7_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_pt_Njet_l7[i]);
-    hpbpb_pt_Njet_g7[i] = (TH1F*)hpbpb_pt_Njet_g7[i]->Rebin(nbins_pt,Form("rebin_mc_jtpt_g7_cent%d",i),boundaries_pt);
-    divideBinWidth(hpbpb_pt_Njet_g7[i]);
+      makeMultiPanelCanvas(cpT_njet_gl7[i],2,2,0.0,0.0,0.2,0.15,0.07);    
+      cpT_njet_gl7[i]->cd(1);
+      cpT_njet_gl7[i]->cd(1)->SetLogy();
+      cpT_njet_gl7[i]->cd(1)->SetGridx();
+
+      makeHistTitle(dPbPb_Trg55[i]," ","Jet p_{T} (GeV/c)","counts/dp_{T}");
+      dPbPb_Trg55[i] = (TH1F*)dPbPb_Trg55[i]->Rebin(nbins_pt,Form("rebin_trgobj55_cent%d",i),boundaries_pt);
+      divideBinWidth(dPbPb_Trg55[i]);
+      hpbpb_TrgObj55_nJet_l7[i] = (TH1F*)hpbpb_TrgObj55_nJet_l7[i]->Rebin(nbins_pt,Form("rebin_trgobj55_l7_cent%d",i),boundaries_pt);
+      divideBinWidth(hpbpb_TrgObj55_nJet_l7[i]);
+      hpbpb_TrgObj55_nJet_g7[i] = (TH1F*)hpbpb_TrgObj55_nJet_g7[i]->Rebin(nbins_pt,Form("rebin_trgobj55_g7_cent%d",i),boundaries_pt);
+      divideBinWidth(hpbpb_TrgObj55_nJet_g7[i]);
+
+      dPbPb_Trg55[i]->SetMarkerColor(kBlack);
+      dPbPb_Trg55[i]->SetMarkerStyle(25);
+      dPbPb_Trg55[i]->SetAxisRange(30,400,"X");
+      dPbPb_Trg55[i]->SetAxisRange(1e-2,1e8,"Y");
+      dPbPb_Trg55[i]->Draw();
+
+      hpbpb_TrgObj55_nJet_l7[i]->SetMarkerColor(kBlack);
+      hpbpb_TrgObj55_nJet_l7[i]->SetMarkerStyle(20);
+      hpbpb_TrgObj55_nJet_l7[i]->Draw("same");
     
-    makeHistTitle(mPbPb_Reco[i]," ","Jet RECO p_{T} (GeV/c)","d#sigma/dp_{T}");
-    mPbPb_Reco[i]->SetMarkerColor(kBlack);
-    mPbPb_Reco[i]->SetMarkerStyle(25);
-    mPbPb_Reco[i]->SetAxisRange(30,500,"X");
-    mPbPb_Reco[i]->SetAxisRange(1e-12,1e-2,"Y");
-    mPbPb_Reco[i]->Draw();
+      hpbpb_TrgObj55_nJet_g7[i]->SetMarkerColor(kRed);
+      hpbpb_TrgObj55_nJet_g7[i]->SetMarkerStyle(20);
+      hpbpb_TrgObj55_nJet_g7[i]->Draw("same");
+    
+      drawText("Jet55, 55<TrgObjpT<65",0.5,0.65,16);
 
-    hpbpb_pt_Njet_l7[i]->SetMarkerColor(kBlack);
-    hpbpb_pt_Njet_l7[i]->SetMarkerStyle(20);
-    hpbpb_pt_Njet_l7[i]->Draw("same");
+      TLegend *PbPb_lg7 = myLegend(0.5,0.75,0.75,0.9);
+      PbPb_lg7->AddEntry(dPbPb_Trg55[i],"Total","pl");
+      PbPb_lg7->AddEntry(hpbpb_TrgObj55_nJet_l7[i],"NJet < 7 (Jet pT>50)","pl");
+      PbPb_lg7->AddEntry(hpbpb_TrgObj55_nJet_g7[i],"NJet > 7 (Jet pT>50)","pl");
+      PbPb_lg7->SetTextSize(0.04);
+      PbPb_lg7->Draw();
 
-    hpbpb_pt_Njet_g7[i]->SetMarkerColor(kRed);
-    hpbpb_pt_Njet_g7[i]->SetMarkerStyle(20);
-    hpbpb_pt_Njet_g7[i]->Draw("same");
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.85,20);
+      putCMSPrel();
+      if(i!=nbins_cent)drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);
+      else drawText("0-100 %",0.75,0.9,20);
+      drawText("|#eta|<2, chMax/jtpt>0.01",0.5,0.55,16);
+      drawText("|vz|<15, pCES, HBHE",0.5,0.45,16);
+      drawText("hiNpix_1 > 38000 - 500*NJet",0.5,0.35,16);
 
+      cpT_njet_gl7[i]->cd(2);
+      cpT_njet_gl7[i]->cd(2)->SetLogy();
+      cpT_njet_gl7[i]->cd(2)->SetGridx();
+
+      makeHistTitle(dPbPb_Trg65[i]," ","Jet p_{T} (GeV/c)","counts/dp_{T}");
+      dPbPb_Trg65[i] = (TH1F*)dPbPb_Trg65[i]->Rebin(nbins_pt,Form("rebin_trgobj65_cent%d",i),boundaries_pt);
+      divideBinWidth(dPbPb_Trg65[i]);
+      hpbpb_TrgObj65_nJet_l7[i] = (TH1F*)hpbpb_TrgObj65_nJet_l7[i]->Rebin(nbins_pt,Form("rebin_trgobj65_l7_cent%d",i),boundaries_pt);
+      divideBinWidth(hpbpb_TrgObj65_nJet_l7[i]);
+      hpbpb_TrgObj65_nJet_g7[i] = (TH1F*)hpbpb_TrgObj65_nJet_g7[i]->Rebin(nbins_pt,Form("rebin_trgobj65_g7_cent%d",i),boundaries_pt);
+      divideBinWidth(hpbpb_TrgObj65_nJet_g7[i]);
+
+      dPbPb_Trg65[i]->SetMarkerColor(kBlack);
+      dPbPb_Trg65[i]->SetMarkerStyle(25);
+      dPbPb_Trg65[i]->SetAxisRange(30,400,"X");
+      dPbPb_Trg65[i]->SetAxisRange(1e-2,1e8,"Y");
+      dPbPb_Trg65[i]->Draw();
+
+      hpbpb_TrgObj65_nJet_l7[i]->SetMarkerColor(kBlack);
+      hpbpb_TrgObj65_nJet_l7[i]->SetMarkerStyle(20);
+      hpbpb_TrgObj65_nJet_l7[i]->Draw("same");
+    
+      hpbpb_TrgObj65_nJet_g7[i]->SetMarkerColor(kRed);
+      hpbpb_TrgObj65_nJet_g7[i]->SetMarkerStyle(20);
+      hpbpb_TrgObj65_nJet_g7[i]->Draw("same");
+
+      drawText("Jet65, 65<TrgObjpT<80",0.5,0.65,16);
+      drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.55,16);
+
+      cpT_njet_gl7[i]->cd(3);
+      cpT_njet_gl7[i]->cd(3)->SetLogy();
+      cpT_njet_gl7[i]->cd(3)->SetGridx();
+
+      makeHistTitle(dPbPb_Trg80[i]," ","Jet p_{T} (GeV/c)","counts/dp_{T}");
+      dPbPb_Trg80[i] = (TH1F*)dPbPb_Trg80[i]->Rebin(nbins_pt,Form("rebin_trgobj80_cent%d",i),boundaries_pt);
+      divideBinWidth(dPbPb_Trg80[i]);
+      hpbpb_TrgObj80_nJet_l7[i] = (TH1F*)hpbpb_TrgObj80_nJet_l7[i]->Rebin(nbins_pt,Form("rebin_trgobj80_l7_cent%d",i),boundaries_pt);
+      divideBinWidth(hpbpb_TrgObj80_nJet_l7[i]);
+      hpbpb_TrgObj80_nJet_g7[i] = (TH1F*)hpbpb_TrgObj80_nJet_g7[i]->Rebin(nbins_pt,Form("rebin_trgobj80_g7_cent%d",i),boundaries_pt);
+      divideBinWidth(hpbpb_TrgObj80_nJet_g7[i]);
+
+      dPbPb_Trg80[i]->SetMarkerColor(kBlack);
+      dPbPb_Trg80[i]->SetMarkerStyle(25);
+      dPbPb_Trg80[i]->SetAxisRange(30,400,"X");
+      dPbPb_Trg80[i]->SetAxisRange(1e-2,1e8,"Y");
+      dPbPb_Trg80[i]->Draw();
+
+      hpbpb_TrgObj80_nJet_l7[i]->SetMarkerColor(kBlack);
+      hpbpb_TrgObj80_nJet_l7[i]->SetMarkerStyle(20);
+      hpbpb_TrgObj80_nJet_l7[i]->Draw("same");
+    
+      hpbpb_TrgObj80_nJet_g7[i]->SetMarkerColor(kRed);
+      hpbpb_TrgObj80_nJet_g7[i]->SetMarkerStyle(20);
+      hpbpb_TrgObj80_nJet_g7[i]->Draw("same");
+
+      drawText("Jet80, 80<TrgObjpT",0.5,0.65,16);
+
+      cpT_njet_gl7[i]->cd(4);
+      cpT_njet_gl7[i]->cd(4)->SetLogy();
+      cpT_njet_gl7[i]->cd(4)->SetGridx();
+
+      makeHistTitle(dPbPb_TrgComb[i]," ","Jet p_{T} (GeV/c)","counts/dp_{T}");
+      dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("rebin_trgobjComb_cent%d",i),boundaries_pt);
+      divideBinWidth(dPbPb_TrgComb[i]);
+      hpbpb_TrgObjComb_nJet_l7[i] = (TH1F*)hpbpb_TrgObjComb_nJet_l7[i]->Rebin(nbins_pt,Form("rebin_trgobjComb_l7_cent%d",i),boundaries_pt);
+      divideBinWidth(hpbpb_TrgObjComb_nJet_l7[i]);
+      hpbpb_TrgObjComb_nJet_g7[i] = (TH1F*)hpbpb_TrgObjComb_nJet_g7[i]->Rebin(nbins_pt,Form("rebin_trgobjComb_g7_cent%d",i),boundaries_pt);
+      divideBinWidth(hpbpb_TrgObjComb_nJet_g7[i]);
+
+      dPbPb_TrgComb[i]->SetMarkerColor(kBlack);
+      dPbPb_TrgComb[i]->SetMarkerStyle(25);
+      dPbPb_TrgComb[i]->SetAxisRange(30,400,"X");
+      dPbPb_TrgComb[i]->SetAxisRange(1e-2,1e8,"Y");
+      dPbPb_TrgComb[i]->Draw();
+
+      hpbpb_TrgObjComb_nJet_l7[i]->SetMarkerColor(kBlack);
+      hpbpb_TrgObjComb_nJet_l7[i]->SetMarkerStyle(20);
+      hpbpb_TrgObjComb_nJet_l7[i]->Draw("same");
+    
+      hpbpb_TrgObjComb_nJet_g7[i]->SetMarkerColor(kRed);
+      hpbpb_TrgObjComb_nJet_g7[i]->SetMarkerStyle(20);
+      hpbpb_TrgObjComb_nJet_g7[i]->Draw("same");
+
+      drawText("Jet Trigger Combined",0.5,0.65,16);
+
+      cpT_njet_gl7[i]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_spectra_nJetcut_ak%s%d%s_cent%d_%d.pdf",algo,radius,jet_type,i,date.GetDate()),"RECREATE");
+
+    }//cent loop
   }
 
-  cMC_njet_lg7->cd(1);
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  if(doSupernovaContributionMC){
+    // make the same plot as above, showing the contributions from the NJet>7 vs NJet<7 for MC.
   
-  putCMSSim();
-  TLegend *PbPb_mc_lg7 = myLegend(0.5,0.75,0.75,0.9);
-  PbPb_mc_lg7->AddEntry(mPbPb_Reco[0],"Total","pl");
-  PbPb_mc_lg7->AddEntry(hpbpb_pt_Njet_l7[0],"NJet < 7 (Jet pT>50)","pl");
-  PbPb_mc_lg7->AddEntry(hpbpb_pt_Njet_g7[0],"NJet > 7 (Jet pT>50)","pl");
-  PbPb_mc_lg7->SetTextSize(0.04);
-  PbPb_mc_lg7->Draw();
+    TCanvas *cMC_njet_lg7 = new TCanvas("nMC_njet_lg7","",1000,800);
+    makeMultiPanelCanvas(cMC_njet_lg7,3,2,0.0,0.0,0.2,0.15,0.07);
 
-  drawText("|#eta|<2, chMax/jtpt>0.01",0.5,0.55,16);
-  drawText("|vz|<15, pCES",0.5,0.45,16);
-  //drawText("hiNpix_1 > 38000 - 500*NJet",0.5,0.35,16);
+    for(int i = 0;i<nbins_cent;i++){
+
+      cMC_njet_lg7->cd(nbins_cent-i);
+      cMC_njet_lg7->cd(nbins_cent-i)->SetLogy();
     
-  cMC_njet_lg7->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_mc_spectra_nJetcut_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+      mPbPb_Reco[i] = (TH1F*)mPbPb_Reco[i]->Rebin(nbins_pt,Form("rebin_mc_jtpt_cent%d",i),boundaries_pt);
+      divideBinWidth(mPbPb_Reco[i]);
+      mPbPb_Reco[i]->Scale(4);
+      hpbpb_pt_Njet_l7[i] = (TH1F*)hpbpb_pt_Njet_l7[i]->Rebin(nbins_pt,Form("rebin_mc_jtpt_l7_cent%d",i),boundaries_pt);
+      divideBinWidth(hpbpb_pt_Njet_l7[i]);
+      hpbpb_pt_Njet_g7[i] = (TH1F*)hpbpb_pt_Njet_g7[i]->Rebin(nbins_pt,Form("rebin_mc_jtpt_g7_cent%d",i),boundaries_pt);
+      divideBinWidth(hpbpb_pt_Njet_g7[i]);
+    
+      makeHistTitle(mPbPb_Reco[i]," ","Jet RECO p_{T} (GeV/c)","d#sigma/dp_{T}");
+      mPbPb_Reco[i]->SetMarkerColor(kBlack);
+      mPbPb_Reco[i]->SetMarkerStyle(25);
+      mPbPb_Reco[i]->SetAxisRange(30,500,"X");
+      mPbPb_Reco[i]->SetAxisRange(1e-12,1e-2,"Y");
+      mPbPb_Reco[i]->Draw();
 
-  */
+      hpbpb_pt_Njet_l7[i]->SetMarkerColor(kBlack);
+      hpbpb_pt_Njet_l7[i]->SetMarkerStyle(20);
+      hpbpb_pt_Njet_l7[i]->Draw("same");
+
+      hpbpb_pt_Njet_g7[i]->SetMarkerColor(kRed);
+      hpbpb_pt_Njet_g7[i]->SetMarkerStyle(20);
+      hpbpb_pt_Njet_g7[i]->Draw("same");
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.85,20);
+
+    }
+
+    cMC_njet_lg7->cd(1);
+  
+    putCMSSim();
+    TLegend *PbPb_mc_lg7 = myLegend(0.5,0.75,0.75,0.9);
+    PbPb_mc_lg7->AddEntry(mPbPb_Reco[0],"Total","pl");
+    PbPb_mc_lg7->AddEntry(hpbpb_pt_Njet_l7[0],"NJet < 7 (Jet pT>50)","pl");
+    PbPb_mc_lg7->AddEntry(hpbpb_pt_Njet_g7[0],"NJet > 7 (Jet pT>50)","pl");
+    PbPb_mc_lg7->SetTextSize(0.04);
+    PbPb_mc_lg7->Draw();
+
+    drawText("|#eta|<2, chMax/jtpt>0.01",0.5,0.55,16);
+    drawText("|vz|<15, pCES",0.5,0.45,16);
+    //drawText("hiNpix_1 > 38000 - 500*NJet",0.5,0.35,16);
+    
+    cMC_njet_lg7->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_mc_spectra_nJetcut_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  
+  }
 
   //
   timer.Stop();

@@ -620,8 +620,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
     
     hpbpb_Npix_before_cut[k][nbins_cent] = new TH2F(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),Form("Number of pixels hit per no of jets pT>50 before cut R%d n20_eta_p20 0-200cent",list_radius[k]),50,0,50,100,0,60000);
     hpbpb_Npix_after_cut[k][nbins_cent] = new TH2F(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),Form("Number of pixels hit per no of jets pT>50 after cut R%d n20_eta_p20 0-200cent",list_radius[k]),50,0,50,100,0,60000);
-    
-    
+  
   }// radii loop
 
   // Setup jet data branches - this will be 2D with [radius][pthat-file], but the histogram here is just 1D with [radius]
@@ -836,7 +835,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	  hpbpb_eta_full_noScale[k]->Fill(data[k][h]->jteta[g]);
 	  hpbpb_phi_full_noScale[k]->Fill(data[k][h]->jtphi[g]);
   
-	  if ( data[k][h]->rawpt[g] < 10. ) continue;
+	  if ( data[k][h]->rawpt[g] < 20. ) continue;
 	  if ( data[k][h]->refpt[g] < 25. ) continue; //to see if we can get a better response matrix 
 	  //if ( data[k][h]->jtpt[g] <= 15 ) continue;
 	  //if ( data[k][h]->jtpt[g] > 2.*data[k][h]->pthat) continue;
@@ -896,7 +895,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	    
 	    if ( data[k][h]->subid[g] != sub_id ) continue;
 
-	    if (cut4>3.8 || cut1<0.05 || cut1>1) continue;
+	    if (cut1<0.05 || cut1>1) continue;
 	    
 	    //for (int l= 0; l< data[h]->ngen;l++) {
 	    //  if (data[h]->refpt[k]==data[h]->genpt[l]) {
