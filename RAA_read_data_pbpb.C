@@ -756,12 +756,14 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   int L1_MB_1;
   int L1_MB_p_1;
   int L1_sj36_1;
+  int L1_sj52_1;
   int jetMB_1;
   int jet55_1;
   int jet65_1;
   int jet80_1;
   int jetMB_p_1;
   int L1_sj36_p_1;
+  int L1_sj52_p_1;
   int jet55_p_1;
   int jet65_p_1;
   int jet80_p_1;
@@ -942,6 +944,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND",&L1_sj36_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND_Prescl",&L1_sj36_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND",&L1_sj52_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND_Prescl",&L1_sj52_p_1);
 
     jetpbpb1[2][k]->SetBranchAddress("id",&trgObj_id_1);
     jetpbpb1[2][k]->SetBranchAddress("pt",&trgObj_pt_1);
@@ -1155,8 +1159,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   Float_t chMax = 0,chSum = 0,phMax = 0,phSum = 0, neMax = 0, neSum = 0, muSum = 0, muMax = 0, eSum = 0, eMax = 0;
   Float_t cent = 0;
 
-  TNtuple *jets_ID = new TNtuple("jets_ID","","cut1:cut2:cut3:cut4:cut5:pt:jtpu:l1sl36:l1sl36_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
-  Float_t arrayValues[27];
+  TNtuple *jets_ID = new TNtuple("jets_ID","","cut1:cut2:cut3:cut4:cut5:pt:jtpu:l1sl36:l1sl36_prescl:l1sl52:l1sl52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
+  Float_t arrayValues[29];
 
   //loop for the MB tree. 
   //empty for now - need to fix that once we have the MB data.  
@@ -1218,10 +1222,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       hpbpb_Npix_before_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);	
       
       // apply the correct supernova selection cut rejection here: 
-      if(hiNpix_1 > 38000 - 500*jetCounter){
-	if(printDebug) cout<<"removed this supernova event"<<endl;
-	continue;
-      }
+      //if(hiNpix_1 > 38000 - 500*jetCounter){
+      //if(printDebug) cout<<"removed this supernova event"<<endl;
+      //continue;
+      //}
       
       hpbpb_Npix_after_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
       hpbpb_Npix_after_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);
@@ -1237,7 +1241,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  
 	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
 	  
-	  if(raw_1[g] < 20) continue;
+	  //if(raw_1[g] < 20) continue;
 	  
 	  if(printDebug)cout<<"jet variables:  "<<endl;
 	  if(printDebug)cout<<"chSum = "<<chSum_1[g]<<endl;
@@ -1264,7 +1268,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  //hCut4->Fill(cut4);
 	  //hCut2->Fill(cut2);
 	  //hCut1->Fill(cut1);
-
+	  
 	  pt = pt_1[g];
 	  cent = centBin;
 	  chMax = chMax_1[g];
@@ -1277,7 +1281,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  muSum = muSum_1[g];
 	  eMax = eMax_1[g];
 	  eSum = eSum_1[g];
-
+	  
 	  arrayValues[0] = cut1;
 	  arrayValues[1] = cut2;
 	  arrayValues[2] = cut3;
@@ -1287,24 +1291,26 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  arrayValues[6] = jtpu_1[g];
 	  arrayValues[7] = L1_sj36_1;
 	  arrayValues[8] = L1_sj36_p_1;
-	  arrayValues[9] = jet55_1;
-	  arrayValues[10] = jet55_p_1;
-	  arrayValues[11] = jet65_1;
-	  arrayValues[12] = jet65_p_1;
-	  arrayValues[13] = jet80_1;
-	  arrayValues[14] = jet80_p_1;
-	  arrayValues[15] = trgObj_pt_1;
-	  arrayValues[16] = cent;
-	  arrayValues[17] = chMax;
-	  arrayValues[18] = chSum;
-	  arrayValues[19] = phMax;
-	  arrayValues[20] = phSum;
-	  arrayValues[21] = neMax;
-	  arrayValues[22] = neSum;
-	  arrayValues[23] = muMax;
-	  arrayValues[24] = muSum;
-	  arrayValues[25] = eMax;
-	  arrayValues[26] = eSum;
+	  arrayValues[9] = L1_sj36_1;
+	  arrayValues[10] = L1_sj36_p_1;
+	  arrayValues[11] = jet55_1;
+	  arrayValues[12] = jet55_p_1;
+	  arrayValues[13] = jet65_1;
+	  arrayValues[14] = jet65_p_1;
+	  arrayValues[15] = jet80_1;
+	  arrayValues[16] = jet80_p_1;
+	  arrayValues[17] = trgObj_pt_1;
+	  arrayValues[18] = cent;
+	  arrayValues[19] = chMax;
+	  arrayValues[20] = chSum;
+	  arrayValues[21] = phMax;
+	  arrayValues[22] = phSum;
+	  arrayValues[23] = neMax;
+	  arrayValues[24] = neSum;
+	  arrayValues[25] = muMax;
+	  arrayValues[26] = muSum;
+	  arrayValues[27] = eMax;
+	  arrayValues[28] = eSum;
 
 	  jets_ID->Fill(arrayValues);
 
@@ -1315,19 +1321,21 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	    //cout<<"passed the cut"<<endl;
 
 	    hJets->Fill(1);
+	    //if(raw_1[g] < 20) continue;
 
-	    if(jet80_1==1 && L1_sj36_1==1) {
+
+	    if(jet80_1==1 && L1_sj52_1==1) {
 	      if(trgObj_pt_1>=80){
-		hpbpb_TrgObj80[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
-		hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
+		hpbpb_TrgObj80[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
+		hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
 		
 		if(jetCounter>=7){
-		  hpbpb_TrgObj80_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
-		  hpbpb_TrgObj80_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
+		  hpbpb_TrgObj80_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
+		  hpbpb_TrgObj80_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
 		}
 		if(jetCounter<7){
-		  hpbpb_TrgObj80_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
-		  hpbpb_TrgObj80_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj36_p_1);
+		  hpbpb_TrgObj80_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
+		  hpbpb_TrgObj80_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
 		}
 	      }
 	      // hpbpb_Jet80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);

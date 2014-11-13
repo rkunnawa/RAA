@@ -161,21 +161,27 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   bool doPbPbsigma = false;
   bool doPPsigma = false;
   bool doGenSpectra = false;
-  bool doPbPbTrgComb = true;
+  bool doPbPbTrgComb = false;
   bool doPPTrgComb = false;
   bool doRandomCone = false;
   bool doSupernova = false;
   bool doSupernovaContributionData = false;
   bool doSupernovaContributionMC = false;
+  bool doJetID = true;
+  bool do2DCutpTplot = false;
+  bool do2DCut1 = false;
+  bool do2DCut2 = false;
+  bool do2DCut3 = false;
+  bool do2DCut4 = false;
+  bool do2DCut5 = false;
   
   TFile *fin; 
   
   //if(location=="MIT") 
-  // fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfo_ak%s%d%s_20141106.root",algo,radius,jet_type));
-  fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfo_mcclosure_sameside_ak%s%d%s_20141111_test.root",algo,radius,jet_type));
+  //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
-  
   
   TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1];
   
@@ -211,12 +217,12 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   for(int i = 0;i<=nbins_cent;i++){
     
     cout<<"cent = "<<i<<endl;
-    dPbPb_TrgComb[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObjComb_R%d_n20_eta_p20_cent%d",radius,i));
-    dPbPb_TrgComb[i]->Print("base");
-    dPbPb_Trg80[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObj80_R%d_n20_eta_p20_cent%d",radius,i));
-    dPbPb_Trg65[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObj65_R%d_n20_eta_p20_cent%d",radius,i));
-    dPbPb_Trg55[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObj55_R%d_n20_eta_p20_cent%d",radius,i));    
-    /*
+    //dPbPb_TrgComb[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObjComb_R%d_n20_eta_p20_cent%d",radius,i));
+    //dPbPb_TrgComb[i]->Print("base");
+    //dPbPb_Trg80[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObj80_R%d_n20_eta_p20_cent%d",radius,i));
+    //dPbPb_Trg65[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObj65_R%d_n20_eta_p20_cent%d",radius,i));
+    //dPbPb_Trg55[i] = (TH1F*)fin->Get(Form("hpbpb_TrgObj55_R%d_n20_eta_p20_cent%d",radius,i));    
+    
     mPbPb_Reco[i] = (TH1F*)fin->Get(Form("hpbpb_reco_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Gen[i] = (TH1F*)fin->Get(Form("hpbpb_gen_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_ResponseNorm[i] = (TH2F*)fin->Get(Form("mPbPb_ResponseNorm_cent%d",i));
@@ -235,8 +241,21 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       uPbPb_BayesianIter[j][i] = (TH1F*)fin->Get(Form("uPbPb_BayesianIter%d_cent%d",j,i));
       uPbPb_MC_BayesianIter[j][i] = (TH1F*)fin->Get(Form("uPbPb_MC_BayesianIter%d_cent%d",j,i));
     }
-    */
   }
+  /*
+  //intermediate (small) output file for running the unfolding: 
+  TFile fout(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_testComb4_cut1_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  fout.cd();
+  for(int i = 0;i<=nbins_cent;i++){
+    dPbPb_TrgComb[i]->Write();
+    dPbPb_Trg80[i]->Write();
+    dPbPb_Trg65[i]->Write();
+    dPbPb_Trg55[i]->Write();
+  }
+  fout.Write();
+  fout.Close();
+  */
+
   /*
   dPP_Comb = (TH1F*)fin->Get(Form("hpp_TrgComb_R%d_n20_eta_p20",radius));
   mPP_ResponseNorm = (TH2F*)fin->Get(Form("mPP_ResponseNorm",radius));	
@@ -258,11 +277,9 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   */
 
-
-  
   // get histograms from the MC file. 
-  TFile *fMCin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_ak%s%s_20141110.root",algo,jet_type));
-  TFile *fDatain = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_testComb2_cut2_20141108.root",algo,jet_type));
+  TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_pp_mc_ak%s%s_20141111.root",algo,jet_type));
+  TFile *fDatain = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   
   TH1F *hPbPb_MC_jtpu[no_radius][nbins_eta][nbins_cent+1];
   
@@ -290,9 +307,15 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   
   
   for(int i = 0;i<=nbins_cent;i++){
-    
-    hpbpb_Npix_before_cut_data[i] = (TH2F*)fin->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,i));
-    hpbpb_Npix_after_cut_data[i] = (TH2F*)fin->Get(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",radius,i));
+
+    dPbPb_TrgComb[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObjComb_R%d_n20_eta_p20_cent%d",radius,i));
+    dPbPb_TrgComb[i]->Print("base");
+    dPbPb_Trg80[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObj80_R%d_n20_eta_p20_cent%d",radius,i));
+    dPbPb_Trg65[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObj65_R%d_n20_eta_p20_cent%d",radius,i));
+    dPbPb_Trg55[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObj55_R%d_n20_eta_p20_cent%d",radius,i));   
+
+    hpbpb_Npix_before_cut_data[i] = (TH2F*)fDatain->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,i));
+    hpbpb_Npix_after_cut_data[i] = (TH2F*)fDatain->Get(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",radius,i));
     hpbpb_Npix_before_cut_data[i]->Print("base");
     hpbpb_Npix_after_cut_data[i]->Print("base");
     hpbpb_Npix_before_cut_mc[i] = (TH2F*)fMCin->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,i));
@@ -330,7 +353,6 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       for(int j = 0;j<nbins_eta;j++){
 	
 	//hPbPb_MC_jtpu[k][j][i] = (TH1F*)fMCin->Get(Form("hpbpb_jtpu_noScale_R%d_%s_cent%d",list_radius[k],etaWidth[j],i));
-	
 	
       }//eta bins loop  
     }//centrality loop
@@ -632,7 +654,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       hMCClosurePbPb_BinByBin[i]->Draw("same");
 
       linePbPb_mcclosure->Draw();
-      drawText(Form("%2.0f-%2.0f %",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.2,16);
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.6,0.33,16);
 
     }
 
@@ -643,10 +665,11 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     pbpbmcclosure->AddEntry(hMCClosurePbPb_BinByBin[0],"PbPb BinbyBin","pl");
     pbpbmcclosure->Draw();
     putCMSPrel();
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.6,0.31,16);
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
+    drawText("Data and gen, same half statistics",0.3,0.13,16);
   
-    cPbPbMCclosure->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_mc_closure_test_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cPbPbMCclosure->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_mc_closure_samehalf_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1503,7 +1526,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     }
 
     cMC_njet_lg7->cd(1);
-  
+    
     putCMSSim();
     TLegend *PbPb_mc_lg7 = myLegend(0.5,0.75,0.75,0.9);
     PbPb_mc_lg7->AddEntry(mPbPb_Reco[0],"Total","pl");
@@ -1520,6 +1543,623 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   
   }
 
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  
+  if(doJetID){
+
+    //get the jetID trees from the MC and data files 
+    TTree *jetID_data = (TTree*)fDatain->Get("jets_ID");
+    TTree *jetID_mc = (TTree*)fMCin->Get("jets_ID");
+
+    //declare histogram arrays
+    TH1F* hCut1_Data[nbins_cent];
+    TH1F* hCut1_MC[nbins_cent]; 
+    TH1F* hCut2_Data[nbins_cent];
+    TH1F* hCut2_MC[nbins_cent]; 
+    TH1F* hCut3_Data[nbins_cent];
+    TH1F* hCut3_MC[nbins_cent]; 
+    TH1F* hCut4_Data[nbins_cent];
+    TH1F* hCut4_MC[nbins_cent]; 
+    TH1F* hCut5_Data[nbins_cent];
+    TH1F* hCut5_MC[nbins_cent]; 
+
+    for(int i = 0;i<nbins_cent;i++){
+      //declare the histograms 
+      hCut1_Data[i] = new TH1F(Form("hCut1_Data_cent%d",i),"",21,0,1.05);
+      hCut1_MC[i] = new TH1F(Form("hCut1_MC_cent%d",i),"",21,0,1.05);
+      hCut2_Data[i] = new TH1F(Form("hCut2_Data_cent%d",i),"",21,0,1.05);
+      hCut2_MC[i] = new TH1F(Form("hCut2_MC_cent%d",i),"",21,0,1.05);
+      hCut3_Data[i] = new TH1F(Form("hCut3_Data_cent%d",i),"",100,0,5);
+      hCut3_MC[i] = new TH1F(Form("hCut3_MC_cent%d",i),"",100,0,5);
+      hCut4_Data[i] = new TH1F(Form("hCut4_Data_cent%d",i),"",100,0,15);
+      hCut4_MC[i] = new TH1F(Form("hCut4_MC_cent%d",i),"",100,0,15);
+      hCut5_Data[i] = new TH1F(Form("hCut5_Data_cent%d",i),"",21,0,1.05);
+      hCut5_MC[i] = new TH1F(Form("hCut5_MC_cent%d",i),"",21,0,1.05);
+
+      //get the histograms from the trees 
+      jetID_data->Draw(Form("cut1>>hCut1_Data_cent%d",i),Form("cent==%d",i),"goff");
+      jetID_mc->Draw(Form("cut1>>hCut1_MC_cent%d",i),Form("cent==%d",i),"goff");
+      jetID_data->Draw(Form("cut2>>hCut2_Data_cent%d",i),Form("cent==%d",i),"goff");
+      jetID_mc->Draw(Form("cut2>>hCut2_MC_cent%d",i),Form("cent==%d",i),"goff");
+      jetID_data->Draw(Form("cut3>>hCut3_Data_cent%d",i),Form("cent==%d",i),"goff");
+      jetID_mc->Draw(Form("cut3>>hCut3_MC_cent%d",i),Form("cent==%d",i),"goff");
+      jetID_data->Draw(Form("cut4>>hCut4_Data_cent%d",i),Form("cent==%d",i),"goff");
+      jetID_mc->Draw(Form("cut4>>hCut4_MC_cent%d",i),Form("cent==%d",i),"goff");
+      jetID_data->Draw(Form("cut5>>hCut5_Data_cent%d",i),Form("cent==%d",i),"goff");
+      jetID_mc->Draw(Form("cut5>>hCut5_MC_cent%d",i),Form("cent==%d",i),"goff");      
+      
+      //normalize w.r.t no of jets for each. (should ideally normalize to the number of events in the dataset)
+      hCut1_Data[i]->Scale(1./hCut1_Data[i]->Integral());
+      hCut1_MC[i]->Scale(1./hCut1_MC[i]->Integral());
+      hCut2_Data[i]->Scale(1./hCut2_Data[i]->Integral());
+      hCut2_MC[i]->Scale(1./hCut2_MC[i]->Integral());
+      hCut3_Data[i]->Scale(1./hCut3_Data[i]->Integral());
+      hCut3_MC[i]->Scale(1./hCut3_MC[i]->Integral());
+      hCut4_Data[i]->Scale(1./hCut4_Data[i]->Integral());
+      hCut4_MC[i]->Scale(1./hCut4_MC[i]->Integral());
+      hCut5_Data[i]->Scale(1./hCut5_Data[i]->Integral());
+      hCut5_MC[i]->Scale(1./hCut5_MC[i]->Integral());
+
+      //hCut1_Data[i]->Print("base");
+      //hCut1_MC[i]->Print("base");
+    
+    }
+    TCanvas *cCut1 = new TCanvas("cCut1","",1200,800);
+    makeMultiPanelCanvas(cCut1,3,2,0.0,0.0,0.2,0.15,0.07);
+    
+    for(int i = 0;i<nbins_cent;i++){
+      cCut1->cd(nbins_cent-i);
+      cCut1->cd(nbins_cent-i)->SetLogy();
+      
+      makeHistTitle(hCut1_MC[i]," ","#frac{chMax}{Jet p_{T}}","Event Fraction");
+      hCut1_MC[i]->SetFillStyle(3005);
+      hCut1_MC[i]->SetFillColor(kCyan);
+      hCut1_MC[i]->Draw("L");      
+
+      hCut1_Data[i]->SetMarkerStyle(20);
+      hCut1_Data[i]->SetMarkerColor(kBlack);
+      hCut1_Data[i]->Draw("same");
+
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.55,0.83,16);
+
+    }
+    cCut1->cd(1);
+    TLegend *pbpbCut1 = myLegend(0.77,0.65,0.9,0.9);
+    pbpbCut1->AddEntry(hCut1_Data[0],"Data","p");
+    pbpbCut1->AddEntry(hCut1_MC[0],"MC","f");
+    pbpbCut1->SetTextSize(0.04);
+    pbpbCut1->Draw();
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
+    drawText("pCES, HBHE",0.3,0.43,16);
+
+    cCut1->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut1_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+
+    TCanvas *cCut2 = new TCanvas("cCut2","",1200,800);
+    makeMultiPanelCanvas(cCut2,3,2,0.0,0.0,0.2,0.15,0.07);
+    
+    for(int i = 0;i<nbins_cent;i++){
+      cCut2->cd(nbins_cent-i);
+      cCut2->cd(nbins_cent-i)->SetLogy();
+      
+      makeHistTitle(hCut2_MC[i]," ","#frac{neMax}{Maximum(chSum,neSum)}","Event Fraction");
+      hCut2_MC[i]->SetFillStyle(3005);
+      hCut2_MC[i]->SetFillColor(kCyan);
+      hCut2_MC[i]->Draw("L");      
+
+      hCut2_Data[i]->SetMarkerStyle(20);
+      hCut2_Data[i]->SetMarkerColor(kBlack);
+      hCut2_Data[i]->Draw("same");
+
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.55,0.83,16);
+
+    }
+    cCut2->cd(1);
+    TLegend *pbpbCut2 = myLegend(0.77,0.65,0.9,0.9);
+    pbpbCut2->AddEntry(hCut2_Data[0],"Data","p");
+    pbpbCut2->AddEntry(hCut2_MC[0],"MC","f");
+    pbpbCut2->SetTextSize(0.04);
+    pbpbCut2->Draw();
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
+    drawText("pCES, HBHE",0.3,0.43,16);
+
+    cCut2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut2_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+
+    Tcanvas *cCut3 = new TCanvas("cCut3","",1200,800);
+    makeMultiPanelCanvas(cCut3,3,2,0.0,0.0,0.2,0.15,0.07);
+    
+    for(int i = 0;i<nbins_cent;i++){
+      cCut3->cd(nbins_cent-i);
+      cCut3->cd(nbins_cent-i)->SetLogy();
+      
+      makeHistTitle(hCut3_MC[i]," ","#frac{chSum+phsum+neSum+muSum+eSum–jtpu}{Jet p_{T}}","Event Fraction");
+      hCut3_MC[i]->SetFillStyle(3005);
+      hCut3_MC[i]->SetFillColor(kCyan);
+      hCut3_MC[i]->Draw("L");      
+
+      hCut3_Data[i]->SetMarkerStyle(20);
+      hCut3_Data[i]->SetMarkerColor(kBlack);
+      hCut3_Data[i]->Draw("same");
+
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.55,0.83,16);
+
+    }
+    cCut3->cd(1);
+    TLegend *pbpbCut3 = myLegend(0.77,0.65,0.9,0.9);
+    pbpbCut3->AddEntry(hCut3_Data[0],"Data","p");
+    pbpbCut3->AddEntry(hCut3_MC[0],"MC","f");
+    pbpbCut3->SetTextSize(0.04);
+    pbpbCut3->Draw();
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
+    drawText("pCES, HBHE",0.3,0.43,16);
+
+    cCut3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut3_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+
+    Tcanvas *cCut4 = new TCanvas("cCut4","",1200,800);
+    makeMultiPanelCanvas(cCut4,3,2,0.0,0.0,0.2,0.15,0.07);
+    
+    for(int i = 0;i<nbins_cent;i++){
+      cCut4->cd(nbins_cent-i);
+      cCut4->cd(nbins_cent-i)->SetLogy();
+      
+      makeHistTitle(hCut4_MC[i]," ","#frac{chSum+phsum+neSum+muSum+eSum}{0.5* raw p_{T}}","Event Fraction");
+      hCut4_MC[i]->SetFillStyle(3005);
+      hCut4_MC[i]->SetFillColor(kCyan);
+      hCut4_MC[i]->Draw("L");      
+
+      hCut4_Data[i]->SetMarkerStyle(20);
+      hCut4_Data[i]->SetMarkerColor(kBlack);
+      hCut4_Data[i]->Draw("same");
+
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.55,0.83,16);
+
+    }
+    cCut4->cd(1);
+    TLegend *pbpbCut4 = myLegend(0.77,0.65,0.9,0.9);
+    pbpbCut4->AddEntry(hCut4_Data[0],"Data","p");
+    pbpbCut4->AddEntry(hCut4_MC[0],"MC","f");
+    pbpbCut4->SetTextSize(0.04);
+    pbpbCut4->Draw();
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
+    drawText("pCES, HBHE",0.3,0.43,16);
+
+    cCut4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut4_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+
+    Tcanvas *cCut5 = new TCanvas("cCut5","",1200,800);
+    makeMultiPanelCanvas(cCut5,3,2,0.0,0.0,0.2,0.15,0.07);
+    
+    for(int i = 0;i<nbins_cent;i++){
+      cCut5->cd(nbins_cent-i);
+      cCut5->cd(nbins_cent-i)->SetLogy();
+      
+      makeHistTitle(hCut5_MC[i]," ","#frac{neMax}{neMax+chMax+phMax}","Event Fraction");
+      hCut5_MC[i]->SetFillStyle(3005);
+      hCut5_MC[i]->SetFillColor(kCyan);
+      hCut5_MC[i]->Draw("L");      
+
+      hCut5_Data[i]->SetMarkerStyle(20);
+      hCut5_Data[i]->SetMarkerColor(kBlack);
+      hCut5_Data[i]->Draw("same");
+
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.55,0.83,16);
+
+    }
+    cCut5->cd(1);
+    TLegend *pbpbCut5 = myLegend(0.77,0.65,0.9,0.9);
+    pbpbCut5->AddEntry(hCut5_Data[0],"Data","p");
+    pbpbCut5->AddEntry(hCut5_MC[0],"MC","f");
+    pbpbCut5->SetTextSize(0.04);
+    pbpbCut5->Draw();
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
+    drawText("pCES, HBHE",0.3,0.43,16);
+
+    cCut5->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut5_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+
+  }//do jetID
+
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  
+
+  if(do2DCutpTplot){
+    //each cut gets a canvas. the way these plots are going to be plotted as 4 (Jet80, Jet65, Jet55 and MC) x 6 centrality 
+    TH2F *hCut1_pt[4][nbins_cent], *hCut2_pt[4][nbins_cent], *hCut3_pt[4][nbins_cent] ,*hCut4_pt[4][nbins_cent], *hCut5_pt[4][nbins_cent];
+    /*
+    for(int i = 0;i<nbins_cent;i++){
+      for(int j = 0;j<4;j++){
+	hCut1_pt[i][j] = new TH2F(Form("hCut1_pt_%d_cent%d",j,i),"",40,0,10,400,0,400);
+	hCut2_pt[i][j] = new TH2F(Form("hCut2_pt_%d_cent%d",j,i),"",40,0,10,400,0,400);
+	hCut3_pt[i][j] = new TH2F(Form("hCut3_pt_%d_cent%d",j,i),"",40,0,10,400,0,400);
+	hCut4_pt[i][j] = new TH2F(Form("hCut4_pt_%d_cent%d",j,i),"",40,0,10,400,0,400);
+	hCut5_pt[i][j] = new TH2F(Form("hCut5_pt_%d_cent%d",j,i),"",40,0,10,400,0,400);
+      }
+    }
+    */
+
+    if(do2DCut1){
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_0_cent0","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_0_cent1","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_0_cent2","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_0_cent3","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_0_cent4","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_0_cent5","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==5 && pt<500","goff");    
+
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_1_cent0","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_1_cent1","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_1_cent2","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_1_cent3","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_1_cent4","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_1_cent5","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==5 && pt<500","goff"); 
+
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_2_cent0","jet80 && l1sl52 && trgObjpt>80 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_2_cent1","jet80 && l1sl52 && trgObjpt>80 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_2_cent2","jet80 && l1sl52 && trgObjpt>80 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_2_cent3","jet80 && l1sl52 && trgObjpt>80 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_2_cent4","jet80 && l1sl52 && trgObjpt>80 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut1:pt)>>hCut1_pt_2_cent5","jet80 && l1sl52 && trgObjpt>80 && cent==5 && pt<500","goff"); 
+
+      jetID_data->Draw("(cut1:jtpt)>>hCut1_pt_2_cent0","refpt<500 && cent==0 && subid==0","goff");
+      jetID_data->Draw("(cut1:jtpt)>>hCut1_pt_2_cent1","refpt<500 && cent==1 && subid==0","goff");
+      jetID_data->Draw("(cut1:jtpt)>>hCut1_pt_2_cent2","refpt<500 && cent==2 && subid==0","goff");
+      jetID_data->Draw("(cut1:jtpt)>>hCut1_pt_2_cent3","refpt<500 && cent==3 && subid==0","goff");
+      jetID_data->Draw("(cut1:jtpt)>>hCut1_pt_2_cent4","refpt<500 && cent==4 && subid==0","goff");
+      jetID_data->Draw("(cut1:jtpt)>>hCut1_pt_2_cent5","refpt<500 && cent==5 && subid==0","goff");
+
+      TCanvas *cCut1_pt = new TCanvas("cCut1_pt","",1000,800);
+      makeMultiPanelCanvas(cCut1_pt,4,6,0.0,0.0,0.2,0.15,0.07)
+	cCut1_pt->cd(1);cCut1_pt->cd(1)->SetLogy();hCut1_pt[0][0]->Draw("colz");
+      drawText("0-5%",0.5,0.6,15);
+      drawText("Jet55",0.2,0.8,15);
+      putCMSPrel();
+      cCut1_pt->cd(2);cCut1_pt->cd(2)->SetLogy();hCut1_pt[0][1]->Draw("colz");
+      drawText("5-10%",0.5,0.6,15);
+      cCut1_pt->cd(3);cCut1_pt->cd(3)->SetLogy();hCut1_pt[0][2]->Draw("colz");
+      drawText("10-30%",0.5,0.6,15);
+      cCut1_pt->cd(4);cCut1_pt->cd(4)->SetLogy();hCut1_pt[0][3]->Draw("colz");
+      drawText("30-50%",0.5,0.6,15);
+      cCut1_pt->cd(5);cCut1_pt->cd(5)->SetLogy();hCut1_pt[0][4]->Draw("colz");
+      drawText("50-70%",0.5,0.6,15);
+      cCut1_pt->cd(6);cCut1_pt->cd(6)->SetLogy();hCut1_pt[0][5]->Draw("colz");
+      drawText("70-90%",0.5,0.6,15);
+    
+      cCut1_pt->cd(7);cCut1_pt->cd(7)->SetLogy();hCut1_pt[1][0]->Draw("colz");
+      drawText("Jet65",0.2,0.8,15);
+      cCut1_pt->cd(8);cCut1_pt->cd(8)->SetLogy();hCut1_pt[1][1]->Draw("colz");
+      cCut1_pt->cd(9);cCut1_pt->cd(9)->SetLogy();hCut1_pt[1][2]->Draw("colz");
+      cCut1_pt->cd(10);cCut1_pt->cd(10)->SetLogy();hCut1_pt[1][3]->Draw("colz");
+      cCut1_pt->cd(11);cCut1_pt->cd(11)->SetLogy();hCut1_pt[1][4]->Draw("colz");
+      cCut1_pt->cd(12);cCut1_pt->cd(12)->SetLogy();hCut1_pt[1][5]->Draw("colz");
+    
+      cCut1_pt->cd(13);cCut1_pt->cd(13)->SetLogy();hCut1_pt[2][0]->Draw("colz");
+      drawText("Jet80",0.2,0.8,15);
+      cCut1_pt->cd(14);cCut1_pt->cd(14)->SetLogy();hCut1_pt[2][1]->Draw("colz");
+      cCut1_pt->cd(15);cCut1_pt->cd(15)->SetLogy();hCut1_pt[2][2]->Draw("colz");
+      cCut1_pt->cd(16);cCut1_pt->cd(16)->SetLogy();hCut1_pt[2][3]->Draw("colz");
+      cCut1_pt->cd(17);cCut1_pt->cd(17)->SetLogy();hCut1_pt[2][4]->Draw("colz");
+      cCut1_pt->cd(18);cCut1_pt->cd(18)->SetLogy();hCut1_pt[2][5]->Draw("colz");
+    
+      cCut1_pt->cd(13);cCut1_pt->cd(13)->SetLogy();hCut1_pt[3][0]->Draw("colz");
+      drawText("MC",0.2,0.8,15);
+      cCut1_pt->cd(14);cCut1_pt->cd(14)->SetLogy();hCut1_pt[3][1]->Draw("colz");
+      cCut1_pt->cd(15);cCut1_pt->cd(15)->SetLogy();hCut1_pt[3][2]->Draw("colz");
+      cCut1_pt->cd(16);cCut1_pt->cd(16)->SetLogy();hCut1_pt[3][3]->Draw("colz");
+      cCut1_pt->cd(17);cCut1_pt->cd(17)->SetLogy();hCut1_pt[3][4]->Draw("colz");
+      cCut1_pt->cd(18);cCut1_pt->cd(18)->SetLogy();hCut1_pt[3][5]->Draw("colz");
+    
+      cCut1_pt->SaveAs(Form(""),"RECREATE");
+    }
+
+
+    if(do2DCut2){    
+
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_0_cent0","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_0_cent1","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_0_cent2","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_0_cent3","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_0_cent4","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_0_cent5","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==5 && pt<500","goff");    
+
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_1_cent0","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_1_cent1","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_1_cent2","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_1_cent3","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_1_cent4","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_1_cent5","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==5 && pt<500","goff"); 
+
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_2_cent0","jet80 && l1sl52 && trgObjpt>80 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_2_cent1","jet80 && l1sl52 && trgObjpt>80 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_2_cent2","jet80 && l1sl52 && trgObjpt>80 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_2_cent3","jet80 && l1sl52 && trgObjpt>80 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_2_cent4","jet80 && l1sl52 && trgObjpt>80 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut2:pt)>>hCut2_pt_2_cent5","jet80 && l1sl52 && trgObjpt>80 && cent==5 && pt<500","goff"); 
+
+      jetID_data->Draw("(cut2:jtpt)>>hCut2_pt_2_cent0","refpt<500 && cent==0 && subid==0","goff");
+      jetID_data->Draw("(cut2:jtpt)>>hCut2_pt_2_cent1","refpt<500 && cent==1 && subid==0","goff");
+      jetID_data->Draw("(cut2:jtpt)>>hCut2_pt_2_cent2","refpt<500 && cent==2 && subid==0","goff");
+      jetID_data->Draw("(cut2:jtpt)>>hCut2_pt_2_cent3","refpt<500 && cent==3 && subid==0","goff");
+      jetID_data->Draw("(cut2:jtpt)>>hCut2_pt_2_cent4","refpt<500 && cent==4 && subid==0","goff");
+      jetID_data->Draw("(cut2:jtpt)>>hCut2_pt_2_cent5","refpt<500 && cent==5 && subid==0","goff");
+
+      TCanvas *cCut2_pt = new TCanvas("cCut2_pt","",1000,800);
+      makeMultiPanelCanvas(cCut2_pt,4,6,0.0,0.0,0.2,0.15,0.07)
+	cCut2_pt->cd(1);cCut2_pt->cd(1)->SetLogy();hCut2_pt[0][0]->Draw("colz");
+      drawText("0-5%",0.5,0.6,15);
+      drawText("Jet55",0.2,0.8,15);
+      putCMSPrel();
+      cCut2_pt->cd(2);cCut2_pt->cd(2)->SetLogy();hCut2_pt[0][1]->Draw("colz");
+      drawText("5-10%",0.5,0.6,15);
+      cCut2_pt->cd(3);cCut2_pt->cd(3)->SetLogy();hCut2_pt[0][2]->Draw("colz");
+      drawText("10-30%",0.5,0.6,15);
+      cCut2_pt->cd(4);cCut2_pt->cd(4)->SetLogy();hCut2_pt[0][3]->Draw("colz");
+      drawText("30-50%",0.5,0.6,15);
+      cCut2_pt->cd(5);cCut2_pt->cd(5)->SetLogy();hCut2_pt[0][4]->Draw("colz");
+      drawText("50-70%",0.5,0.6,15);
+      cCut2_pt->cd(6);cCut2_pt->cd(6)->SetLogy();hCut2_pt[0][5]->Draw("colz");
+      drawText("70-90%",0.5,0.6,15);
+    
+      cCut2_pt->cd(7);cCut2_pt->cd(7)->SetLogy();hCut2_pt[1][0]->Draw("colz");
+      drawText("Jet65",0.2,0.8,15);
+      cCut2_pt->cd(8);cCut2_pt->cd(8)->SetLogy();hCut2_pt[1][1]->Draw("colz");
+      cCut2_pt->cd(9);cCut2_pt->cd(9)->SetLogy();hCut2_pt[1][2]->Draw("colz");
+      cCut2_pt->cd(10);cCut2_pt->cd(10)->SetLogy();hCut2_pt[1][3]->Draw("colz");
+      cCut2_pt->cd(11);cCut2_pt->cd(11)->SetLogy();hCut2_pt[1][4]->Draw("colz");
+      cCut2_pt->cd(12);cCut2_pt->cd(12)->SetLogy();hCut2_pt[1][5]->Draw("colz");
+    
+      cCut2_pt->cd(13);cCut2_pt->cd(13)->SetLogy();hCut2_pt[2][0]->Draw("colz");
+      drawText("Jet80",0.2,0.8,15);
+      cCut2_pt->cd(14);cCut2_pt->cd(14)->SetLogy();hCut2_pt[2][1]->Draw("colz");
+      cCut2_pt->cd(15);cCut2_pt->cd(15)->SetLogy();hCut2_pt[2][2]->Draw("colz");
+      cCut2_pt->cd(16);cCut2_pt->cd(16)->SetLogy();hCut2_pt[2][3]->Draw("colz");
+      cCut2_pt->cd(17);cCut2_pt->cd(17)->SetLogy();hCut2_pt[2][4]->Draw("colz");
+      cCut2_pt->cd(18);cCut2_pt->cd(18)->SetLogy();hCut2_pt[2][5]->Draw("colz");
+    
+      cCut2_pt->cd(13);cCut2_pt->cd(13)->SetLogy();hCut2_pt[3][0]->Draw("colz");
+      drawText("MC",0.2,0.8,15);
+      cCut2_pt->cd(14);cCut2_pt->cd(14)->SetLogy();hCut2_pt[3][1]->Draw("colz");
+      cCut2_pt->cd(15);cCut2_pt->cd(15)->SetLogy();hCut2_pt[3][2]->Draw("colz");
+      cCut2_pt->cd(16);cCut2_pt->cd(16)->SetLogy();hCut2_pt[3][3]->Draw("colz");
+      cCut2_pt->cd(17);cCut2_pt->cd(17)->SetLogy();hCut2_pt[3][4]->Draw("colz");
+      cCut2_pt->cd(18);cCut2_pt->cd(18)->SetLogy();hCut2_pt[3][5]->Draw("colz");
+    
+      cCut2_pt->SaveAs(Form(),"RECREATE");
+    }
+    
+    if(do2DCut3){
+
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_0_cent0","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_0_cent1","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_0_cent2","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_0_cent3","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_0_cent4","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_0_cent5","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==5 && pt<500","goff");    
+
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_1_cent0","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_1_cent1","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_1_cent2","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_1_cent3","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_1_cent4","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_1_cent5","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==5 && pt<500","goff"); 
+
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_2_cent0","jet80 && l1sl52 && trgObjpt>80 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_2_cent1","jet80 && l1sl52 && trgObjpt>80 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_2_cent2","jet80 && l1sl52 && trgObjpt>80 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_2_cent3","jet80 && l1sl52 && trgObjpt>80 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_2_cent4","jet80 && l1sl52 && trgObjpt>80 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut3:pt)>>hCut3_pt_2_cent5","jet80 && l1sl52 && trgObjpt>80 && cent==5 && pt<500","goff"); 
+
+      jetID_data->Draw("(cut3:jtpt)>>hCut3_pt_2_cent0","refpt<500 && cent==0 && subid==0","goff");
+      jetID_data->Draw("(cut3:jtpt)>>hCut3_pt_2_cent1","refpt<500 && cent==1 && subid==0","goff");
+      jetID_data->Draw("(cut3:jtpt)>>hCut3_pt_2_cent2","refpt<500 && cent==2 && subid==0","goff");
+      jetID_data->Draw("(cut3:jtpt)>>hCut3_pt_2_cent3","refpt<500 && cent==3 && subid==0","goff");
+      jetID_data->Draw("(cut3:jtpt)>>hCut3_pt_2_cent4","refpt<500 && cent==4 && subid==0","goff");
+      jetID_data->Draw("(cut3:jtpt)>>hCut3_pt_2_cent5","refpt<500 && cent==5 && subid==0","goff");
+
+      TCanvas *cCut3_pt = new TCanvas("cCut3_pt","",1000,800);
+      makeMultiPanelCanvas(cCut3_pt,4,6,0.0,0.0,0.2,0.15,0.07)
+	cCut3_pt->cd(1);cCut3_pt->cd(1)->SetLogy();hCut3_pt[0][0]->Draw("colz");
+      drawText("0-5%",0.5,0.6,15);
+      drawText("Jet55",0.2,0.8,15);
+      putCMSPrel();
+      cCut3_pt->cd(2);cCut3_pt->cd(2)->SetLogy();hCut3_pt[0][1]->Draw("colz");
+      drawText("5-10%",0.5,0.6,15);
+      cCut3_pt->cd(3);cCut3_pt->cd(3)->SetLogy();hCut3_pt[0][2]->Draw("colz");
+      drawText("10-30%",0.5,0.6,15);
+      cCut3_pt->cd(4);cCut3_pt->cd(4)->SetLogy();hCut3_pt[0][3]->Draw("colz");
+      drawText("30-50%",0.5,0.6,15);
+      cCut3_pt->cd(5);cCut3_pt->cd(5)->SetLogy();hCut3_pt[0][4]->Draw("colz");
+      drawText("50-70%",0.5,0.6,15);
+      cCut3_pt->cd(6);cCut3_pt->cd(6)->SetLogy();hCut3_pt[0][5]->Draw("colz");
+      drawText("70-90%",0.5,0.6,15);
+    
+      cCut3_pt->cd(7);cCut3_pt->cd(7)->SetLogy();hCut3_pt[1][0]->Draw("colz");
+      drawText("Jet65",0.2,0.8,15);
+      cCut3_pt->cd(8);cCut3_pt->cd(8)->SetLogy();hCut3_pt[1][1]->Draw("colz");
+      cCut3_pt->cd(9);cCut3_pt->cd(9)->SetLogy();hCut3_pt[1][2]->Draw("colz");
+      cCut3_pt->cd(10);cCut3_pt->cd(10)->SetLogy();hCut3_pt[1][3]->Draw("colz");
+      cCut3_pt->cd(11);cCut3_pt->cd(11)->SetLogy();hCut3_pt[1][4]->Draw("colz");
+      cCut3_pt->cd(12);cCut3_pt->cd(12)->SetLogy();hCut3_pt[1][5]->Draw("colz");
+    
+      cCut3_pt->cd(13);cCut3_pt->cd(13)->SetLogy();hCut3_pt[2][0]->Draw("colz");
+      drawText("Jet80",0.2,0.8,15);
+      cCut3_pt->cd(14);cCut3_pt->cd(14)->SetLogy();hCut3_pt[2][1]->Draw("colz");
+      cCut3_pt->cd(15);cCut3_pt->cd(15)->SetLogy();hCut3_pt[2][2]->Draw("colz");
+      cCut3_pt->cd(16);cCut3_pt->cd(16)->SetLogy();hCut3_pt[2][3]->Draw("colz");
+      cCut3_pt->cd(17);cCut3_pt->cd(17)->SetLogy();hCut3_pt[2][4]->Draw("colz");
+      cCut3_pt->cd(18);cCut3_pt->cd(18)->SetLogy();hCut3_pt[2][5]->Draw("colz");
+    
+      cCut3_pt->cd(13);cCut3_pt->cd(13)->SetLogy();hCut3_pt[3][0]->Draw("colz");
+      drawText("MC",0.2,0.8,15);
+      cCut3_pt->cd(14);cCut3_pt->cd(14)->SetLogy();hCut3_pt[3][1]->Draw("colz");
+      cCut3_pt->cd(15);cCut3_pt->cd(15)->SetLogy();hCut3_pt[3][2]->Draw("colz");
+      cCut3_pt->cd(16);cCut3_pt->cd(16)->SetLogy();hCut3_pt[3][3]->Draw("colz");
+      cCut3_pt->cd(17);cCut3_pt->cd(17)->SetLogy();hCut3_pt[3][4]->Draw("colz");
+      cCut3_pt->cd(18);cCut3_pt->cd(18)->SetLogy();hCut3_pt[3][5]->Draw("colz");
+    
+      cCut3_pt->SaveAs(Form(),"RECREATE");
+    }
+
+    if(do2DCut4){
+ 
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_0_cent0","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_0_cent1","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_0_cent2","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_0_cent3","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_0_cent4","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_0_cent5","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==5 && pt<500","goff");    
+
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_1_cent0","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_1_cent1","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_1_cent2","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_1_cent3","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_1_cent4","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_1_cent5","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==5 && pt<500","goff"); 
+
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_2_cent0","jet80 && l1sl52 && trgObjpt>80 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_2_cent1","jet80 && l1sl52 && trgObjpt>80 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_2_cent2","jet80 && l1sl52 && trgObjpt>80 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_2_cent3","jet80 && l1sl52 && trgObjpt>80 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_2_cent4","jet80 && l1sl52 && trgObjpt>80 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut4:pt)>>hCut4_pt_2_cent5","jet80 && l1sl52 && trgObjpt>80 && cent==5 && pt<500","goff"); 
+
+      jetID_data->Draw("(cut4:jtpt)>>hCut4_pt_2_cent0","refpt<500 && cent==0 && subid==0","goff");
+      jetID_data->Draw("(cut4:jtpt)>>hCut4_pt_2_cent1","refpt<500 && cent==1 && subid==0","goff");
+      jetID_data->Draw("(cut4:jtpt)>>hCut4_pt_2_cent2","refpt<500 && cent==2 && subid==0","goff");
+      jetID_data->Draw("(cut4:jtpt)>>hCut4_pt_2_cent3","refpt<500 && cent==3 && subid==0","goff");
+      jetID_data->Draw("(cut4:jtpt)>>hCut4_pt_2_cent4","refpt<500 && cent==4 && subid==0","goff");
+      jetID_data->Draw("(cut4:jtpt)>>hCut4_pt_2_cent5","refpt<500 && cent==5 && subid==0","goff");
+
+      TCanvas *cCut4_pt = new TCanvas("cCut4_pt","",1000,800);
+      makeMultiPanelCanvas(cCut4_pt,4,6,0.0,0.0,0.2,0.15,0.07)
+	cCut4_pt->cd(1);cCut4_pt->cd(1)->SetLogy();hCut4_pt[0][0]->Draw("colz");
+      drawText("0-5%",0.5,0.6,15);
+      drawText("Jet55",0.2,0.8,15);
+      putCMSPrel();
+      cCut4_pt->cd(2);cCut4_pt->cd(2)->SetLogy();hCut4_pt[0][1]->Draw("colz");
+      drawText("5-10%",0.5,0.6,15);
+      cCut4_pt->cd(3);cCut4_pt->cd(3)->SetLogy();hCut4_pt[0][2]->Draw("colz");
+      drawText("10-30%",0.5,0.6,15);
+      cCut4_pt->cd(4);cCut4_pt->cd(4)->SetLogy();hCut4_pt[0][3]->Draw("colz");
+      drawText("30-50%",0.5,0.6,15);
+      cCut4_pt->cd(5);cCut4_pt->cd(5)->SetLogy();hCut4_pt[0][4]->Draw("colz");
+      drawText("50-70%",0.5,0.6,15);
+      cCut4_pt->cd(6);cCut4_pt->cd(6)->SetLogy();hCut4_pt[0][5]->Draw("colz");
+      drawText("70-90%",0.5,0.6,15);
+    
+      cCut4_pt->cd(7);cCut4_pt->cd(7)->SetLogy();hCut4_pt[1][0]->Draw("colz");
+      drawText("Jet65",0.2,0.8,15);
+      cCut4_pt->cd(8);cCut4_pt->cd(8)->SetLogy();hCut4_pt[1][1]->Draw("colz");
+      cCut4_pt->cd(9);cCut4_pt->cd(9)->SetLogy();hCut4_pt[1][2]->Draw("colz");
+      cCut4_pt->cd(10);cCut4_pt->cd(10)->SetLogy();hCut4_pt[1][3]->Draw("colz");
+      cCut4_pt->cd(11);cCut4_pt->cd(11)->SetLogy();hCut4_pt[1][4]->Draw("colz");
+      cCut4_pt->cd(12);cCut4_pt->cd(12)->SetLogy();hCut4_pt[1][5]->Draw("colz");
+    
+      cCut4_pt->cd(13);cCut4_pt->cd(13)->SetLogy();hCut4_pt[2][0]->Draw("colz");
+      drawText("Jet80",0.2,0.8,15);
+      cCut4_pt->cd(14);cCut4_pt->cd(14)->SetLogy();hCut4_pt[2][1]->Draw("colz");
+      cCut4_pt->cd(15);cCut4_pt->cd(15)->SetLogy();hCut4_pt[2][2]->Draw("colz");
+      cCut4_pt->cd(16);cCut4_pt->cd(16)->SetLogy();hCut4_pt[2][3]->Draw("colz");
+      cCut4_pt->cd(17);cCut4_pt->cd(17)->SetLogy();hCut4_pt[2][4]->Draw("colz");
+      cCut4_pt->cd(18);cCut4_pt->cd(18)->SetLogy();hCut4_pt[2][5]->Draw("colz");
+    
+      cCut4_pt->cd(13);cCut4_pt->cd(13)->SetLogy();hCut4_pt[3][0]->Draw("colz");
+      drawText("MC",0.2,0.8,15);
+      cCut4_pt->cd(14);cCut4_pt->cd(14)->SetLogy();hCut4_pt[3][1]->Draw("colz");
+      cCut4_pt->cd(15);cCut4_pt->cd(15)->SetLogy();hCut4_pt[3][2]->Draw("colz");
+      cCut4_pt->cd(16);cCut4_pt->cd(16)->SetLogy();hCut4_pt[3][3]->Draw("colz");
+      cCut4_pt->cd(17);cCut4_pt->cd(17)->SetLogy();hCut4_pt[3][4]->Draw("colz");
+      cCut4_pt->cd(18);cCut4_pt->cd(18)->SetLogy();hCut4_pt[3][5]->Draw("colz");
+    
+      cCut4_pt->SaveAs(Form(),"RECREATE");
+    }
+
+    if(do2DCut5){
+
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_0_cent0","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_0_cent1","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_0_cent2","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_0_cent3","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_0_cent4","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_0_cent5","jet55 && !jet65 && !jet80 && l1sl36 && trgObjpt>55 && trgObjpt<65 && cent==5 && pt<500","goff");    
+
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_1_cent0","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_1_cent1","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_1_cent2","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_1_cent3","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_1_cent4","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_1_cent5","jet65 && !jet80 && l1sl36 && trgObjpt>65 && trgObjpt<80 && cent==5 && pt<500","goff"); 
+
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_2_cent0","jet80 && l1sl52 && trgObjpt>80 && cent==0 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_2_cent1","jet80 && l1sl52 && trgObjpt>80 && cent==1 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_2_cent2","jet80 && l1sl52 && trgObjpt>80 && cent==2 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_2_cent3","jet80 && l1sl52 && trgObjpt>80 && cent==3 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_2_cent4","jet80 && l1sl52 && trgObjpt>80 && cent==4 && pt<500","goff");    
+      jetID_data->Draw("(cut5:pt)>>hCut5_pt_2_cent5","jet80 && l1sl52 && trgObjpt>80 && cent==5 && pt<500","goff"); 
+
+      jetID_data->Draw("(cut5:jtpt)>>hCut5_pt_2_cent0","refpt<500 && cent==0 && subid==0","goff");
+      jetID_data->Draw("(cut5:jtpt)>>hCut5_pt_2_cent1","refpt<500 && cent==1 && subid==0","goff");
+      jetID_data->Draw("(cut5:jtpt)>>hCut5_pt_2_cent2","refpt<500 && cent==2 && subid==0","goff");
+      jetID_data->Draw("(cut5:jtpt)>>hCut5_pt_2_cent3","refpt<500 && cent==3 && subid==0","goff");
+      jetID_data->Draw("(cut5:jtpt)>>hCut5_pt_2_cent4","refpt<500 && cent==4 && subid==0","goff");
+      jetID_data->Draw("(cut5:jtpt)>>hCut5_pt_2_cent5","refpt<500 && cent==5 && subid==0","goff");
+
+      TCanvas *cCut5_pt = new TCanvas("cCut5_pt","",1000,800);
+      makeMultiPanelCanvas(cCut5_pt,4,6,0.0,0.0,0.2,0.15,0.07)
+	cCut5_pt->cd(1);cCut5_pt->cd(1)->SetLogy();hCut5_pt[0][0]->Draw("colz");
+      drawText("0-5%",0.5,0.6,15);
+      drawText("Jet55",0.2,0.8,15);
+      putCMSPrel();
+      cCut5_pt->cd(2);cCut5_pt->cd(2)->SetLogy();hCut5_pt[0][1]->Draw("colz");
+      drawText("5-10%",0.5,0.6,15);
+      cCut5_pt->cd(3);cCut5_pt->cd(3)->SetLogy();hCut5_pt[0][2]->Draw("colz");
+      drawText("10-30%",0.5,0.6,15);
+      cCut5_pt->cd(4);cCut5_pt->cd(4)->SetLogy();hCut5_pt[0][3]->Draw("colz");
+      drawText("30-50%",0.5,0.6,15);
+      cCut5_pt->cd(5);cCut5_pt->cd(5)->SetLogy();hCut5_pt[0][4]->Draw("colz");
+      drawText("50-70%",0.5,0.6,15);
+      cCut5_pt->cd(6);cCut5_pt->cd(6)->SetLogy();hCut5_pt[0][5]->Draw("colz");
+      drawText("70-90%",0.5,0.6,15);
+    
+      cCut5_pt->cd(7);cCut5_pt->cd(7)->SetLogy();hCut5_pt[1][0]->Draw("colz");
+      drawText("Jet65",0.2,0.8,15);
+      cCut5_pt->cd(8);cCut5_pt->cd(8)->SetLogy();hCut5_pt[1][1]->Draw("colz");
+      cCut5_pt->cd(9);cCut5_pt->cd(9)->SetLogy();hCut5_pt[1][2]->Draw("colz");
+      cCut5_pt->cd(10);cCut5_pt->cd(10)->SetLogy();hCut5_pt[1][3]->Draw("colz");
+      cCut5_pt->cd(11);cCut5_pt->cd(11)->SetLogy();hCut5_pt[1][4]->Draw("colz");
+      cCut5_pt->cd(12);cCut5_pt->cd(12)->SetLogy();hCut5_pt[1][5]->Draw("colz");
+    
+      cCut5_pt->cd(13);cCut5_pt->cd(13)->SetLogy();hCut5_pt[2][0]->Draw("colz");
+      drawText("Jet80",0.2,0.8,15);
+      cCut5_pt->cd(14);cCut5_pt->cd(14)->SetLogy();hCut5_pt[2][1]->Draw("colz");
+      cCut5_pt->cd(15);cCut5_pt->cd(15)->SetLogy();hCut5_pt[2][2]->Draw("colz");
+      cCut5_pt->cd(16);cCut5_pt->cd(16)->SetLogy();hCut5_pt[2][3]->Draw("colz");
+      cCut5_pt->cd(17);cCut5_pt->cd(17)->SetLogy();hCut5_pt[2][4]->Draw("colz");
+      cCut5_pt->cd(18);cCut5_pt->cd(18)->SetLogy();hCut5_pt[2][5]->Draw("colz");
+    
+      cCut5_pt->cd(13);cCut5_pt->cd(13)->SetLogy();hCut5_pt[3][0]->Draw("colz");
+      drawText("MC",0.2,0.8,15);
+      cCut5_pt->cd(14);cCut5_pt->cd(14)->SetLogy();hCut5_pt[3][1]->Draw("colz");
+      cCut5_pt->cd(15);cCut5_pt->cd(15)->SetLogy();hCut5_pt[3][2]->Draw("colz");
+      cCut5_pt->cd(16);cCut5_pt->cd(16)->SetLogy();hCut5_pt[3][3]->Draw("colz");
+      cCut5_pt->cd(17);cCut5_pt->cd(17)->SetLogy();hCut5_pt[3][4]->Draw("colz");
+      cCut5_pt->cd(18);cCut5_pt->cd(18)->SetLogy();hCut5_pt[3][5]->Draw("colz");
+    
+      cCut5_pt->SaveAs(Form(),"RECREATE");
+    }
+  }
+
   //
   timer.Stop();
   cout<<" Total time taken CPU = "<<timer.CpuTime()<<endl;
@@ -1527,20 +2167,6 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

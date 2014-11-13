@@ -466,9 +466,8 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   TDatime date;
   
   //declare the output file 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_mc_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_pp_mc_nocut_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   f.cd();
-
 
   // lets declare all the histograms here. 
 
@@ -799,10 +798,10 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	//hpbpb_Npix_cut[k][cBin]->Fill(data[k][h]->hiNpix,sum$())
 
 	// apply the supernova events cut rejection here: 
-	if(data[k][h]->hiNpix > 38000 - 500*jetCounter){
+	//if(data[k][h]->hiNpix > 38000 - 500*jetCounter){
 	  //if(printDebug) cout<<"removed this supernova event"<<endl;
-	  continue;
-	}
+	//  continue;
+	//}
 
 	hpbpb_Npix_after_cut[k][cBin]->Fill(jetCounter,data[k][h]->hiNpix);
 	hpbpb_Npix_after_cut[k][nbins_cent]->Fill(jetCounter,data[k][h]->hiNpix);
@@ -835,8 +834,11 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	  hpbpb_eta_full_noScale[k]->Fill(data[k][h]->jteta[g]);
 	  hpbpb_phi_full_noScale[k]->Fill(data[k][h]->jtphi[g]);
   
-	  if ( data[k][h]->rawpt[g] < 20. ) continue;
-	  if ( data[k][h]->refpt[g] < 25. ) continue; //to see if we can get a better response matrix 
+	  //removed the following for no cut histogram: 
+	  //if ( data[k][h]->rawpt[g] < 20. ) continue;
+	  //if ( data[k][h]->refpt[g] < 25. ) continue; //to see if we can get a better response matrix 
+	  
+	  
 	  //if ( data[k][h]->jtpt[g] <= 15 ) continue;
 	  //if ( data[k][h]->jtpt[g] > 2.*data[k][h]->pthat) continue;
 	  
@@ -895,7 +897,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	    
 	    if ( data[k][h]->subid[g] != sub_id ) continue;
 
-	    if (cut1<0.05 || cut1>1) continue;
+	    //if (cut1<0.05 || cut1>1) continue;
 	    
 	    //for (int l= 0; l< data[h]->ngen;l++) {
 	    //  if (data[h]->refpt[k]==data[h]->genpt[l]) {
