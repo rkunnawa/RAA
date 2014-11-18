@@ -166,13 +166,18 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   bool doPbPbsigma = false;
   bool doPPsigma = false;
   bool doGenSpectra = false;
-  bool doPbPbTrgComb = false;
+  bool doPbPbTrgComb = true;
+  bool doPbPb12003TrgComb = true;
   bool doPPTrgComb = false;
   bool doRandomCone = false;
-  bool doSupernova = false;
+  bool doSupernovaData = false;
+  bool doSupernovaMC = false;
+  bool doSupernovaDataMCUltraCentral = false;
   bool doSupernovaContributionData = false;
   bool doSupernovaContributionMC = false;
-  bool doJetVariablesCheck = true;
+  bool doCentDatavsMC = false;
+  bool doVertexDatavsMC = false;
+  bool doJetVariablesCheck = false;
   bool doJetID = false;
   bool do2DCutpTplot = false;
   bool do2DCut1 = false;
@@ -195,7 +200,6 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TH2F *mPbPb_Matrix[nbins_cent+1], *mPbPb_Response[nbins_cent+1], *mPbPb_ResponseNorm[nbins_cent+1];
   TH1F *mPbPb_mcclosure_data[nbins_cent+1];
   TH1F *mPbPb_mcclosure_gen[nbins_cent+1];
-  
   TH1F *dPP_1, *dPP_2, *dPP_3, *dPP_Comb;
   
   TH1F *mPP_Gen, *mPP_Reco;
@@ -219,7 +223,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TH1F *RAA_measured[nbins_cent+1];
   TH1F *RAA_binbybin[nbins_cent+1];
   TH1F *RAA_bayesian[nbins_cent+1];
-
+  
   for(int i = 0;i<=nbins_cent;i++){
     
     cout<<"cent = "<<i<<endl;
@@ -247,6 +251,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       uPbPb_BayesianIter[j][i] = (TH1F*)fin->Get(Form("uPbPb_BayesianIter%d_cent%d",j,i));
       uPbPb_MC_BayesianIter[j][i] = (TH1F*)fin->Get(Form("uPbPb_MC_BayesianIter%d_cent%d",j,i));
     }
+  
   }
   
 
@@ -272,10 +277,12 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   */
 
   // get histograms from the MC file. 
-  TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_pp_mc_ak%s%s_20141112.root",algo,jet_type));
-  TFile *fDatain = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141112.root",algo,jet_type));
+  TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_pp_mc_nocut_ak%s%s_20141117.root",algo,jet_type));
+  TFile *fDatain = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_test12003_cut5_20141117.root",algo,jet_type));
   
   TH1F *hPbPb_MC_jtpu[no_radius][nbins_eta][nbins_cent+1];
+
+  TH1F *hPbPb12003Jet80[nbins_cent+1], *hPbPb12003Jet65[nbins_cent+1], *hPbPb12003Jet55[nbins_cent+1], *hPbPb12003Comb[nbins_cent+1];
   
   TH1F *hpbpb_TrgObj80_nJet_g7[nbins_cent+1];
   TH1F *hpbpb_TrgObj65_nJet_g7[nbins_cent+1];
@@ -290,28 +297,45 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TH1F *hpbpb_TrgObjComb_nJet_l7[nbins_cent+1];
 
   // histograms for the supernova cut rejection 
-  TH2F *hpbpb_Npix_before_cut_data[nbins_cent+1]; 
+  TH2F *hpbpb_Npix_before_cut_data[nbins_cent+2]; 
   TH2F *hpbpb_Npix_after_cut_data[nbins_cent+1]; 
-  TH2F *hpbpb_Npix_before_cut_mc[nbins_cent+1]; 
+  TH2F *hpbpb_Npix_before_cut_mc[nbins_cent+2]; 
   TH2F *hpbpb_Npix_after_cut_mc[nbins_cent+1]; 
 
   // histograms to check the contribution of the nJets>7 (with pT>50 and |eta|<2) to the nJets < 7 
   TH1F *hpbpb_pt_Njet_g7[nbins_cent+1];
   TH1F *hpbpb_pt_Njet_l7[nbins_cent+1];
   
+  hpbpb_Npix_before_cut_data[nbins_cent+1] = (TH2F*)fDatain->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,nbins_cent+1));
+  hpbpb_Npix_before_cut_data[nbins_cent+1]->Print("base");
   
-  for(int i = 0;i<=nbins_cent;i++){
+  hpbpb_Npix_before_cut_mc[nbins_cent+1] = (TH2F*)fMCin->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,nbins_cent+1));
+  hpbpb_Npix_before_cut_mc[nbins_cent+1]->Print("base");
+  
+  // I changed it from <= to < due to a problem with the data macro which is now fixed for the hpbpb_JetComb_oldR%d_n20_eta_p20_cent%d should be hpbpb_JetComb_old_R%d_n20_eta_p20_cent%d
+  for(int i = 0;i<nbins_cent;i++){
 
+    cout<<"cent = "<<i<<endl;
     dPbPb_TrgComb[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObjComb_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_TrgComb[i]->Print("base");
     dPbPb_Trg80[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObj80_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_Trg65[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObj65_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_Trg55[i] = (TH1F*)fDatain->Get(Form("hpbpb_TrgObj55_R%d_n20_eta_p20_cent%d",radius,i));   
 
+    hPbPb12003Jet80[i] = (TH1F*)fDatain->Get(Form("hpbpb_Jet80_R%d_n20_eta_p20_cent%d",radius,i));
+    hPbPb12003Jet80[i]->Print("base");
+    hPbPb12003Jet65[i] = (TH1F*)fDatain->Get(Form("hpbpb_Jet65_noJet80_R%d_n20_eta_p20_cent%d",radius,i));
+    hPbPb12003Jet65[i]->Print("base");
+    hPbPb12003Jet55[i] = (TH1F*)fDatain->Get(Form("hpbpb_Jet55_noJet65_80_R%d_n20_eta_p20_cent%d",radius,i));
+    hPbPb12003Jet55[i]->Print("base");
+    hPbPb12003Comb[i] = (TH1F*)fDatain->Get(Form("hpbpb_JetComb_oldR%d_n20_eta_p20_cent%d",radius,i));
+    hPbPb12003Comb[i]->Print("base");
+
     hpbpb_Npix_before_cut_data[i] = (TH2F*)fDatain->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,i));
     hpbpb_Npix_after_cut_data[i] = (TH2F*)fDatain->Get(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",radius,i));
     hpbpb_Npix_before_cut_data[i]->Print("base");
     hpbpb_Npix_after_cut_data[i]->Print("base");
+    
     hpbpb_Npix_before_cut_mc[i] = (TH2F*)fMCin->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,i));
     hpbpb_Npix_before_cut_mc[i]->Print("base");
     hpbpb_Npix_after_cut_mc[i] = (TH2F*)fMCin->Get(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",radius,i));
@@ -440,11 +464,11 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.45,0.9,20);
     drawText("2.76 TeV, |#eta|<2, |vz|<15",0,0.9,20);
     drawText("pp",0.3,0.8,20);
-  
+    
     dPP_Comb->SetMarkerStyle(25);
     dPP_Comb->SetMarkerColor(kBlack);
     dPP_Comb->Draw("same");
-  
+    
     mPP_Reco->SetMarkerStyle(27);
     mPP_Reco->SetMarkerColor(kBlack);
     mPP_Reco->Draw("same");
@@ -1158,13 +1182,84 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
     putCMSPrel();
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.95,15);
-    drawText("|#eta|<2, |vz|<15, 0.05<cut1<1",0.25,0.61,16);
+    drawText("|#eta|<2, |vz|<15, cut5<0.975",0.25,0.61,16);
     drawText("pCES, HBHE",0.55,0.51,16);
     cDataMerge->cd(2);
     drawText("L1_SingleJet36, 52 added to triggers",0.22,0.83,15);
+    drawText("cut5: #frac{neMax}{neMax + chMax + phMax}",0.22,0.73,15);
     //drawText("cut4: #frac{#sum #left(ch+nu+ph+mu+e#right)}{0.5*raw p_{T}}",0.22,0.83,15);
-    drawText("cut1: #frac{chMax}{jet p_{T}}",0.22,0.73,15);
+    //drawText("cut1: #frac{chMax}{jet p_{T}}",0.22,0.73,15);
     cDataMerge->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_cut1_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  if(doPbPb12003TrgComb){
+
+        // Plotting the trigObj spectra from individual triggers vs the combined triggers. 
+    TCanvas *cData12003Merge = new TCanvas("cData12003Merge","",1000,800);
+    makeMultiPanelCanvas(cData12003Merge,3,2,0.0,0.0,0.2,0.15,0.07);
+
+    for(int i = 0;i<nbins_cent;i++){
+
+      cData12003Merge->cd(nbins_cent-i);
+      cData12003Merge->cd(nbins_cent-i)->SetLogy();
+      cData12003Merge->cd(nbins_cent-i)->SetLogx();
+
+      makeHistTitle(hPbPb12003Comb[i]," ","Jet p_{T} (GeV/c)","#frac{d^{2} N}{dp_{T}}");
+      //hPbPb12003Comb[i]->Scale(1e-6)
+      hPbPb12003Comb[i] = (TH1F*)hPbPb12003Comb[i]->Rebin(nbins_pt,Form("rebin_pbpb_meas_cent%d",i),boundaries_pt);
+      divideBinWidth(hPbPb12003Comb[i]);
+      hPbPb12003Comb[i]->SetMarkerStyle(25);
+      hPbPb12003Comb[i]->SetMarkerColor(kBlack);
+      hPbPb12003Comb[i]->SetAxisRange(1e-2,1e8,"Y");
+      hPbPb12003Comb[i]->SetAxisRange(30,500,"X");
+      hPbPb12003Comb[i]->Draw();
+
+      hPbPb12003Jet80[i]->SetMarkerStyle(20);
+      hPbPb12003Jet80[i]->SetMarkerColor(kRed);
+      hPbPb12003Jet80[i] = (TH1F*)hPbPb12003Jet80[i]->Rebin(nbins_pt,Form("rebin_measured_80_cent%d",i),boundaries_pt);
+      divideBinWidth(hPbPb12003Jet80[i]);
+      hPbPb12003Jet80[i]->Draw("same");
+
+      hPbPb12003Jet65[i]->SetMarkerStyle(20);
+      hPbPb12003Jet65[i]->SetMarkerColor(kBlue);
+      hPbPb12003Jet65[i] = (TH1F*)hPbPb12003Jet65[i]->Rebin(nbins_pt,Form("rebin_measured_65_cent%d",i),boundaries_pt);
+      divideBinWidth(hPbPb12003Jet65[i]);
+      hPbPb12003Jet65[i]->Draw("same");
+
+      hPbPb12003Jet55[i]->SetMarkerStyle(20);
+      hPbPb12003Jet55[i]->SetMarkerColor(kGreen);
+      hPbPb12003Jet55[i] = (TH1F*)hPbPb12003Jet55[i]->Rebin(nbins_pt,Form("rebin_measured_55_cent%d",i),boundaries_pt);
+      divideBinWidth(hPbPb12003Jet55[i]);
+      hPbPb12003Jet55[i]->Draw("same");
+
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+    
+    }
+
+    cData12003Merge->cd(1);
+    TLegend *PbPb_data12003Merge = myLegend(0.53,0.75,0.8,0.9);
+    PbPb_data12003Merge->AddEntry(hPbPb12003Comb[0],"Combined","pl");
+    PbPb_data12003Merge->AddEntry(hPbPb12003Jet80[0],"Jet80","pl");
+    PbPb_data12003Merge->AddEntry(hPbPb12003Jet65[0],"Jet65","pl");
+    PbPb_data12003Merge->AddEntry(hPbPb12003Jet55[0],"Jet55","pl");
+    PbPb_data12003Merge->SetTextSize(0.04);
+    PbPb_data12003Merge->Draw();
+
+    putCMSPrel();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.95,15);
+    drawText("|#eta|<2, |vz|<15, cut5<0.975",0.25,0.61,16);
+    drawText("pCES, HBHE",0.55,0.51,16);
+    cData12003Merge->cd(2);
+    drawText("L1_SingleJet36, 52 added to triggers",0.22,0.83,15);
+    //drawText("cut4: #frac{#sum #left(ch+nu+ph+mu+e#right)}{0.5*raw p_{T}}",0.22,0.83,15);
+    //drawText("cut1: #frac{chMax}{jet p_{T}}",0.22,0.73,15);
+    drawText("cut5: #frac{neMax}{neMax + chMax + phMax}",0.22,0.73,15);
+    drawText("12003 Method",0.22,0.63,15);
+    cData12003Merge->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_12003_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+
   }
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1277,7 +1372,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  if(doSupernova){
+  if(doSupernovaData){
     // plotting the hiNpix vs NJets(pT>50 and |eta|<2) for each centrality bin. 
     TCanvas *cSupernova_data = new TCanvas("cSupernova_data","",1000,800);
     makeMultiPanelCanvas(cSupernova_data,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -1313,8 +1408,12 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     putCMSPrel();
     drawText("Full dataset Jet55 or Jet65 or Jet80",0.3,0.85,16);
     cSupernova_data->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-  
-  
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  if(doSupernovaMC){
     // plotting the hiNpix vs NJets(pT>50 and |eta|<2) for each centrality bin. for MC
     TCanvas *cSupernova_mc = new TCanvas("cSupernova_mc","",1000,800);
     makeMultiPanelCanvas(cSupernova_mc,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -1341,7 +1440,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       lineSupernova_mc->Draw();
       //lineSupernova_mc_2->Draw();
       drawText("MC",0.6,0.2,16);
-      drawText("|vz|<15, pCES, HBHE",0.45,0.75,16);
+      drawText("|vz|<15, pCES",0.45,0.75,16);
       drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.2,16);
     }
     cSupernova_mc->cd(1);
@@ -1350,6 +1449,47 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     cSupernova_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_mc_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   
   }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  if(doSupernovaDataMCUltraCentral){
+
+    TCanvas *cSupernovaDataMC = new TCanvas("cSupernovaDataMC","",1000,800);
+    makeMultiPanelCanvas(cSupernovaDataMC,2,1,0.0,0.0,0.2,0.15,0.07);
+    
+    //TLine *lineSupernova_mc = new TLine(0,38000,50,35500);
+    TLine *lineSupernova_mc = new TLine(0,38000,50,13000);
+    lineSupernova_mc->SetLineStyle(2);
+    lineSupernova_mc->SetLineWidth(2);
+    
+    cSupernovaDataMC->cd(1);
+    
+    hpbpb_Npix_before_cut_data[7]->SetYTitle("No of Pixels");
+    hpbpb_Npix_before_cut_data[7]->SetTitle(" ");
+    hpbpb_Npix_before_cut_data[7]->SetXTitle("No of Jets (p_{T}>50 GeV/c, |#eta|<2)");
+    hpbpb_Npix_before_cut_data[7]->Draw("col");
+    
+    lineSupernova_mc->Draw();
+    drawText("Data",0.6,0.2,16);
+    //drawText("|vz|<15, pCES",0.55,0.75,16);
+    putCMSPrel();
+    
+    cSupernovaDataMC->cd(2);
+    
+    hpbpb_Npix_before_cut_mc[7]->SetYTitle("No of Pixels");
+    hpbpb_Npix_before_cut_mc[7]->SetTitle(" ");
+    hpbpb_Npix_before_cut_mc[7]->SetXTitle("No of Jets (p_{T}>50 GeV/c, |#eta|<2)");
+    hpbpb_Npix_before_cut_mc[7]->Draw("col");
+    
+    lineSupernova_mc->Draw();
+    drawText("Pythia + HYDJET",0.3,0.2,16);
+    drawText(" 0 - 0.5% central events",0.3,0.85,16);
+    drawText("|vz|<15, pCES",0.55,0.65,16);
+
+    cSupernovaDataMC->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_DataMC_supernova_ultraCentral_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");    
+    
+  }
+  
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
@@ -1554,6 +1694,166 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+  if(doCentDatavsMC){
+
+    TH1F *hDataCent = (TH1F*)fDatain->Get(Form("hpbpb_cent_R%d",radius));
+    TH1F *hMCCent = (TH1F*)fMCin->Get(Form("hpbpb_cent_R%d",radius));
+
+    TCanvas *cDataMCCent = new TCanvas("cDataMCCent","",800,600);
+    makeMultiPanelCanvas(cDataMCCent,1,2,0.0,0.0,0.2,0.15,0.07);
+	
+    cDataMCCent->cd(1)->SetLogy();
+    hDataCent->Scale(1./hDataCent->Integral());
+    hMCCent->Scale(1./hMCCent->Integral());
+
+    makeHistTitle(hDataCent," ","hiBin","Event Fraction");
+    hDataCent->SetMarkerStyle(24);
+    hDataCent->SetMarkerColor(kBlack);
+    hDataCent->Draw();
+    
+    hMCCent->SetLineColor(kRed);
+    hMCCent->SetLineStyle(1);
+    hMCCent->Draw("same L");
+
+    TLegend *pbpbCent = myLegend(0.77,0.65,0.9,0.9);
+    pbpbCent->AddEntry(hDataCent,"Data","p");
+    pbpbCent->AddEntry(hMCCent,"MC","l");
+    pbpbCent->SetTextSize(0.04);
+    pbpbCent->Draw();
+    putCMSPrel();    
+    //drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
+    //drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
+    drawText("pCES, HBHE",0.3,0.43,16);
+    
+    cDataMCCent->cd(2);
+    cDataMCCent->cd(2)->SetLogy();
+    TH1F* hCentRatio = (TH1F*)hDataCent->Clone("hCentRatio");
+    hCentRatio->Divide(hMCCent);
+
+    TF1 *fCentralityWeight = new TF1("fCentralityWeight","[0]*exp([1]+[2]*x+[3]*x*x+[4]*x*x*x)",0,200);
+
+    hCentRatio->SetMarkerStyle(20);
+    hCentRatio->SetMarkerColor(kBlack);
+    makeHistTitle(hCentRatio," ","hiBin","Data/MC");
+    hCentRatio->Fit("fCentralityWeight","LL","",0,200);
+    hCentRatio->Draw();
+    
+    cDataMCCent->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_datavsmc_centrality_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+
+    // TFile fout(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_DataMC_cent_ratio_%d.root",date.GetDate()),"RECREATE");
+    // fout.cd();
+    // hCentRatio->Write();
+    // fout.Close();
+
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  if(doVertexDatavsMC){
+
+    TH1F *hDataVx = (TH1F*)fDatain->Get(Form("hpbpb_vx_R%d",radius));
+    TH1F *hMCVx = (TH1F*)fMCin->Get(Form("hpbpb_vx_R%d",radius));  
+
+    TH1F *hDataVy = (TH1F*)fDatain->Get(Form("hpbpb_vy_R%d",radius));
+    TH1F *hMCVy = (TH1F*)fMCin->Get(Form("hpbpb_vy_R%d",radius));
+
+    TH1F *hDataVz = (TH1F*)fDatain->Get(Form("hpbpb_vz_R%d",radius));
+    TH1F *hMCVz = (TH1F*)fMCin->Get(Form("hpbpb_vz_R%d",radius));
+
+    TCanvas *cDataMCVertex = new TCanvas("cDataMCVertex","",600,600);
+    makeMultiPanelCanvas(cDataMCVertex,1,2,0.0,0.0,0.2,0.15,0.07);
+
+    hDataVx->Scale(1./hDataVx->Integral());
+    hDataVy->Scale(1./hDataVy->Integral());
+    hDataVz->Scale(1./hDataVz->Integral());
+
+    hMCVx->Scale(1./hMCVx->Integral());
+    hMCVy->Scale(1./hMCVy->Integral());
+    hMCVz->Scale(1./hMCVz->Integral());
+    /*
+    cDataMCVertex->cd(1);
+    cDataMCVertex->cd(1)->SetLogy();
+    makeHistTitle(hDataVx," ","Vx","Event Fraction");
+    hDataVx->SetMarkerStyle(24);
+    hDataVx->SetMarkerColor(kBlack);
+    hDataVx->Draw();
+
+    hMCVx->SetLineColor(kRed);
+    hMCVx->SetLineStyle(1);
+    hMCVx->Draw("same L");
+    
+    TLegend *pbpbVx = myLegend(0.77,0.65,0.9,0.9);
+    pbpbVx->AddEntry(hDataVx,"Data","p");
+    pbpbVx->AddEntry(hMCVx,"MC","l");
+    pbpbVx->SetTextSize(0.04);
+    pbpbVx->Draw();
+    putCMSPrel();    
+    //drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
+    //drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
+    drawText("pCES, HBHE",0.3,0.43,16);
+
+    cDataMCVertex->cd(4);
+    TH1F *hVxRatio = (TH1F*)hDataVx->Clone("hVxRatio");
+    hVxRatio->Divide(hMCVx);
+    hVxRatio->SetMarkerColor(kBlack);
+    hVxRatio->SetMarkerStyle(20);
+    hVxRatio->SetAxisRange(0,2,"X");
+    makeHistTitle(hVxRatio," ","Vx","Data/MC");
+    hVxRatio->Draw();
+
+    cDataMCVertex->cd(2);
+    cDataMCVertex->cd(2)->SetLogy();
+    makeHistTitle(hDataVy," ","Vy","Event Fraction");
+    hDataVy->SetMarkerStyle(24);
+    hDataVy->SetMarkerColor(kBlack);
+    hDataVy->Draw();
+
+    hMCVy->SetLineColor(kRed);
+    hMCVy->SetLineStyle(1);
+    hMCVy->Draw("same L");
+
+    cDataMCVertex->cd(5);
+    TH1F *hVyRatio = (TH1F*)hDataVy->Clone("hVyRatio");
+    hVyRatio->Divide(hMCVy);
+    hVyRatio->SetMarkerColor(kBlack);
+    hVyRatio->SetMarkerStyle(20);
+    hVyRatio->SetAxisRange(0,2,"X");
+    makeHistTitle(hVyRatio," ","Vy","Data/MC");
+    hVyRatio->Draw();
+    */
+    cDataMCVertex->cd(1);
+    cDataMCVertex->cd(1)->SetLogy();
+    makeHistTitle(hDataVz," ","Vz","Event Fraction");
+    hDataVz->SetMarkerStyle(24);
+    hDataVz->SetMarkerColor(kBlack);
+    hDataVz->Draw();
+
+    hMCVz->SetLineColor(kRed);
+    hMCVz->SetLineStyle(1);
+    hMCVz->Draw("same L");
+
+    cDataMCVertex->cd(2);
+    TH1F *hVzRatio = (TH1F*)hDataVz->Clone("hVzRatio");
+    hVzRatio->Divide(hMCVz);
+
+    TF1 *fVz = new TF1("fVz","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x",-15,15);
+    hVzRatio->Fit("fVz","","",-15,15);
+    
+    hVzRatio->SetMarkerColor(kBlack);
+    hVzRatio->SetMarkerStyle(20);
+    //hVzRatio->SetAxisRange(0,2,"X");
+    makeHistTitle(hVzRatio," ","Vz","Data/MC");
+    hVzRatio->Draw();
+    
+    cDataMCVertex->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_datavsmc_vertex_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+ 
+  
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
   if(doJetVariablesCheck){
 
     cout<<endl<<"Plotting JetVarialbles Check"<<endl;
@@ -1621,8 +1921,9 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       //jetID_mc->Draw(Form("jtpu>>hjtpu_mc_cent%d",i),Form("cent==%d",i),"goff"); 
       //cout<<"got charged histograms for data and MC"<<endl;
       
+      
+      hchMax[0][i]->Scale(1./hchMax[0][i]->Integral());   
       hchSum[0][i]->Scale(1./hchSum[0][i]->Integral());
-      hchMax[0][i]->Scale(1./hchMax[0][i]->Integral());
       hchSum[1][i]->Scale(1./hchSum[1][i]->Integral());
       hchMax[1][i]->Scale(1./hchMax[1][i]->Integral());
       hphSum[0][i]->Scale(1./hphSum[0][i]->Integral());
@@ -1641,23 +1942,23 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       heMax[0][i]->Scale(1./heMax[0][i]->Integral());
       heSum[1][i]->Scale(1./heSum[1][i]->Integral());
       heMax[1][i]->Scale(1./heMax[1][i]->Integral());
+      
       //hjtpu[0][i]->Scale(1./hjtpu[0][i]->Integral());
       //hjtpu[1][i]->Scale(1./hjtpu[1][i]->Integral());
 
     }
 
+
     //make the plots: 
-    TCanvas *cchMax, *cchSum, *cphMax, *cphSum, *cneMax, *cneSum, *cmuMax, *cmuSum, *ceMax, *ceSum, *cjtpu;
-    
+    TCanvas *cchMax = new TCanvas("cchMax","",1000,800);
     // make plot for chMax
     makeMultiPanelCanvas(cchMax,3,2,0.0,0.0,0.2,0.15,0.07);
     for(int i = 0;i<nbins_cent;i++){
-
       cchMax->cd(nbins_cent-i);
       cchMax->cd(nbins_cent-i)->SetLogy();
 
       makeHistTitle(hchMax[0][i]," ","chMax p_{T} (GeV/c)","Event Fraction");
-      hchMax[0][i]->SetMarkerStyle(20);
+      hchMax[0][i]->SetMarkerStyle(24);
       hchMax[0][i]->SetMarkerColor(kBlack);
       hchMax[0][i]->Draw();
 
@@ -1679,8 +1980,9 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
     drawText("pCES, HBHE",0.3,0.43,16);
     cchMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_chMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-
+    
     // make plot for chSum
+    TCanvas *cchSum = new TCanvas("cchSum","",1000,800);
     makeMultiPanelCanvas(cchSum,3,2,0.0,0.0,0.2,0.15,0.07);
     for(int i = 0;i<nbins_cent;i++){
 
@@ -1688,7 +1990,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       cchSum->cd(nbins_cent-i)->SetLogy();
 
       makeHistTitle(hchSum[0][i]," ","chSum p_{T} (GeV/c)","Event Fraction");
-      hchSum[0][i]->SetMarkerStyle(20);
+      hchSum[0][i]->SetMarkerStyle(24);
       hchSum[0][i]->SetMarkerColor(kBlack);
       hchSum[0][i]->Draw();
 
@@ -1714,6 +2016,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
         
     // make plot for phMax
+    TCanvas *cphMax = new TCanvas("cphMax","",1000,800);
     makeMultiPanelCanvas(cphMax,3,2,0.0,0.0,0.2,0.15,0.07);
     for(int i = 0;i<nbins_cent;i++){
 
@@ -1721,7 +2024,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       cphMax->cd(nbins_cent-i)->SetLogy();
 
       makeHistTitle(hphMax[0][i]," ","phMax p_{T} (GeV/c)","Event Fraction");
-      hphMax[0][i]->SetMarkerStyle(20);
+      hphMax[0][i]->SetMarkerStyle(24);
       hphMax[0][i]->SetMarkerColor(kBlack);
       hphMax[0][i]->Draw();
 
@@ -1745,6 +2048,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     cphMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_phMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for phSum
+    TCanvas *cphSum = new TCanvas("cphSum","",1000,800);
     makeMultiPanelCanvas(cphSum,3,2,0.0,0.0,0.2,0.15,0.07);
     for(int i = 0;i<nbins_cent;i++){
 
@@ -1752,7 +2056,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       cphSum->cd(nbins_cent-i)->SetLogy();
 
       makeHistTitle(hphSum[0][i]," ","phSum p_{T} (GeV/c)","Event Fraction");
-      hphSum[0][i]->SetMarkerStyle(20);
+      hphSum[0][i]->SetMarkerStyle(24);
       hphSum[0][i]->SetMarkerColor(kBlack);
       hphSum[0][i]->Draw();
 
@@ -1779,6 +2083,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
         
     // make plot for neMax
+    TCanvas *cneMax = new TCanvas("cneMax","",1000,800);
     makeMultiPanelCanvas(cneMax,3,2,0.0,0.0,0.2,0.15,0.07);
     for(int i = 0;i<nbins_cent;i++){
 
@@ -1786,7 +2091,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       cneMax->cd(nbins_cent-i)->SetLogy();
 
       makeHistTitle(hneMax[0][i]," ","neMax p_{T} (GeV/c)","Event Fraction");
-      hneMax[0][i]->SetMarkerStyle(20);
+      hneMax[0][i]->SetMarkerStyle(24);
       hneMax[0][i]->SetMarkerColor(kBlack);
       hneMax[0][i]->Draw();
 
@@ -1810,6 +2115,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     cneMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_neMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for neSum
+    TCanvas *cneSum = new TCanvas("cneSum","",1000,800);
     makeMultiPanelCanvas(cneSum,3,2,0.0,0.0,0.2,0.15,0.07);
     for(int i = 0;i<nbins_cent;i++){
 
@@ -1817,7 +2123,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       cneSum->cd(nbins_cent-i)->SetLogy();
 
       makeHistTitle(hneSum[0][i]," ","neSum p_{T} (GeV/c)","Event Fraction");
-      hneSum[0][i]->SetMarkerStyle(20);
+      hneSum[0][i]->SetMarkerStyle(24);
       hneSum[0][i]->SetMarkerColor(kBlack);
       hneSum[0][i]->Draw();
 
@@ -1843,6 +2149,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
         
     // make plot for muMax
+    TCanvas *cmuMax = new TCanvas("cmuMax","",1000,800);
     makeMultiPanelCanvas(cmuMax,3,2,0.0,0.0,0.2,0.15,0.07);
     for(int i = 0;i<nbins_cent;i++){
 
@@ -1850,7 +2157,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       cmuMax->cd(nbins_cent-i)->SetLogy();
 
       makeHistTitle(hmuMax[0][i]," ","muMax p_{T} (GeV/c)","Event Fraction");
-      hmuMax[0][i]->SetMarkerStyle(20);
+      hmuMax[0][i]->SetMarkerStyle(24);
       hmuMax[0][i]->SetMarkerColor(kBlack);
       hmuMax[0][i]->Draw();
 
@@ -1874,6 +2181,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     cmuMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_muMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for muSum
+    TCanvas *cmuSum = new TCanvas("cmuSum","",1000,800);
     makeMultiPanelCanvas(cmuSum,3,2,0.0,0.0,0.2,0.15,0.07);
     for(int i = 0;i<nbins_cent;i++){
 
@@ -1881,7 +2189,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       cmuSum->cd(nbins_cent-i)->SetLogy();
 
       makeHistTitle(hmuSum[0][i]," ","muSum p_{T} (GeV/c)","Event Fraction");
-      hmuSum[0][i]->SetMarkerStyle(20);
+      hmuSum[0][i]->SetMarkerStyle(24);
       hmuSum[0][i]->SetMarkerColor(kBlack);
       hmuSum[0][i]->Draw();
 
@@ -1906,6 +2214,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
 
    // make plot for eMax
+    TCanvas *ceMax = new TCanvas("ceMax","",1000,800);
     makeMultiPanelCanvas(ceMax,3,2,0.0,0.0,0.2,0.15,0.07);
     for(int i = 0;i<nbins_cent;i++){
 
@@ -1913,7 +2222,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       ceMax->cd(nbins_cent-i)->SetLogy();
 
       makeHistTitle(heMax[0][i]," ","eMax p_{T} (GeV/c)","Event Fraction");
-      heMax[0][i]->SetMarkerStyle(20);
+      heMax[0][i]->SetMarkerStyle(24);
       heMax[0][i]->SetMarkerColor(kBlack);
       heMax[0][i]->Draw();
 
@@ -1937,14 +2246,15 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     ceMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_eMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for eSum
+    TCanvas *ceSum = new TCanvas("ceSum","",1000,800);
     makeMultiPanelCanvas(ceSum,3,2,0.0,0.0,0.2,0.15,0.07);
     for(int i = 0;i<nbins_cent;i++){
 
       ceSum->cd(nbins_cent-i);
       ceSum->cd(nbins_cent-i)->SetLogy();
 
-      makeHistTitle(hmuSum[0][i]," ","eSum p_{T} (GeV/c)","Event Fraction");
-      heSum[0][i]->SetMarkerStyle(20);
+      makeHistTitle(heSum[0][i]," ","eSum p_{T} (GeV/c)","Event Fraction");
+      heSum[0][i]->SetMarkerStyle(24);
       heSum[0][i]->SetMarkerColor(kBlack);
       heSum[0][i]->Draw();
 
@@ -1966,7 +2276,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
     drawText("pCES, HBHE",0.3,0.43,16);
     ceSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_eSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-
+    
     /*
     // make plot for jtpu
     makeMultiPanelCanvas(cjtpu,3,2,0.0,0.0,0.2,0.15,0.07);

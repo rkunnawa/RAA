@@ -1031,39 +1031,44 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
 
   //declare the histograms needed for the hpbpb_TrigObj80, hpbpb_TrigObj65, hpbpb_TrigObj55, hpbpb_TrigObjMB, hpbpb_TrigComb;
-
+  
   TH1F *hpbpb_TrgObj80[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObj65[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObj55[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObjMB[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObjComb[no_radius][nbins_eta][nbins_cent+1];
-
+  
   TH1F *hpbpb_TrgObj80_nJet_g7[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObj65_nJet_g7[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObj55_nJet_g7[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObjMB_nJet_g7[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObjComb_nJet_g7[no_radius][nbins_eta][nbins_cent+1];
-
+  
   TH1F *hpbpb_TrgObj80_nJet_l7[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObj65_nJet_l7[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObj55_nJet_l7[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObjMB_nJet_l7[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObjComb_nJet_l7[no_radius][nbins_eta][nbins_cent+1];
+  
+  TH1F *hpbpb_vx[no_radius];
+  TH1F *hpbpb_vy[no_radius];
+  TH1F *hpbpb_vz[no_radius];
+  TH1F *hpbpb_cent[no_radius];
 
   // histograms for the supernova cut rejection 
-  TH2F *hpbpb_Npix_before_cut[no_radius][nbins_cent+1]; 
+  TH2F *hpbpb_Npix_before_cut[no_radius][nbins_cent+2]; 
   TH2F *hpbpb_Npix_after_cut[no_radius][nbins_cent+1]; 
   // histograms to check the contribution of the nJets>7 (with pT>50 and |eta|<2) to the nJets < 7 
   TH1F *hpbpb_pt_Njet_g7[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_pt_Njet_l7[no_radius][nbins_eta][nbins_cent+1];
 
   //test histograms for the spectra alone 
-  // TH1F *hpbpb_Jet80[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet80[no_radius][nbins_eta][nbins_cent+1];
   // TH1F *hpbpb_Jet65[no_radius][nbins_eta][nbins_cent+1];
   // TH1F *hpbpb_Jet55[no_radius][nbins_eta][nbins_cent+1];
-  // TH1F *hpbpb_Jet65_noJet80[no_radius][nbins_eta][nbins_cent+1];
-  // TH1F *hpbpb_Jet55_noJet65_80[no_radius][nbins_eta][nbins_cent+1];
-  // TH1F *hpbpb_JetComb_old[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet65_noJet80[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet55_noJet65_80[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_JetComb_old[no_radius][nbins_eta][nbins_cent+1];
 
   for(int k = 0;k<no_radius;k++){
 
@@ -1092,12 +1097,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	hpbpb_pt_Njet_g7[k][j][i] = new TH1F(Form("hpbpb_pt_Njet_g7_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("jet spectra from the events with Njet(pT>50)>7 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 	hpbpb_pt_Njet_l7[k][j][i] = new TH1F(Form("hpbpb_pt_Njet_l7_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("jet spectra from the events with Njet(pT>50)<7 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 
-	// hpbpb_Jet80[k][j][i] = new TH1F(Form("hpbpb_Jet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Jet 80 trigger alone R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
-	// hpbpb_Jet65[k][j][i] = new TH1F(Form("hpbpb_Jet65_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Jet 65 trigger alone R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
-	// hpbpb_Jet55[k][j][i] = new TH1F(Form("hpbpb_Jet55_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Jet 55 trigger alone R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
-	// hpbpb_Jet65_noJet80[k][j][i] = new TH1F(Form("hpbpb_Jet65_noJet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra for Jet65 and not Jet80 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
-	// hpbpb_Jet55_noJet65_80[k][j][i] = new TH1F(Form("hpbpb_Jet55_noJet65_80_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra for Jet55 and not Jet65 and not Jet80 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
-	// hpbpb_JetComb_old[k][j][i] = new TH1F(Form("hpbpb_JetComb_oldR%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Combined spectra using old method R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
+	hpbpb_Jet80[k][j][i] = new TH1F(Form("hpbpb_Jet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Jet 80 trigger alone R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+	// hpbpb_Jet65[k][j][i] = new TH1F(Form("hpbpb_Jet65_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Jet 65 trigger alone R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+	// hpbpb_Jet55[k][j][i] = new TH1F(Form("hpbpb_Jet55_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Jet 55 trigger alone R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+	hpbpb_Jet65_noJet80[k][j][i] = new TH1F(Form("hpbpb_Jet65_noJet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra for Jet65 and not Jet80 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+	hpbpb_Jet55_noJet65_80[k][j][i] = new TH1F(Form("hpbpb_Jet55_noJet65_80_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra for Jet55 and not Jet65 and not Jet80 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+	hpbpb_JetComb_old[k][j][i] = new TH1F(Form("hpbpb_JetComb_old_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Combined spectra using old method R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 
       }//cent bin loop
 
@@ -1123,13 +1128,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       hpbpb_pt_Njet_l7[k][j][nbins_cent] = new TH1F(Form("hpbpb_pt_Njet_l7_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jet spectra from the events with Njet(pT>50)<7 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
       
 
-      // hpbpb_Jet80[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet80 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
-      // hpbpb_Jet65[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet65_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet65 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
-      // hpbpb_Jet55[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet55_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet55 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
-
-      // hpbpb_Jet65_noJet80[k][j][nbins_cent] = new TH1F(Form("hpbbp_Jet65_noJet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra for Jet65 and not Jet80 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
-      // hpbpb_Jet55_noJet65_80[k][j][nbins_cent] = new TH1F(Form("hpbbp_Jet55_noJet65_80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra for Jet55 and not Jet65 and not Jet80 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
-      // hpbpb_JetComb_old[k][j][nbins_cent] = new TH1F(Form("hpbpb_JetComb_old_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Combined spectra using the old method R%d %s 0-200 cent",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
+      hpbpb_Jet80[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet80 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
+      // hpbpb_Jet65[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet65_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet65 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
+      //hpbpb_Jet55[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet55_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet55 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpbpb_Jet65_noJet80[k][j][nbins_cent] = new TH1F(Form("hpbbp_Jet65_noJet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra for Jet65 and not Jet80 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpbpb_Jet55_noJet65_80[k][j][nbins_cent] = new TH1F(Form("hpbbp_Jet55_noJet65_80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra for Jet55 and not Jet65 and not Jet80 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpbpb_JetComb_old[k][j][nbins_cent] = new TH1F(Form("hpbpb_JetComb_old_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Combined spectra using the old method R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
 
     }//eta bin loop  
 
@@ -1139,7 +1143,13 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     }
     
     hpbpb_Npix_before_cut[k][nbins_cent] = new TH2F(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),Form("Number of pixels hit per no of jets pT>50 before cut R%d n20_eta_p20 0-200cent",list_radius[k]),50,0,50,100,0,60000);
+    hpbpb_Npix_before_cut[k][nbins_cent+1] = new TH2F(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent+1),Form("Number of pixels hit per no of jets pT>50 before cut R%d n20_eta_p20 ultraCentral 0 to 1 centrality",list_radius[k]),50,0,50,100,0,60000);
+
     hpbpb_Npix_after_cut[k][nbins_cent] = new TH2F(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),Form("Number of pixels hit per no of jets pT>50 after cut R%d n20_eta_p20 0-200cent",list_radius[k]),50,0,50,100,0,60000);
+    hpbpb_cent[k] = new TH1F(Form("hpbpb_cent_R%d",list_radius[k]),Form("centrality distributions R%d",list_radius[k]),200,0,200);
+    hpbpb_vz[k] = new TH1F(Form("hpbpb_vz_R%d",list_radius[k]),Form("vz distribution R%d",list_radius[k]),60,-15,15);
+    hpbpb_vx[k] = new TH1F(Form("hpbpb_vx_R%d",list_radius[k]),Form("vx distribution R%d",list_radius[k]),60,-15,15);
+    hpbpb_vy[k] = new TH1F(Form("hpbpb_vy_R%d",list_radius[k]),Form("vy distribution R%d",list_radius[k]),60,-15,15);
     
   }//radius loop
 
@@ -1159,8 +1169,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   Float_t chMax = 0,chSum = 0,phMax = 0,phSum = 0, neMax = 0, neSum = 0, muSum = 0, muMax = 0, eSum = 0, eMax = 0;
   Float_t cent = 0;
 
-  TNtuple *jets_ID = new TNtuple("jets_ID","","cut1:cut2:cut3:cut4:cut5:pt:jtpu:l1sl36:l1sl36_prescl:l1sl52:l1sl52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
-  Float_t arrayValues[29];
+  //TNtuple *jets_ID = new TNtuple("jets_ID","","cut1:cut2:cut3:cut4:cut5:pt:jtpu:l1sl36:l1sl36_prescl:l1sl52:l1sl52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
+  //Float_t arrayValues[29];
 
   //loop for the MB tree. 
   //empty for now - need to fix that once we have the MB data.  
@@ -1191,7 +1201,14 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       //if(printDebug)cout<<"cent bin = "<<centBin<<endl;
       //if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
       
-      if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0 || (vz_1>15)) continue; 
+      if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
+
+      hpbpb_cent[k]->Fill(hiBin_1);
+      hpbpb_vz[k]->Fill(vz_1);
+      hpbpb_vx[k]->Fill(vx_1);
+      hpbpb_vy[k]->Fill(vy_1);
+
+      if(fabs(vz_1)>15) continue;
       
       // if(printDebug)cout<<" trigger object pt =  "<<trgObj_pt_1<<endl;
       // if(printDebug)cout<<" jet80 = "<<jet80_1<<endl;
@@ -1220,12 +1237,13 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       //if(printDebug)cout<<"pixel hit = "<<hiNpix_1<<", jet counter = "<<jetCounter<<endl;
       hpbpb_Npix_before_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
       hpbpb_Npix_before_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);	
-      
+      if(hiBin_1 >= 0 && hiBin_1 < 1) hpbpb_Npix_before_cut[k][nbins_cent+1]->Fill(jetCounter,hiNpix_1);	
+
       // apply the correct supernova selection cut rejection here: 
-      //if(hiNpix_1 > 38000 - 500*jetCounter){
-      //if(printDebug) cout<<"removed this supernova event"<<endl;
-      //continue;
-      //}
+      if(hiNpix_1 > 38000 - 500*jetCounter){
+      if(printDebug) cout<<"removed this supernova event"<<endl;
+      continue;
+      }
       
       hpbpb_Npix_after_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
       hpbpb_Npix_after_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);
@@ -1241,7 +1259,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  
 	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
 	  
-	  //if(raw_1[g] < 20) continue;
+	  if(raw_1[g] < 20) continue;
 	  
 	  if(printDebug)cout<<"jet variables:  "<<endl;
 	  if(printDebug)cout<<"chSum = "<<chSum_1[g]<<endl;
@@ -1281,7 +1299,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  muSum = muSum_1[g];
 	  eMax = eMax_1[g];
 	  eSum = eSum_1[g];
-	  
+	  /*
 	  arrayValues[0] = cut1;
 	  arrayValues[1] = cut2;
 	  arrayValues[2] = cut3;
@@ -1313,16 +1331,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  arrayValues[28] = eSum;
 
 	  jets_ID->Fill(arrayValues);
-
-	  if(/*put your favourite QA cut here*/cut1>0.05 && cut1<1.00){
-	  //if(/*put your favourite QA cut here*/(neMax_1[g]/TMath::Max(chSum_1[g],neSum_1[g])>0.00) && (neMax_1[g]/TMath::Max(chSum_1[g],neSum_1[g])<0.97)){
-
-	    //if(1>0){ // just to check without the cut. 
-	    //cout<<"passed the cut"<<endl;
+	  */
+	 
+	  if(/*put your favourite QA cut here*/cut5<0.975){
 
 	    hJets->Fill(1);
 	    //if(raw_1[g] < 20) continue;
-
 
 	    if(jet80_1==1 && L1_sj52_1==1) {
 	      if(trgObj_pt_1>=80){
@@ -1338,8 +1352,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 		  hpbpb_TrgObj80_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
 		}
 	      }
-	      // hpbpb_Jet80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
-	      // hpbpb_Jet80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
+	      hpbpb_Jet80[k][j][centBin]->Fill(pt_1[g]);
+	      hpbpb_Jet80[k][j][nbins_cent]->Fill(pt_1[g]);
 	    }else if(jet65_1==1 && L1_sj36_1==1) {
 	      if(trgObj_pt_1>=65 && trgObj_pt_1<80){
 		hpbpb_TrgObj65[k][j][centBin]->Fill(pt_1[g],jet65_p_1*L1_sj36_p_1);
@@ -1356,10 +1370,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      }
 	      // hpbpb_Jet65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
 	      // hpbpb_Jet65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
-	      // if(jet80_1==0){
-	      //   hpbpb_Jet65_noJet80[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
-	      //   hpbpb_Jet65_noJet80[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
-	      // }
+	      if(jet80_1==0){//this is following the 12003 method. look at the AN page AN2013_273_v7.pdf 5 lines 113 to 115
+	        hpbpb_Jet65_noJet80[k][j][centBin]->Fill(pt_1[g]);
+	        hpbpb_Jet65_noJet80[k][j][nbins_cent]->Fill(pt_1[g]);
+	      }
 	    }else if(jet55_1==1 && L1_sj36_1==1) { // passes the jet55 trigger
 	      if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
 		hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
@@ -1379,10 +1393,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      }
 	      // hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
 	      // hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-	      // if((jet65_1==0) && (jet80_1==0)){ // this is to just check
-	      //   hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-	      //   hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-	      // }
+	      if((jet65_1==0) && (jet80_1==0)){ // this is to just check
+	        hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
+	        hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+	      }
 	    }
 
 	    // if(jet80_1) {
@@ -1468,9 +1482,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     
   }//radius loop. 
   
-  
   //declare the output file
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_testComb4_cut1_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_test12003_cut5_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   //TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   
   f.cd();
@@ -1509,7 +1522,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
         hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj65_nJet_l7[k][j][i]);
         hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj55_nJet_l7[k][j][i]);
 	
-
 	// old method histograms, just as a test: 
 	
 	// hpbpb_Jet80[k][j][i]->Scale(1./delta_eta[j]);
@@ -1519,17 +1531,16 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	// hpbpb_Jet65_noJet80[k][j][i]->Scale(1./delta_eta[j]);
 	// hpbpb_Jet55_noJet65_80[k][j][i]->Scale(1./delta_eta[j]);
 	
-	// divideBinWidth(hpbpb_Jet80[k][j][i]);
+	divideBinWidth(hpbpb_Jet80[k][j][i]);
 	// divideBinWidth(hpbpb_Jet65[k][j][i]);
 	// divideBinWidth(hpbpb_Jet55[k][j][i]);
 
-	// divideBinWidth(hpbpb_Jet65_noJet80[k][j][i]);
-	// divideBinWidth(hpbpb_Jet55_noJet65_80[k][j][i]);
+	divideBinWidth(hpbpb_Jet65_noJet80[k][j][i]);
+	divideBinWidth(hpbpb_Jet55_noJet65_80[k][j][i]);
 	
-	// hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet80[k][j][i]);
-	// hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet65_noJet80[k][j][i]);
-	// hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet55_noJet65_80[k][j][i]);
-	
+	hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet80[k][j][i]);
+	hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet65_noJet80[k][j][i]);
+	hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet55_noJet65_80[k][j][i]);
 	
         hpbpb_TrgObjComb[k][j][i]->Write();
         if(printDebug)hpbpb_TrgObjComb[k][j][i]->Print();
@@ -1558,19 +1569,19 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
         hpbpb_TrgObj55_nJet_l7[k][j][i]->Write();
         if(printDebug)hpbpb_TrgObj55_nJet_l7[k][j][i]->Print();	
 
-	// hpbpb_Jet80[k][j][i]->Write();
-	// if(printDebug)hpbpb_Jet80[k][j][i]->Print();
+	hpbpb_Jet80[k][j][i]->Write();
+	if(printDebug)hpbpb_Jet80[k][j][i]->Print();
 	// hpbpb_Jet65[k][j][i]->Write();
 	// if(printDebug)hpbpb_Jet65[k][j][i]->Print();
 	// hpbpb_Jet55[k][j][i]->Write();
 	// if(printDebug)hpbpb_Jet55[k][j][i]->Print();
 
-	// hpbpb_Jet65_noJet80[k][j][i]->Write();
-	// if(printDebug)hpbpb_Jet65_noJet80[k][j][i]->Print();
-	// hpbpb_Jet55_noJet65_80[k][j][i]->Write();
-	// if(printDebug)hpbpb_Jet55_noJet65_80[k][j][i]->Print();
-	// hpbpb_JetComb_old[k][j][i]->Write();
-	// if(printDebug)hpbpb_JetComb_old[k][j][i]->Print();
+	hpbpb_Jet65_noJet80[k][j][i]->Write();
+	if(printDebug)hpbpb_Jet65_noJet80[k][j][i]->Print();
+	hpbpb_Jet55_noJet65_80[k][j][i]->Write();
+	if(printDebug)hpbpb_Jet55_noJet65_80[k][j][i]->Print();
+	hpbpb_JetComb_old[k][j][i]->Write();
+	if(printDebug)hpbpb_JetComb_old[k][j][i]->Print();
 
       }//cent bins loop
 
@@ -1584,6 +1595,17 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       hpbpb_Npix_after_cut[k][i]->Write();
       
     }
+    if(printDebug)hpbpb_Npix_before_cut[k][nbins_cent+1]->Print("base");
+    hpbpb_Npix_before_cut[k][nbins_cent+1]->Write();
+
+    hpbpb_cent[k]->Write();
+    if(printDebug)hpbpb_cent[k]->Print("base");
+    hpbpb_vz[k]->Write();
+    if(printDebug)hpbpb_vz[k]->Print("base");
+    hpbpb_vx[k]->Write();
+    if(printDebug)hpbpb_vx[k]->Print("base");
+    hpbpb_vy[k]->Write();
+    if(printDebug)hpbpb_vy[k]->Print("base");
 
   }//radius loop
 
@@ -1593,11 +1615,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   //hCut4->Write();
   //hCut5->Write();
 
-  //hEvents->Write();
-  //hJets->Write();
-  jets_ID->Write();
+  hEvents->Write();
+  hJets->Write();
+  //jets_ID->Write();
 
-  if(printDebug)jets_ID->Print();
+  //if(printDebug)jets_ID->Print();
   if(printDebug)hEvents->Print();
   if(printDebug)hJets->Print();
 
