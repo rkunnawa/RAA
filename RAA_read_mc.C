@@ -335,7 +335,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
 
   cout<<"Running for Algorithm "<<algo<<" "<<jet_type<<endl;
  
-  bool printDebug = true;
+  bool printDebug = false;
   TDatime date;
 
   const int nbins_pthat = 9;
@@ -350,57 +350,56 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
   // refer this twiki for the data and MC files: http://twiki.cern.ch/twiki/bin/viewauth/CMS/HiForestPA2014#PYTHIA_HYDJET_embedded_sample
 
   boundaries_pthat[0]=15;
-  // fileName_pthat[0] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15/hiForest_DijetpT15_Hydjet1p8_STARTHI53_LV1_Track9_Jet30_v15.root";
-  // fileName_pthat[0] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT15_Hydjet1p8_STARTHI53_LV1_v15_full.root";
   fileName_pthat[0] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat15_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[0] = "/export/d00/scratch/dav2105/badjets/bad15.root";
   xsection[0]= 2.034e-01;
   //entries[0] = ;//total - 48588
   
   boundaries_pthat[1]=30;
-  // fileName_pthat[1] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT30_Hydjet1p8_STARTHI53_LV1_v15_full.root";
   fileName_pthat[1] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat30_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[1] = "/export/d00/scratch/dav2105/badjets/bad30.root";
   xsection[1]= 1.075e-02;
   // entries[1] = ;//total - 48428
   
   boundaries_pthat[2]=50;
-  // fileName_pthat[2] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT50_Hydjet1p8_STARTHI53_LV1_v15_full.root";
   fileName_pthat[2] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat50_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[2] = "/export/d00/scratch/dav2105/badjets/bad50.root";
   xsection[2]= 1.025e-03;
   // entries[2] = ;//total - 50000
   
   boundaries_pthat[3]=80;
-  // fileName_pthat[3] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT80_Hydjet1p8_STARTHI53_LV1_v15_full.root";
   fileName_pthat[3] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat80_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[3] = "/export/d00/scratch/dav2105/badjets/bad80.root";
   xsection[3]= 9.865e-05;
   // entries[3] = ;//total - 49500
   
   boundaries_pthat[4]=120;
-  // fileName_pthat[4] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT120_Hydjet1p8_STARTHI53_LV1_v15_full.root";
-  fileName_pthat[4] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat120_Track9_Jet30_matchEqR_merged_forest_0.root";
+  fileName_pthat[4] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat120_Track9_Jet30_matchEqR_merged_forest_0.root";  
+  //fileName_pthat[4] = "/export/d00/scratch/dav2105/badjets/bad120.root";
   xsection[4]= 1.129e-05;
   // entries[4] = ;//total - 49500
 
   boundaries_pthat[5]=170;
-  //fileName_pthat[5] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT170_Hydjet1p8_STARTHI53_LV1_v15_full.root";
   fileName_pthat[5] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat170_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[5] = "/export/d00/scratch/dav2105/badjets/bad120.root";
   xsection[5]= 1.465e-06;
   // entries[5] = ;//total - 49444
 
   boundaries_pthat[6]=220;
-  // fileName_pthat[6] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT220_Hydjet1p8_STARTHI53_LV1_v15_full.root";
   fileName_pthat[6] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat220_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[6] = "/export/d00/scratch/dav2105/badjets/bad220.root";
   xsection[6]= 2.837e-07;
   // entries[6] = ;//total - 49460
 
   boundaries_pthat[7]=280;
-  // fileName_pthat[7] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT280_Hydjet1p8_STARTHI53_LV1_v15_full.root";
   fileName_pthat[7] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat280_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[7] = "/export/d00/scratch/dav2105/badjets/bad280.root";
   xsection[7]= 5.323e-08;
   // entries[7] = ;//total - 49541
 
   boundaries_pthat[8]=370;
-  // fileName_pthat[8] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT370_Hydjet1p8_STARTHI53_LV1_v15_full.root";
   fileName_pthat[8] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat370_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[8] = "/export/d00/scratch/dav2105/badjets/bad370.root";
   xsection[8]= 5.934e-09;
   // entries[8] = ;//total - 19031
 
@@ -531,9 +530,8 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
   boundariesPP_pthat[11]=2000; 
 
 
-
   //declare the output file 
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_pp_mc_nocut_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_pp_mc_nocut_scaletest_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
  
   // lets declare all the histograms here. 
 
@@ -724,72 +722,6 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
   
   }// radii loop
 
-  TH2F *hSumpTvsHF[15];
-  TH2F *hSumpTvsHF_cent[nbins_cent];
-  TH2F *hSumpTvshiBin[15];
-  TH2F *hSumpTvshiBin_cent[nbins_cent];
-  TH2F *hNJetsvsSumpT[nbins_cent];
-  TH1F *hSumpT[nbins_cent];
-  TH1F *hPsi[5][15][nbins_cent];
-
-  TH2F *hPsivsHF[5][15];
-  TH2F *hPsivsHF_cent[5][nbins_cent];
-  TH2F *hvnvsHF[5][15];
-  TH2F *hvnvscent[5][nbins_cent];
-
-
-  // UseFull histograms: Event Plane from HF for the official versus HF/Vs algorithm calculation of the Event Plane.
-  // first [3] array elements - Psi_2, Psi_3, Psi_4  only in the HF for tonight. 
-  // [3] - total, p - positive and n - negative in eta; based on what we have from the https://github.com/CmsHI/cmssw/blob/forest_CMSSW_5_3_20/RecoHI/HiEvtPlaneAlgos/interface/HiEvtPlaneList.h#L31 
-  TH1F *hEP_HF_Official[3][3][nbins_cent];
-  TH1F *hEP_HF_Vs[3][3][nbins_cent];
-
-  for(int i = 0;i<nbins_cent;i++){
-    
-    for(int z = 0;z<3;z++){
-      for(int x = 0;x<3;x++){
-	hEP_HF_Official[z][x][i] = new TH1F(Form("hEP_HF_Official_Psi%d_%d_cent%d",z,x,i),"",630,-3.15,3.15);
-	hEP_HF_Vs[z][x][i] = new TH1F(Form("hEP_HF_Vs_Psi%d_%d_cent%d",z,x,i),"",630,-3.15,3.15);
-      }
-    }
-
-    hSumpTvsHF_cent[i] = new TH2F(Form("hSumpT_vsHF_cent%d",i),"",5000,0,10000,5000,0,10000);
-    hSumpTvshiBin_cent[i] = new TH2F(Form("hSumpT_vshiBin_cent%d",i),"",5000,0,10000,200,0,200);
-    hNJetsvsSumpT[i] = new TH2F(Form("hNJetsvsSumpT_cent%d",i),"",50,0,50,5000,0,10000);
-
-    hSumpT[i] = new TH1F(Form("hSumpT_cent%d",i),"",5000,0,10000);
-   
-
-    for(int b = 0;b<5;b++){
-
-      hPsivsHF_cent[b][i] = new TH2F(Form("hPsi%d_cent%d",b,i),"",630,-3.15,+3.15,5000,0,10000);
-      hvnvsHF[b][i] = new TH2F(Form("hvn%d_HF_cent%d",b,i),"",100,0,1,5000,0,10000);
-      //hvnvscent[b][i] = new TH2F
-      for(int a = 0;a<15;a++){
-
-	//hPsi[b][a][i] = new TH1F(Form("hPsi_n%d_eta%d_cent%d",b,a,i),"",630,-3.15,3.15);
-
-      }
-      
-    }
-
-  }
-  
-  // declare the histograms in loops:
-  for(int a = 0;a<15;a++){
-    
-    hSumpTvsHF[a] = new TH2F(Form("hSumpT_eta%d_vsHF",a),"",5000,0,10000,5000,0,10000);
-    hSumpTvshiBin[a] = new TH2F(Form("hSumpT_eta%d_vshiBin",a),"",5000,0,10000,200,0,200);
-    
-    for(int b = 0;b<5;b++){
-      
-      hPsivsHF[b][a] = new TH2F(Form("hPsi%d_etabin%d_HF",b,a),"",630,-3.15,+3.15,5000,0,10000);
-      hvnvsHF[b][a] = new TH2F(Form("hvn%d_etabin%d_HF",b,a),"",100,0,1,5000,0,10000);
-      
-    }// no of flow components
-    
-  }// eta bin
-
   // Setup jet data branches - this will be 2D with [radius][pthat-file], but the histogram here is just 1D with [radius]
   JetData *data[no_radius][nbins_pthat]; 
   JetData *dataPP[no_radius][nbinsPP_pthat];
@@ -928,8 +860,6 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
         weight_cent = hCentWeight->GetBinContent(hCentWeight->FindBin(data[k][h]->bin));
 	if(fabs(data[k][h]->vz)>15) continue;
 
-
-
         weight_vz = fVz->Eval(data[k][h]->vz);
 
 	hpbpb_vz[k]->Fill(data[k][h]->vz,weight_vz);
@@ -971,56 +901,6 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
 	hpbpb_Npix_before_cut[k][nbins_cent]->Fill(jetCounter,data[k][h]->hiNpix);	
 
 	if(data[k][h]->bin>=0 && data[k][h]->bin<1) hpbpb_Npix_before_cut[k][nbins_cent+1]->Fill(jetCounter,data[k][h]->hiNpix);	
-
-	//getting the event plane information for the Official and Vs calculations. 
-
-	hEP_HF_Official[0][0][cBin]->Fill(data[k][h]->hiEvtPlanes[21]);
-	hEP_HF_Official[0][1][cBin]->Fill(data[k][h]->hiEvtPlanes[22]);
-	hEP_HF_Official[0][2][cBin]->Fill(data[k][h]->hiEvtPlanes[23]);
-
-	hEP_HF_Official[1][0][cBin]->Fill(data[k][h]->hiEvtPlanes[24]);
-	hEP_HF_Official[1][1][cBin]->Fill(data[k][h]->hiEvtPlanes[25]);
-	hEP_HF_Official[1][2][cBin]->Fill(data[k][h]->hiEvtPlanes[26]);
-
-	hEP_HF_Official[2][0][cBin]->Fill(data[k][h]->hiEvtPlanes[27]);
-	hEP_HF_Official[2][1][cBin]->Fill(data[k][h]->hiEvtPlanes[28]);
-	hEP_HF_Official[2][2][cBin]->Fill(data[k][h]->hiEvtPlanes[29]);
-
-	hEP_HF_Vs[0][0][cBin]->Fill(data[k][h]->psi_n[2][0]);
-	hEP_HF_Vs[0][0][cBin]->Fill(data[k][h]->psi_n[2][14]);
-	hEP_HF_Vs[0][1][cBin]->Fill(data[k][h]->psi_n[2][0]);
-	hEP_HF_Vs[0][2][cBin]->Fill(data[k][h]->psi_n[2][14]);
-
-	hEP_HF_Vs[1][0][cBin]->Fill(data[k][h]->psi_n[3][0]);
-	hEP_HF_Vs[1][0][cBin]->Fill(data[k][h]->psi_n[3][14]);
-	hEP_HF_Vs[1][1][cBin]->Fill(data[k][h]->psi_n[3][0]);
-	hEP_HF_Vs[1][2][cBin]->Fill(data[k][h]->psi_n[3][14]);
-
-	hEP_HF_Vs[2][0][cBin]->Fill(data[k][h]->psi_n[4][0]);
-	hEP_HF_Vs[2][0][cBin]->Fill(data[k][h]->psi_n[4][14]);
-	hEP_HF_Vs[2][1][cBin]->Fill(data[k][h]->psi_n[4][0]);
-	hEP_HF_Vs[2][2][cBin]->Fill(data[k][h]->psi_n[4][14]);
-
-
-
-	for(int a = 0;a<15;a++){
-
-	  hSumpTvsHF[a]->Fill(data[k][h]->sumpT[a],data[k][h]->hiHF);
-	  hSumpTvshiBin[a]->Fill(data[k][h]->sumpT[a],data[k][h]->bin);
-	  hNJetsvsSumpT[cBin]->Fill(jetCounter,data[k][h]->sumpT[a]);
-	  hSumpTvsHF_cent[cBin]->Fill(data[k][h]->sumpT[a],data[k][h]->hiHF);
-	  //hSumpTvshiBin_cent[cBin]->Fill(data[k][h]->sumpT[a],data[k][h]->hiHF);
-	  hSumpT[cBin]->Fill(data[k][h]->sumpT[a]);
-
-	  for(int b = 0;b<5;b++){
-	    
-	    hPsivsHF[b][a]->Fill(data[k][h]->psi_n[b][a],data[k][h]->hiHF);
-	    hvnvsHF[b][a]->Fill(data[k][h]->v_n[b][a],data[k][h]->hiHF);
-	    //hPsi[cBin]->Fill(data[k][h]->psi_n[b][a]);
-
-	  }// no of flow components 
-	  
-	}// eta bin
 
 	//for(int b = 0;b<5;b++){
 	//  hvnvscent
@@ -1065,7 +945,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
 	  }
 	  if (hasLeadingJet == 0) continue;
         */
-
+	/*
         for (int g = 0; g < data[k][h]->njets; g++) {
 
 	  hpbpb_eta_full_noScale[k]->Fill(data[k][h]->jteta[g]);
@@ -1136,7 +1016,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
 	    arrayValues[28] = data[k][h]->eMax[g];
 	    arrayValues[29] = data[k][h]->eSum[g];
 
-	    jets_ID->Fill(arrayValues);
+	    //jets_ID->Fill(arrayValues);
 
 	    //jets_ID->Fill(cut1,cut2,cut3,cut4,cut5,data[k][h]->jtpt[g],data[k][h]->rawpt[g],data[k][h]->refpt[g],cBin,sub_id,data[k][h]->chargedMax[g],data[k][h]->chargedSum[g],data[k][h]->photonMax[g],data[k][h]->photonSum[g],data[k][h]->neutralMax[g],data[k][h]->neutralSum[g],data[k][h]->muMax[g],data[k][h]->muSum[g],data[k][h]->eMax[g],data[k][h]->eSum[g]);
 	    
@@ -1201,7 +1081,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
 	  }// eta bins loop
 	      
         }//njets loop
-      
+	*/
       }//nentry loop
 
       if(printDebug)cout<<"no of events inbetween pthat "<<boundaries_pthat[h]<<" and "<<boundaries_pthat[h+1]<<" = "<<test_counter<<endl;
@@ -1234,7 +1114,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
       double fentries = el->GetN();
       if(printDebug)cout<<"tree entries: "<<dataPP[k][h]->tJet->GetEntries()<<" elist: "<<fentries<<endl;
       delete el;
-
+      /*
       for (Long64_t jentry=0; jentry<dataPP[k][h]->tJet->GetEntries();jentry++) {
 	//for (Long64_t jentry=0; jentry<10;jentry++) {
         dataPP[k][h]->tEvt->GetEntry(jentry);
@@ -1263,19 +1143,19 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
         hPtHatPP[k]->Fill(dataPP[k][h]->pthat,scalepp*weight_vz);
         int hasLeadingJet = 0;
         hVzPPMC[k]->Fill(dataPP[k][h]->vz,scalepp*weight_vz);
-        /*
-	  for (int k= 0; k < dataPP[k][h]->njets; k++) { 
-	  if ( dataPP[k][h]->jteta[k]  > 2. || dataPP[k][h]->jteta[k] < -2. ) continue;
-	  if ( dataPP[k][h]->jtpt[k]>100) {
-	  hasLeadingJet = 1;
-	  }
-	  break;
+        
+	// for (int k= 0; k < dataPP[k][h]->njets; k++) { 
+	//   if ( dataPP[k][h]->jteta[k]  > 2. || dataPP[k][h]->jteta[k] < -2. ) continue;
+	//   if ( dataPP[k][h]->jtpt[k]>100) {
+	//   hasLeadingJet = 1;
+	//   }
+	//   break;
 	
-	  }
-	  if (hasLeadingJet == 0) continue;
-        */
+	//   }
+	// if (hasLeadingJet == 0) continue;
+	  
 
-
+	
         for (int g= 0; g< dataPP[k][h]->njets; g++) { 
 
 	  hpp_eta_full_noScale[k]->Fill(dataPP[k][h]->jteta[g]);
@@ -1328,13 +1208,16 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
         }//njet loop     
       
       }//nentry loop
-    
+      */
     }//ptbins loop
+      
 
+    
   }// radius loop
-
+  
   f.cd();
   
+  /*
   for(int k = 0;k<no_radius;k++){
     
     for(int j=0;j<nbins_eta;j++){
@@ -1454,46 +1337,18 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
     if(printDebug)hpbpb_vy[k]->Print("base");
 
   }// radius loop
-
+  
   hCut1->Write();
   hCut2->Write();
   hCut3->Write();
   hCut4->Write();
   hCut5->Write();
   jets_ID->Write();
-    
-  for(int a = 0;a<15;a++){
-    hSumpTvsHF[a]->Write();
-    if(printDebug)hSumpTvsHF[a]->Print("base");
-    hSumpTvshiBin[a]->Write();
-    if(printDebug)hSumpTvshiBin[a]->Print("base");
-    for(int b = 0;b<5;b++){
-      hPsivsHF[b][a]->Write();
-      if(printDebug)hPsivsHF[b][a]->Print("base");
-      hvnvsHF[b][a]->Write();
-    }
-  }
+  */
 
-  for(int i = 0;i<nbins_cent;i++){
-    
-    hNJetsvsSumpT[i]->Write();
-    hSumpTvsHF_cent[i]->Write();
-    hSumpT[i]->Write();
-    //hPsi[i]->Write();
-    
 
-    for(int z = 0;z<3;z++){
-      for(int x = 0;x<3;x++){
-	hEP_HF_Official[z][x][i]->Write();
-	if(printDebug)hEP_HF_Official[z][x][i]->Print("base");
-	hEP_HF_Vs[z][x][i]->Write();
-	if(printDebug)hEP_HF_Vs[z][x][i]->Print("base");
-      }
-    }
-  }
   f.Write();
   f.Close();
-  
   
   timer.Stop();
   cout<<"Macro finished: "<<endl;
