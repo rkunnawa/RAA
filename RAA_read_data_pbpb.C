@@ -222,7 +222,7 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "PF"){
+void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", char *jet_type = "PF"){
 
   TH1::SetDefaultSumw2();
   //gStyle->SetOptStat(0);
@@ -743,6 +743,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   float vz_1;
   int hiNpix_1;
   int hiNtracks_1;
+  float hiHF_1;
   float hiHFminus_1;
   float hiHFplus_1;
   float hiHFplusEta4_1;
@@ -905,6 +906,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     jetpbpb1[2][k]->SetBranchAddress("hiNpix",&hiNpix_1);
     jetpbpb1[2][k]->SetBranchAddress("hiNtracks",&hiNtracks_1);
     jetpbpb1[2][k]->SetBranchAddress("hiHFminus",&hiHFminus_1);
+    jetpbpb1[2][k]->SetBranchAddress("hiHF",&hiHF_1);
     jetpbpb1[2][k]->SetBranchAddress("hiHFplus",&hiHFplus_1);
     jetpbpb1[2][k]->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4_1);
     jetpbpb1[2][k]->SetBranchAddress("hiHFminusEta4",&hiHFminusEta4_1);
@@ -1013,22 +1015,21 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   // run lumi evt HLTobjpt HLTobjeta HLTobjphi hibin jtpt jteta jtphi
 
   //ofstream fHLT_80,fHLT_65,fHLT_55;
-  //ofstream fHLT_high[no_radius];
+  ofstream fVs_failure[no_radius];
   //fHLT_80.open(Form("pbpb_%s_R%d_max_trgObj_80_jets.txt",algo,radius));
   //fHLT_65.open(Form("pbpb_%s_R%d_80_max_trgObj_65_jets.txt",algo,radius));
   //fHLT_55.open(Form("pbpb_%s_R%d_65_max_trgObj_55_jets.txt",algo,radius));
-  //for(int k = 0;k<no_radius;k++){
-  //fHLT_high[k].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pbpb_%s_R%d_abnormal_jets_%d_%d.txt",algo,list_radius[k],date.GetDate(),endfile));
+  for(int k = 0;k<no_radius;k++){
+    fVs_failure[k].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pbpb_%s_R%d_DATA_failure_mode_events_%d_%d.txt",algo,list_radius[k],date.GetDate(),endfile));
     //fHLT_high[k].open(Form("/export/d00/scratch/rkunnawa/rootfiles/pbpb_%s_R%d_abnormal_jets_%d_%d.txt",algo,list_radius[k],date.GetDate(),endfile));
-  //}
+  }
+
   // the actual cut we are going to be using is 
   // TMath::Max(chargedMax,neutralMax)/(TMath::Max(chargedSum,neutralSum))<0.975
   // which is pretty much the same as doing the one mentioned above.  
   // ok the cut mentioned above is not the one we are using for the analysis now. We have to check if that cut actually removes a lot of the fake events for us to have a meaningful combined jet spectra. 
   
-
   // TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975 im going to add this from Kurt used in 12003 here to see if it sort of helps. he also used this in 14007 analysis. 
-
 
   //declare the histograms needed for the hpbpb_TrigObj80, hpbpb_TrigObj65, hpbpb_TrigObj55, hpbpb_TrigObjMB, hpbpb_TrigComb;
   
@@ -1127,7 +1128,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       hpbpb_pt_Njet_g7[k][j][nbins_cent] = new TH1F(Form("hpbpb_pt_Njet_g7_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jet spectra from the events with Njet(pT>50)>7 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
       hpbpb_pt_Njet_l7[k][j][nbins_cent] = new TH1F(Form("hpbpb_pt_Njet_l7_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jet spectra from the events with Njet(pT>50)<7 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
       
-
       hpbpb_Jet80[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet80 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
       // hpbpb_Jet65[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet65_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet65 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
       //hpbpb_Jet55[k][j][nbins_cent] = new TH1F(Form("hpbpb_Jet55_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra form Jet55 only R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
@@ -1154,9 +1154,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   }//radius loop
 
   Float_t cut1 = 0;
-  Float_t cut2 = 0;
+  Float_t cut2 = 0, cut2b = 0;;
   Float_t cut3 = 0;
-  Float_t cut4 = 0,cut5 = 0;
+  Float_t cut4 = 0,cut5 = 0, cut6 = 0, cut7 = 0;
 
   TH1F* hCut1 = new TH1F("hCut1","chMax/jtpt",100,0,10);
   TH1F* hCut2 = new TH1F("hCut2","neMax/Max(chSum,neSum)",100,0,10);
@@ -1169,8 +1169,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   Float_t chMax = 0,chSum = 0,phMax = 0,phSum = 0, neMax = 0, neSum = 0, muSum = 0, muMax = 0, eSum = 0, eMax = 0;
   Float_t cent = 0;
 
-  //TNtuple *jets_ID = new TNtuple("jets_ID","","cut1:cut2:cut3:cut4:cut5:pt:jtpu:l1sl36:l1sl36_prescl:l1sl52:l1sl52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
-  //Float_t arrayValues[29];
+  TNtuple *jets_ID = new TNtuple("jets_ID","","cut1:cut2:cut3:cut4:cut5:pt:jtpu:l1sl36:l1sl36_prescl:l1sl52:l1sl52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum:rawpt");
+  Float_t arrayValues[30];
 
   //loop for the MB tree. 
   //empty for now - need to fix that once we have the MB data.  
@@ -1239,10 +1239,16 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       hpbpb_Npix_before_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);	
       if(hiBin_1 >= 0 && hiBin_1 < 1) hpbpb_Npix_before_cut[k][nbins_cent+1]->Fill(jetCounter,hiNpix_1);	
 
+
+      if(jetCounter>10){
+	//put the failure mode event variables here: 
+	fVs_failure[k]<<run_1<<" "<<lumi_1<<" "<<evt_1<<" "<<vz_1<<" "<<hiHF_1<<" "<<hiNpix_1<<" "<<hiNtracks_1<<endl;
+      }
+
       // apply the correct supernova selection cut rejection here: 
       if(hiNpix_1 > 38000 - 500*jetCounter){
-      if(printDebug) cout<<"removed this supernova event"<<endl;
-      continue;
+	if(printDebug) cout<<"removed this supernova event"<<endl;
+	continue;
       }
       
       hpbpb_Npix_after_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
@@ -1250,12 +1256,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       //}//if Vs search for supernova events. 
       
       hEvents->Fill(1);
-      
+      /*
       for(int j = 0;j<nbins_eta;j++){
 	
 	for(int g = 0;g<nrefe_1;g++){
 	  
-	  //if(/*put your favourite QA cut here*/(chMax_1[g]/pt_1[g]>0.05) && (chMax_1[g]/pt_1[g]<1.00)){
+	  //if((chMax_1[g]/pt_1[g]>0.05) && (chMax_1[g]/pt_1[g]<1.00)){
 	  
 	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
 	  
@@ -1273,8 +1279,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  cut3 = (float)(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g] + eSum_1[g] - jtpu_1[g])/(pt_1[g]);
 	  cut1 = (float)chMax_1[g]/(pt_1[g]);
 	  cut2 = (float)neMax_1[g]/TMath::Max(chSum_1[g],neSum_1[g]);
+	  cut2b = (float)phMax_1[g]/TMath::Max(chSum_1[g],neSum_1[g]);
 	  cut4 = (float)(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g] + eSum_1[g])/(0.5*raw_1[g]);
 	  cut5 = (float)neMax_1[g]/(neMax_1[g] + chMax_1[g] + phMax_1[g]);
+	  cut6 = (float)muMax_1[g]/(neMax_1[g] + chMax_1[g] + phMax_1[g]);
+	  cut7 = (float)eMax_1[g]/(neMax_1[g] + chMax_1[g] + phMax_1[g]);
 	  if(printDebug)cout<<"Cut1 value = "<<cut1<<endl;
 	  if(printDebug)cout<<"Cut2 value = "<<cut2<<endl;
 	  if(printDebug)cout<<"Cut3 value = "<<cut3<<endl;
@@ -1299,7 +1308,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  muSum = muSum_1[g];
 	  eMax = eMax_1[g];
 	  eSum = eSum_1[g];
-	  /*
+	  
 	  arrayValues[0] = cut1;
 	  arrayValues[1] = cut2;
 	  arrayValues[2] = cut3;
@@ -1329,14 +1338,18 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  arrayValues[26] = muSum;
 	  arrayValues[27] = eMax;
 	  arrayValues[28] = eSum;
+	  arrayValues[29] = raw_1[g];
 
 	  jets_ID->Fill(arrayValues);
-	  */
-	 
-	  if(/*put your favourite QA cut here*/cut5<0.975){
+	  
+
+	  // going to use the effective prescl for the Jet55 trigger: 2.0475075465
+	  Float_t effecPrescl = 2.047507;
+
+	  if(cut5<0.95 && cut6<0.95 && cut7<0.95 && cut1>0.05 && cut2<0.95 && cut2b<0.95){
 
 	    hJets->Fill(1);
-	    //if(raw_1[g] < 20) continue;
+	    if(raw_1[g] < 20) continue;
 
 	    if(jet80_1==1 && L1_sj52_1==1) {
 	      if(trgObj_pt_1>=80){
@@ -1394,8 +1407,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      // hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
 	      // hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
 	      if((jet65_1==0) && (jet80_1==0)){ // this is to just check
-	        hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-	        hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+	        hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],effecPrescl*L1_sj36_p_1);
+	        hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],effecPrescl*L1_sj36_p_1);
 	      }
 	    }
 
@@ -1430,7 +1443,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	}//jet loop
 	  
       }//eta bin loop
-    
+    */
+
     }//nentries_jet55or65 loop
     
     
@@ -1478,12 +1492,13 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     
   //   }//nentries_jet80or95 loop
 
-    //fHLT_high[k].close();
+    fVs_failure[k].close();
     
   }//radius loop. 
   
+  /*
   //declare the output file
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_test12003_cut5_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_12003_effPres_severalcut_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   //TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   
   f.cd();
@@ -1627,8 +1642,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
   f.Close();
 
-  //fHLT_high.write();
 
+  */
+  
   timer.Stop();
   cout<<"Macro finished: "<<endl;
   cout<<"CPU time (min)  = "<<(float)timer.CpuTime()/60<<endl;

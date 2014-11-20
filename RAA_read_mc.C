@@ -173,11 +173,35 @@ public:
     tFile = new TFile(fileName,"read");
     tEvt = (TTree*)tFile->Get("hiEvtAnalyzer/HiTree");
     tSkim = (TTree*)tFile->Get("skimanalysis/HltTree");
-    //tHlt = (TTree*)tFile->Get("hltanalysis/HltTree");
+    tHlt = (TTree*)tFile->Get("hltanalysis/HltTree");
+    tpfCand = (TTree*)tFile->Get("pfcandAnalyzer/pfTree");
     tJet = (TTree*)tFile->Get(jetTree);
     tJet->SetBranchAddress("jtpt" , jtpt );
     if(isPbPb)tJet->SetBranchAddress("jtpu", jtpu );
     if(isPbPb)tEvt->SetBranchAddress("hiNpix",&hiNpix);
+    if(isPbPb)tEvt->SetBranchAddress("run",&run);
+    if(isPbPb)tEvt->SetBranchAddress("evt",&evt);
+    if(isPbPb)tEvt->SetBranchAddress("lumi",&lumi);
+    if(isPbPb)tEvt->SetBranchAddress("hiNtracks",&hiNtracks);
+    if(isPbPb)tEvt->SetBranchAddress("hiHF",&hiHF);
+
+    if(isPbPb){
+      tpfCand->SetBranchAddress("nPFpart",&nPFpart);
+      tpfCand->SetBranchAddress("pfId",&pfID);
+      tpfCand->SetBranchAddress("pfPt",&pfPt);
+      tpfCand->SetBranchAddress("pfVsPt",&pfVsPt);
+      tpfCand->SetBranchAddress("pfVsPtInitial",&pfVsPtInitial);
+      tpfCand->SetBranchAddress("pfArea",&pfArea);
+      tpfCand->SetBranchAddress("pfEta",&pfEta);
+      tpfCand->SetBranchAddress("pfPhi",&pfPhi);
+      tpfCand->SetBranchAddress("vn",&v_n);
+      tpfCand->SetBranchAddress("psin",&psi_n);
+      tpfCand->SetBranchAddress("sumpt",&sumpT);
+      
+      tEvt->SetBranchAddress("hiNevtPlane",&hiNevtPlane);
+      tEvt->SetBranchAddress("hiEvtPlanes",&hiEvtPlanes);
+    }
+
     tJet->SetBranchAddress("rawpt", rawpt);
     tJet->SetBranchAddress("trackMax" , trackMax );
     tJet->SetBranchAddress("chargedMax",chargedMax);
@@ -208,20 +232,42 @@ public:
     tSkim->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
     if(isPbPb) tSkim->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
     else tSkim->SetBranchAddress("pPAcollisionEventSelectionPA",&pPAcollisionEventSelectionPA);
-    
-    //if(ifPbPB) tHlt->SetBranchAddress("HLT_HIJet80_v")
-
+    if(isPbPb) tHlt->SetBranchAddress("HLT_HIJet80_v7",&jet80_1);
+    if(isPbPb) tHlt->SetBranchAddress("HLT_HIJet65_v7",&jet65_1);
+    if(isPbPb) tHlt->SetBranchAddress("HLT_HIJet55_v7",&jet55_1);
+    if(isPbPb) tHlt->SetBranchAddress("HLT_HIJet80_v7_Prescl",&jet80_p_1);
+    if(isPbPb) tHlt->SetBranchAddress("HLT_HIJet65_v7_Prescl",&jet65_p_1);
+    if(isPbPb) tHlt->SetBranchAddress("HLT_HIJet55_v7_Prescl",&jet55_p_1);
     tJet->AddFriend(tEvt);
     tJet->AddFriend(tSkim);
-    //tJet->AddFriend(tHlt);
-    
+    tJet->AddFriend(tHlt);
+    tJet->AddFriend(tpfCand);
   };
   TFile *tFile;
   TTree *tJet;
   TTree *tGenJet;
   TTree *tEvt;
   TTree *tHlt;
-  TTree* tSkim;
+  TTree *tSkim;
+  TTree *tpfCand;
+ 
+  //event varianbles
+  int run;
+  int evt;
+  int lumi;
+  int hiNTracks;
+  Float_t hiHF;
+  float vz;
+  float vx;
+  float vy;
+  float pthat;
+  int hiNpix;
+  int hiNtracks;
+  int hiNevtPlane;
+  Float_t hiEvtPlanes[1000];
+
+
+  //jet variables 
   float jtpt[1000];
   float jtpu[1000];
   float rawpt[1000];
@@ -243,11 +289,8 @@ public:
   float genpt[1000];
   int gensubid[1000];
   float subid[1000];
-  float vz;
-  float vx;
-  float vy;
-  float pthat;
-  int hiNpix;
+
+
   int njets;
   int ngen;
   int bin;     
@@ -257,12 +300,30 @@ public:
   int jet55_1;
   int jet65_1;
   int jet80_1;
+  int jet55_p_1;
+  int jet65_p_1;
+  int jet80_p_1;
+
+  //from the pfcandanalyzer tree:
+  Int_t nPFpart;
+  Int_t pfID[10000];
+  Float_t pfPt[10000];
+  Float_t pfVsPt[10000];
+  Float_t pfVsPtInitial[10000];
+  Float_t pfArea[10000];
+  Float_t pfEta[10000];
+  Float_t pfPhi[10000];
+  Float_t v_n[5][15];
+  Float_t psi_n[5][15];
+  Float_t sumpT[15];
+
+
 };
 
 
 using namespace std;
 
-void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
+void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
   
   TStopwatch timer;
   timer.Start();
@@ -275,6 +336,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   cout<<"Running for Algorithm "<<algo<<" "<<jet_type<<endl;
  
   bool printDebug = true;
+  TDatime date;
 
   const int nbins_pthat = 9;
   Double_t boundaries_pthat[nbins_pthat+1];
@@ -469,12 +531,10 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   boundariesPP_pthat[11]=2000; 
 
 
-  TDatime date;
-  
+
   //declare the output file 
   TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_pp_mc_nocut_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
-  f.cd();
-
+ 
   // lets declare all the histograms here. 
 
   TH1F *hpbpb_gen[no_radius][nbins_eta][nbins_cent+1],*hpbpb_reco[no_radius][nbins_eta][nbins_cent+1];
@@ -489,7 +549,17 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   TH1F *hpbpb_vy[no_radius];
   TH1F *hpbpb_vz[no_radius];
   TH1F *hpbpb_cent[no_radius];
-  
+
+  //get the spectra with the specific trigger object from the different files. 
+  TH1F *hpbpb_Jet80_gen[no_radius][nbins_eta][nbins_cent+1],*hpbpb_Jet80_reco[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet65_gen[no_radius][nbins_eta][nbins_cent+1],*hpbpb_Jet65_reco[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet55_gen[no_radius][nbins_eta][nbins_cent+1],*hpbpb_Jet55_reco[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_JetComb_gen[no_radius][nbins_eta][nbins_cent+1],*hpbpb_JetComb_reco[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet80_raw[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet65_raw[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_Jet55_raw[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_JetComb_raw[no_radius][nbins_eta][nbins_cent+1];
+
   //TH1F *hpbpb_eta[no_radius][nbins_eta][nbins_cent+1], *hpbpb_phi[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_eta_full[no_radius], *hpbpb_phi_full[no_radius];
   TH1F *hpbpb_eta_full_noScale[no_radius], *hpbpb_phi_full_noScale[no_radius];
@@ -539,9 +609,22 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   TH1F* hCut4 = new TH1F("hCut4","(chSum+phSum+neSum+muSum+eSum)/(0.5*rawpt)",100,0,10);
   TH1F* hCut5 = new TH1F("hCut5","neMax/(neMax+chMax+phMax)",100,0,10);
  
-  TNtuple *jets_ID = new TNtuple("jets_ID","","cut1:cut2:cut3:cut4:cut5:jtpt:rawpt:refpt:jtpu:scale:weight_vz_:weight_cent:cent:subid:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
-  Float_t arrayValues[24];
+  TNtuple *jets_ID = new TNtuple("jets_ID","","cut1:cut2:cut3:cut4:cut5:jtpt:rawpt:refpt:jtpu:jet55:jet55_p:jet65:jet65_p:jet80:jet80_p:scale:weight_vz:weight_cent:cent:subid:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
+  Float_t arrayValues[30];
+
+  cout<<" before the output text file declaration "<<endl;
   
+  //ofstream fVs_failure[nbins_pthat];
+  //for(int k = 0;k<no_radius;k++){
+  //for(int h = 0;h<nbins_pthat;h++){
+    //cout<<" "<<h<<endl;
+    //cout<<boundaries_pthat[h]<<endl;
+    //fVs_failure[h].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pbpb_%s_pthat%d_PYTHIA_HYDJET_failure_mode_events_%d.txt",algo,h,date.GetDate()));
+    // }
+    //}
+  
+  cout<<" after the output text file declaration "<<endl;
+
   for(int k = 0;k<no_radius;k++){
     //cout<<"radius = "<<list_radius[k]<<endl;
     for(int j = 0;j<nbins_eta;j++){
@@ -569,6 +652,10 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	
 	//cout<<"D"<<endl;
 	//hpbpb_response[h] = new TH2F(Form("hpbpb_response_cent%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[h],5*boundaries_cent[i+1]),1000,0,1000,1000,0,1000);
+
+        hpbpb_Jet80_gen[k][j][i] = new TH1F(Form("hpbpb_Jet80_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Gen refpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+        hpbpb_Jet80_reco[k][j][i] = new TH1F(Form("hpbpb_Jet80_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("reco jtpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);	
+
       }// centrality bin loop
 
       hpbpb_pt_Njet_g7[k][j][nbins_cent] = new TH1F(Form("hpbpb_pt_Njet_g7_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jet spectra from the events with Njet(pT>50)>7 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
@@ -636,6 +723,72 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
     hpbpb_Npix_after_cut[k][nbins_cent] = new TH2F(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),Form("Number of pixels hit per no of jets pT>50 after cut R%d n20_eta_p20 0-200cent",list_radius[k]),50,0,50,100,0,60000);
   
   }// radii loop
+
+  TH2F *hSumpTvsHF[15];
+  TH2F *hSumpTvsHF_cent[nbins_cent];
+  TH2F *hSumpTvshiBin[15];
+  TH2F *hSumpTvshiBin_cent[nbins_cent];
+  TH2F *hNJetsvsSumpT[nbins_cent];
+  TH1F *hSumpT[nbins_cent];
+  TH1F *hPsi[5][15][nbins_cent];
+
+  TH2F *hPsivsHF[5][15];
+  TH2F *hPsivsHF_cent[5][nbins_cent];
+  TH2F *hvnvsHF[5][15];
+  TH2F *hvnvscent[5][nbins_cent];
+
+
+  // UseFull histograms: Event Plane from HF for the official versus HF/Vs algorithm calculation of the Event Plane.
+  // first [3] array elements - Psi_2, Psi_3, Psi_4  only in the HF for tonight. 
+  // [3] - total, p - positive and n - negative in eta; based on what we have from the https://github.com/CmsHI/cmssw/blob/forest_CMSSW_5_3_20/RecoHI/HiEvtPlaneAlgos/interface/HiEvtPlaneList.h#L31 
+  TH1F *hEP_HF_Official[3][3][nbins_cent];
+  TH1F *hEP_HF_Vs[3][3][nbins_cent];
+
+  for(int i = 0;i<nbins_cent;i++){
+    
+    for(int z = 0;z<3;z++){
+      for(int x = 0;x<3;x++){
+	hEP_HF_Official[z][x][i] = new TH1F(Form("hEP_HF_Official_Psi%d_%d_cent%d",z,x,i),"",630,-3.15,3.15);
+	hEP_HF_Vs[z][x][i] = new TH1F(Form("hEP_HF_Vs_Psi%d_%d_cent%d",z,x,i),"",630,-3.15,3.15);
+      }
+    }
+
+    hSumpTvsHF_cent[i] = new TH2F(Form("hSumpT_vsHF_cent%d",i),"",5000,0,10000,5000,0,10000);
+    hSumpTvshiBin_cent[i] = new TH2F(Form("hSumpT_vshiBin_cent%d",i),"",5000,0,10000,200,0,200);
+    hNJetsvsSumpT[i] = new TH2F(Form("hNJetsvsSumpT_cent%d",i),"",50,0,50,5000,0,10000);
+
+    hSumpT[i] = new TH1F(Form("hSumpT_cent%d",i),"",5000,0,10000);
+   
+
+    for(int b = 0;b<5;b++){
+
+      hPsivsHF_cent[b][i] = new TH2F(Form("hPsi%d_cent%d",b,i),"",630,-3.15,+3.15,5000,0,10000);
+      hvnvsHF[b][i] = new TH2F(Form("hvn%d_HF_cent%d",b,i),"",100,0,1,5000,0,10000);
+      //hvnvscent[b][i] = new TH2F
+      for(int a = 0;a<15;a++){
+
+	//hPsi[b][a][i] = new TH1F(Form("hPsi_n%d_eta%d_cent%d",b,a,i),"",630,-3.15,3.15);
+
+      }
+      
+    }
+
+  }
+  
+  // declare the histograms in loops:
+  for(int a = 0;a<15;a++){
+    
+    hSumpTvsHF[a] = new TH2F(Form("hSumpT_eta%d_vsHF",a),"",5000,0,10000,5000,0,10000);
+    hSumpTvshiBin[a] = new TH2F(Form("hSumpT_eta%d_vshiBin",a),"",5000,0,10000,200,0,200);
+    
+    for(int b = 0;b<5;b++){
+      
+      hPsivsHF[b][a] = new TH2F(Form("hPsi%d_etabin%d_HF",b,a),"",630,-3.15,+3.15,5000,0,10000);
+      hvnvsHF[b][a] = new TH2F(Form("hvn%d_etabin%d_HF",b,a),"",100,0,1,5000,0,10000);
+      
+    }// no of flow components
+    
+  }// eta bin
 
   // Setup jet data branches - this will be 2D with [radius][pthat-file], but the histogram here is just 1D with [radius]
   JetData *data[no_radius][nbins_pthat]; 
@@ -713,7 +866,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
     // // put the supernova events histogram here: 
     // jetTree[1]->Draw(Form("hiNpix:Sum$(jtpt>50&&abs(jteta)<2)>>hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),centWeight,"col");    
     
-
+    
     for (int h=0;h<nbins_pthat;h++) {
       if (xsection[h]==0) continue;
       if(printDebug)cout <<"Loading pthat"<<boundaries_pthat[h]<<" sample, cross section = "<<xsection[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundaries_pthat[h],boundaries_pthat[h+1])<<endl;
@@ -775,6 +928,8 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
         weight_cent = hCentWeight->GetBinContent(hCentWeight->FindBin(data[k][h]->bin));
 	if(fabs(data[k][h]->vz)>15) continue;
 
+
+
         weight_vz = fVz->Eval(data[k][h]->vz);
 
 	hpbpb_vz[k]->Fill(data[k][h]->vz,weight_vz);
@@ -817,10 +972,67 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 
 	if(data[k][h]->bin>=0 && data[k][h]->bin<1) hpbpb_Npix_before_cut[k][nbins_cent+1]->Fill(jetCounter,data[k][h]->hiNpix);	
 
+	//getting the event plane information for the Official and Vs calculations. 
+
+	hEP_HF_Official[0][0][cBin]->Fill(data[k][h]->hiEvtPlanes[21]);
+	hEP_HF_Official[0][1][cBin]->Fill(data[k][h]->hiEvtPlanes[22]);
+	hEP_HF_Official[0][2][cBin]->Fill(data[k][h]->hiEvtPlanes[23]);
+
+	hEP_HF_Official[1][0][cBin]->Fill(data[k][h]->hiEvtPlanes[24]);
+	hEP_HF_Official[1][1][cBin]->Fill(data[k][h]->hiEvtPlanes[25]);
+	hEP_HF_Official[1][2][cBin]->Fill(data[k][h]->hiEvtPlanes[26]);
+
+	hEP_HF_Official[2][0][cBin]->Fill(data[k][h]->hiEvtPlanes[27]);
+	hEP_HF_Official[2][1][cBin]->Fill(data[k][h]->hiEvtPlanes[28]);
+	hEP_HF_Official[2][2][cBin]->Fill(data[k][h]->hiEvtPlanes[29]);
+
+	hEP_HF_Vs[0][0][cBin]->Fill(data[k][h]->psi_n[2][0]);
+	hEP_HF_Vs[0][0][cBin]->Fill(data[k][h]->psi_n[2][14]);
+	hEP_HF_Vs[0][1][cBin]->Fill(data[k][h]->psi_n[2][0]);
+	hEP_HF_Vs[0][2][cBin]->Fill(data[k][h]->psi_n[2][14]);
+
+	hEP_HF_Vs[1][0][cBin]->Fill(data[k][h]->psi_n[3][0]);
+	hEP_HF_Vs[1][0][cBin]->Fill(data[k][h]->psi_n[3][14]);
+	hEP_HF_Vs[1][1][cBin]->Fill(data[k][h]->psi_n[3][0]);
+	hEP_HF_Vs[1][2][cBin]->Fill(data[k][h]->psi_n[3][14]);
+
+	hEP_HF_Vs[2][0][cBin]->Fill(data[k][h]->psi_n[4][0]);
+	hEP_HF_Vs[2][0][cBin]->Fill(data[k][h]->psi_n[4][14]);
+	hEP_HF_Vs[2][1][cBin]->Fill(data[k][h]->psi_n[4][0]);
+	hEP_HF_Vs[2][2][cBin]->Fill(data[k][h]->psi_n[4][14]);
+
+
+
+	for(int a = 0;a<15;a++){
+
+	  hSumpTvsHF[a]->Fill(data[k][h]->sumpT[a],data[k][h]->hiHF);
+	  hSumpTvshiBin[a]->Fill(data[k][h]->sumpT[a],data[k][h]->bin);
+	  hNJetsvsSumpT[cBin]->Fill(jetCounter,data[k][h]->sumpT[a]);
+	  hSumpTvsHF_cent[cBin]->Fill(data[k][h]->sumpT[a],data[k][h]->hiHF);
+	  //hSumpTvshiBin_cent[cBin]->Fill(data[k][h]->sumpT[a],data[k][h]->hiHF);
+	  hSumpT[cBin]->Fill(data[k][h]->sumpT[a]);
+
+	  for(int b = 0;b<5;b++){
+	    
+	    hPsivsHF[b][a]->Fill(data[k][h]->psi_n[b][a],data[k][h]->hiHF);
+	    hvnvsHF[b][a]->Fill(data[k][h]->v_n[b][a],data[k][h]->hiHF);
+	    //hPsi[cBin]->Fill(data[k][h]->psi_n[b][a]);
+
+	  }// no of flow components 
+	  
+	}// eta bin
+
+	//for(int b = 0;b<5;b++){
+	//  hvnvscent
+	//}
 
 	//data[k][h]->tJet->Draw(Form("hiNpix:Sum$(jtpt>50&&abs(jteta)<2)>>hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],cBin),"","goff");
 
 	//hpbpb_Npix_cut[k][cBin]->Fill(data[k][h]->hiNpix,sum$())
+
+	// if(jetCounter>10){
+	//   fVs_failure[h]<<data[k][h]->run<<":"<<data[k][h]->lumi<<":"<<data[k][h]->evt<<endl;
+	// }
 
 	// apply the supernova events cut rejection here: 
 	//if(data[k][h]->hiNpix > 38000 - 500*jetCounter){
@@ -902,21 +1114,27 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	    arrayValues[6] = data[k][h]->rawpt[g];
 	    arrayValues[7] = data[k][h]->refpt[g];
 	    arrayValues[8] = data[k][h]->jtpu[g];
-	    arrayValues[9] = scale;
-	    arrayValues[10] = weight_vz;
-	    arrayValues[11] = weight_cent;
-	    arrayValues[12] = cent;
-	    arrayValues[13] = data[k][h]->subid[g];
-	    arrayValues[14] = data[k][h]->chargedMax[g];
-	    arrayValues[15] = data[k][h]->chargedSum[g];
-	    arrayValues[16] = data[k][h]->photonMax[g];
-	    arrayValues[17] = data[k][h]->photonSum[g];
-	    arrayValues[18] = data[k][h]->neutralMax[g];
-	    arrayValues[19] = data[k][h]->neutralSum[g];
-	    arrayValues[20] = data[k][h]->muMax[g];
-	    arrayValues[21] = data[k][h]->muSum[g];
-	    arrayValues[22] = data[k][h]->eMax[g];
-	    arrayValues[23] = data[k][h]->eSum[g];
+	    arrayValues[9] = data[k][h]->jet55_1;
+	    arrayValues[10] = data[k][h]->jet55_p_1;
+	    arrayValues[11] = data[k][h]->jet65_1;
+	    arrayValues[12] = data[k][h]->jet65_p_1;
+	    arrayValues[13] = data[k][h]->jet80_1;
+	    arrayValues[14] = data[k][h]->jet80_p_1;
+	    arrayValues[15] = scale;
+	    arrayValues[16] = weight_vz;
+	    arrayValues[17] = weight_cent;
+	    arrayValues[18] = cent;
+	    arrayValues[19] = data[k][h]->subid[g];
+	    arrayValues[20] = data[k][h]->chargedMax[g];
+	    arrayValues[21] = data[k][h]->chargedSum[g];
+	    arrayValues[22] = data[k][h]->photonMax[g];
+	    arrayValues[23] = data[k][h]->photonSum[g];
+	    arrayValues[24] = data[k][h]->neutralMax[g];
+	    arrayValues[25] = data[k][h]->neutralSum[g];
+	    arrayValues[26] = data[k][h]->muMax[g];
+	    arrayValues[27] = data[k][h]->muSum[g];
+	    arrayValues[28] = data[k][h]->eMax[g];
+	    arrayValues[29] = data[k][h]->eSum[g];
 
 	    jets_ID->Fill(arrayValues);
 
@@ -987,10 +1205,12 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
       }//nentry loop
 
       if(printDebug)cout<<"no of events inbetween pthat "<<boundaries_pthat[h]<<" and "<<boundaries_pthat[h+1]<<" = "<<test_counter<<endl;
-    
+      //fVs_failure[h].close();
+
     }//ptbins loop
-  
-  
+    
+
+ 
     // Vertex reweighting for pp
     TF1 *fVzPP = new TF1("fVzPP","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
     fVzPP->SetParameters(8.41684e-01,-2.58609e-02,4.86550e-03,-3.10581e-04,2.07918e-05);
@@ -1112,7 +1332,6 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
     }//ptbins loop
 
   }// radius loop
-
 
   f.cd();
   
@@ -1241,9 +1460,38 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   hCut3->Write();
   hCut4->Write();
   hCut5->Write();
-  //jets_ID->Write();
-  
-  //f.Write();
+  jets_ID->Write();
+    
+  for(int a = 0;a<15;a++){
+    hSumpTvsHF[a]->Write();
+    if(printDebug)hSumpTvsHF[a]->Print("base");
+    hSumpTvshiBin[a]->Write();
+    if(printDebug)hSumpTvshiBin[a]->Print("base");
+    for(int b = 0;b<5;b++){
+      hPsivsHF[b][a]->Write();
+      if(printDebug)hPsivsHF[b][a]->Print("base");
+      hvnvsHF[b][a]->Write();
+    }
+  }
+
+  for(int i = 0;i<nbins_cent;i++){
+    
+    hNJetsvsSumpT[i]->Write();
+    hSumpTvsHF_cent[i]->Write();
+    hSumpT[i]->Write();
+    //hPsi[i]->Write();
+    
+
+    for(int z = 0;z<3;z++){
+      for(int x = 0;x<3;x++){
+	hEP_HF_Official[z][x][i]->Write();
+	if(printDebug)hEP_HF_Official[z][x][i]->Print("base");
+	hEP_HF_Vs[z][x][i]->Write();
+	if(printDebug)hEP_HF_Vs[z][x][i]->Print("base");
+      }
+    }
+  }
+  f.Write();
   f.Close();
   
   
