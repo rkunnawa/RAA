@@ -613,13 +613,15 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
   cout<<" before the output text file declaration "<<endl;
   
   //ofstream fVs_failure[nbins_pthat];
-  //for(int k = 0;k<no_radius;k++){
+  ofstream fVs_good[no_radius];
+  for(int k = 0;k<no_radius;k++){
   //for(int h = 0;h<nbins_pthat;h++){
     //cout<<" "<<h<<endl;
     //cout<<boundaries_pthat[h]<<endl;
     //fVs_failure[h].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pbpb_%s_pthat%d_PYTHIA_HYDJET_failure_mode_events_%d.txt",algo,h,date.GetDate()));
+    fVs_good[k].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pbpb_%s_R%d_PYTHIA_HYDJET_smallgood_events_%d.txt",algo,k,date.GetDate()));
     // }
-    //}
+  }
   
   cout<<" after the output text file declaration "<<endl;
 
@@ -722,6 +724,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
   
   }// radii loop
 
+
   // Setup jet data branches - this will be 2D with [radius][pthat-file], but the histogram here is just 1D with [radius]
   JetData *data[no_radius][nbins_pthat]; 
   JetData *dataPP[no_radius][nbinsPP_pthat];
@@ -798,8 +801,9 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
     // // put the supernova events histogram here: 
     // jetTree[1]->Draw(Form("hiNpix:Sum$(jtpt>50&&abs(jteta)<2)>>hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),centWeight,"col");    
     
-    
     for (int h=0;h<nbins_pthat;h++) {
+      int goodCounter = 0;
+
       if (xsection[h]==0) continue;
       if(printDebug)cout <<"Loading pthat"<<boundaries_pthat[h]<<" sample, cross section = "<<xsection[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundaries_pthat[h],boundaries_pthat[h+1])<<endl;
       
@@ -913,7 +917,10 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
 	// if(jetCounter>10){
 	//   fVs_failure[h]<<data[k][h]->run<<":"<<data[k][h]->lumi<<":"<<data[k][h]->evt<<endl;
 	// }
-
+	if(jetCounter<10 && goodCounter<=15){
+	  fVs_good[k]<<boundaries_pthat[h]<<" "<<data[k][h]->run<<" "<<data[k][h]->lumi<<" "<<data[k][h]->evt<<" "<<data[k][h]->vz<<" "<<data[k][h]->hiHF<<" "<<data[k][h]->hiNpix<<" "<<data[k][h]->hiNtracks<<endl;
+	  goodCounter++;
+	}
 	// apply the supernova events cut rejection here: 
 	//if(data[k][h]->hiNpix > 38000 - 500*jetCounter){
 	  //if(printDebug) cout<<"removed this supernova event"<<endl;
@@ -1065,7 +1072,6 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
 	      hpbpb_mcclosure_data[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	      hpbpb_mcclosure_data[k][j][nbins_cent]->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 
-
 	    }
 
 	    if(jentry%2==1) {
@@ -1089,7 +1095,7 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
 
     }//ptbins loop
     
-
+    fVs_good[k].close();
  
     // Vertex reweighting for pp
     TF1 *fVzPP = new TF1("fVzPP","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");

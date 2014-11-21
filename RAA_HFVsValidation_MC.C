@@ -344,56 +344,56 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
   // refer this twiki for the data and MC files: http://twiki.cern.ch/twiki/bin/viewauth/CMS/HiForestPA2014#PYTHIA_HYDJET_embedded_sample
 
   boundaries_pthat[0]=15;
-  fileName_pthat[0] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat15_Track9_Jet30_matchEqR_merged_forest_0.root";
-  //fileName_pthat[0] = "/export/d00/scratch/dav2105/badjets/bad15.root";
+  //fileName_pthat[0] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat15_Track9_Jet30_matchEqR_merged_forest_0.root";
+  fileName_pthat[0] = "/export/d00/scratch/dav2105/badjets/bad15.root";
   xsection[0]= 2.034e-01;
   //entries[0] = ;//total - 48588
   
   boundaries_pthat[1]=30;
-  fileName_pthat[1] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat30_Track9_Jet30_matchEqR_merged_forest_0.root";
-  //fileName_pthat[1] = "/export/d00/scratch/dav2105/badjets/bad30.root";
+  //fileName_pthat[1] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat30_Track9_Jet30_matchEqR_merged_forest_0.root";
+  fileName_pthat[1] = "/export/d00/scratch/dav2105/badjets/bad30.root";
   xsection[1]= 1.075e-02;
   // entries[1] = ;//total - 48428
   
   boundaries_pthat[2]=50;
-  fileName_pthat[2] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat50_Track9_Jet30_matchEqR_merged_forest_0.root";
-  //fileName_pthat[2] = "/export/d00/scratch/dav2105/badjets/bad50.root";
+  //fileName_pthat[2] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat50_Track9_Jet30_matchEqR_merged_forest_0.root";
+  fileName_pthat[2] = "/export/d00/scratch/dav2105/badjets/bad50.root";
   xsection[2]= 1.025e-03;
   // entries[2] = ;//total - 50000
   
   boundaries_pthat[3]=80;
-  fileName_pthat[3] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat80_Track9_Jet30_matchEqR_merged_forest_0.root";
-  //fileName_pthat[3] = "/export/d00/scratch/dav2105/badjets/bad80.root";
+  //fileName_pthat[3] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat80_Track9_Jet30_matchEqR_merged_forest_0.root";
+  fileName_pthat[3] = "/export/d00/scratch/dav2105/badjets/bad80.root";
   xsection[3]= 9.865e-05;
   // entries[3] = ;//total - 49500
   
   boundaries_pthat[4]=120;
-  fileName_pthat[4] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat120_Track9_Jet30_matchEqR_merged_forest_0.root";  
-  //fileName_pthat[4] = "/export/d00/scratch/dav2105/badjets/bad120.root";
+  //fileName_pthat[4] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat120_Track9_Jet30_matchEqR_merged_forest_0.root";  
+  fileName_pthat[4] = "/export/d00/scratch/dav2105/badjets/bad120.root";
   xsection[4]= 1.129e-05;
   // entries[4] = ;//total - 49500
 
   boundaries_pthat[5]=170;
-  fileName_pthat[5] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat170_Track9_Jet30_matchEqR_merged_forest_0.root";
-  //fileName_pthat[5] = "/export/d00/scratch/dav2105/badjets/bad120.root";
+  //fileName_pthat[5] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat170_Track9_Jet30_matchEqR_merged_forest_0.root";
+  fileName_pthat[5] = "/export/d00/scratch/dav2105/badjets/bad120.root";
   xsection[5]= 1.465e-06;
   // entries[5] = ;//total - 49444
 
   boundaries_pthat[6]=220;
-  fileName_pthat[6] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat220_Track9_Jet30_matchEqR_merged_forest_0.root";
-  //fileName_pthat[6] = "/export/d00/scratch/dav2105/badjets/bad220.root";
+  //fileName_pthat[6] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat220_Track9_Jet30_matchEqR_merged_forest_0.root";
+  fileName_pthat[6] = "/export/d00/scratch/dav2105/badjets/bad220.root";
   xsection[6]= 2.837e-07;
   // entries[6] = ;//total - 49460
 
   boundaries_pthat[7]=280;
-  fileName_pthat[7] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat280_Track9_Jet30_matchEqR_merged_forest_0.root";
-  //fileName_pthat[7] = "/export/d00/scratch/dav2105/badjets/bad280.root";
+  //fileName_pthat[7] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat280_Track9_Jet30_matchEqR_merged_forest_0.root";
+  fileName_pthat[7] = "/export/d00/scratch/dav2105/badjets/bad280.root";
   xsection[7]= 5.323e-08;
   // entries[7] = ;//total - 49541
 
   boundaries_pthat[8]=370;
-  fileName_pthat[8] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat370_Track9_Jet30_matchEqR_merged_forest_0.root";
-  //fileName_pthat[8] = "/export/d00/scratch/dav2105/badjets/bad370.root";
+  //fileName_pthat[8] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat370_Track9_Jet30_matchEqR_merged_forest_0.root";
+  fileName_pthat[8] = "/export/d00/scratch/dav2105/badjets/bad370.root";
   xsection[8]= 5.934e-09;
   // entries[8] = ;//total - 19031
 
@@ -587,7 +587,6 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 	  
 	}//eta bins loop
 
-
 	//constructing the x-,y- and x+,y+ based on the following equation: 
 	// x- = sumpt[0]*vn[2][0]*cos(2*vpsi[2][0]) y- = sumpt[0]*vn[2][0]*sin(2*vpsi[2][0])
 	Float_t Vs_2_x_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[2][0]*TMath::Cos(2*data[k][h]->psi_n[2][0]);
@@ -645,7 +644,7 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 	hEP_HF_Vs[2][0][cBin]->Fill(data[k][h]->psi_n[4][14],scale*weight_vz*weight_cent);
 	hEP_HF_Vs[2][1][cBin]->Fill(data[k][h]->psi_n[4][0],scale*weight_vz*weight_cent);
 	hEP_HF_Vs[2][2][cBin]->Fill(data[k][h]->psi_n[4][14],scale*weight_vz*weight_cent);
-
+	
 	hEP_HF[0][0][cBin]->Fill(data[k][h]->hiEvtPlanes[21],data[k][h]->psi_n[2][0],scale*weight_vz*weight_cent);
 	hEP_HF[0][0][cBin]->Fill(data[k][h]->hiEvtPlanes[21],data[k][h]->psi_n[2][14],scale*weight_vz*weight_cent);
 	hEP_HF[0][1][cBin]->Fill(data[k][h]->hiEvtPlanes[22],data[k][h]->psi_n[2][0],scale*weight_vz*weight_cent);
@@ -689,7 +688,7 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 
   }// radius loop
 
-  TFile fout(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MC_HFVsValidation_histograms_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  TFile fout(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MC_HFVsValidation_failure_histograms_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   fout.cd();
 
   for(int i = 0;i<nbins_cent;i++){
