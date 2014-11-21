@@ -343,56 +343,56 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
   // refer this twiki for the data and MC files: http://twiki.cern.ch/twiki/bin/viewauth/CMS/HiForestPA2014#PYTHIA_HYDJET_embedded_sample
 
   boundaries_pthat[0]=15;
-  //fileName_pthat[0] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat15_Track9_Jet30_matchEqR_merged_forest_0.root";
-  fileName_pthat[0] = "/export/d00/scratch/dav2105/badjets/bad15.root";
+  fileName_pthat[0] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat15_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[0] = "/export/d00/scratch/dav2105/badjets/bad15.root";
   xsection[0]= 2.034e-01;
   //entries[0] = ;//total - 48588
   
   boundaries_pthat[1]=30;
-  //fileName_pthat[1] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat30_Track9_Jet30_matchEqR_merged_forest_0.root";
-  fileName_pthat[1] = "/export/d00/scratch/dav2105/badjets/bad30.root";
+  fileName_pthat[1] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat30_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[1] = "/export/d00/scratch/dav2105/badjets/bad30.root";
   xsection[1]= 1.075e-02;
   // entries[1] = ;//total - 48428
   
   boundaries_pthat[2]=50;
-  //fileName_pthat[2] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat50_Track9_Jet30_matchEqR_merged_forest_0.root";
-  fileName_pthat[2] = "/export/d00/scratch/dav2105/badjets/bad50.root";
+  fileName_pthat[2] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat50_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[2] = "/export/d00/scratch/dav2105/badjets/bad50.root";
   xsection[2]= 1.025e-03;
   // entries[2] = ;//total - 50000
   
   boundaries_pthat[3]=80;
-  //fileName_pthat[3] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat80_Track9_Jet30_matchEqR_merged_forest_0.root";
-  fileName_pthat[3] = "/export/d00/scratch/dav2105/badjets/bad80.root";
+  fileName_pthat[3] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat80_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[3] = "/export/d00/scratch/dav2105/badjets/bad80.root";
   xsection[3]= 9.865e-05;
   // entries[3] = ;//total - 49500
   
   boundaries_pthat[4]=120;
-  //fileName_pthat[4] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat120_Track9_Jet30_matchEqR_merged_forest_0.root";  
-  fileName_pthat[4] = "/export/d00/scratch/dav2105/badjets/bad120.root";
+  fileName_pthat[4] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat120_Track9_Jet30_matchEqR_merged_forest_0.root";  
+  //fileName_pthat[4] = "/export/d00/scratch/dav2105/badjets/bad120.root";
   xsection[4]= 1.129e-05;
   // entries[4] = ;//total - 49500
 
   boundaries_pthat[5]=170;
-  //fileName_pthat[5] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat170_Track9_Jet30_matchEqR_merged_forest_0.root";
-  fileName_pthat[5] = "/export/d00/scratch/dav2105/badjets/bad120.root";
+  fileName_pthat[5] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat170_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[5] = "/export/d00/scratch/dav2105/badjets/bad120.root";
   xsection[5]= 1.465e-06;
   // entries[5] = ;//total - 49444
 
   boundaries_pthat[6]=220;
-  //fileName_pthat[6] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat220_Track9_Jet30_matchEqR_merged_forest_0.root";
-  fileName_pthat[6] = "/export/d00/scratch/dav2105/badjets/bad220.root";
+  fileName_pthat[6] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat220_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[6] = "/export/d00/scratch/dav2105/badjets/bad220.root";
   xsection[6]= 2.837e-07;
   // entries[6] = ;//total - 49460
 
   boundaries_pthat[7]=280;
-  //fileName_pthat[7] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat280_Track9_Jet30_matchEqR_merged_forest_0.root";
-  fileName_pthat[7] = "/export/d00/scratch/dav2105/badjets/bad280.root";
+  fileName_pthat[7] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat280_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[7] = "/export/d00/scratch/dav2105/badjets/bad280.root";
   xsection[7]= 5.323e-08;
   // entries[7] = ;//total - 49541
 
   boundaries_pthat[8]=370;
-  //fileName_pthat[8] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat370_Track9_Jet30_matchEqR_merged_forest_0.root";
-  fileName_pthat[8] = "/export/d00/scratch/dav2105/badjets/bad370.root";
+  fileName_pthat[8] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat370_Track9_Jet30_matchEqR_merged_forest_0.root";
+  //fileName_pthat[8] = "/export/d00/scratch/dav2105/badjets/bad370.root";
   xsection[8]= 5.934e-09;
   // entries[8] = ;//total - 19031
 
@@ -410,19 +410,18 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 
 
   TH2F *hSumpTvsHF[15];
-  TH2F *hSumpTvsHF_cent[nbins_cent];
+  TH2F *hSumpTvsHF_cent[nbins_cent+1];
   TH2F *hSumpTvshiBin[15];
-  TH2F *hSumpTvshiBin_cent[nbins_cent];
-  TH2F *hNJetsvsSumpT[nbins_cent];
-  TH1F *hSumpT[nbins_cent];
-  TH1F *hPsi[5][15][nbins_cent];
+  TH2F *hSumpTvshiBin_cent[nbins_cent+1];
+  TH2F *hNJetsvsSumpT[nbins_cent+1];
+  TH1F *hSumpT[nbins_cent+1];
+  TH1F *hPsi[5][15][nbins_cent+1];
   //TH2F *hPsi_2d[5][15][nbins_cent];
 
   TH2F *hPsivsHF[5][15];
-  TH2F *hPsivsHF_cent[5][nbins_cent];
+  TH2F *hPsivsHF_cent[5][nbins_cent+1];
   TH2F *hvnvsHF[5][15];
-  TH2F *hvnvscent[5][nbins_cent];
-
+  TH2F *hvnvscent[5][nbins_cent+1];
 
   // UseFull histograms: Event Plane from HF for the official versus HF/Vs algorithm calculation of the Event Plane.
   // first [3] array elements - Psi_2, Psi_3, Psi_4  only in the HF for tonight. 
@@ -436,6 +435,11 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
   TH1F *hAngle_2_HF_Official[nbins_cent+1];
   TH1F *hAngle_3_HF_Official[nbins_cent+1];
   TH1F *hAngle_4_HF_Official[nbins_cent+1];
+  TH1F *hMagnitude_2_HF_Vs[nbins_cent+1];
+  TH1F *hMagnitude_3_HF_Vs[nbins_cent+1];
+  TH1F *hMagnitude_4_HF_Vs[nbins_cent+1];
+  TH2F *hSub_vs_SumpT[nbins_cent+1];
+  TH2F *hVsAngle_EP[3][nbins_cent+1];
 
   for(int i = 0;i<nbins_cent+1;i++){
     
@@ -450,14 +454,21 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
     hSumpTvsHF_cent[i] = new TH2F(Form("hSumpT_vsHF_cent%d",i),"",5000,0,100000,5000,0,100000);
     hSumpTvshiBin_cent[i] = new TH2F(Form("hSumpT_vshiBin_cent%d",i),"",5000,0,100000,200,0,200);
     hNJetsvsSumpT[i] = new TH2F(Form("hNJetsvsSumpT_cent%d",i),"",50,0,50,5000,0,100000);
-    hAngle_2_HF_Vs[i] = new TH1F(Form("hAngle_2_HF_Vs_cent%d",i),"",630,-6.30,+6.30);
-    hAngle_3_HF_Vs[i] = new TH1F(Form("hAngle_3_HF_Vs_cent%d",i),"",630,-6.30,+6.30);
-    hAngle_4_HF_Vs[i] = new TH1F(Form("hAngle_4_HF_Vs_cent%d",i),"",630,-6.30,+6.30);
-    hAngle_2_HF_Official[i] = new TH1F(Form("hAngle_2_HF_Official_cent%d",i),"",630,-6.30,+6.30);
-    hAngle_3_HF_Official[i] = new TH1F(Form("hAngle_3_HF_Official_cent%d",i),"",630,-6.30,+6.30);
-    hAngle_4_HF_Official[i] = new TH1F(Form("hAngle_4_HF_Official_cent%d",i),"",630,-6.30,+6.30);
+    hAngle_2_HF_Vs[i] = new TH1F(Form("hAngle_2_HF_Vs_cent%d",i),"",30,-3.15,+3.15);
+    hAngle_3_HF_Vs[i] = new TH1F(Form("hAngle_3_HF_Vs_cent%d",i),"",30,-3.15,+3.15);
+    hAngle_4_HF_Vs[i] = new TH1F(Form("hAngle_4_HF_Vs_cent%d",i),"",30,-3.15,+3.15);
+    hAngle_2_HF_Official[i] = new TH1F(Form("hAngle_2_HF_Official_cent%d",i),"",60,-3.15,+3.15);
+    hAngle_3_HF_Official[i] = new TH1F(Form("hAngle_3_HF_Official_cent%d",i),"",60,-3.15,+3.15);
+    hAngle_4_HF_Official[i] = new TH1F(Form("hAngle_4_HF_Official_cent%d",i),"",60,-3.15,+3.15);
     hSumpT[i] = new TH1F(Form("hSumpT_cent%d",i),"",5000,0,100000);
-   
+    hMagnitude_2_HF_Vs[i] = new TH1F(Form("hMagnitude_2_HF_Vs_cent%d",i),"",1000,0,1);
+    hMagnitude_3_HF_Vs[i] = new TH1F(Form("hMagnitude_3_HF_Vs_cent%d",i),"",1000,0,1);
+    hMagnitude_4_HF_Vs[i] = new TH1F(Form("hMagnitude_4_HF_Vs_cent%d",i),"",1000,0,1);
+    hSub_vs_SumpT[i] = new TH2F(Form("hSub_vs_SumpT_cent%d",i),"",1200,0,12000,1200,0,12000);
+    hVsAngle_EP[0][i] = new TH2F(Form("hVsAngle_EP_2_cent%d",i),"",60,-3.15,+3.15,60,-3.15,+3.15);
+    hVsAngle_EP[1][i] = new TH2F(Form("hVsAngle_EP_3_cent%d",i),"",60,-3.15,+3.15,60,-3.15,+3.15);
+    hVsAngle_EP[2][i] = new TH2F(Form("hVsAngle_EP_4_cent%d",i),"",60,-3.15,+3.15,60,-3.15,+3.15);
+
     /*
     for(int b = 0;b<5;b++){
 
@@ -590,36 +601,67 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 	// x- = sumpt[0]*vn[2][0]*cos(2*vpsi[2][0]) y- = sumpt[0]*vn[2][0]*sin(2*vpsi[2][0])
 	Float_t Vs_2_x_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[2][0]*TMath::Cos(2*data[k][h]->psi_n[2][0]);
 	Float_t Vs_2_x_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[2][14]*TMath::Cos(2*data[k][h]->psi_n[2][14]);
-	Float_t Vs_2_y_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[2][0]*TMath::Cos(2*data[k][h]->psi_n[2][0]);
-	Float_t Vs_2_y_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[2][14]*TMath::Cos(2*data[k][h]->psi_n[2][14]);
+	Float_t Vs_2_y_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[2][0]*TMath::Sin(2*data[k][h]->psi_n[2][0]);
+	Float_t Vs_2_y_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[2][14]*TMath::Sin(2*data[k][h]->psi_n[2][14]);
 	Float_t Vs_2_x = Vs_2_x_minus + Vs_2_x_plus;
 	Float_t Vs_2_y = Vs_2_y_minus + Vs_2_y_plus;
 	Float_t Vs_2_angle = TMath::ATan2(Vs_2_y,Vs_2_x);
 	hAngle_2_HF_Vs[cBin]->Fill(Vs_2_angle);
 	hAngle_2_HF_Vs[nbins_cent]->Fill(Vs_2_angle);
-	cout<<"Vs_2_angle = "<<Vs_2_angle<<endl;
+	//cout<<"Vs_2_angle = "<<Vs_2_angle<<endl;
 
-	Float_t Vs_3_x_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[3][0]*TMath::Cos(2*data[k][h]->psi_n[3][0]);
-	Float_t Vs_3_x_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[3][14]*TMath::Cos(2*data[k][h]->psi_n[3][14]);
-	Float_t Vs_3_y_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[3][0]*TMath::Cos(2*data[k][h]->psi_n[3][0]);
-	Float_t Vs_3_y_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[3][14]*TMath::Cos(2*data[k][h]->psi_n[3][14]);
+	Float_t Vs_3_x_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[3][0]*TMath::Cos(3*data[k][h]->psi_n[3][0]);
+	Float_t Vs_3_x_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[3][14]*TMath::Cos(3*data[k][h]->psi_n[3][14]);
+	Float_t Vs_3_y_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[3][0]*TMath::Sin(3*data[k][h]->psi_n[3][0]);
+	Float_t Vs_3_y_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[3][14]*TMath::Sin(3*data[k][h]->psi_n[3][14]);
 	Float_t Vs_3_x = Vs_3_x_minus + Vs_3_x_plus;
 	Float_t Vs_3_y = Vs_3_y_minus + Vs_3_y_plus;
 	Float_t Vs_3_angle = TMath::ATan2(Vs_3_y,Vs_3_x);
 	hAngle_3_HF_Vs[cBin]->Fill(Vs_3_angle);
 	hAngle_3_HF_Vs[nbins_cent]->Fill(Vs_3_angle);
-	cout<<"Vs_3_angle = "<<Vs_3_angle<<endl;
+	//cout<<"Vs_3_angle = "<<Vs_3_angle<<endl;
 
-	Float_t Vs_4_x_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[4][0]*TMath::Cos(2*data[k][h]->psi_n[4][0]);
-	Float_t Vs_4_x_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[4][14]*TMath::Cos(2*data[k][h]->psi_n[4][14]);
-	Float_t Vs_4_y_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[4][0]*TMath::Cos(2*data[k][h]->psi_n[4][0]);
-	Float_t Vs_4_y_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[4][14]*TMath::Cos(2*data[k][h]->psi_n[4][14]);
+	Float_t Vs_4_x_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[4][0]*TMath::Cos(4*data[k][h]->psi_n[4][0]);
+	Float_t Vs_4_x_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[4][14]*TMath::Cos(4*data[k][h]->psi_n[4][14]);
+	Float_t Vs_4_y_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[4][0]*TMath::Sin(4*data[k][h]->psi_n[4][0]);
+	Float_t Vs_4_y_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[4][14]*TMath::Sin(4*data[k][h]->psi_n[4][14]);
 	Float_t Vs_4_x = Vs_4_x_minus + Vs_4_x_plus;
 	Float_t Vs_4_y = Vs_4_y_minus + Vs_4_y_plus;
 	Float_t Vs_4_angle = TMath::ATan2(Vs_4_y,Vs_4_x);
 	hAngle_4_HF_Vs[cBin]->Fill(Vs_4_angle);
 	hAngle_4_HF_Vs[nbins_cent]->Fill(Vs_4_angle);
-      	cout<<"Vs_3_angle = "<<Vs_3_angle<<endl;
+      	//cout<<"Vs_4_angle = "<<Vs_4_angle<<endl;
+
+	//lets get the maginitude of the x,y here: 
+	Float_t Vs_Mag_2 = TMath::Sqrt(Vs_2_x*Vs_2_x + Vs_2_y*Vs_2_y);
+	Float_t Vs_Mag_3 = TMath::Sqrt(Vs_3_x*Vs_3_x + Vs_3_y*Vs_3_y);
+	Float_t Vs_Mag_4 = TMath::Sqrt(Vs_4_x*Vs_4_x + Vs_4_y*Vs_4_y);
+	// need to calculate the Total per event (pfPt - pfVsPt) versus sumpT[0]+sumpT[14];
+	Float_t pfPt_Tot = 0;
+	Float_t pfVsPt_Tot = 0;
+	for(int i = 0;i<data[k][h]->nPFpart;i++){
+	  pfPt_Tot += data[k][h]->pfPt[i];
+	  pfVsPt_Tot += data[k][h]->pfVsPt[i];
+	}
+	Float_t sumpT_HF = data[k][h]->sumpT[0] + data[k][h]->sumpT[14];
+
+	hMagnitude_2_HF_Vs[cBin]->Fill(Vs_Mag_2/sumpT_HF);
+	hMagnitude_2_HF_Vs[nbins_cent]->Fill(Vs_Mag_2/sumpT_HF);
+	hMagnitude_3_HF_Vs[cBin]->Fill(Vs_Mag_3/sumpT_HF);
+	hMagnitude_3_HF_Vs[nbins_cent]->Fill(Vs_Mag_3/sumpT_HF);
+	hMagnitude_4_HF_Vs[cBin]->Fill(Vs_Mag_4/sumpT_HF);
+	hMagnitude_4_HF_Vs[nbins_cent]->Fill(Vs_Mag_4/sumpT_HF);
+	//Float_t sub_ratio = (Float_t)(pfPt_Tot-pfVsPt_Tot)/sumpT_HF;
+	hSub_vs_SumpT[cBin]->Fill(sumpT_HF,pfPt_Tot-pfVsPt_Tot);
+	hSub_vs_SumpT[nbins_cent]->Fill(sumpT_HF,pfPt_Tot-pfVsPt_Tot);
+
+	hVsAngle_EP[0][cBin]->Fill(Vs_2_angle,2*data[k][h]->hiEvtPlanes[21]);
+	hVsAngle_EP[1][cBin]->Fill(Vs_3_angle,3*data[k][h]->hiEvtPlanes[24]);
+	hVsAngle_EP[2][cBin]->Fill(Vs_4_angle,4*data[k][h]->hiEvtPlanes[27]);
+
+	hVsAngle_EP[0][nbins_cent]->Fill(Vs_2_angle,2*data[k][h]->hiEvtPlanes[21]);
+	hVsAngle_EP[1][nbins_cent]->Fill(Vs_3_angle,3*data[k][h]->hiEvtPlanes[24]);
+	hVsAngle_EP[2][nbins_cent]->Fill(Vs_4_angle,4*data[k][h]->hiEvtPlanes[27]);
 
 	//getting the event plane information for the Official and Vs calculations. 
 	/*
@@ -665,10 +707,10 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 	hEP_HF[2][1][cBin]->Fill(data[k][h]->hiEvtPlanes[28],data[k][h]->psi_n[4][0],scale*weight_vz*weight_cent);
 	hEP_HF[2][2][cBin]->Fill(data[k][h]->hiEvtPlanes[29],data[k][h]->psi_n[4][14],scale*weight_vz*weight_cent);
 	*/
-
+	
 	float sumpTtotal = 0;
 	for(int a = 0;a<15;a++){
-
+	  
 	  //hSumpTvsHF[a]->Fill(data[k][h]->sumpT[a],data[k][h]->hiHF,scale*weight_vz*weight_cent);
 	  //hSumpTvshiBin[a]->Fill(data[k][h]->sumpT[a],data[k][h]->bin,scale*weight_vz*weight_cent);
 	  sumpTtotal+= data[k][h]->sumpT[a];
@@ -677,10 +719,9 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 	  //  hPsivsHF[b][a]->Fill(data[k][h]->psi_n[b][a],data[k][h]->hiHF,scale*weight_vz*weight_cent);
 	  //  hvnvsHF[b][a]->Fill(data[k][h]->v_n[b][a],data[k][h]->hiHF,scale*weight_vz*weight_cent);
 	    //hPsi[cBin]->Fill(data[k][h]->psi_n[b][a]);
-
+	  
 	  //}// no of flow components 
 	}// eta bin
-	
 	hNJetsvsSumpT[cBin]->Fill(jetCounter,sumpTtotal,scale*weight_vz*weight_cent);
 	hNJetsvsSumpT[nbins_cent]->Fill(jetCounter,sumpTtotal,scale*weight_vz*weight_cent);
 	hSumpTvsHF_cent[cBin]->Fill(sumpTtotal,data[k][h]->hiHF,scale*weight_vz*weight_cent);
@@ -696,7 +737,7 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 
   }// radius loop
 
-  TFile fout(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MC_HFVsValidation_failure_histograms_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  TFile fout(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MC_HFVsValidation_total_histograms_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   fout.cd();
 
   for(int i = 0;i<=nbins_cent;i++){
@@ -706,6 +747,13 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
     hAngle_2_HF_Vs[i]->Write();
     hAngle_3_HF_Vs[i]->Write();
     hAngle_4_HF_Vs[i]->Write();
+    hMagnitude_2_HF_Vs[i]->Write();
+    hMagnitude_3_HF_Vs[i]->Write();
+    hMagnitude_4_HF_Vs[i]->Write();
+    hSub_vs_SumpT[i]->Write();
+    hVsAngle_EP[0][i]->Write();
+    hVsAngle_EP[1][i]->Write();
+    hVsAngle_EP[2][i]->Write();
   }
 
 }

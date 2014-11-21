@@ -148,33 +148,39 @@ void RAA_plot_HFVsValidation(int radius = 3, char *algo = "Vs", char *jet_type="
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
   
   //get the histograms from the MC file. 
-  TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_pp_mc_nocut_scaletest_ak%s%s_20141120.root",algo,jet_type));
+  TFile *fMCin = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MC_HFVsValidation_total_histograms_ak%s%s_20141121.root",algo,jet_type));
   
   // UseFull histograms: Event Plane from HF for the official versus HF/Vs algorithm calculation of the Event Plane.
   // first [3] array elements - Psi_2, Psi_3, Psi_4  only in the HF for tonight. 
   // [3] - total, p - positive and n - negative in eta; based on what we have from the https://github.com/CmsHI/cmssw/blob/forest_CMSSW_5_3_20/RecoHI/HiEvtPlaneAlgos/interface/HiEvtPlaneList.h#L31 
-  TH1F *hEP_HF_Official[3][3][nbins_cent];
-  TH1F *hEP_HF_Vs[3][3][nbins_cent];
-  TH2F *hEP_HF[3][3][nbins_cent];
-  TH1F *hNJetsvsSumpT[nbins_cent];
-  TH1F *hSumpT[nbins_cent];
+  TH1F *hEP_HF_Official[3][3][nbins_cent+1];
+  TH1F *hEP_HF_Vs[3][3][nbins_cent+1];
+  TH2F *hEP_HF[3][3][nbins_cent+1];
+  TH1F *hNJetsvsSumpT[nbins_cent+1];
+  TH1F *hSumpT[nbins_cent+1];
   TH2F *hSumpTvsHF[15];
+  TH2F *hVsAngle_EP[3][nbins_cent+1];
 
-  for(int i = 0;i<nbins_cent;i++){
+  for(int i = 0;i<=nbins_cent;i++){
     hNJetsvsSumpT[i] = (TH1F*)fMCin->Get(Form("hNJetsvsSumpT_cent%d",i));
     hSumpT[i] = (TH1F*)fMCin->Get(Form("hSumpT_cent%d",i));
-    for(int z = 0;z<3;z++){
-      for(int x = 0;x<3;x++){
-	hEP_HF_Official[z][x][i] = (TH1F*)fMCin->Get(Form("hEP_HF_Official_Psi%d_%d_cent%d",z,x,i));
-	hEP_HF_Vs[z][x][i] = (TH1F*)fMCin->Get(Form("hEP_HF_Vs_Psi%d_%d_cent%d",z,x,i));
-	hEP_HF[z][x][i] = (TH2F*)fMCin->Get(Form("hEP_HF_Psi%d_%d_cent%d",z,x,i));
-      }
-    }
+
+    hVsAngle_EP[0][i] = (TH2F*)fMCin->Get(Form("hVsAngle_EP_2_cent%d",i));
+    hVsAngle_EP[1][i] = (TH2F*)fMCin->Get(Form("hVsAngle_EP_3_cent%d",i));
+    hVsAngle_EP[2][i] = (TH2F*)fMCin->Get(Form("hVsAngle_EP_4_cent%d",i));    
+
+    // for(int z = 0;z<3;z++){
+    //   for(int x = 0;x<3;x++){
+    // 	hEP_HF_Official[z][x][i] = (TH1F*)fMCin->Get(Form("hEP_HF_Official_Psi%d_%d_cent%d",z,x,i));
+    // 	hEP_HF_Vs[z][x][i] = (TH1F*)fMCin->Get(Form("hEP_HF_Vs_Psi%d_%d_cent%d",z,x,i));
+    // 	hEP_HF[z][x][i] = (TH2F*)fMCin->Get(Form("hEP_HF_Psi%d_%d_cent%d",z,x,i));
+    //   }
+    //}
   }
 
-  for(int a = 0;a<15;a++){
-    hSumpTvsHF[a] = (TH2F*)fMCin->Get(Form("hsumpT_eta%d_vsHF",a));
-  }
+  // for(int a = 0;a<15;a++){
+  //   hSumpTvsHF[a] = (TH2F*)fMCin->Get(Form("hsumpT_eta%d_vsHF",a));
+  // }
   
   // time to make plots! 
   
@@ -285,10 +291,10 @@ void RAA_plot_HFVsValidation(int radius = 3, char *algo = "Vs", char *jet_type="
 
     cSumpT->cd(nbins_cent-i);
     cSumpT->cd(nbins_cent-i)->SetLogy();
-    cSumpT->cd(nbins_cent-i)->SetLogz();
+    //cSumpT->cd(nbins_cent-i)->SetLogz();
 
     makeHistTitle(hNJetsvsSumpT[i],"","No Jets (pT>50GeV)","SumpT from all eta bins");
-    hNJetsvsSumpT[i]->SetAxisRange(1,1e6,"Y");
+    hNJetsvsSumpT[i]->SetAxisRange(1,1e5,"Y");
     hNJetsvsSumpT[i]->Draw("colz");
     drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
 
@@ -297,8 +303,26 @@ void RAA_plot_HFVsValidation(int radius = 3, char *algo = "Vs", char *jet_type="
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // 2d plot showing the correlation of the two event planes on an event by event level.
 
+  // 2d plot showing the correlation of the two event planes on an event by event level.
+  TCanvas *cEPCorr[3];
+
+  for(int q = 0;q<3;q++){
+
+    cEPCorr[q] = new TCanvas(Form("cEPCorr_%d",q),"",1000,800);
+    makeMultiPanelCanvasWithGap(cEPCorr[q],3,2,0.01,0.01,0.16,0.2,0.04,0.04); 
+
+    for(int i = 0;i<nbins_cent;i++){
+
+      cEPCorr[q]->cd(nbins_cent-i);
+      cEPCorr[q]->cd(nbins_cent-i)->SetLogz();
+      makeHistTitle(hVsAngle_EP[q][i],"",Form("Vs EP angle %d",q+2),Form("Official #Psi_{%d} from HF",q+2));
+      hVsAngle_EP[q][i]->Draw("colz");
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+
+    }
+    cEPCorr[q]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_HFVs_validation_EP_%dCorrelation_ak%s%s_%d.pdf",q+2,algo,jet_type,date.GetDate()),"RECREATE");
+  }
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
