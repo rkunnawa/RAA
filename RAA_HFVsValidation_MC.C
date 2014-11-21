@@ -89,7 +89,6 @@ static const char etaWidth [nbins_eta][256] = {
 
 */
 
-
 static const int nbins_eta = 1;
 static const double boundaries_eta[nbins_eta][2] = {
   {-2.0,+2.0}
@@ -428,17 +427,17 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
   // UseFull histograms: Event Plane from HF for the official versus HF/Vs algorithm calculation of the Event Plane.
   // first [3] array elements - Psi_2, Psi_3, Psi_4  only in the HF for tonight. 
   // [3] - total, p - positive and n - negative in eta; based on what we have from the https://github.com/CmsHI/cmssw/blob/forest_CMSSW_5_3_20/RecoHI/HiEvtPlaneAlgos/interface/HiEvtPlaneList.h#L31 
-  TH1F *hEP_HF_Official[3][3][nbins_cent];
-  TH1F *hEP_HF_Vs[3][3][nbins_cent];
-  TH2F *hEP_HF[3][3][nbins_cent];
-  TH1F *hAngle_2_HF_Vs[nbins_cent];
-  TH1F *hAngle_3_HF_Vs[nbins_cent];
-  TH1F *hAngle_4_HF_Vs[nbins_cent];
-  TH1F *hAngle_2_HF_Official[nbins_cent];
-  TH1F *hAngle_3_HF_Official[nbins_cent];
-  TH1F *hAngle_4_HF_Official[nbins_cent];
+  TH1F *hEP_HF_Official[3][3][nbins_cent+1];
+  TH1F *hEP_HF_Vs[3][3][nbins_cent+1];
+  TH2F *hEP_HF[3][3][nbins_cent+1];
+  TH1F *hAngle_2_HF_Vs[nbins_cent+1];
+  TH1F *hAngle_3_HF_Vs[nbins_cent+1];
+  TH1F *hAngle_4_HF_Vs[nbins_cent+1];
+  TH1F *hAngle_2_HF_Official[nbins_cent+1];
+  TH1F *hAngle_3_HF_Official[nbins_cent+1];
+  TH1F *hAngle_4_HF_Official[nbins_cent+1];
 
-  for(int i = 0;i<nbins_cent;i++){
+  for(int i = 0;i<nbins_cent+1;i++){
     
     for(int z = 0;z<3;z++){
       for(int x = 0;x<3;x++){
@@ -597,6 +596,8 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 	Float_t Vs_2_y = Vs_2_y_minus + Vs_2_y_plus;
 	Float_t Vs_2_angle = TMath::ATan2(Vs_2_y,Vs_2_x);
 	hAngle_2_HF_Vs[cBin]->Fill(Vs_2_angle);
+	hAngle_2_HF_Vs[nbins_cent]->Fill(Vs_2_angle);
+	cout<<"Vs_2_angle = "<<Vs_2_angle<<endl;
 
 	Float_t Vs_3_x_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[3][0]*TMath::Cos(2*data[k][h]->psi_n[3][0]);
 	Float_t Vs_3_x_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[3][14]*TMath::Cos(2*data[k][h]->psi_n[3][14]);
@@ -606,6 +607,8 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 	Float_t Vs_3_y = Vs_3_y_minus + Vs_3_y_plus;
 	Float_t Vs_3_angle = TMath::ATan2(Vs_3_y,Vs_3_x);
 	hAngle_3_HF_Vs[cBin]->Fill(Vs_3_angle);
+	hAngle_3_HF_Vs[nbins_cent]->Fill(Vs_3_angle);
+	cout<<"Vs_3_angle = "<<Vs_3_angle<<endl;
 
 	Float_t Vs_4_x_minus = data[k][h]->sumpT[0]*data[k][h]->v_n[4][0]*TMath::Cos(2*data[k][h]->psi_n[4][0]);
 	Float_t Vs_4_x_plus = data[k][h]->sumpT[14]*data[k][h]->v_n[4][14]*TMath::Cos(2*data[k][h]->psi_n[4][14]);
@@ -615,7 +618,9 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 	Float_t Vs_4_y = Vs_4_y_minus + Vs_4_y_plus;
 	Float_t Vs_4_angle = TMath::ATan2(Vs_4_y,Vs_4_x);
 	hAngle_4_HF_Vs[cBin]->Fill(Vs_4_angle);
-      
+	hAngle_4_HF_Vs[nbins_cent]->Fill(Vs_4_angle);
+      	cout<<"Vs_3_angle = "<<Vs_3_angle<<endl;
+
 	//getting the event plane information for the Official and Vs calculations. 
 	/*
 	hEP_HF_Official[0][0][cBin]->Fill(data[k][h]->hiEvtPlanes[21],scale*weight_vz*weight_cent);
@@ -677,9 +682,12 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 	}// eta bin
 	
 	hNJetsvsSumpT[cBin]->Fill(jetCounter,sumpTtotal,scale*weight_vz*weight_cent);
+	hNJetsvsSumpT[nbins_cent]->Fill(jetCounter,sumpTtotal,scale*weight_vz*weight_cent);
 	hSumpTvsHF_cent[cBin]->Fill(sumpTtotal,data[k][h]->hiHF,scale*weight_vz*weight_cent);
+	hSumpTvsHF_cent[nbins_cent]->Fill(sumpTtotal,data[k][h]->hiHF,scale*weight_vz*weight_cent);
 	//hSumpTvshiBin_cent[cBin]->Fill(data[k][h]->sumpT[a],data[k][h]->hiHF);
 	hSumpT[cBin]->Fill(sumpTtotal,scale*weight_vz*weight_cent);
+	hSumpT[nbins_cent]->Fill(sumpTtotal,scale*weight_vz*weight_cent);
        
 	
       }// event entry loop
@@ -691,7 +699,7 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
   TFile fout(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MC_HFVsValidation_failure_histograms_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   fout.cd();
 
-  for(int i = 0;i<nbins_cent;i++){
+  for(int i = 0;i<=nbins_cent;i++){
     hNJetsvsSumpT[i]->Write();
     hSumpTvsHF_cent[i]->Write();
     hSumpT[i]->Write();
