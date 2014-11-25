@@ -414,6 +414,8 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
   TH2F *hSumpTvshiBin[15];
   TH2F *hSumpTvshiBin_cent[nbins_cent+1];
   TH2F *hNJetsvsSumpT[nbins_cent+1];
+  TH2F *hNJetsvsSumpT_noHF[nbins_cent+1];
+  TH2F *hNJetsvsSumpT_HF[nbins_cent+1];
   TH1F *hSumpT[nbins_cent+1];
   TH1F *hPsi[5][15][nbins_cent+1];
   //TH2F *hPsi_2d[5][15][nbins_cent];
@@ -454,6 +456,8 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
     hSumpTvsHF_cent[i] = new TH2F(Form("hSumpT_vsHF_cent%d",i),"",5000,0,100000,5000,0,100000);
     hSumpTvshiBin_cent[i] = new TH2F(Form("hSumpT_vshiBin_cent%d",i),"",5000,0,100000,200,0,200);
     hNJetsvsSumpT[i] = new TH2F(Form("hNJetsvsSumpT_cent%d",i),"",50,0,50,5000,0,100000);
+    hNJetsvsSumpT_noHF[i] = new TH2F(Form("hNJetsvsSumpT_noHF_cent%d",i),"",50,0,50,5000,0,100000);
+    hNJetsvsSumpT_HF[i] = new TH2F(Form("hNJetsvsSumpT_HF_cent%d",i),"",50,0,50,5000,0,100000);
     hAngle_2_HF_Vs[i] = new TH1F(Form("hAngle_2_HF_Vs_cent%d",i),"",30,-3.15,+3.15);
     hAngle_3_HF_Vs[i] = new TH1F(Form("hAngle_3_HF_Vs_cent%d",i),"",30,-3.15,+3.15);
     hAngle_4_HF_Vs[i] = new TH1F(Form("hAngle_4_HF_Vs_cent%d",i),"",30,-3.15,+3.15);
@@ -722,8 +726,21 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 	  
 	  //}// no of flow components 
 	}// eta bin
+
+	//Float_t sumpT_HF = data[k][h]->sumpT[0] + data[k][h]->sumpT[14];
+	Float_t sumpT_noHF = 0;
+
+	for(int a = 1;a<14;a++){
+	  sumpT_noHF+= data[k][h]->sumpT[a];
+	}
+	
 	hNJetsvsSumpT[cBin]->Fill(jetCounter,sumpTtotal,scale*weight_vz*weight_cent);
 	hNJetsvsSumpT[nbins_cent]->Fill(jetCounter,sumpTtotal,scale*weight_vz*weight_cent);
+	hNJetsvsSumpT_noHF[cBin]->Fill(jetCounter,sumpT_noHF,scale*weight_vz*weight_cent);
+	hNJetsvsSumpT_noHF[nbins_cent]->Fill(jetCounter,sumpT_noHF,scale*weight_vz*weight_cent);
+	hNJetsvsSumpT_HF[cBin]->Fill(jetCounter,sumpT_HF,scale*weight_vz*weight_cent);
+	hNJetsvsSumpT_HF[nbins_cent]->Fill(jetCounter,sumpT_HF,scale*weight_vz*weight_cent);
+	
 	hSumpTvsHF_cent[cBin]->Fill(sumpTtotal,data[k][h]->hiHF,scale*weight_vz*weight_cent);
 	hSumpTvsHF_cent[nbins_cent]->Fill(sumpTtotal,data[k][h]->hiHF,scale*weight_vz*weight_cent);
 	//hSumpTvshiBin_cent[cBin]->Fill(data[k][h]->sumpT[a],data[k][h]->hiHF);
@@ -742,6 +759,8 @@ void RAA_HFVsValidation_MC(char *algo = "Vs", char *jet_type = "PF"){
 
   for(int i = 0;i<=nbins_cent;i++){
     hNJetsvsSumpT[i]->Write();
+    hNJetsvsSumpT_noHF[i]->Write();
+    hNJetsvsSumpT_HF[i]->Write();
     hSumpTvsHF_cent[i]->Write();
     hSumpT[i]->Write();
     hAngle_2_HF_Vs[i]->Write();

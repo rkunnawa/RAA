@@ -323,7 +323,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo", int sub_id = 0){
+void RAA_read_mc(char *algo = "Vs", char *jet_type = "PF", int sub_id = 0){
   
   TStopwatch timer;
   timer.Start();
@@ -612,16 +612,17 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo", int sub_id = 0){
 
   cout<<" before the output text file declaration "<<endl;
   
-  ofstream fVs_failure[nbins_pthat];
+  //ofstream fVs_failure[nbins_pthat];
   //ofstream fVs_failure;
-  //ofstream fVs_good[no_radius];
+  ofstream fVs_good[nbins_pthat];
   //for(int k = 0;k<no_radius;k++){
   for(int h = 0;h<nbins_pthat;h++){
     //cout<<" "<<h<<endl;
     //cout<<boundaries_pthat[h]<<endl;
-  fVs_failure[h].open(Form("/net/hisrv0001/home/rkunnawa/PUBLIC/VsValidation/pbpb_%s%s_pthat%d_PYTHIA_HYDJET_failure_mode_events_%d.txt",algo,jet_type,h,date.GetDate()));
+    //fVs_failure[h].open(Form("/net/hisrv0001/home/rkunnawa/PUBLIC/VsValidation/pbpb_%s%s_pthat%d_PYTHIA_HYDJET_failure_mode_events_%d.txt",algo,jet_type,h,date.GetDate()));
+    fVs_good[h].open(Form("/net/hisrv0001/home/rkunnawa/PUBLIC/VsValidation/pbpb_%s%s_pthat%d_PYTHIA_HYDJET_good_central_events_%d.txt",algo,jet_type,h,date.GetDate()));
     //fVs_good[k].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pbpb_%s_R%d_PYTHIA_HYDJET_smallgood_events_%d.txt",algo,k,date.GetDate()));
-    }
+  }
     //}
   
   cout<<" after the output text file declaration "<<endl;
@@ -915,13 +916,13 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo", int sub_id = 0){
 
 	//hpbpb_Npix_cut[k][cBin]->Fill(data[k][h]->hiNpix,sum$())
 	
-	if(jetCounter>10){
-	  fVs_failure[h]<<boundaries_pthat[h]<<" "<<data[k][h]->run<<" "<<data[k][h]->lumi<<" "<<data[k][h]->evt<<" "<<data[k][h]->vz<<" "<<data[k][h]->hiHF<<" "<<data[k][h]->hiNpix<<" "<<data[k][h]->hiNtracks<<endl;
-	}
-	//if(jetCounter<10 && goodCounter<=15){
-	//  fVs_good[k]<<boundaries_pthat[h]<<" "<<data[k][h]->run<<" "<<data[k][h]->lumi<<" "<<data[k][h]->evt<<" "<<data[k][h]->vz<<" "<<data[k][h]->hiHF<<" "<<data[k][h]->hiNpix<<" "<<data[k][h]->hiNtracks<<endl;
-	//  goodCounter++;
+	//if(jetCounter>10){
+	//  fVs_failure[h]<<boundaries_pthat[h]<<" "<<data[k][h]->run<<" "<<data[k][h]->lumi<<" "<<data[k][h]->evt<<" "<<data[k][h]->vz<<" "<<data[k][h]->hiHF<<" "<<data[k][h]->hiNpix<<" "<<data[k][h]->hiNtracks<<endl;
 	//}
+	if(jetCounter<10 && goodCounter<=15 && data[k][h]->bin<2){
+	  fVs_good[h]<<boundaries_pthat[h]<<" "<<data[k][h]->run<<" "<<data[k][h]->lumi<<" "<<data[k][h]->evt<<" "<<data[k][h]->vz<<" "<<data[k][h]->hiHF<<" "<<data[k][h]->hiNpix<<" "<<data[k][h]->hiNtracks<<endl;
+	  goodCounter++;
+	}
 	// apply the supernova events cut rejection here: 
 	//if(data[k][h]->hiNpix > 38000 - 500*jetCounter){
 	  //if(printDebug) cout<<"removed this supernova event"<<endl;
@@ -1092,7 +1093,8 @@ void RAA_read_mc(char *algo = "Vs", char *jet_type = "Calo", int sub_id = 0){
       }//nentry loop
 
       if(printDebug)cout<<"no of events inbetween pthat "<<boundaries_pthat[h]<<" and "<<boundaries_pthat[h+1]<<" = "<<test_counter<<endl;
-      fVs_failure[h].close();
+      //fVs_failure[h].close();
+      fVs_good[h].close();
 
     }//ptbins loop
     

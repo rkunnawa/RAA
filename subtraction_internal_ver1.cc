@@ -8,7 +8,8 @@
 #include <TApplication.h>
 #include <TStyle.h>
 #include <TCanvas.h>
-#include <TH1D.h>
+#include <TH2D.h>
+#include <TMath.h>
 
 #define NOBJECT_MAX 16384
 
@@ -40,18 +41,17 @@ size_t pf_id_reduce(const Int_t pf_id)
 	return 0;
 }
 
-void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/store/group/phys_heavyions/dgulhan/PbPbForest_MatchEqR_Calo_HIHighPt_HIRun2011-14Mar2014-v4_merged_nodublicate/PbPbForest_MatchEqR_Calo_HIHighPt_HIRun2011-14Mar2014-v4.root")
+void subtraction_internal_ver1(const char *filename = "bad_allpthat.root", const int data = 0, const int calorimetric = 0)
 {
+	gStyle->SetPalette(55);
+
 	static const size_t nfourier = 5;
 	size_t nevent;
-
-	int data = 0;
-	int calorimetric = 0;
 
 	const char *root_tree_name = calorimetric ?
 		"rechitanalyzer/tower" : "pfcandAnalyzer/pfTree";
 
-	TFile *f = TFile::Open(filename);
+	TFile *root_file = TFile::Open(filename);
 	TTree *root_tree = dynamic_cast<TTree *>(gDirectory->Get(root_tree_name));
 
 	Int_t nPFpart;
@@ -166,7 +166,7 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 	std::ifstream in_stream(data ? (calorimetric ? "ue_calibrations_calo_data.txt" : "ue_calibrations_pf_data.txt") : (calorimetric ? "ue_calibrations_calo_mc.txt" : "ue_calibrations_pf_mc.txt"));
 	std::string line;
 	size_t index = 0;
-	static const size_t nline_predictor = 3 * 15 * (1 + (5 - 1) * 2) * 82;
+	const size_t nline_predictor = 3 * 15 * (1 + (5 - 1) * 2) * 82;
 
 	while (std::getline(in_stream, line)) {
 		if (line.empty() || line[0] == '#') {
@@ -242,10 +242,16 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 	size_t nentries = root_tree->GetEntries();
 	nentries = 10;
 
+	TCanvas canvas0("canvas0", "", 960, 720);
+
+	TH2D root_histogram0("root_histogram0", "", 32, -5.191, 5.191, 32, -TMath::Pi(), TMath::Pi());
+
 	for (size_t i = 0; i < nentries; i++) {
 		root_tree->GetEntry(i);
 		hiTree->GetEntry(i);
 		t->GetEntry(i);
+
+		root_histogram0.Reset();
 
 		// Event collective Fourier components, per particle flow ID
 		// group. Note that since by heavy ion convention, dN/dphi =
@@ -336,10 +342,6 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 
 		fprintf(stderr, "%s:%d: %f %f\n", __FILE__, __LINE__, hiBin * 0.5, sqrt(feature[3] * feature[3] +
 				 feature[4] * feature[4]));
-
-		std::vector<double> particle_perp_subtracted;
-		std::vector<double> particle_perp_subtracted_unequalized;
-
 
 		for (size_t k = 0; k < nPFpart; k++) {
 			int predictor_index = -1;
@@ -454,12 +456,31 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 			}
 
 							// Prints the subtracted density * area
-			fprintf(stderr, "%s:%d: %.8e %.8e %.8e %.8e %.8e\n", __FILE__, __LINE__, hiBin * 0.5, pfEta[k], pfPhi[k], pfPt[k], density * pfArea[k]);
+			//fprintf(stderr, "%s:%d: %.8e %.8e %.8e %.8e %.8e\n", __FILE__, __LINE__, hiBin * 0.5, pfEta[k], pfPhi[k], pfPt[k], density * pfArea[k]);
+			root_histogram0.Fill(pfEta[k], pfPhi[k], pfPt[k] - density * pfArea[k]);
 		}
+
+		canvas0.SetRightMargin(0.125);
+		canvas0.SetLeftMargin(0.0625);
+		canvas0.SetBottomMargin(0.0625);
+
+		root_histogram0.SetMinimum(-100);
+		root_histogram0.SetMaximum(100);
+		root_histogram0.SetContour(252);
+		root_histogram0.SetXTitle("#eta");
+		root_histogram0.SetYTitle("#phi");
+		//root_histogram0.SetZTitle("p_{T} - UEDensity*Area");
+		root_histogram0.SetTitle(Form("Evt.%d Subtracted energy per candidate = p_{T} - UE_{Density}*Area",i+1));
+		root_histogram0.Draw("colz");
+
+		char buf[4096];
+
+		snprintf(buf, 4096, "/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/HFVs_validation_subtraction_%lu.png", i);
+
+		canvas0.SaveAs(buf);
 	}
 
-
-	f->Close();
+	root_file->Close();
 
 	gSystem->Exit(0);
 }
