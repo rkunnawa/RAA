@@ -9,7 +9,8 @@
 #include <TApplication.h>
 #include <TStyle.h>
 #include <TCanvas.h>
-#include <TH1D.h>
+#include <TH2D.h>
+#include <TMath.h>
 
 #define NOBJECT_MAX 16384
 
@@ -41,17 +42,16 @@ size_t pf_id_reduce(const Int_t pf_id)
 	return 0;
 }
 
-void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/store/group/phys_heavyions/dgulhan/PbPbForest_MatchEqR_Calo_HIHighPt_HIRun2011-14Mar2014-v4_merged_nodublicate/PbPbForest_MatchEqR_Calo_HIHighPt_HIRun2011-14Mar2014-v4.root")
+void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velicanu/public/forest/badjets/bad_allpthat.root", const int data = 0, const int calorimetric = 0)
 {
-	static const size_t nfourier = 5;
+	gStyle->SetPalette(55);
 
-	int data = 0;
-	int calorimetric = 0;
+	static const size_t nfourier = 5;
 
 	const char *root_tree_name = calorimetric ?
 		"rechitanalyzer/tower" : "pfcandAnalyzer/pfTree";
 
-	TFile *f = TFile::Open(filename);
+	TFile *root_file = TFile::Open(filename);
 	TTree *root_tree = dynamic_cast<TTree *>(gDirectory->Get(root_tree_name));
 
 	Int_t nPFpart;
@@ -166,7 +166,7 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 	std::ifstream in_stream(data ? (calorimetric ? "ue_calibrations_calo_data.txt" : "ue_calibrations_pf_data.txt") : (calorimetric ? "ue_calibrations_calo_mc.txt" : "ue_calibrations_pf_mc.txt"));
 	std::string line;
 	size_t index = 0;
-	static const size_t nline_predictor = 3 * 15 * (1 + (5 - 1) * 2) * 82;
+	const size_t nline_predictor = 3 * 15 * (1 + (5 - 1) * 2) * 82;
 
 	while (std::getline(in_stream, line)) {
 		if (line.empty() || line[0] == '#') {
@@ -240,12 +240,18 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 	const std::vector<double> cms_ecal_edge_pseudorapidity_v(cms_ecal_edge_pseudorapidity, cms_ecal_edge_pseudorapidity + ncms_ecal_edge_pseudorapidity);
 
 	size_t nentries = root_tree->GetEntries();
-	nentries = 10;
+	nentries = 50;
+
+	TCanvas canvas0("canvas0", "", 960, 720);
+
+	TH2D root_histogram0("root_histogram0", "", ncms_hcal_edge_pseudorapidity - 1, cms_hcal_edge_pseudorapidity, 36, -TMath::Pi(), TMath::Pi());
 
 	for (size_t i = 0; i < nentries; i++) {
 		root_tree->GetEntry(i);
 		hiTree->GetEntry(i);
 		t->GetEntry(i);
+
+		root_histogram0.Reset();
 
 		// Event collective Fourier components, per particle flow ID
 		// group. Note that since by heavy ion convention, dN/dphi =
@@ -311,7 +317,7 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 			(perp_fourier[0                       ][l][0][0] +
 			 perp_fourier[nedge_pseudorapidity - 2][l][0][0]);
 		}
-		fprintf(stderr, "%s:%d: %f %f\n", __FILE__, __LINE__, feature[0], feature[0] / scale[0]);
+		fprintf(stderr, "%s:%d: HF bulk: %f scaled, %f GeV/c unscaled\n", __FILE__, __LINE__, feature[0], feature[0] / scale[0]);
 		for (size_t k = 1; k < nfourier; k++) {
 			feature[2 * k - 1] = 0;
 			for (size_t l = 0; l < nreduced_id; l++) {
@@ -319,14 +325,14 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 				(perp_fourier[0                       ][l][k][0] +
 				 perp_fourier[nedge_pseudorapidity - 2][l][k][0]);
 			}
-			fprintf(stderr, "%s:%d: %f %f %f\n", __FILE__, __LINE__, perp_fourier[0                       ][2][k][0], perp_fourier[nedge_pseudorapidity - 2][2][k][0], feature[2 * k - 1]);
+			fprintf(stderr, "%s:%d: HF order %lu flow: cos %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k - 1], feature[2 * k - 1] / scale[k]);
 			feature[2 * k] = 0;
 			for (size_t l = 0; l < nreduced_id; l++) {
 			feature[2 * k] += scale[k] *
 				(perp_fourier[0                       ][l][k][1] +
 				 perp_fourier[nedge_pseudorapidity - 2][l][k][1]);
 			}
-			fprintf(stderr, "%s:%d: %f %f %f\n", __FILE__, __LINE__, perp_fourier[0                       ][2][k][1], perp_fourier[nedge_pseudorapidity - 2][2][k][1], feature[2 * k]);
+			fprintf(stderr, "%s:%d: HF order %lu flow: sin %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k], feature[2 * k] / scale[k]);
 		}
 
 #if 0
@@ -338,10 +344,6 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 
 		fprintf(stderr, "%s:%d: %f %f\n", __FILE__, __LINE__, hiBin * 0.5, sqrt(feature[3] * feature[3] +
 				 feature[4] * feature[4]));
-
-		std::vector<double> particle_perp_subtracted;
-		std::vector<double> particle_perp_subtracted_unequalized;
-
 
 		for (Int_t k = 0; k < nPFpart; k++) {
 			int predictor_index = -1;
@@ -393,24 +395,29 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 							float u = p[l][m][0];
 
 							for (size_t n = 0; n < 2 * nfourier - 1; n++) {
-								u += (((((((((p[l][m][9 * n + 9]) *
+								if (feature[0] < 0.9 || (l == 0 && n == 0)) {
+									u += (((((((((p[l][m][9 * n + 9]) *
+												 feature[n] +
+												 p[l][m][9 * n + 8]) *
+												feature[n] +
+												p[l][m][9 * n + 7]) *
+											   feature[n] +
+											   p[l][m][9 * n + 6]) *
+											  feature[n] +
+											  p[l][m][9 * n + 5]) *
 											 feature[n] +
-											 p[l][m][9 * n + 8]) *
+											 p[l][m][9 * n + 4]) *
 											feature[n] +
-											p[l][m][9 * n + 7]) *
+											p[l][m][9 * n + 3]) *
 										   feature[n] +
-										   p[l][m][9 * n + 6]) *
+										   p[l][m][9 * n + 2]) *
 										  feature[n] +
-										  p[l][m][9 * n + 5]) *
-										 feature[n] +
-										 p[l][m][9 * n + 4]) *
-										feature[n] +
-										p[l][m][9 * n + 3]) *
-									   feature[n] +
-									   p[l][m][9 * n + 2]) *
-									  feature[n] +
-									  p[l][m][9 * n + 1]) *
-									feature[n];
+										  p[l][m][9 * n + 1]) *
+										feature[n];
+								}
+								else if (n == 2 * l - 1 || n == 2 * l) {
+									u += p[l][m][9 * n + 1] * feature[n];
+								}
 							}
 #if 0
 							// This looks at a specific flow component and see how the polynomial is evaluated
@@ -456,12 +463,27 @@ void subtraction_internal_ver0(const char *filename = "root://eoscms//eos/cms/st
 			}
 
 							// Prints the subtracted density * area
-			fprintf(stderr, "%s:%d: %.8e %.8e %.8e %.8e %.8e\n", __FILE__, __LINE__, hiBin * 0.5, pfEta[k], pfPhi[k], pfPt[k], density * pfArea[k]);
+			//fprintf(stderr, "%s:%d: %.8e %.8e %.8e %.8e %.8e\n", __FILE__, __LINE__, hiBin * 0.5, pfEta[k], pfPhi[k], pfPt[k], density * pfArea[k]);
+			root_histogram0.Fill(pfEta[k], pfPhi[k], pfPt[k] - density * pfArea[k]);
 		}
+
+		canvas0.SetRightMargin(0.125);
+		canvas0.SetLeftMargin(0.0625);
+		canvas0.SetBottomMargin(0.0625);
+
+		root_histogram0.SetMinimum(-100);
+		root_histogram0.SetMaximum(100);
+		root_histogram0.SetContour(252);
+		root_histogram0.Draw("colz");
+
+		char buf[4096];
+
+		snprintf(buf, 4096, "subtraction_%lu.png", i);
+
+		canvas0.SaveAs(buf);
 	}
 
-
-	f->Close();
+	root_file->Close();
 
 	gSystem->Exit(0);
 }

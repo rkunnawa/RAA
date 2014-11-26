@@ -1,5 +1,6 @@
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 #include <TROOT.h>
 #include <TSystem.h>
@@ -41,12 +42,11 @@ size_t pf_id_reduce(const Int_t pf_id)
 	return 0;
 }
 
-void subtraction_internal_ver1(const char *filename = "bad_allpthat.root", const int data = 0, const int calorimetric = 0)
+void subtraction_internal_ver1(const char *filename = "/afs/cern.ch/work/v/velicanu/public/forest/badjets/bad_allpthat.root", const int data = 0, const int calorimetric = 0)
 {
 	gStyle->SetPalette(55);
 
 	static const size_t nfourier = 5;
-	size_t nevent;
 
 	const char *root_tree_name = calorimetric ?
 		"rechitanalyzer/tower" : "pfcandAnalyzer/pfTree";
@@ -244,7 +244,7 @@ void subtraction_internal_ver1(const char *filename = "bad_allpthat.root", const
 
 	TCanvas canvas0("canvas0", "", 960, 720);
 
-	TH2D root_histogram0("root_histogram0", "", 32, -5.191, 5.191, 32, -TMath::Pi(), TMath::Pi());
+	TH2D root_histogram0("root_histogram0", "", ncms_hcal_edge_pseudorapidity - 1, cms_hcal_edge_pseudorapidity, 36, -TMath::Pi(), TMath::Pi());
 
 	for (size_t i = 0; i < nentries; i++) {
 		root_tree->GetEntry(i);
@@ -335,15 +335,17 @@ void subtraction_internal_ver1(const char *filename = "bad_allpthat.root", const
 			fprintf(stderr, "%s:%d: %f %f %f\n", __FILE__, __LINE__, perp_fourier[0                       ][2][k][1], perp_fourier[nedge_pseudorapidity - 2][2][k][1], feature[2 * k]);
 		}
 
+#if 0
 		const double event_plane = atan2(feature[4], feature[3]);
 		const double v2 =
 			sqrt(feature[3] * feature[3] +
 				 feature[4] * feature[4]) / feature[0];
+#endif
 
 		fprintf(stderr, "%s:%d: %f %f\n", __FILE__, __LINE__, hiBin * 0.5, sqrt(feature[3] * feature[3] +
 				 feature[4] * feature[4]));
 
-		for (size_t k = 0; k < nPFpart; k++) {
+		for (Int_t k = 0; k < nPFpart; k++) {
 			int predictor_index = -1;
 			int interpolation_index = -1;
 			double density = 0;
@@ -467,15 +469,11 @@ void subtraction_internal_ver1(const char *filename = "bad_allpthat.root", const
 		root_histogram0.SetMinimum(-100);
 		root_histogram0.SetMaximum(100);
 		root_histogram0.SetContour(252);
-		root_histogram0.SetXTitle("#eta");
-		root_histogram0.SetYTitle("#phi");
-		//root_histogram0.SetZTitle("p_{T} - UEDensity*Area");
-		root_histogram0.SetTitle(Form("Evt.%d Subtracted energy per candidate = p_{T} - UE_{Density}*Area",i+1));
 		root_histogram0.Draw("colz");
 
 		char buf[4096];
 
-		snprintf(buf, 4096, "/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/HFVs_validation_subtraction_%lu.png", i);
+		snprintf(buf, 4096, "subtraction_%lu.png", i);
 
 		canvas0.SaveAs(buf);
 	}
