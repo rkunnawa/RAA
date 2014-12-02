@@ -240,7 +240,7 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 	const std::vector<double> cms_ecal_edge_pseudorapidity_v(cms_ecal_edge_pseudorapidity, cms_ecal_edge_pseudorapidity + ncms_ecal_edge_pseudorapidity);
 
 	size_t nentries = root_tree->GetEntries();
-	nentries = 50;
+	//nentries = 50;
 
 	TCanvas canvas0("canvas0", "", 960, 720);
 
@@ -317,6 +317,7 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 			(perp_fourier[0                       ][l][0][0] +
 			 perp_fourier[nedge_pseudorapidity - 2][l][0][0]);
 		}
+		if (i == 6 || i == 11 || i == 12  || i == 14)
 		fprintf(stderr, "%s:%d: HF bulk: %f scaled, %f GeV/c unscaled\n", __FILE__, __LINE__, feature[0], feature[0] / scale[0]);
 		for (size_t k = 1; k < nfourier; k++) {
 			feature[2 * k - 1] = 0;
@@ -325,6 +326,7 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 				(perp_fourier[0                       ][l][k][0] +
 				 perp_fourier[nedge_pseudorapidity - 2][l][k][0]);
 			}
+		if (i == 6 || i == 11 || i == 12  || i == 14)
 			fprintf(stderr, "%s:%d: HF order %lu flow: cos %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k - 1], feature[2 * k - 1] / scale[k]);
 			feature[2 * k] = 0;
 			for (size_t l = 0; l < nreduced_id; l++) {
@@ -332,6 +334,7 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 				(perp_fourier[0                       ][l][k][1] +
 				 perp_fourier[nedge_pseudorapidity - 2][l][k][1]);
 			}
+		if (i == 6 || i == 11 || i == 12  || i == 14)
 			fprintf(stderr, "%s:%d: HF order %lu flow: sin %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k], feature[2 * k] / scale[k]);
 		}
 
@@ -342,6 +345,9 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 				 feature[4] * feature[4]) / feature[0];
 #endif
 
+		const double max_feature = std::max(-(*std::min_element(feature, feature + nfeature)), *std::max_element(feature, feature + nfeature));
+
+		if (i == 6 || i == 11 || i == 12  || i == 14)
 		fprintf(stderr, "%s:%d: %f %f\n", __FILE__, __LINE__, hiBin * 0.5, sqrt(feature[3] * feature[3] +
 				 feature[4] * feature[4]));
 
@@ -395,7 +401,7 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 							float u = p[l][m][0];
 
 							for (size_t n = 0; n < 2 * nfourier - 1; n++) {
-								if (feature[0] < 0.9 || (l == 0 && n == 0)) {
+								if (max_feature < 0.9 || (l == 0 && n == 0) || (l == 2 && (n == 3 || n == 4))) {
 									u += (((((((((p[l][m][9 * n + 9]) *
 												 feature[n] +
 												 p[l][m][9 * n + 8]) *

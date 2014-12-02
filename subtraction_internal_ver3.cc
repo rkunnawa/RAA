@@ -418,15 +418,22 @@ void subtraction_internal_ver3(const char *filename = "/afs/cern.ch/work/v/velic
 								else if (n == 2 * l - 1 || n == 2 * l) {
 									u += p[l][m][9 * n + 1] * feature[n];
 
-									if (predictor_index == 8 && l == 4 && m == 0) {
+									if (predictor_index == 8 && l >= 3) {
 										fprintf(stderr, "%s:%d: %d %lu %lu\n", __FILE__, __LINE__, predictor_index, l, m);
 										char buf[4096];
 
 										snprintf(buf, 4096, "function%lu", function.size());
-										function.push_back(new TF1(buf, "[0]+[1]*x+[2]*x^2+[3]*x^3+[4]*x^4+[5]*x^5+[6]*x^6+[7]*x^7+[8]*x^8+[9]*x^9", 0, 2));
+										function.push_back(new TF1(buf, "[0]+[1]*(x*[10])+[2]*(x*[10])^2+[3]*(x*[10])^3+[4]*(x*[10])^4+[5]*(x*[10])^5+[6]*(x*[10])^6+[7]*(x*[10])^7+[8]*(x*[10])^8+[9]*(x*[10])^9", 0, 500));
 										function.back()->SetParameter(0, p[l][m][0]);
 										for (size_t o = 1; o <= 9; o++) {
 											function.back()->SetParameter(o, p[l][m][9 * n + o]);
+										}
+										function.back()->SetParameter(10, scale[l]);
+										if (l == 3) {
+											function.back()->SetLineColor(kRed);
+										}
+										else {
+											function.back()->SetLineColor(kBlue);
 										}
 										
 									}
@@ -478,9 +485,9 @@ void subtraction_internal_ver3(const char *filename = "/afs/cern.ch/work/v/velic
 						canvas0.SetLeftMargin(0.0625);
 						canvas0.SetBottomMargin(0.0625);
 
-						TH1D h("h", "", 1, 0, 2);
+						TH1D h("h", "", 1, 0, 500);
 
-						h.GetYaxis()->SetRangeUser(-10, 10);
+						h.GetYaxis()->SetRangeUser(-50, 50);
 						h.Draw("");
 
 						for (std::vector<TF1 *>::iterator iterator = function.begin(); iterator != function.end(); iterator++) {
