@@ -23,6 +23,13 @@
 #include <TH2D.h>
 #include <TH2F.h>
 #include <TMath.h>
+#include "TLegend.h"
+#include "TLatex.h"
+#include "TMath.h"
+#include "TLine.h"
+#include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
+#include "Headers/plot.h"
 
 #define NOBJECT_MAX 16384
 
@@ -57,9 +64,11 @@ size_t pf_id_reduce(const Int_t pf_id)
   return 0;
 }
 
-void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WORK/RAA/Output/goodcentral_allpthat.root", const int data = 0, const int calorimetric = 0){
+void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WORK/RAA/Output/bad_allpthat.root", const int data = 0, const int calorimetric = 0){
 
   gStyle->SetPalette(55);
+  bool printDebug = false;
+  bool printDebug2 = false;
   
   static const size_t nfourier = 5;
 
@@ -217,9 +226,14 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
 
   static const size_t nreduced_id = 3;
 
-  static const size_t nedge_pseudorapidity = 15 + 1;
-  static const double edge_pseudorapidity[nedge_pseudorapidity] = {-5.191, -2.650, -2.043, -1.740, -1.479, -1.131, -0.783, -0.522, 0.522, 0.783, 1.131, 1.479, 1.740, 2.043, 2.650, 5.191 };
+  // static const size_t nedge_pseudorapidity = 15 + 1;
+  // static const double edge_pseudorapidity[nedge_pseudorapidity] = {-5.191, -2.650, -2.043, -1.740, -1.479, -1.131, -0.783, -0.522, 0.522, 0.783, 1.131, 1.479, 1.740, 2.043, 2.650, 5.191 };
 
+  static const size_t nedge_pseudorapidity = 19 + 1;
+  static const double edge_pseudorapidity[nedge_pseudorapidity] = {-5.191, -2.964, -2.853 ,-2.650, -2.043, -1.740, -1.479, -1.131, -0.783, -0.522, 0.522, 0.783, 1.131, 1.479, 1.740, 2.043, 2.650, 2.853, 2.964,5.191 };
+
+
+#if 0
   const std::vector<double> edge_pseudorapidity_v(edge_pseudorapidity, edge_pseudorapidity + nedge_pseudorapidity);
 
   static const size_t ncms_hcal_edge_pseudorapidity = 82 + 1;
@@ -254,18 +268,21 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
   };
 
   const std::vector<double> cms_ecal_edge_pseudorapidity_v(cms_ecal_edge_pseudorapidity, cms_ecal_edge_pseudorapidity + ncms_ecal_edge_pseudorapidity);
+#endif
 
   // declare the histograms we want here: 
   // Sum$(PfVsPtInitial) as a function of the 15 eta bins. -> 15 histograms. since i want the RMS value for each of them. 
   // same for PFVsPt 
   // want to see when bulk = v0+v2 over v0 diverges. or when v2 diverges. or what is the contribution of v3 and v4 for those eevents. 
   
-  TH1F *hSumPfVsPtInitial[15], *hSumPfVsPt[15], *hSumPfPt[15];
+  TH1F *hSumPfVsPtInitial[nedge_pseudorapidity-1], *hSumPfVsPt[nedge_pseudorapidity-1], *hSumPfPt[nedge_pseudorapidity-1];
   TH2F *hPfVsPtInitial_eta, *hPfVsPt_eta, *hPfPt_eta;
   TH2F *hRMSSumPFVsPtIni_eta;
+  TH2F *hRMSSumPFVsPt_eta;
+  TH2F *hRMSSumPFPt_eta;
   TH1F *hetabin_test;
 
-  for(int j = 0;j<15;j++){
+  for(int j = 0;j<nedge_pseudorapidity-1;j++){
 
     hSumPfVsPtInitial[j] = new TH1F(Form("hSumPfVsPtInitial_%d",j),"",10000,-10000,10000);
     hSumPfVsPt[j] = new TH1F(Form("hSumPfVsPt_%d",j),"",10000,-10000,10000);
@@ -276,12 +293,14 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
   hPfVsPtInitial_eta = new TH2F("hPfVsPtInitial_eta","",10000,-10000,10000,60,-6,+6);
   hPfVsPt_eta = new TH2F("hPfVsPt_eta","",10000,-10000,10000,60,-6,+6);
   hPfPt_eta = new TH2F("hPfPt_eta","",10000,-10000,10000,60,-6,+6);
-  hRMSSumPFVsPtIni_eta = new TH2F("hRMSSumPFVsPtIni_eta","",10000,-10000,10000,nedge_pseudorapidity-1,edge_pseudorapidity);
+  hRMSSumPFVsPtIni_eta = new TH2F("hRMSSumPFVsPtIni_eta","",nedge_pseudorapidity-1,edge_pseudorapidity,10000,-1000,3000);
+  hRMSSumPFVsPt_eta = new TH2F("hRMSSumPFVsPt_eta","",nedge_pseudorapidity-1,edge_pseudorapidity,10000,-1000,3000);
+  hRMSSumPFPt_eta = new TH2F("hRMSSumPFPt_eta","",nedge_pseudorapidity-1,edge_pseudorapidity,10000,-1000,3000);
   hetabin_test = new TH1F("hetabin_test","",nedge_pseudorapidity-1,edge_pseudorapidity);
 
   size_t nentries = root_tree->GetEntries();
   std::cout<<"No of Entries = "<<nentries<<endl;
-  //nentries = 2;
+  if(printDebug)nentries = 2;
   //start the event loop
   for(size_t i = 0; i<nentries; i++){
 
@@ -290,24 +309,24 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
     t->GetEntry(i);
 
     // declare the variables to hold the values per event per eta bin. 
-    Float_t SumPfVsPtInitial[15], SumPfVsPt[15], SumPfPt[15];
-    for(int k = 0;k<15;k++) {SumPfVsPtInitial[k] = 0; SumPfVsPt[k] = 0; SumPfPt[k] = 0;}
-    //std::cout<<"entry = "<< i<<endl;
+    Float_t SumPfVsPtInitial[nedge_pseudorapidity-1], SumPfVsPt[nedge_pseudorapidity-1], SumPfPt[nedge_pseudorapidity-1];
+    for(int k = 0;k<nedge_pseudorapidity-1;k++) {SumPfVsPtInitial[k] = 0; SumPfVsPt[k] = 0; SumPfPt[k] = 0;}
+    if(printDebug)std::cout<<"entry = "<< i<<endl;
 
     for(int ij = 0; ij < nPFpart; ij++){
-      //std::cout<<"pfcand = "<<ij<<endl;
+      if(printDebug)std::cout<<"pfcand = "<<ij<<endl;
 
-      for(int k = 0;k<15;k++){
-	//std::cout<<"eta bin = "<<k<<endl;
-	//std::cout<<"pfeta = "<<pfEta[ij]<<endl;
-	//std::cout<<"eta boundaries = "<<edge_pseudorapidity[k]<<" "<<edge_pseudorapidity[k+1]<<endl;
+      for(int k = 0;k<nedge_pseudorapidity-1;k++){
+	if(printDebug)std::cout<<"eta bin = "<<k<<endl;
+	if(printDebug)std::cout<<"pfeta = "<<pfEta[ij]<<endl;
+	if(printDebug)std::cout<<"eta boundaries = "<<edge_pseudorapidity[k]<<" "<<edge_pseudorapidity[k+1]<<endl;
 	if(pfEta[ij]>= edge_pseudorapidity[k] && pfEta[ij]< edge_pseudorapidity[k+1]){
-	  //std::cout<<"inside eta bin"<<endl;
+	  if(printDebug)std::cout<<"inside eta bin"<<endl;
 	  hetabin_test->Fill(edge_pseudorapidity[k]);
 	  SumPfVsPtInitial[k] += pfVsPtInitial[ij];
 	  SumPfVsPt[k] += pfVsPt[ij];
 	  SumPfPt[k] += pfPt[ij];
-	  //std::cout<<SumPfVsPtInitial[k]<<endl;
+	  if(printDebug)std::cout<<SumPfVsPtInitial[k]<<endl;
 	}// eta selection statement 
 
       }// eta bin loop
@@ -318,7 +337,7 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
 
     }// pfcand loop   
 
-    for(int k = 0;k<15;k++){
+    for(int k = 0;k<nedge_pseudorapidity-1;k++){
       
       hSumPfVsPtInitial[k]->Fill(SumPfVsPtInitial[k]);
       hSumPfVsPt[k]->Fill(SumPfVsPt[k]);
@@ -329,20 +348,35 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
   }// entry loop
   
   //get the RMS value from the histograms at this level. 
-  for(int k = 0;k<15;k++){
-    hRMSSumPFVsPtIni_eta->Fill(hSumPfVsPtInitial[k]->GetRMS(1),edge_pseudorapidity[k]);
-    //std::cout<<"RMS value of bin"<<k<<" = "<<hSumPfVsPtInitial[k]->GetRMS(1)<<endl;
+  for(int k = 0;k<nedge_pseudorapidity-1;k++){
+    hRMSSumPFVsPtIni_eta->Fill(edge_pseudorapidity[k],hSumPfVsPtInitial[k]->GetRMS(1));
+    hRMSSumPFVsPt_eta->Fill(edge_pseudorapidity[k],hSumPfVsPt[k]->GetRMS(1));
+    hRMSSumPFPt_eta->Fill(edge_pseudorapidity[k],hSumPfPt[k]->GetRMS(1));
+    if(printDebug2)std::cout<<"RMS value of pfVsPtInitial bin"<<k<<" = "<<hSumPfVsPtInitial[k]->GetRMS(1)<<endl;
+    if(printDebug2)std::cout<<"RMS value of pfVsPt bin"<<k<<" = "<<hSumPfVsPt[k]->GetRMS(1)<<endl;
+    if(printDebug2)std::cout<<"RMS value of pfPt bin"<<k<<" = "<<hSumPfPt[k]->GetRMS(1)<<endl;
   }
 
-  TCanvas c3;
-  hRMSSumPFVsPtIni_eta->SetXTitle("RMS value of Sum$(PfVsPtInitial)");
-  hRMSSumPFVsPtIni_eta->SetYTitle("eta bins");
+  TCanvas *c1 = new TCanvas("c1","",600,400);
+  makeMultiPanelCanvas(c1,3,1,0.0,0.0,0.2,0.15,0.07);
+  c1->cd(1);
+  hRMSSumPFVsPtIni_eta->SetTitle("RMS value of Sum$(PfVsPtInitial)");
+  hRMSSumPFVsPtIni_eta->SetYTitle("GeV/c");
+  hRMSSumPFVsPtIni_eta->SetXTitle("Detector #eta bins");
   hRMSSumPFVsPtIni_eta->Draw("col");
-  c3.SaveAs("RMSvalue_sumPFVsPtInitial_etaBins_goodcentral_MC.pdf","RECREATE");
+  c1->cd(2);
+  hRMSSumPFVsPt_eta->SetTitle("RMS value of Sum$(PfVsPt)");
+  hRMSSumPFVsPt_eta->SetXTitle("Detector #eta bins");
+  hRMSSumPFVsPt_eta->Draw("col");
+  c1->cd(3);
+  hRMSSumPFPt_eta->SetTitle("RMS value of Sum$(PfPt)");
+  hRMSSumPFPt_eta->SetXTitle("Detector #eta bins");
+  hRMSSumPFPt_eta->Draw("col");
+  c1->SaveAs("RMSvalue_SumPt_etaBins_bad_mc.pdf","RECREATE");
 
-  TFile f("goodcentral_mc_sumPFVsPT_histos.root","RECREATE");  
+  TFile f("bad_mc_sumPFVsPT_histos.root","RECREATE");  
   f.cd();
-  for(int k = 0;k<15;k++){
+  for(int k = 0;k<nedge_pseudorapidity-1;k++){
     hSumPfVsPtInitial[k]->Write();
     hSumPfVsPt[k]->Write();
     hSumPfPt[k]->Write();
@@ -352,6 +386,8 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
   hPfVsPt_eta->Write();
   hPfPt_eta->Write();
   hRMSSumPFVsPtIni_eta->Write();
+  hRMSSumPFVsPt_eta->Write();
+  hRMSSumPFPt_eta->Write();
   f.Write();
   f.Close();
 }

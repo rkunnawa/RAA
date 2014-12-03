@@ -43,7 +43,7 @@ size_t pf_id_reduce(const Int_t pf_id)
 	return 0;
 }
 
-void subtraction_internal_ver4(const int data = 1, const int calorimetric = 0, const size_t predictor_index = 7)
+void subtraction_internal_ver4(const int data = 1, const int calorimetric = 0, const size_t predictor_index = 8)
 {
 	std::ifstream in_stream(data ? (calorimetric ? "ue_calibrations_calo_data.txt" : "ue_calibrations_pf_data.txt") : (calorimetric ? "ue_calibrations_calo_mc.txt" : "ue_calibrations_pf_mc.txt"));
 	std::string line;
@@ -207,7 +207,7 @@ void subtraction_internal_ver4(const int data = 1, const int calorimetric = 0, c
 
 	char buf[4096];
 
-	snprintf(buf, 4096, "polynom_%d_data_%d.png", 0,data);
+	snprintf(buf, 4096, "polynom_%d.png", 0);
 	canvas0.SaveAs(buf);
 
 	gSystem->Exit(0);

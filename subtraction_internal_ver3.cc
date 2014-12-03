@@ -43,7 +43,7 @@ size_t pf_id_reduce(const Int_t pf_id)
 	return 0;
 }
 
-void subtraction_internal_ver3(const char *filename = "/Users/keraghav/WORK/RAA/Output/PbPb_data_bad_events.root", const size_t index_event = 6, const size_t nentries = 2, const int data = 1, const int calorimetric = 0)
+void subtraction_internal_ver3(const char *filename = "/afs/cern.ch/work/v/velicanu/public/forest/badjets/bad_allpthat.root", const size_t index_event = 6, const size_t nentries = 1, const int data = 0, const int calorimetric = 0)
 {
 	gStyle->SetPalette(55);
 

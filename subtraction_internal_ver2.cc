@@ -42,7 +42,7 @@ size_t pf_id_reduce(const Int_t pf_id)
 	return 0;
 }
 
-void subtraction_internal_ver2(const char *filename = "/Users/keraghav/WORK/RAA/Output/PbPb_data_bad_events.root", const int data = 0, const int calorimetric = 0)
+void subtraction_internal_ver2(const char *filename = "/Users/keraghav/WORK/RAA/Output/PbPb_data_bad_events.root", const int data = 1, const int calorimetric = 0)
 {
 	gStyle->SetPalette(55);
 
@@ -240,7 +240,7 @@ void subtraction_internal_ver2(const char *filename = "/Users/keraghav/WORK/RAA/
 	const std::vector<double> cms_ecal_edge_pseudorapidity_v(cms_ecal_edge_pseudorapidity, cms_ecal_edge_pseudorapidity + ncms_ecal_edge_pseudorapidity);
 
 	size_t nentries = root_tree->GetEntries();
-	nentries = 50;
+	//nentries = 50;
 
 	TCanvas canvas0("canvas0", "", 960, 720);
 
@@ -401,7 +401,8 @@ void subtraction_internal_ver2(const char *filename = "/Users/keraghav/WORK/RAA/
 							float u = p[l][m][0];
 
 							for (size_t n = 0; n < 2 * nfourier - 1; n++) {
-								if (max_feature < 0.9 || (l == 0 && n == 0) || (l == 2 && (n == 3 || n == 4))) {
+								//if (max_feature < 0.9 || (l == 0 && n == 0) || (l == 2 && (n == 3 || n == 4))) {
+								if (true || (l == 0 && n == 0)) {
 									u += (((((((((p[l][m][9 * n + 9]) *
 												 feature[n] +
 												 p[l][m][9 * n + 8]) *
@@ -421,7 +422,8 @@ void subtraction_internal_ver2(const char *filename = "/Users/keraghav/WORK/RAA/
 										  p[l][m][9 * n + 1]) *
 										feature[n];
 								}
-								else if (n == 2 * l - 1 || n == 2 * l) {
+								//else if (n == 2 * l - 1 || n == 2 * l) {
+								else if ((l == 2 && (n == 3 || n == 4))) {
 									u += p[l][m][9 * n + 1] * feature[n];
 								}
 							}
@@ -482,11 +484,23 @@ void subtraction_internal_ver2(const char *filename = "/Users/keraghav/WORK/RAA/
 		root_histogram0.SetContour(252);
 		root_histogram0.Draw("colz");
 
+		double sum_square = 0;
+
+		for (size_t j = root_histogram0.GetXaxis()->FindFixBin(-2); j <= root_histogram0.GetXaxis()->FindFixBin(2); j++) {
+			for (size_t k = 1; k <= 36; k++) {
+				const double u = root_histogram0.GetBinContent(root_histogram0.GetBin(j, k));
+				sum_square += u * u;
+			}
+		}
+		fprintf(stderr, "%s:%d: %f\n", __FILE__, __LINE__, sqrt(sum_square));
+
+#if 0
 		char buf[4096];
 
 		snprintf(buf, 4096, "subtraction_%lu.png", i);
 
 		canvas0.SaveAs(buf);
+#endif
 	}
 
 	root_file->Close();
