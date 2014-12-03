@@ -42,7 +42,7 @@ size_t pf_id_reduce(const Int_t pf_id)
 	return 0;
 }
 
-void subtraction_internal_ver1(const char *filename = "/afs/cern.ch/work/v/velicanu/public/forest/badjets/bad_allpthat.root", const int data = 0, const int calorimetric = 0)
+void subtraction_internal_ver1(const char *filename = "/Users/keraghav/WORK/RAA/Output/PbPb_data_bad_events.root", const int data = 1, const int calorimetric = 0)
 {
 	gStyle->SetPalette(55);
 
@@ -670,7 +670,7 @@ void subtraction_internal_ver1(const char *filename = "/afs/cern.ch/work/v/velic
 
 		char buf[4096];
 
-		snprintf(buf, 4096, "subtraction_%lu.png", i);
+		snprintf(buf, 4096, "subtraction_data_ver1_%lu.png", i);
 
 		canvas0.SaveAs(buf);
 	}

@@ -42,7 +42,7 @@ size_t pf_id_reduce(const Int_t pf_id)
 	return 0;
 }
 
-void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velicanu/public/forest/badjets/bad_allpthat.root", const int data = 0, const int calorimetric = 0)
+void subtraction_internal_ver2(const char *filename = "/Users/keraghav/WORK/RAA/Output/PbPb_data_bad_events.root", const int data = 0, const int calorimetric = 0)
 {
 	gStyle->SetPalette(55);
 
@@ -240,7 +240,7 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 	const std::vector<double> cms_ecal_edge_pseudorapidity_v(cms_ecal_edge_pseudorapidity, cms_ecal_edge_pseudorapidity + ncms_ecal_edge_pseudorapidity);
 
 	size_t nentries = root_tree->GetEntries();
-	//nentries = 50;
+	nentries = 50;
 
 	TCanvas canvas0("canvas0", "", 960, 720);
 
