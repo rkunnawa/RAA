@@ -64,10 +64,10 @@ size_t pf_id_reduce(const Int_t pf_id)
   return 0;
 }
 
-void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WORK/RAA/Output/bad_allpthat.root", const int data = 0, const int calorimetric = 0){
+void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WORK/RAA/Output/bad_allpthat.root", const int data = 0, const int calorimetric = 0){
 
   gStyle->SetPalette(55);
-  bool printDebug = false;
+  bool printDebug = true;
   bool printDebug2 = false;
   
   static const size_t nfourier = 5;
@@ -226,14 +226,15 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
 
   static const size_t nreduced_id = 3;
 
-  // static const size_t nedge_pseudorapidity = 15 + 1;
-  // static const double edge_pseudorapidity[nedge_pseudorapidity] = {-5.191, -2.650, -2.043, -1.740, -1.479, -1.131, -0.783, -0.522, 0.522, 0.783, 1.131, 1.479, 1.740, 2.043, 2.650, 5.191 };
+  static const size_t nedge_pseudorapidity = 15 + 1;
+  static const double edge_pseudorapidity[nedge_pseudorapidity] = {-5.191, -2.650, -2.043, -1.740, -1.479, -1.131, -0.783, -0.522, 0.522, 0.783, 1.131, 1.479, 1.740, 2.043, 2.650, 5.191 };
 
-  static const size_t nedge_pseudorapidity = 19 + 1;
-  static const double edge_pseudorapidity[nedge_pseudorapidity] = {-5.191, -2.964, -2.853 ,-2.650, -2.043, -1.740, -1.479, -1.131, -0.783, -0.522, 0.522, 0.783, 1.131, 1.479, 1.740, 2.043, 2.650, 2.853, 2.964,5.191 };
+  // there are the bins which we might end up moving to! 
+  // static const size_t nedge_pseudorapidity = 19 + 1;
+  // static const double edge_pseudorapidity[nedge_pseudorapidity] = {-5.191, -2.964, -2.853 ,-2.650, -2.043, -1.740, -1.479, -1.131, -0.783, -0.522, 0.522, 0.783, 1.131, 1.479, 1.740, 2.043, 2.650, 2.853, 2.964,5.191 };
 
 
-#if 0
+
   const std::vector<double> edge_pseudorapidity_v(edge_pseudorapidity, edge_pseudorapidity + nedge_pseudorapidity);
 
   static const size_t ncms_hcal_edge_pseudorapidity = 82 + 1;
@@ -268,13 +269,290 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
   };
 
   const std::vector<double> cms_ecal_edge_pseudorapidity_v(cms_ecal_edge_pseudorapidity, cms_ecal_edge_pseudorapidity + ncms_ecal_edge_pseudorapidity);
+
+  // lets do a simple check on the ue_predictor_pf to see where v0 (bulk) and v2 blow up. 
+ 
+  for(int i = 0;i<3;i++){
+    for(int j = 0;j<15;j++){
+      for(int k = 0;k<2;k++){
+	for(int l = 0;l<82;l++){
+	  //std::cout<<ue_predictor_pf[i][j][0][k][l]<<std::endl;
+	  if(TMath::Abs(ue_predictor_pf[i][j][0][k][l])>1e6){
+	    if(printDebug)std::cout<<i<<" "<<j<<" 0 "<<k<<" "<<l<<" = "<<ue_predictor_pf[i][j][0][k][l]<<std::endl; 
+	  }
+	  if(TMath::Abs(ue_predictor_pf[i][j][1][k][l])>1e6){
+	    if(printDebug)std::cout<<i<<" "<<j<<" 1 "<<k<<" "<<l<<" = "<<ue_predictor_pf[i][j][1][k][l]<<std::endl; 
+	  }
+	  if(TMath::Abs(ue_predictor_pf[i][j][2][k][l])>1e6){
+	    if(printDebug)std::cout<<i<<" "<<j<<" 2 "<<k<<" "<<l<<" = "<<ue_predictor_pf[i][j][2][k][l]<<std::endl; 
+	  }
+	  if(TMath::Abs(ue_predictor_pf[i][j][3][k][l])>1e6){
+	    if(printDebug)std::cout<<i<<" "<<j<<" 3 "<<k<<" "<<l<<" = "<<ue_predictor_pf[i][j][3][k][l]<<std::endl; 
+	  }
+	  if(TMath::Abs(ue_predictor_pf[i][j][4][k][l])>1e6){
+	    if(printDebug)std::cout<<i<<" "<<j<<" 4 "<<k<<" "<<l<<" = "<<ue_predictor_pf[i][j][4][k][l]<<std::endl; 
+	  }
+	}
+      }
+    }
+  }
+
+  size_t nentries = root_tree->GetEntries();
+  std::cout<<"No of Entries = "<<nentries<<endl;
+  // nentries = 2;
+
+  for(size_t i = 0; i<nentries; i++){
+
+    root_tree->GetEntry(i);
+    hiTree->GetEntry(i);
+    t->GetEntry(i);
+    
+    
+    // Event collective Fourier components, per particle flow ID
+    // group. Note that since by heavy ion convention, dN/dphi =
+    // v0/(2 pi) + v0 v1/pi cos(phi - Psi_RP) + v0 v2/pi cos(2(phi
+    // - Psi_RP)) + ..., and orthonormal relation for the Fourier
+    // basis f0 = v0, f1 = v0 v1, ..., if f is the Fourier and v0
+    // the phi-averaged 1/(2 pi) dpT/dy
+
+    double perp_fourier[nedge_pseudorapidity - 1][nreduced_id][nfourier][2];
+
+    for (size_t k = 1; k < nedge_pseudorapidity; k++) {
+      for (size_t l = 0; l < nreduced_id; l++) {
+	for (size_t m = 0; m < nfourier; m++) {
+	  for (size_t re_or_im = 0; re_or_im < 2;
+	       re_or_im++) {
+	    perp_fourier[k - 1][l][m][re_or_im] = 0;
+	  }
+	}
+      }
+    }
+
+    memset(perp_fourier, 0,
+	   (nedge_pseudorapidity - 1) * nreduced_id * nfourier * 2 *
+	   sizeof(double));
+
+    for (Int_t j = 0; j < nPFpart; j++) {
+      size_t reduced_id = pf_id_reduce(pfId[j]);
+
+      for (size_t k = 1; k < nedge_pseudorapidity; k++) {
+	if (pfEta[j] >= edge_pseudorapidity[k - 1] &&
+	    pfEta[j] < edge_pseudorapidity[k]) {
+	  for (size_t l = 0; l < nfourier; l++) {
+	    perp_fourier[k - 1][reduced_id][l][0] +=
+	      pfPt[j] * cos(l * pfPhi[j]);
+	    perp_fourier[k - 1][reduced_id][l][1] +=
+	      pfPt[j] * sin(l * pfPhi[j]);
+	  }
+	}
+      }
+    }
+
+
+    // look at the different v0 and v2 values. 
+    // for(int i)
+    
+    // Event selection
+  
+    static const size_t nfeature = 2 * nfourier - 1;
+    double feature[nfeature];
+
+    // Scale factor to get 95% of the coefficient below 1.0
+
+    std::vector<double> scale(nfourier, 1.0 / 200.0);
+
+    if (nfourier >= 1) {
+      scale[0] = 1.0 / 5400.0;
+    }
+    if (nfourier >= 2) {
+      scale[1] = 1.0 / 130.0;
+    }
+    if (nfourier >= 3) {
+      scale[2] = 1.0 / 220.0;
+    }
+
+    feature[0] = 0;
+    for (size_t l = 0; l < nreduced_id; l++) {
+      feature[0] += scale[0] *
+	(perp_fourier[0                       ][l][0][0] +
+	 perp_fourier[nedge_pseudorapidity - 2][l][0][0]);
+    }
+    if (i == 6 || i == 11 || i == 12  || i == 14)
+      fprintf(stderr, "%s:%d: HF bulk: %f scaled, %f GeV/c unscaled\n", __FILE__, __LINE__, feature[0], feature[0] / scale[0]);
+    for (size_t k = 1; k < nfourier; k++) {
+      feature[2 * k - 1] = 0;
+      for (size_t l = 0; l < nreduced_id; l++) {
+	feature[2 * k - 1] += scale[k] *
+	  (perp_fourier[0                       ][l][k][0] +
+	   perp_fourier[nedge_pseudorapidity - 2][l][k][0]);
+      }
+      if (i == 6 || i == 11 || i == 12  || i == 14)
+	fprintf(stderr, "%s:%d: HF order %lu flow: cos %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k - 1], feature[2 * k - 1] / scale[k]);
+      feature[2 * k] = 0;
+      for (size_t l = 0; l < nreduced_id; l++) {
+	feature[2 * k] += scale[k] *
+	  (perp_fourier[0                       ][l][k][1] +
+	   perp_fourier[nedge_pseudorapidity - 2][l][k][1]);
+      }
+      if (i == 6 || i == 11 || i == 12  || i == 14)
+	fprintf(stderr, "%s:%d: HF order %lu flow: sin %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k], feature[2 * k] / scale[k]);
+    }
+
+#if 0
+    const double event_plane = atan2(feature[4], feature[3]);
+    const double v2 =
+      sqrt(feature[3] * feature[3] +
+	   feature[4] * feature[4]) / feature[0];
 #endif
+
+    const double max_feature = std::max(-(*std::min_element(feature, feature + nfeature)), *std::max_element(feature, feature + nfeature));
+
+    if (i == 6 || i == 11 || i == 12  || i == 14)
+      fprintf(stderr, "%s:%d: %f %f\n", __FILE__, __LINE__, hiBin * 0.5, sqrt(feature[3] * feature[3] + feature[4] * feature[4]));
+
+    for (Int_t k = 0; k < nPFpart; k++) {
+      int predictor_index = -1;
+      int interpolation_index = -1;
+      double density = 0;
+
+      if (pfEta[k] >= edge_pseudorapidity[0] &&
+	  pfEta[k] < edge_pseudorapidity[nedge_pseudorapidity - 1]) {
+	std::vector<double>::const_iterator p = std::lower_bound(edge_pseudorapidity_v.begin(), edge_pseudorapidity_v.end(), pfEta[k]);
+
+	predictor_index = (p - edge_pseudorapidity_v.begin()) - 1;
+      }
+
+      for (size_t j = 0; j < nreduced_id; j++) {
+	if (j == 2) {
+	  // HCAL
+	  if (pfEta[k] >=
+	      cms_hcal_edge_pseudorapidity[0] &&
+	      pfEta[k] <
+	      cms_hcal_edge_pseudorapidity[ncms_hcal_edge_pseudorapidity - 1]) {
+	    std::vector<double>::const_iterator p = std::lower_bound(cms_hcal_edge_pseudorapidity_v.begin(), cms_hcal_edge_pseudorapidity_v.end(), pfEta[k]);
+
+	    interpolation_index = (p - cms_hcal_edge_pseudorapidity_v.begin()) - 1;
+	  }
+	}
+	else {
+	  // Tracks or ECAL clusters
+	  if (pfEta[k] >=
+	      cms_ecal_edge_pseudorapidity[0] &&
+	      pfEta[k] <
+	      cms_ecal_edge_pseudorapidity[ncms_ecal_edge_pseudorapidity - 1]) {
+	    std::vector<double>::const_iterator p = std::lower_bound(cms_ecal_edge_pseudorapidity_v.begin(), cms_ecal_edge_pseudorapidity_v.end(), pfEta[k]);
+
+	    interpolation_index = (p - cms_ecal_edge_pseudorapidity_v.begin()) - 1;
+	  }
+	}
+	
+	
+	if (predictor_index >= 0 && interpolation_index >= 0) {
+	  // Calculate the aggregated prediction and
+	  // interpolation for the pseudorapidity segment
+
+	  const double azimuth = pfPhi[k];
+	  const double (*p)[2][82] =
+	    ue_predictor_pf[j][predictor_index];
+	  double pred = 0;
+
+	  for (size_t l = 0; l < nfourier; l++) {
+	    for (size_t m = 0; m < 2; m++) {
+	      float u = p[l][m][0];
+
+	      for (size_t n = 0; n < 2 * nfourier - 1; n++) {
+		//if (max_feature < 0.9 || (l == 0 && n == 0) || (l == 2 && (n == 3 || n == 4))) {
+		if (true || (l == 0 && n == 0)) {
+		  u += (((((((((p[l][m][9 * n + 9]) *
+			       feature[n] +
+			       p[l][m][9 * n + 8]) *
+			      feature[n] +
+			      p[l][m][9 * n + 7]) *
+			     feature[n] +
+			     p[l][m][9 * n + 6]) *
+			    feature[n] +
+			    p[l][m][9 * n + 5]) *
+			   feature[n] +
+			   p[l][m][9 * n + 4]) *
+			  feature[n] +
+			  p[l][m][9 * n + 3]) *
+			 feature[n] +
+			 p[l][m][9 * n + 2]) *
+			feature[n] +
+			p[l][m][9 * n + 1]) *
+		    feature[n];
+		}
+		//else if (n == 2 * l - 1 || n == 2 * l) {
+		else if ((l == 2 && (n == 3 || n == 4))) {
+		  u += p[l][m][9 * n + 1] * feature[n];
+		}
+	      }
+	    
+#if 0
+	      // This looks at a specific flow component and see how the polynomial is evaluated
+	      if (j == 0 && predictor_index == 3 && l == 0 && m == 0) {
+		// if(printDebug)fprintf(stderr, "%s:%d: %f %f\n", __FILE__, __LINE__, perp_fourier[0][2][2][0], perp_fourier[nedge_pseudorapidity - 2][2][2][1]);
+		if(printDebug)fprintf(stderr, "%s:%d: << %f %f %f %f %f %f %f\n", __FILE__, __LINE__, feature[0], feature[1], feature[2], feature[3], feature[4], u, perp_fourier[predictor_index][j][l][m]);
+	      }
+#endif
+	    
+	      pred += u * (l == 0 ? 1.0 : 2.0) *
+		(m == 0 ? cos(l * azimuth) :
+		 sin(l * azimuth));
+	      
+
+	    }
+	  }
+     
+	  //if(printDebug)std::cout<<"pred = "<<pred<<std::endl;
+
+	  double interp;
+
+	  if (j == 0) {
+	    interp =
+	      ue_interpolation_pf0[predictor_index][
+						    interpolation_index];
+	  }
+	  else if (j == 1) {
+	    interp =
+	      ue_interpolation_pf1[predictor_index][
+						    interpolation_index];
+	  }
+	  else if (j == 2) {
+	    interp =
+	      ue_interpolation_pf2[predictor_index][
+						    interpolation_index];
+	  }
+
+	  // Interpolate down to the finely binned
+	  // pseudorapidity
+
+	  density += pred /
+	    (2.0 * M_PI *
+	     (edge_pseudorapidity[predictor_index + 1] -
+	      edge_pseudorapidity[predictor_index])) *
+	    interp;
+
+	}
+      }
+    
+      // Prints the subtracted density * area
+      // fprintf(stderr, "%s:%d: %.8e %.8e %.8e %.8e %.8e\n", __FILE__, __LINE__, hiBin * 0.5, pfEta[k], pfPhi[k], pfPt[k], density * pfArea[k]);
+      // root_histogram0.Fill(pfEta[k], pfPhi[k], pfPt[k] - density * pfArea[k]);
+
+      if(printDebug && TMath::Abs(density * pfArea[k])>10000 && TMath::Abs(pfEta[k])<2) 
+	std::cout<<"eta = "<<pfEta[k]<<"; phi = "<<pfPhi[k]<<"; density*pfArea[k] = "<<density * pfArea[k]<<std::endl;
+    
+    }
+  
+  }
+  
+#if 0
 
   // declare the histograms we want here: 
   // Sum$(PfVsPtInitial) as a function of the 15 eta bins. -> 15 histograms. since i want the RMS value for each of them. 
   // same for PFVsPt 
-  // want to see when bulk = v0+v2 over v0 diverges. or when v2 diverges. or what is the contribution of v3 and v4 for those eevents. 
-  
+  // want to see when bulk = v0+v2 over v0 diverges. or when v2 diverges. or what is the contribution of v3 and v4 for those eevents.   
   TH1F *hSumPfVsPtInitial[nedge_pseudorapidity-1], *hSumPfVsPt[nedge_pseudorapidity-1], *hSumPfPt[nedge_pseudorapidity-1];
   TH2F *hPfVsPtInitial_eta, *hPfVsPt_eta, *hPfPt_eta;
   TH2F *hRMSSumPFVsPtIni_eta;
@@ -298,8 +576,6 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
   hRMSSumPFPt_eta = new TH2F("hRMSSumPFPt_eta","",nedge_pseudorapidity-1,edge_pseudorapidity,10000,-1000,3000);
   hetabin_test = new TH1F("hetabin_test","",nedge_pseudorapidity-1,edge_pseudorapidity);
 
-  size_t nentries = root_tree->GetEntries();
-  std::cout<<"No of Entries = "<<nentries<<endl;
   if(printDebug)nentries = 2;
   //start the event loop
   for(size_t i = 0; i<nentries; i++){
@@ -359,22 +635,25 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
 
   TCanvas *c1 = new TCanvas("c1","",600,400);
   makeMultiPanelCanvas(c1,3,1,0.0,0.0,0.2,0.15,0.07);
-  c1->cd(1);
+  c1->cd(2);
   hRMSSumPFVsPtIni_eta->SetTitle("RMS value of Sum$(PfVsPtInitial)");
   hRMSSumPFVsPtIni_eta->SetYTitle("GeV/c");
   hRMSSumPFVsPtIni_eta->SetXTitle("Detector #eta bins");
   hRMSSumPFVsPtIni_eta->Draw("col");
-  c1->cd(2);
+  drawText("After Sub, before Equ",0.1,0.2,15);
+  c1->cd(3);
   hRMSSumPFVsPt_eta->SetTitle("RMS value of Sum$(PfVsPt)");
   hRMSSumPFVsPt_eta->SetXTitle("Detector #eta bins");
   hRMSSumPFVsPt_eta->Draw("col");
-  c1->cd(3);
+  drawText("Final; after Equ",0.2,0.2,15);
+  c1->cd(1);
   hRMSSumPFPt_eta->SetTitle("RMS value of Sum$(PfPt)");
   hRMSSumPFPt_eta->SetXTitle("Detector #eta bins");
   hRMSSumPFPt_eta->Draw("col");
-  c1->SaveAs("RMSvalue_SumPt_etaBins_bad_mc.pdf","RECREATE");
+  drawText("Before Subtraction",0.25,0.2,15);
+  c1->SaveAs("RMSvalue_SumPt_etaBins_bad_data.pdf","RECREATE");
 
-  TFile f("bad_mc_sumPFVsPT_histos.root","RECREATE");  
+  TFile f("bad_data_sumPFVsPT_histos.root","RECREATE");  
   f.cd();
   for(int k = 0;k<nedge_pseudorapidity-1;k++){
     hSumPfVsPtInitial[k]->Write();
@@ -390,4 +669,7 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WO
   hRMSSumPFPt_eta->Write();
   f.Write();
   f.Close();
+
+#endif
+
 }
