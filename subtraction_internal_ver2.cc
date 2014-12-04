@@ -42,7 +42,7 @@ size_t pf_id_reduce(const Int_t pf_id)
 	return 0;
 }
 
-void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velicanu/public/forest/badjets/bad_allpthat.root", const int data = 0, const int calorimetric = 0)
+void subtraction_internal_ver2(const char *filename = "/Users/keraghav/WORK/RAA/Output/PbPb_data_bad_events.root", const int data = 1, const int calorimetric = 0)
 {
 	gStyle->SetPalette(55);
 
@@ -240,7 +240,7 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 	const std::vector<double> cms_ecal_edge_pseudorapidity_v(cms_ecal_edge_pseudorapidity, cms_ecal_edge_pseudorapidity + ncms_ecal_edge_pseudorapidity);
 
 	size_t nentries = root_tree->GetEntries();
-	nentries = 50;
+	//nentries = 50;
 
 	TCanvas canvas0("canvas0", "", 960, 720);
 
@@ -317,6 +317,7 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 			(perp_fourier[0                       ][l][0][0] +
 			 perp_fourier[nedge_pseudorapidity - 2][l][0][0]);
 		}
+		if (i == 6 || i == 11 || i == 12  || i == 14)
 		fprintf(stderr, "%s:%d: HF bulk: %f scaled, %f GeV/c unscaled\n", __FILE__, __LINE__, feature[0], feature[0] / scale[0]);
 		for (size_t k = 1; k < nfourier; k++) {
 			feature[2 * k - 1] = 0;
@@ -325,6 +326,7 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 				(perp_fourier[0                       ][l][k][0] +
 				 perp_fourier[nedge_pseudorapidity - 2][l][k][0]);
 			}
+		if (i == 6 || i == 11 || i == 12  || i == 14)
 			fprintf(stderr, "%s:%d: HF order %lu flow: cos %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k - 1], feature[2 * k - 1] / scale[k]);
 			feature[2 * k] = 0;
 			for (size_t l = 0; l < nreduced_id; l++) {
@@ -332,6 +334,7 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 				(perp_fourier[0                       ][l][k][1] +
 				 perp_fourier[nedge_pseudorapidity - 2][l][k][1]);
 			}
+		if (i == 6 || i == 11 || i == 12  || i == 14)
 			fprintf(stderr, "%s:%d: HF order %lu flow: sin %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k], feature[2 * k] / scale[k]);
 		}
 
@@ -342,6 +345,9 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 				 feature[4] * feature[4]) / feature[0];
 #endif
 
+		const double max_feature = std::max(-(*std::min_element(feature, feature + nfeature)), *std::max_element(feature, feature + nfeature));
+
+		if (i == 6 || i == 11 || i == 12  || i == 14)
 		fprintf(stderr, "%s:%d: %f %f\n", __FILE__, __LINE__, hiBin * 0.5, sqrt(feature[3] * feature[3] +
 				 feature[4] * feature[4]));
 
@@ -395,7 +401,8 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 							float u = p[l][m][0];
 
 							for (size_t n = 0; n < 2 * nfourier - 1; n++) {
-								if (feature[0] < 0.9 || (l == 0 && n == 0)) {
+								//if (max_feature < 0.9 || (l == 0 && n == 0) || (l == 2 && (n == 3 || n == 4))) {
+								if (true || (l == 0 && n == 0)) {
 									u += (((((((((p[l][m][9 * n + 9]) *
 												 feature[n] +
 												 p[l][m][9 * n + 8]) *
@@ -415,7 +422,8 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 										  p[l][m][9 * n + 1]) *
 										feature[n];
 								}
-								else if (n == 2 * l - 1 || n == 2 * l) {
+								//else if (n == 2 * l - 1 || n == 2 * l) {
+								else if ((l == 2 && (n == 3 || n == 4))) {
 									u += p[l][m][9 * n + 1] * feature[n];
 								}
 							}
@@ -476,11 +484,23 @@ void subtraction_internal_ver2(const char *filename = "/afs/cern.ch/work/v/velic
 		root_histogram0.SetContour(252);
 		root_histogram0.Draw("colz");
 
+		double sum_square = 0;
+
+		for (size_t j = root_histogram0.GetXaxis()->FindFixBin(-2); j <= root_histogram0.GetXaxis()->FindFixBin(2); j++) {
+			for (size_t k = 1; k <= 36; k++) {
+				const double u = root_histogram0.GetBinContent(root_histogram0.GetBin(j, k));
+				sum_square += u * u;
+			}
+		}
+		fprintf(stderr, "%s:%d: %f\n", __FILE__, __LINE__, sqrt(sum_square));
+
+#if 0
 		char buf[4096];
 
 		snprintf(buf, 4096, "subtraction_%lu.png", i);
 
 		canvas0.SaveAs(buf);
+#endif
 	}
 
 	root_file->Close();

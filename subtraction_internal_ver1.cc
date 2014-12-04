@@ -240,11 +240,55 @@ void subtraction_internal_ver1(const char *filename = "/afs/cern.ch/work/v/velic
 	const std::vector<double> cms_ecal_edge_pseudorapidity_v(cms_ecal_edge_pseudorapidity, cms_ecal_edge_pseudorapidity + ncms_ecal_edge_pseudorapidity);
 
 	size_t nentries = root_tree->GetEntries();
-	nentries = 10;
+	nentries = 20;
 
-	TCanvas canvas0("canvas0", "", 960, 720);
+	TCanvas canvas0("canvas0", "", 1440, 480);
+
+	const double left_margin = 0.0657133;
+	const double right_margin = 0.0023535;
+	const double top_margin = 0.05 / 1440 * 480;
+	const double bottom_margin = 0.109076 * 1.17;
+	const size_t npanel_x = 3;
+	const size_t npanel_y = 1;
+
+	std::vector<TPad *> pad;
+
+	for (size_t i = 0; i < 3; i++) {
+		canvas0.cd();
+
+		char buf[4096];
+
+		snprintf(buf, 4096, "pad%lu", i);
+
+		pad.push_back(
+			new TPad(buf, "",
+					 (1 - left_margin - right_margin) / npanel_x * i,
+					 (1 - top_margin - bottom_margin) / npanel_y * 0,
+					 left_margin + right_margin +
+					 (1 - left_margin - right_margin) / npanel_x * (i + 1),
+					 top_margin + bottom_margin +
+					 (1 - top_margin - bottom_margin) / npanel_y * 1));
+		pad.back()->SetLeftMargin(
+			left_margin / (left_margin + right_margin +
+						   (1 - left_margin - right_margin) / npanel_x));
+		pad.back()->SetRightMargin(
+			right_margin / (left_margin + right_margin +
+							(1 - left_margin - right_margin) / npanel_x));
+		pad.back()->SetTopMargin(
+			top_margin / (top_margin + bottom_margin +
+						  (1 - top_margin - bottom_margin) / npanel_y));
+		pad.back()->SetBottomMargin(
+			bottom_margin / (top_margin + bottom_margin +
+							 (1 - top_margin - bottom_margin) / npanel_y));
+		pad.back()->SetFillStyle(0);
+		pad.back()->SetFillColor(0);
+		pad.back()->Draw();
+		pad.back()->Modified();
+	}
 
 	TH2D root_histogram0("root_histogram0", "", ncms_hcal_edge_pseudorapidity - 1, cms_hcal_edge_pseudorapidity, 36, -TMath::Pi(), TMath::Pi());
+	TH2D root_histogram1("root_histogram1", "", ncms_hcal_edge_pseudorapidity - 1, cms_hcal_edge_pseudorapidity, 36, -TMath::Pi(), TMath::Pi());
+	TH2D root_histogram2("root_histogram1", "", ncms_hcal_edge_pseudorapidity - 1, cms_hcal_edge_pseudorapidity, 36, -TMath::Pi(), TMath::Pi());
 
 	for (size_t i = 0; i < nentries; i++) {
 		root_tree->GetEntry(i);
@@ -252,6 +296,8 @@ void subtraction_internal_ver1(const char *filename = "/afs/cern.ch/work/v/velic
 		t->GetEntry(i);
 
 		root_histogram0.Reset();
+		root_histogram1.Reset();
+		root_histogram2.Reset();
 
 		// Event collective Fourier components, per particle flow ID
 		// group. Note that since by heavy ion convention, dN/dphi =
@@ -414,6 +460,7 @@ void subtraction_internal_ver1(const char *filename = "/afs/cern.ch/work/v/velic
 									  p[l][m][9 * n + 1]) *
 									feature[n];
 							}
+
 #if 0
 							// This looks at a specific flow component and see how the polynomial is evaluated
 							if (j == 0 && predictor_index == 3 && l == 0 && m == 0) {
@@ -460,16 +507,166 @@ void subtraction_internal_ver1(const char *filename = "/afs/cern.ch/work/v/velic
 							// Prints the subtracted density * area
 			//fprintf(stderr, "%s:%d: %.8e %.8e %.8e %.8e %.8e\n", __FILE__, __LINE__, hiBin * 0.5, pfEta[k], pfPhi[k], pfPt[k], density * pfArea[k]);
 			root_histogram0.Fill(pfEta[k], pfPhi[k], pfPt[k] - density * pfArea[k]);
+			root_histogram1.Fill(pfEta[k], pfPhi[k], pfPt[k]);
 		}
 
-		canvas0.SetRightMargin(0.125);
-		canvas0.SetLeftMargin(0.0625);
-		canvas0.SetBottomMargin(0.0625);
+
+		for (int kx = 1; kx < root_histogram2.GetXaxis()->GetNbins() + 1; kx++) {
+			for (int ky = 1; ky < root_histogram2.GetYaxis()->GetNbins() + 1; ky++) {
+				double pfEta_k = root_histogram2.GetXaxis()->GetBinCenter(kx);
+				double pfPhi_k = root_histogram2.GetYaxis()->GetBinCenter(ky);
+
+			int predictor_index = -1;
+			int interpolation_index = -1;
+			double density = 0;
+
+			if (pfEta_k >= edge_pseudorapidity[0] &&
+				pfEta_k < edge_pseudorapidity[nedge_pseudorapidity - 1]) {
+				std::vector<double>::const_iterator p = std::lower_bound(edge_pseudorapidity_v.begin(), edge_pseudorapidity_v.end(), pfEta_k);
+
+				predictor_index = (p - edge_pseudorapidity_v.begin()) - 1;
+			}
+
+			for (size_t j = 0; j < nreduced_id; j++) {
+				if (j == 2) {
+					// HCAL
+					if (pfEta_k >=
+						cms_hcal_edge_pseudorapidity[0] &&
+						pfEta_k <
+						cms_hcal_edge_pseudorapidity[ncms_hcal_edge_pseudorapidity - 1]) {
+						std::vector<double>::const_iterator p = std::lower_bound(cms_hcal_edge_pseudorapidity_v.begin(), cms_hcal_edge_pseudorapidity_v.end(), pfEta_k);
+
+						interpolation_index = (p - cms_hcal_edge_pseudorapidity_v.begin()) - 1;
+					}
+				}
+				else {
+					// Tracks or ECAL clusters
+					if (pfEta_k >=
+						cms_ecal_edge_pseudorapidity[0] &&
+						pfEta_k <
+						cms_ecal_edge_pseudorapidity[ncms_ecal_edge_pseudorapidity - 1]) {
+						std::vector<double>::const_iterator p = std::lower_bound(cms_ecal_edge_pseudorapidity_v.begin(), cms_ecal_edge_pseudorapidity_v.end(), pfEta_k);
+
+						interpolation_index = (p - cms_ecal_edge_pseudorapidity_v.begin()) - 1;
+					}
+				}
+
+				if (predictor_index >= 0 && interpolation_index >= 0) {
+					// Calculate the aggregated prediction and
+					// interpolation for the pseudorapidity segment
+
+					const double azimuth = pfPhi_k;
+					const double (*p)[2][82] =
+						ue_predictor_pf[j][predictor_index];
+					double pred = 0;
+
+					for (size_t l = 0; l < nfourier; l++) {
+						for (size_t m = 0; m < 2; m++) {
+							float u = p[l][m][0];
+
+							for (size_t n = 0; n < 2 * nfourier - 1; n++) {
+								u += (((((((((p[l][m][9 * n + 9]) *
+											 feature[n] +
+											 p[l][m][9 * n + 8]) *
+											feature[n] +
+											p[l][m][9 * n + 7]) *
+										   feature[n] +
+										   p[l][m][9 * n + 6]) *
+										  feature[n] +
+										  p[l][m][9 * n + 5]) *
+										 feature[n] +
+										 p[l][m][9 * n + 4]) *
+										feature[n] +
+										p[l][m][9 * n + 3]) *
+									   feature[n] +
+									   p[l][m][9 * n + 2]) *
+									  feature[n] +
+									  p[l][m][9 * n + 1]) *
+									feature[n];
+							}
+
+#if 0
+							// This looks at a specific flow component and see how the polynomial is evaluated
+							if (j == 0 && predictor_index == 3 && l == 0 && m == 0) {
+								//fprintf(stderr, "%s:%d: %f %f\n", __FILE__, __LINE__, perp_fourier[0][2][2][0], perp_fourier[nedge_pseudorapidity - 2][2][2][1]);
+								fprintf(stderr, "%s:%d: << %f %f %f %f %f %f %f\n", __FILE__, __LINE__, feature[0], feature[1], feature[2], feature[3], feature[4], u, perp_fourier[predictor_index][j][l][m]);
+							}
+#endif
+
+							pred += u * (l == 0 ? 1.0 : 2.0) *
+								(m == 0 ? cos(l * azimuth) :
+								 sin(l * azimuth));
+						}
+					}
+
+					double interp;
+
+					if (j == 0) {
+						interp =
+							ue_interpolation_pf0[predictor_index][
+								interpolation_index];
+					}
+					else if (j == 1) {
+						interp =
+							ue_interpolation_pf1[predictor_index][
+								interpolation_index];
+					}
+					else if (j == 2) {
+						interp =
+							ue_interpolation_pf2[predictor_index][
+								interpolation_index];
+					}
+
+					// Interpolate down to the finely binned
+					// pseudorapidity
+
+					density += pred /
+						(2.0 * M_PI *
+						 (edge_pseudorapidity[predictor_index + 1] -
+						  edge_pseudorapidity[predictor_index])) *
+						interp;
+				}
+			}
+			root_histogram2.SetBinContent(root_histogram2.FindBin(pfEta_k, pfPhi_k), density * root_histogram2.GetXaxis()->GetBinWidth(root_histogram2.GetXaxis()->FindFixBin(pfEta_k)) * root_histogram2.GetYaxis()->GetBinWidth(root_histogram2.GetYaxis()->FindFixBin(pfPhi_k)));
+			}
+		}
+
+		pad[0]->cd();
+
+		pad[0]->SetRightMargin(0.125);
+		pad[0]->SetLeftMargin(0.0625);
+		pad[0]->SetBottomMargin(0.0625);
+
+		root_histogram1.SetMinimum(-100);
+		root_histogram1.SetMaximum(100);
+		root_histogram1.SetContour(252);
+		root_histogram1.Draw("colz");
+
+		pad[0]->Modified();
+
+		pad[1]->cd();
+
+		pad[1]->SetRightMargin(0.125);
+		pad[1]->SetLeftMargin(0.0625);
+		pad[1]->SetBottomMargin(0.0625);
+
+		root_histogram2.SetMinimum(-100);
+		root_histogram2.SetMaximum(100);
+		root_histogram2.SetContour(252);
+		root_histogram2.Draw("colz");
+
+		pad[2]->cd();
+
+		pad[2]->SetRightMargin(0.125);
+		pad[2]->SetLeftMargin(0.0625);
+		pad[2]->SetBottomMargin(0.0625);
 
 		root_histogram0.SetMinimum(-100);
 		root_histogram0.SetMaximum(100);
 		root_histogram0.SetContour(252);
 		root_histogram0.Draw("colz");
+
+		pad[2]->Modified();
 
 		char buf[4096];
 
