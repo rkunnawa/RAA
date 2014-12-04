@@ -229,7 +229,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   
   TStopwatch timer;
   timer.Start();
-
+  
   TDatime date;
   
   cout<<"Running for Algo = "<<algo<<" "<<jet_type<<endl;
@@ -250,25 +250,25 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   
   //std::string infile2;
   //infile2 = "jet80_filelist.txt";
-
+  
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
-
+  
   //std::ifstream instr2(infile2.c_str(),std::ifstream::in);
   //std::string filename2;
-
+  
   cout<<"reading from "<<startfile<<" to "<<endfile<<endl;
   
   for(int ifile = 0;ifile<startfile;ifile++){
     instr1>>filename1;
   }
-
+  
   //for(int ifile = 0;ifile<boundaries_fileno_job[startfile];ifile++){
   //  instr2>>filename2;
   //}
- 
+  
   const int N = 5;
-    
+  
   TChain *jetpbpb1[N][no_radius];
   //TChain *jetpbpb2[N][no_radius];
   
@@ -1239,18 +1239,18 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       hpbpb_Npix_before_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);	
       if(hiBin_1 >= 0 && hiBin_1 < 1) hpbpb_Npix_before_cut[k][nbins_cent+1]->Fill(jetCounter,hiNpix_1);	
 
-
-      if(jetCounter>10){
-	//put the failure mode event variables here: 
-	fVs_failure[k]<<run_1<<" "<<lumi_1<<" "<<evt_1<<" "<<vz_1<<" "<<hiHF_1<<" "<<hiNpix_1<<" "<<hiNtracks_1<<endl;
-      }
-
       // apply the correct supernova selection cut rejection here: 
       if(hiNpix_1 > 38000 - 500*jetCounter){
 	if(printDebug) cout<<"removed this supernova event"<<endl;
 	continue;
       }
-      
+
+      //get the failed events after the beam scrapping and pile up rejection cuts. 
+      if(jetCounter>10){
+	//put the failure mode event variables here: 
+	fVs_failure[k]<<run_1<<" "<<lumi_1<<" "<<evt_1<<" "<<vz_1<<" "<<hiHF_1<<" "<<hiNpix_1<<" "<<hiNtracks_1<<endl;
+      }
+
       hpbpb_Npix_after_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
       hpbpb_Npix_after_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);
       //}//if Vs search for supernova events. 
