@@ -67,8 +67,8 @@ void RAA_VsValidationCheck(){
   hOldJet55->Print("base");
   hReReco55->Print("base");
   
-  hOldJet55->Scale(1./hOldJet55->Integral());
-  hReReco55->Scale(1./hReReco55->Integral());
+  //hOldJet55->Scale(1./hOldJet55->Integral());
+  //hReReco55->Scale(1./hReReco55->Integral());
 
   hOldJet55->SetMarkerStyle(20);
   hOldJet55->SetMarkerColor(kBlack);
@@ -95,5 +95,6 @@ void RAA_VsValidationCheck(){
   hRatio->Draw();
   
   c->SaveAs("oldvsrereco.pdf","RECREATE");
+  c->SaveAs("oldvsrereco.C","RECREATE");
 
 }
