@@ -1222,11 +1222,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 #endif 
   
   TH1F* hEvents = new TH1F("hEvents","",2,0,1);
-  TH1F* hEvents_Diverge_v0 = new TH1F("hEvents_Diverge_v0","",2,0,1);
-  TH1F* hEvents_Diverge_v1 = new TH1F("hEvents_Diverge_v1","",2,0,1);
-  TH1F* hEvents_Diverge_v2 = new TH1F("hEvents_Diverge_v2","",2,0,1);
-  TH1F* hEvents_Diverge_v3 = new TH1F("hEvents_Diverge_v3","",2,0,1);
-  TH1F* hEvents_Diverge_v4 = new TH1F("hEvents_Diverge_v4","",2,0,1);
+  TH1F* hEvents_Diverge_v0 = new TH1F("hEvents_Diverge_v0","",2,0,2);
+  TH1F* hEvents_Diverge_v1 = new TH1F("hEvents_Diverge_v1","",2,0,2);
+  TH1F* hEvents_Diverge_v2 = new TH1F("hEvents_Diverge_v2","",2,0,2);
+  TH1F* hEvents_Diverge_v3 = new TH1F("hEvents_Diverge_v3","",2,0,2);
+  TH1F* hEvents_Diverge_v4 = new TH1F("hEvents_Diverge_v4","",2,0,2);
   TH1F* hEvents_Diverge = new TH1F("hEvents_Diverge","",2,0,1);
 
   Int_t goodEvent_counter = 0;
@@ -1327,10 +1327,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       if(TMath::Abs(Vs_0_y)>5200 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v0 > 5200"<<std::endl;
       if(TMath::Abs(Vs_0_x)>5200 || TMath::Abs(Vs_0_y)>5200) hEvents_Diverge_v0->Fill(1);
 
-      Float_t Vs_1_x_minus = sumpT[0]*v_n[1][0]*TMath::Cos(2*psi_n[1][0]);
-      Float_t Vs_1_x_plus = sumpT[14]*v_n[1][14]*TMath::Cos(2*psi_n[1][14]);
-      Float_t Vs_1_y_minus = sumpT[0]*v_n[1][0]*TMath::Sin(2*psi_n[1][0]);
-      Float_t Vs_1_y_plus = sumpT[14]*v_n[1][14]*TMath::Sin(2*psi_n[1][14]);
+      Float_t Vs_1_x_minus = sumpT[0]*v_n[1][0]*TMath::Cos(1*psi_n[1][0]);
+      Float_t Vs_1_x_plus = sumpT[14]*v_n[1][14]*TMath::Cos(1*psi_n[1][14]);
+      Float_t Vs_1_y_minus = sumpT[0]*v_n[1][0]*TMath::Sin(1*psi_n[1][0]);
+      Float_t Vs_1_y_plus = sumpT[14]*v_n[1][14]*TMath::Sin(1*psi_n[1][14]);
       Float_t Vs_1_x = Vs_1_x_minus + Vs_1_x_plus;
       Float_t Vs_1_y = Vs_1_y_minus + Vs_1_y_plus;
       if(printDebug)std::cout<<"Vs_1_x = "<<Vs_1_x<<"; Vs_1_y =  "<<Vs_1_y<<std::endl;
@@ -1349,10 +1349,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       if(TMath::Abs(Vs_2_y)>140 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v2 > 140"<<std::endl;
       if(TMath::Abs(Vs_2_x)>140 || TMath::Abs(Vs_2_y)>140) hEvents_Diverge_v2->Fill(1);
 
-      Float_t Vs_3_x_minus = sumpT[0]*v_n[3][0]*TMath::Cos(2*psi_n[3][0]);
-      Float_t Vs_3_x_plus = sumpT[14]*v_n[3][14]*TMath::Cos(2*psi_n[3][14]);
-      Float_t Vs_3_y_minus = sumpT[0]*v_n[3][0]*TMath::Sin(2*psi_n[3][0]);
-      Float_t Vs_3_y_plus = sumpT[14]*v_n[3][14]*TMath::Sin(2*psi_n[3][14]);
+      Float_t Vs_3_x_minus = sumpT[0]*v_n[3][0]*TMath::Cos(3*psi_n[3][0]);
+      Float_t Vs_3_x_plus = sumpT[14]*v_n[3][14]*TMath::Cos(3*psi_n[3][14]);
+      Float_t Vs_3_y_minus = sumpT[0]*v_n[3][0]*TMath::Sin(3*psi_n[3][0]);
+      Float_t Vs_3_y_plus = sumpT[14]*v_n[3][14]*TMath::Sin(3*psi_n[3][14]);
       Float_t Vs_3_x = Vs_3_x_minus + Vs_3_x_plus;
       Float_t Vs_3_y = Vs_3_y_minus + Vs_3_y_plus;
       if(printDebug)std::cout<<"Vs_3_x = "<<Vs_3_x<<"; Vs_3_y =  "<<Vs_3_y<<std::endl;
@@ -1360,10 +1360,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       if(TMath::Abs(Vs_3_y)>120 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v3 > 120"<<std::endl;
       if(TMath::Abs(Vs_3_x)>120 || TMath::Abs(Vs_3_y)>120) hEvents_Diverge_v3->Fill(1);
 
-      Float_t Vs_4_x_minus = sumpT[0]*v_n[4][0]*TMath::Cos(2*psi_n[4][0]);
-      Float_t Vs_4_x_plus = sumpT[14]*v_n[4][14]*TMath::Cos(2*psi_n[4][14]);
-      Float_t Vs_4_y_minus = sumpT[0]*v_n[4][0]*TMath::Sin(2*psi_n[4][0]);
-      Float_t Vs_4_y_plus = sumpT[14]*v_n[4][14]*TMath::Sin(2*psi_n[4][14]);
+      Float_t Vs_4_x_minus = sumpT[0]*v_n[4][0]*TMath::Cos(4*psi_n[4][0]);
+      Float_t Vs_4_x_plus = sumpT[14]*v_n[4][14]*TMath::Cos(4*psi_n[4][14]);
+      Float_t Vs_4_y_minus = sumpT[0]*v_n[4][0]*TMath::Sin(4*psi_n[4][0]);
+      Float_t Vs_4_y_plus = sumpT[14]*v_n[4][14]*TMath::Sin(4*psi_n[4][14]);
       Float_t Vs_4_x = Vs_4_x_minus + Vs_4_x_plus;
       Float_t Vs_4_y = Vs_4_y_minus + Vs_4_y_plus;
       if(printDebug)std::cout<<"Vs_4_x = "<<Vs_4_x<<"; Vs_4_y =  "<<Vs_4_y<<std::endl;
