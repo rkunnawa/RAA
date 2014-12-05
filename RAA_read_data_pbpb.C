@@ -66,6 +66,8 @@
 
 //static const double boundaries_fileno_job[job_no+1] = {0, 413, 826, 1239, 1652, 2065, 2478, 2891, 3304, 3717, 4130, 4542};
 
+#define NOBJECT_MAX 16384
+
 static const int nbins_pt = 39;
 static const double boundaries_pt[nbins_pt+1] = {
   3, 4, 5, 7, 9, 12, 
@@ -229,7 +231,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   
   TStopwatch timer;
   timer.Start();
-
+  
   TDatime date;
   
   cout<<"Running for Algo = "<<algo<<" "<<jet_type<<endl;
@@ -250,25 +252,25 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   
   //std::string infile2;
   //infile2 = "jet80_filelist.txt";
-
+  
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
-
+  
   //std::ifstream instr2(infile2.c_str(),std::ifstream::in);
   //std::string filename2;
-
+  
   cout<<"reading from "<<startfile<<" to "<<endfile<<endl;
   
   for(int ifile = 0;ifile<startfile;ifile++){
     instr1>>filename1;
   }
-
+  
   //for(int ifile = 0;ifile<boundaries_fileno_job[startfile];ifile++){
   //  instr2>>filename2;
   //}
- 
-  const int N = 5;
-    
+  
+  const int N = 6;
+  
   TChain *jetpbpb1[N][no_radius];
   //TChain *jetpbpb2[N][no_radius];
   
@@ -280,6 +282,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     dir[2][k] = Form("ak%s%d%sJetAnalyzer",algo,list_radius[k],jet_type);
     dir[3][k] = "hiEvtAnalyzer";
     dir[4][k] = "hltobject";
+    dir[5][k] = "pfcandAnalyzer";
   }
 
   string trees[N] = {
@@ -287,7 +290,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     "HltTree",
     "t",
     "HiTree",
-    "jetObjTree"
+    "jetObjTree",
+    "pfTree"
   };
   
   //this loop is to assign the tree values before we go into the file loop. 
@@ -360,6 +364,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     jetpbpb1[2][k]->AddFriend(jetpbpb1[1][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[3][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[4][k]);
+    jetpbpb1[2][k]->AddFriend(jetpbpb1[5][k]);
 
     // jetpbpb2[2][k]->AddFriend(jetpbpb2[0][k]);
     // jetpbpb2[2][k]->AddFriend(jetpbpb2[1][k]);
@@ -777,6 +782,19 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   float trgObj_phi_1;
   float trgObj_mass_1;
   
+
+  Int_t nPFpart;
+  Int_t pfId[NOBJECT_MAX];
+  Float_t pfPt[NOBJECT_MAX];
+  Float_t pfVsPtInitial[NOBJECT_MAX];
+  Float_t pfVsPt[NOBJECT_MAX];
+  Float_t pfEta[NOBJECT_MAX];
+  Float_t pfPhi[NOBJECT_MAX];
+  Float_t pfArea[NOBJECT_MAX];
+  Float_t v_n[5][15];
+  Float_t psi_n[5][15];
+  Float_t sumpT[15];
+
   // //file 2: 
   // // jet tree
   // int nrefe_2;
@@ -955,6 +973,18 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     jetpbpb1[2][k]->SetBranchAddress("phi",&trgObj_phi_1);
     jetpbpb1[2][k]->SetBranchAddress("mass",&trgObj_mass_1);
 
+    jetpbpb1[2][k]->SetBranchAddress("nPFpart", &nPFpart);
+    jetpbpb1[2][k]->SetBranchAddress("pfId", pfId);
+    jetpbpb1[2][k]->SetBranchAddress("pfPt", pfPt);
+    jetpbpb1[2][k]->SetBranchAddress("pfVsPtInitial", pfVsPtInitial);
+    jetpbpb1[2][k]->SetBranchAddress("pfVsPt", pfVsPt);
+    jetpbpb1[2][k]->SetBranchAddress("pfEta", pfEta);
+    jetpbpb1[2][k]->SetBranchAddress("pfPhi", pfPhi);
+    jetpbpb1[2][k]->SetBranchAddress("pfArea", pfArea);
+    jetpbpb1[2][k]->SetBranchAddress("vn",&v_n);
+    jetpbpb1[2][k]->SetBranchAddress("psin",&psi_n);
+    jetpbpb1[2][k]->SetBranchAddress("sumpt",&sumpT);
+
     // //set the branch addresses:  - one of the most boring parts of the code: 
     // jetpbpb2[2][k]->SetBranchAddress("evt",&evt_2);
     // jetpbpb2[2][k]->SetBranchAddress("run",&run_2);
@@ -1015,14 +1045,22 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   // run lumi evt HLTobjpt HLTobjeta HLTobjphi hibin jtpt jteta jtphi
 
   //ofstream fHLT_80,fHLT_65,fHLT_55;
+
+
+#if 0
+
   ofstream fVs_failure[no_radius];
+
   //fHLT_80.open(Form("pbpb_%s_R%d_max_trgObj_80_jets.txt",algo,radius));
   //fHLT_65.open(Form("pbpb_%s_R%d_80_max_trgObj_65_jets.txt",algo,radius));
   //fHLT_55.open(Form("pbpb_%s_R%d_65_max_trgObj_55_jets.txt",algo,radius));
+
   for(int k = 0;k<no_radius;k++){
     fVs_failure[k].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pbpb_%s_R%d_DATA_failure_mode_events_%d_%d.txt",algo,list_radius[k],date.GetDate(),endfile));
     //fHLT_high[k].open(Form("/export/d00/scratch/rkunnawa/rootfiles/pbpb_%s_R%d_abnormal_jets_%d_%d.txt",algo,list_radius[k],date.GetDate(),endfile));
   }
+  
+
 
   // the actual cut we are going to be using is 
   // TMath::Max(chargedMax,neutralMax)/(TMath::Max(chargedSum,neutralSum))<0.975
@@ -1032,6 +1070,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   // TMath::Max(chargedMax,neutralMax)/TMath::Max(chargedSum,neutralSum)<0.975 im going to add this from Kurt used in 12003 here to see if it sort of helps. he also used this in 14007 analysis. 
 
   //declare the histograms needed for the hpbpb_TrigObj80, hpbpb_TrigObj65, hpbpb_TrigObj55, hpbpb_TrigObjMB, hpbpb_TrigComb;
+  
   
   TH1F *hpbpb_TrgObj80[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_TrgObj65[no_radius][nbins_eta][nbins_cent+1];
@@ -1153,6 +1192,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     
   }//radius loop
 
+
+  
+
+
   Float_t cut1 = 0;
   Float_t cut2 = 0, cut2b = 0;;
   Float_t cut3 = 0;
@@ -1163,7 +1206,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   TH1F* hCut3 = new TH1F("hCut3","(chSum+phSum+neSum+muSum+eSum-jtpu)/jtpt",100,0,10);
   TH1F* hCut4 = new TH1F("hCut4","(chSum+phSum+neSum+muSum+eSum)/(0.5*rawpt)",100,0,10);
   TH1F* hCut5 = new TH1F("hCut5","neMax/(neMax+chMax+phMax)",100,0,10);
-  TH1F* hEvents = new TH1F("hEvents","",2,0,1);
   TH1F* hJets = new TH1F("hJets","",2,0,1);
   Float_t pt = 0;
   Float_t chMax = 0,chSum = 0,phMax = 0,phSum = 0, neMax = 0, neSum = 0, muSum = 0, muMax = 0, eSum = 0, eMax = 0;
@@ -1176,6 +1218,18 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   //empty for now - need to fix that once we have the MB data.  
   
   if(printDebug)hpbpb_TrgObj80[0][0][0]->Print("base");
+
+#endif 
+  
+  TH1F* hEvents = new TH1F("hEvents","",2,0,1);
+  TH1F* hEvents_Diverge_v0 = new TH1F("hEvents_Diverge_v0","",2,0,2);
+  TH1F* hEvents_Diverge_v1 = new TH1F("hEvents_Diverge_v1","",2,0,2);
+  TH1F* hEvents_Diverge_v2 = new TH1F("hEvents_Diverge_v2","",2,0,2);
+  TH1F* hEvents_Diverge_v3 = new TH1F("hEvents_Diverge_v3","",2,0,2);
+  TH1F* hEvents_Diverge_v4 = new TH1F("hEvents_Diverge_v4","",2,0,2);
+  TH1F* hEvents_Diverge = new TH1F("hEvents_Diverge","",2,0,1);
+
+  Int_t goodEvent_counter = 0;
 
   for(int k = 0;k<no_radius;k++){
 
@@ -1203,10 +1257,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       
       if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
 
+#if 0
       hpbpb_cent[k]->Fill(hiBin_1);
       hpbpb_vz[k]->Fill(vz_1);
       hpbpb_vx[k]->Fill(vx_1);
       hpbpb_vy[k]->Fill(vy_1);
+#endif
 
       if(fabs(vz_1)>15) continue;
       
@@ -1234,28 +1290,89 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 	
       }//eta bins loop
       
-      //if(printDebug)cout<<"pixel hit = "<<hiNpix_1<<", jet counter = "<<jetCounter<<endl;
-      hpbpb_Npix_before_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
-      hpbpb_Npix_before_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);	
-      if(hiBin_1 >= 0 && hiBin_1 < 1) hpbpb_Npix_before_cut[k][nbins_cent+1]->Fill(jetCounter,hiNpix_1);	
-
-
-      if(jetCounter>10){
-	//put the failure mode event variables here: 
-	fVs_failure[k]<<run_1<<" "<<lumi_1<<" "<<evt_1<<" "<<vz_1<<" "<<hiHF_1<<" "<<hiNpix_1<<" "<<hiNtracks_1<<endl;
-      }
+      // if(printDebug)cout<<"pixel hit = "<<hiNpix_1<<", jet counter = "<<jetCounter<<endl;
+      
+      // hpbpb_Npix_before_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
+      // hpbpb_Npix_before_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);	
+      
+      //if(hiBin_1 >= 0 && hiBin_1 < 1) hpbpb_Npix_before_cut[k][nbins_cent+1]->Fill(jetCounter,hiNpix_1);	
 
       // apply the correct supernova selection cut rejection here: 
       if(hiNpix_1 > 38000 - 500*jetCounter){
-	if(printDebug) cout<<"removed this supernova event"<<endl;
-	continue;
+       	if(printDebug) cout<<"removed this supernova event"<<endl;
+      	continue;
       }
+
+      //get the failed events after the beam scrapping and pile up rejection cuts. 
+      //if(jetCounter>10){
+	//put the failure mode event variables here: 
+	//fVs_failure[k]<<run_1<<" "<<lumi_1<<" "<<evt_1<<" "<<vz_1<<" "<<hiHF_1<<" "<<hiNpix_1<<" "<<hiNtracks_1<<endl;
+	//      }
+
       
-      hpbpb_Npix_after_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
-      hpbpb_Npix_after_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);
+      //hpbpb_Npix_after_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
+      //hpbpb_Npix_after_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);
       //}//if Vs search for supernova events. 
       
       hEvents->Fill(1);
+      
+      Float_t Vs_0_x_minus = sumpT[0]*v_n[0][0]*TMath::Cos(0*psi_n[0][0]);
+      Float_t Vs_0_x_plus = sumpT[14]*v_n[0][14]*TMath::Cos(0*psi_n[0][14]);
+      Float_t Vs_0_y_minus = sumpT[0]*v_n[0][0]*TMath::Sin(0*psi_n[0][0]);
+      Float_t Vs_0_y_plus = sumpT[14]*v_n[0][14]*TMath::Sin(0*psi_n[0][14]);
+      Float_t Vs_0_x = Vs_0_x_minus + Vs_0_x_plus;
+      Float_t Vs_0_y = Vs_0_y_minus + Vs_0_y_plus;
+      if(printDebug)std::cout<<"Vs_0_x = "<<Vs_0_x<<"; Vs_0_y =  "<<Vs_0_y<<std::endl;
+      if(TMath::Abs(Vs_0_x)>5200 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* cos v0 > 5200"<<std::endl;
+      if(TMath::Abs(Vs_0_y)>5200 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v0 > 5200"<<std::endl;
+      if(TMath::Abs(Vs_0_x)>5200 || TMath::Abs(Vs_0_y)>5200) hEvents_Diverge_v0->Fill(1);
+
+      Float_t Vs_1_x_minus = sumpT[0]*v_n[1][0]*TMath::Cos(1*psi_n[1][0]);
+      Float_t Vs_1_x_plus = sumpT[14]*v_n[1][14]*TMath::Cos(1*psi_n[1][14]);
+      Float_t Vs_1_y_minus = sumpT[0]*v_n[1][0]*TMath::Sin(1*psi_n[1][0]);
+      Float_t Vs_1_y_plus = sumpT[14]*v_n[1][14]*TMath::Sin(1*psi_n[1][14]);
+      Float_t Vs_1_x = Vs_1_x_minus + Vs_1_x_plus;
+      Float_t Vs_1_y = Vs_1_y_minus + Vs_1_y_plus;
+      if(printDebug)std::cout<<"Vs_1_x = "<<Vs_1_x<<"; Vs_1_y =  "<<Vs_1_y<<std::endl;
+      if(TMath::Abs(Vs_1_x)>100 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* cos v1 > 100"<<std::endl;
+      if(TMath::Abs(Vs_1_y)>100 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v1 > 100"<<std::endl;
+      if(TMath::Abs(Vs_1_x)>100 || TMath::Abs(Vs_1_y)>100) hEvents_Diverge_v1->Fill(1);
+
+      Float_t Vs_2_x_minus = sumpT[0]*v_n[2][0]*TMath::Cos(2*psi_n[2][0]);
+      Float_t Vs_2_x_plus = sumpT[14]*v_n[2][14]*TMath::Cos(2*psi_n[2][14]);
+      Float_t Vs_2_y_minus = sumpT[0]*v_n[2][0]*TMath::Sin(2*psi_n[2][0]);
+      Float_t Vs_2_y_plus = sumpT[14]*v_n[2][14]*TMath::Sin(2*psi_n[2][14]);
+      Float_t Vs_2_x = Vs_2_x_minus + Vs_2_x_plus;
+      Float_t Vs_2_y = Vs_2_y_minus + Vs_2_y_plus;
+      if(printDebug)std::cout<<"Vs_2_x = "<<Vs_2_x<<"; Vs_2_y =  "<<Vs_2_y<<std::endl;
+      if(TMath::Abs(Vs_2_x)>140 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* cos v2 > 140"<<std::endl;
+      if(TMath::Abs(Vs_2_y)>140 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v2 > 140"<<std::endl;
+      if(TMath::Abs(Vs_2_x)>140 || TMath::Abs(Vs_2_y)>140) hEvents_Diverge_v2->Fill(1);
+
+      Float_t Vs_3_x_minus = sumpT[0]*v_n[3][0]*TMath::Cos(3*psi_n[3][0]);
+      Float_t Vs_3_x_plus = sumpT[14]*v_n[3][14]*TMath::Cos(3*psi_n[3][14]);
+      Float_t Vs_3_y_minus = sumpT[0]*v_n[3][0]*TMath::Sin(3*psi_n[3][0]);
+      Float_t Vs_3_y_plus = sumpT[14]*v_n[3][14]*TMath::Sin(3*psi_n[3][14]);
+      Float_t Vs_3_x = Vs_3_x_minus + Vs_3_x_plus;
+      Float_t Vs_3_y = Vs_3_y_minus + Vs_3_y_plus;
+      if(printDebug)std::cout<<"Vs_3_x = "<<Vs_3_x<<"; Vs_3_y =  "<<Vs_3_y<<std::endl;
+      if(TMath::Abs(Vs_3_x)>120 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* cos v3 > 120"<<std::endl;
+      if(TMath::Abs(Vs_3_y)>120 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v3 > 120"<<std::endl;
+      if(TMath::Abs(Vs_3_x)>120 || TMath::Abs(Vs_3_y)>120) hEvents_Diverge_v3->Fill(1);
+
+      Float_t Vs_4_x_minus = sumpT[0]*v_n[4][0]*TMath::Cos(4*psi_n[4][0]);
+      Float_t Vs_4_x_plus = sumpT[14]*v_n[4][14]*TMath::Cos(4*psi_n[4][14]);
+      Float_t Vs_4_y_minus = sumpT[0]*v_n[4][0]*TMath::Sin(4*psi_n[4][0]);
+      Float_t Vs_4_y_plus = sumpT[14]*v_n[4][14]*TMath::Sin(4*psi_n[4][14]);
+      Float_t Vs_4_x = Vs_4_x_minus + Vs_4_x_plus;
+      Float_t Vs_4_y = Vs_4_y_minus + Vs_4_y_plus;
+      if(printDebug)std::cout<<"Vs_4_x = "<<Vs_4_x<<"; Vs_4_y =  "<<Vs_4_y<<std::endl;
+      if(TMath::Abs(Vs_3_x)>140 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* cos v4 > 140"<<std::endl;
+      if(TMath::Abs(Vs_3_y)>140 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v4 > 140"<<std::endl;
+      if(TMath::Abs(Vs_4_x)>140 || TMath::Abs(Vs_4_y)>140) hEvents_Diverge_v4->Fill(1);
+
+      if(TMath::Abs(Vs_0_x)>5200 || TMath::Abs(Vs_0_y)>5200 || TMath::Abs(Vs_1_x)>100 || TMath::Abs(Vs_1_y)>100 || TMath::Abs(Vs_2_x)>140 || TMath::Abs(Vs_2_y)>140 || TMath::Abs(Vs_3_x)>120 || TMath::Abs(Vs_3_y)>120 || TMath::Abs(Vs_4_x)>140 || TMath::Abs(Vs_4_y)>140) hEvents_Diverge->Fill(1);
+
       /*
       for(int j = 0;j<nbins_eta;j++){
 	
@@ -1492,7 +1609,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     
   //   }//nentries_jet80or95 loop
 
-    fVs_failure[k].close();
+    //fVs_failure[k].close();
     
   }//radius loop. 
   
@@ -1641,10 +1758,19 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   f.Write();
 
   f.Close();
-
-
   */
   
+
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_HF_divergence_events_%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  f.cd();
+  hEvents->Write();
+  hEvents_Diverge->Write();
+  hEvents_Diverge_v0->Write();
+  hEvents_Diverge_v1->Write();
+  hEvents_Diverge_v2->Write();
+  hEvents_Diverge_v3->Write();
+  hEvents_Diverge_v4->Write();
+
   timer.Stop();
   cout<<"Macro finished: "<<endl;
   cout<<"CPU time (min)  = "<<(float)timer.CpuTime()/60<<endl;
