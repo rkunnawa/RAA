@@ -10,6 +10,12 @@
 
 // Nov 25th adding changes for several of the new HF/Vs validation plots 
 
+// Dec 4th - checking for the divergences in the polynomials compared to the different flow candidates. 
+//         - the values for the divergences are given here:  https://twiki.cern.ch/twiki/pub/CMS/HiVsValidation/4Dec2014_VsValidation_divergence.pdf 
+//         - And these are compared with Yue Shi's macro subtraction_internal_v4.cc which plots the polynomials 
+//         - these above plots were made from the training code. we are going to check the data and the MC for such a difference. 
+//         - this is the x axis: for cos:  vn = sumpt[0]*vn[n][0]*cos(n*Psi_[n][0]) + sumpt[14]*vn[n][14]*cos(n*Psi_[n][14])
+ 
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
