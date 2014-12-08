@@ -25,6 +25,8 @@
 
 // Nov 4th - implementing supernova event rejection https://twiki.cern.ch/twiki/pub/CMS/HighPt2014/141102-yenjie-highPt-jetSelection.pdf 
 
+// Dec 7th - added in histograms which 
+
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -270,25 +272,28 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   //  instr2>>filename2;
   //}
   
-  const int N = 6;
+  const int N = 7;
   
   TChain *jetpbpb1[N][no_radius];
-  //TChain *jetpbpb2[N][no_radius];
-  
+
+  //jetpbpb2 and dir2 are all for akPu3PF  
+
   string dir[N][no_radius];
   
   for(int k = 0;k<no_radius;k++){
     dir[0][k] = "hltanalysis";
     dir[1][k] = "skimanalysis";
     dir[2][k] = Form("ak%s%d%sJetAnalyzer",algo,list_radius[k],jet_type);
-    dir[3][k] = "hiEvtAnalyzer";
-    dir[4][k] = "hltobject";
-    dir[5][k] = "pfcandAnalyzer";
+    dir[3][k] = Form("akPu%d%sJetAnalyzer",list_radius[k],jet_type);
+    dir[4][k] = "hiEvtAnalyzer";
+    dir[5][k] = "hltobject";
+    dir[6][k] = "pfcandAnalyzer";
   }
 
   string trees[N] = {
     "HltTree",
     "HltTree",
+    "t",
     "t",
     "HiTree",
     "jetObjTree",
@@ -314,7 +319,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 	jetpbpb1[t][k]->Add(filename1.c_str());
 	if(printDebug)cout << "Tree loaded  " << string(dir[t][k]+"/"+trees[t]).data() << endl;
 	if(printDebug)cout << "Entries : " << jetpbpb1[t][k]->GetEntries() << endl;
-	
+		
       }// tree loop ends
       
       //jetpbpb1->Add(filename.c_str());
@@ -363,14 +368,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   for(int k = 0;k<no_radius;k++){
     jetpbpb1[2][k]->AddFriend(jetpbpb1[0][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[1][k]);
-    jetpbpb1[2][k]->AddFriend(jetpbpb1[3][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[4][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[5][k]);
+    jetpbpb1[2][k]->AddFriend(jetpbpb1[6][k]);
 
-    // jetpbpb2[2][k]->AddFriend(jetpbpb2[0][k]);
-    // jetpbpb2[2][k]->AddFriend(jetpbpb2[1][k]);
-    // jetpbpb2[2][k]->AddFriend(jetpbpb2[3][k]);
-    // jetpbpb2[2][k]->AddFriend(jetpbpb2[4][k]);
+    jetpbpb1[3][k]->AddFriend(jetpbpb1[0][k]);
+    jetpbpb1[3][k]->AddFriend(jetpbpb1[1][k]);
+    jetpbpb1[3][k]->AddFriend(jetpbpb1[4][k]);
+    jetpbpb1[3][k]->AddFriend(jetpbpb1[5][k]);
+    jetpbpb1[3][k]->AddFriend(jetpbpb1[6][k]);
 
   }// radius loop ends
  
@@ -717,7 +723,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 
 
   //file 1: 
-  // jet tree
+  // jet tree 1
   int nrefe_1;
   float pt_1[1000];
   //float old_pt3[1000];
@@ -738,6 +744,28 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   float eSum_1[1000];
   float muSum_1[1000];
   float jtpu_1[1000];
+
+  // jet tree 2
+  int nrefe_2;
+  float pt_2[1000];
+  //float old_2pt3[1000];
+  float raw_2[1000];
+  float eta_2[1000];
+  float eta_2_CM[1000];
+  float phi_2[1000];
+  float chMax_2[1000];
+  float trkMax_2[1000];
+  float chSum_2[1000];
+  float phSum_2[1000];
+  float neSum_2[1000];
+  float trkSum_2[1000];
+  float phMax_2[1000];
+  float neMax_2[1000];
+  float eMax_2[1000];
+  float muMax_2[1000];
+  float eSum_2[1000];
+  float muSum_2[1000];
+  float jtpu_2[1000];
 
   // event tree
   int evt_1;
@@ -796,62 +824,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   Float_t psi_n[5][15];
   Float_t sumpT[15];
 
-  // //file 2: 
-  // // jet tree
-  // int nrefe_2;
-  // float pt_2[1000];
-  // //float old_pt3[1000];
-  // float raw_2[1000];
-  // float eta_2[1000];
-  // float eta_2_CM[1000];
-  // float phi_2[1000];
-  // float chMax_2[1000];
-  // float trkMax_2[1000];
-  // float chSum_2[1000];
-  // float phSum_2[1000];
-  // float neSum_2[1000];
-  // float trkSum_2[1000];
-  // float phMax_2[1000];
-  // float neMax_2[1000];
-
-  // // event tree
-  // int evt_2;
-  // int run_2;
-  // int lumi_2;
-  // int hiBin_2;
-  // float vx_2;
-  // float vy_2;
-  // float vz_2;
-  // int hiNtracks_2;
-  // float hiHFminus_2;
-  // float hiHFplus_2;
-  // float hiHFplusEta4_2;
-  // float hiHFminusEta4_2;
-  // int pcollisionEventSelection_2;
-  // int pHBHENoiseFilter_2;
-  // int pprimaryvertexFilter_2;
-  // int pVertexFilterCutGplus_2;
-
-  // // trigger tree
-  // int L1_MB_2;
-  // int L1_MB_p_2;
-  // int jetMB_2;
-  // int jet55_2;
-  // int jet65_2;
-  // int jet80_2;
-  // int jetMB_p_2;
-  // int jet55_p_2;
-  // int jet65_p_2;
-  // int jet80_p_2;
-
-
-  // // trigger object tree - this contains the maximum value of the particular trigger object. 
-  // float trgObj_id_2;
-  // float trgObj_pt_2;
-  // float trgObj_eta_2;
-  // float trgObj_phi_2;
-  // float trgObj_mass_2;
-  
   
 //   //set the branch addresses:  - one of the most boring parts of the code: 
 //   jetpbpb0_old->SetBranchAddress("evt",&evt_0);
@@ -952,6 +924,25 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     jetpbpb1[2][k]->SetBranchAddress("eMax",&eMax_1);
     jetpbpb1[2][k]->SetBranchAddress("muSum",&muSum_1);
     jetpbpb1[2][k]->SetBranchAddress("muMax",&muMax_1);
+
+    jetpbpb1[3][k]->SetBranchAddress("nref",&nrefe_2);
+    jetpbpb1[3][k]->SetBranchAddress("jtpt",&pt_2);
+    jetpbpb1[3][k]->SetBranchAddress("jteta",&eta_2);
+    jetpbpb1[3][k]->SetBranchAddress("jtphi",&phi_2);
+    jetpbpb1[3][k]->SetBranchAddress("rawpt",&raw_2);
+    jetpbpb1[3][k]->SetBranchAddress("jtpu",&jtpu_2);
+    jetpbpb1[3][k]->SetBranchAddress("chargedMax",&chMax_2);
+    jetpbpb1[3][k]->SetBranchAddress("chargedSum",&chSum_2);
+    jetpbpb1[3][k]->SetBranchAddress("trackMax",&trkMax_2);
+    jetpbpb1[3][k]->SetBranchAddress("trackSum",&trkSum_2);
+    jetpbpb1[3][k]->SetBranchAddress("photonMax",&phMax_2);
+    jetpbpb1[3][k]->SetBranchAddress("photonSum",&phSum_2);
+    jetpbpb1[3][k]->SetBranchAddress("neutralMax",&neMax_2);
+    jetpbpb1[3][k]->SetBranchAddress("neutralSum",&neSum_2);
+    jetpbpb1[3][k]->SetBranchAddress("eSum",&eSum_2);
+    jetpbpb1[3][k]->SetBranchAddress("eMax",&eMax_2);
+    jetpbpb1[3][k]->SetBranchAddress("muSum",&muSum_2);
+    jetpbpb1[3][k]->SetBranchAddress("muMax",&muMax_2);
 
     //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_1);
     //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_1);
@@ -1268,6 +1259,16 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
   TH1F *hpbpb_FullJet55[nbins_cent+1];
   TH1F *hpbpb_FullJetComb[nbins_cent+1];
 
+  TH1F *hpbpb_Pu_Jet80[2][2][nbins_cent+1];
+  TH1F *hpbpb_Pu_Jet65[2][2][nbins_cent+1];
+  TH1F *hpbpb_Pu_Jet55[2][2][nbins_cent+1];
+  TH1F *hpbpb_Pu_JetComb[2][2][nbins_cent+1];  
+
+  TH1F *hpbpb_Pu_FullJet80[nbins_cent+1];
+  TH1F *hpbpb_Pu_FullJet65[nbins_cent+1];
+  TH1F *hpbpb_Pu_FullJet55[nbins_cent+1];
+  TH1F *hpbpb_Pu_FullJetComb[nbins_cent+1];
+
   bool isDivergeTight = false;
   bool isDivergeLoose = false;
 
@@ -1277,20 +1278,30 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       
       for(int b = 0;b<2;b++){
 
-	hpbpb_Jet80[b][a][i] = new TH1F(Form("hpbpb_Jet80_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Jet Spectra for HLT_80 trigger isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);
-	hpbpb_Jet65[b][a][i] = new TH1F(Form("hpbpb_Jet65_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Jet Spectra for HLT_65 trigger isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);
-	hpbpb_Jet55[b][a][i] = new TH1F(Form("hpbpb_Jet55_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Jet Spectra for HLT_55 trigger isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);
-	hpbpb_JetComb[b][a][i] = new TH1F(Form("hpbpb_JetComb_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Combined Jet Spectra isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);	
-      
+	hpbpb_Jet80[b][a][i] = new TH1F(Form("hpbpb_Jet80_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Vs Jet Spectra for HLT_80 trigger isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);
+	hpbpb_Jet65[b][a][i] = new TH1F(Form("hpbpb_Jet65_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Vs Jet Spectra for HLT_65 trigger isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);
+	hpbpb_Jet55[b][a][i] = new TH1F(Form("hpbpb_Jet55_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Vs Jet Spectra for HLT_55 trigger isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);
+	hpbpb_JetComb[b][a][i] = new TH1F(Form("hpbpb_JetComb_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Combined Vs Jet Spectra isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);	
+
+	hpbpb_Pu_Jet80[b][a][i] = new TH1F(Form("hpbpb_Pu_Jet80_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Pu Jet Spectra for HLT_80 trigger isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);
+	hpbpb_Pu_Jet65[b][a][i] = new TH1F(Form("hpbpb_Pu_Jet65_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Pu Jet Spectra for HLT_65 trigger isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);
+	hpbpb_Pu_Jet55[b][a][i] = new TH1F(Form("hpbpb_Pu_Jet55_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Pu Jet Spectra for HLT_55 trigger isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);
+	hpbpb_Pu_JetComb[b][a][i] = new TH1F(Form("hpbpb_Pu_JetComb_isDiverge_%d_isTightCut_%d_cent%d",b,a,i),Form("Combined Pu Jet Spectra isDivergence = %d and isTightCut = %d in cent%d",b,a,i),1000,0,1000);	
+            
       }
 
     }
     
-    hpbpb_FullJet80[i] = new TH1F(Form("hpbpb_Jet80_cent%d",i),Form("Jet Spectra from HLT_80 trigger",i),1000,0,1000);
-    hpbpb_FullJet65[i] = new TH1F(Form("hpbpb_Jet65_cent%d",i),Form("Jet Spectra from HLT_65 trigger",i),1000,0,1000);
-    hpbpb_FullJet55[i] = new TH1F(Form("hpbpb_Jet55_cent%d",i),Form("Jet Spectra from HLT_55 trigger",i),1000,0,1000);
-    hpbpb_FullJetComb[i] = new TH1F(Form("hpbpb_JetComb_cent%d",i),Form("Jet Spectra from HLT_Comb trigger",i),1000,0,1000);
+    hpbpb_FullJet80[i] = new TH1F(Form("hpbpb_Jet80_cent%d",i),Form("Pu Jet Spectra from HLT_80 trigger cent%d",i),1000,0,1000);
+    hpbpb_FullJet65[i] = new TH1F(Form("hpbpb_Jet65_cent%d",i),Form("Pu Jet Spectra from HLT_65 trigger cent%d",i),1000,0,1000);
+    hpbpb_FullJet55[i] = new TH1F(Form("hpbpb_Jet55_cent%d",i),Form("Pu Jet Spectra from HLT_55 trigger cent%d",i),1000,0,1000);
+    hpbpb_FullJetComb[i] = new TH1F(Form("hpbpb_JetComb_cent%d",i),Form("Pu Jet Spectra Trigger combined cent%d",i),1000,0,1000);
 
+    hpbpb_Pu_FullJet80[i] = new TH1F(Form("hpbpb_Pu_Jet80_cent%d",i),Form("Pu Jet Spectra from HLT_80 trigger cent%d",i),1000,0,1000);
+    hpbpb_Pu_FullJet65[i] = new TH1F(Form("hpbpb_Pu_Jet65_cent%d",i),Form("Pu Jet Spectra from HLT_65 trigger cent%d",i),1000,0,1000);
+    hpbpb_Pu_FullJet55[i] = new TH1F(Form("hpbpb_Pu_Jet55_cent%d",i),Form("Pu Jet Spectra from HLT_55 trigger cent%d",i),1000,0,1000);
+    hpbpb_Pu_FullJetComb[i] = new TH1F(Form("hpbpb_Pu_JetComb_cent%d",i),Form("Pu Jet Spectra Trigger combined cent%d",i),1000,0,1000);
+  
   }
 
   for(int k = 0;k<no_radius;k++){
@@ -1306,8 +1317,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
     //jetpbpb1[2][k]->Project(Form("hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),"hiNpix:Sum$(jtpt>50&&abs(jteta)<2)","pcollisionEventSelection&&pHBHENoiseFilter");
     
     for(int jentry = 0;jentry<nentries_jet55or65;jentry++){
-    
-      jetpbpb1[2][k]->GetEntry(jentry);
+
+      jetpbpb1[0][k]->GetEntry(jentry);
+      jetpbpb1[1][k]->GetEntry(jentry);
+      jetpbpb1[2][k]->GetEntry(jentry);    
+      jetpbpb1[3][k]->GetEntry(jentry);
+      jetpbpb1[4][k]->GetEntry(jentry);
+      jetpbpb1[5][k]->GetEntry(jentry);
+      jetpbpb1[6][k]->GetEntry(jentry);
+
       //if(printDebug && jentry%100000==0)cout<<"Jet 55or65 file"<<endl;
       if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<endl;
       
@@ -1449,8 +1467,150 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
       }
       
       for(int j = 0;j<nbins_eta;j++){
+
+	for(int g = 0;g<nrefe_2;g++){ // this is the loop for the Pu Jets 
+
+	  if(eta_2[g]<boundaries_eta[j][0] || eta_2[g]>=boundaries_eta[j][1]) continue;
+
+	  // going to use the effective prescl for the Jet55 trigger: 2.0475075465
+	  Float_t effecPrescl = 2.047507;
+	  
+	  //if(cut5<0.95 && cut6<0.95 && cut7<0.95 && cut1>0.05 && cut2<0.95 && cut2b<0.95){
+	  if(1>0){
+	    
+	    //	    hJets->Fill(1);
+	    //	    if(raw_1[g] < 20) continue;
+	    
+	    if(jet80_1==1 && L1_sj52_1==1) {
+#if 0
+	      if(trgObj_pt_2>=80){
+		hpbpb_Pu_TrgObj80[k][j][centBin]->Fill(pt_2[g],jet80_p_1*L1_sj52_p_1);
+		hpbpb_Pu_TrgObj80[k][j][nbins_cent]->Fill(pt_2[g],jet80_p_1*L1_sj52_p_1);
+		
+		if(jetCounter>=7){
+		  hpbpb_Pu_TrgObj80_nJet_g7[k][j][centBin]->Fill(pt_2[g],jet80_p_1*L1_sj52_p_1);
+		  hpbpb_Pu_TrgObj80_nJet_g7[k][j][nbins_cent]->Fill(pt_2[g],jet80_p_1*L1_sj52_p_1);
+		}
+		if(jetCounter<7){
+		  hpbpb_Pu_TrgObj80_nJet_l7[k][j][centBin]->Fill(pt_2[g],jet80_p_1*L1_sj52_p_1);
+		  hpbpb_Pu_TrgObj80_nJet_l7[k][j][nbins_cent]->Fill(pt_2[g],jet80_p_1*L1_sj52_p_1);
+		}
+	      }
+#endif
+	      
+	      if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
+		hpbpb_Pu_Jet80[1][1][centBin]->Fill(pt_2[g]);
+		hpbpb_Pu_Jet80[1][1][nbins_cent]->Fill(pt_2[g]);
+	      }
+	      if(TMath::Abs(Vs_0_x)<v0_tight && TMath::Abs(Vs_0_y)<v0_tight && TMath::Abs(Vs_1_x)<v1_tight && TMath::Abs(Vs_1_y)<v1_tight && TMath::Abs(Vs_2_x)<v2_tight && TMath::Abs(Vs_2_y)<v2_tight && TMath::Abs(Vs_3_x)<v3_tight && TMath::Abs(Vs_3_y)<v3_tight && TMath::Abs(Vs_4_x)<v4_tight && TMath::Abs(Vs_4_y)<v4_tight){
+		hpbpb_Pu_Jet80[0][1][centBin]->Fill(pt_2[g]);
+		hpbpb_Pu_Jet80[0][1][nbins_cent]->Fill(pt_2[g]);
+	      }
+
+	      if(TMath::Abs(Vs_0_x)>v0_loose || TMath::Abs(Vs_0_y)>v0_loose || TMath::Abs(Vs_1_x)>v1_loose || TMath::Abs(Vs_1_y)>v1_loose || TMath::Abs(Vs_2_x)>v2_loose || TMath::Abs(Vs_2_y)>v2_loose || TMath::Abs(Vs_3_x)>v3_loose || TMath::Abs(Vs_3_y)>v3_loose || TMath::Abs(Vs_4_x)>v4_loose || TMath::Abs(Vs_4_y)>v4_loose) {
+		hpbpb_Pu_Jet80[1][0][centBin]->Fill(pt_2[g]);
+		hpbpb_Pu_Jet80[1][0][nbins_cent]->Fill(pt_2[g]);
+	      }
+	      if(TMath::Abs(Vs_0_x)<v0_loose && TMath::Abs(Vs_0_y)<v0_loose && TMath::Abs(Vs_1_x)<v1_loose && TMath::Abs(Vs_1_y)<v1_loose && TMath::Abs(Vs_2_x)<v2_loose && TMath::Abs(Vs_2_y)<v2_loose && TMath::Abs(Vs_3_x)<v3_loose && TMath::Abs(Vs_3_y)<v3_loose && TMath::Abs(Vs_4_x)<v4_loose && TMath::Abs(Vs_4_y)<v4_loose){
+		hpbpb_Pu_Jet80[0][0][centBin]->Fill(pt_2[g]);
+		hpbpb_Pu_Jet80[0][0][nbins_cent]->Fill(pt_2[g]);
+	      }
+
+	      hpbpb_Pu_FullJet80[centBin]->Fill(pt_2[g]);
+	      hpbpb_Pu_FullJet80[nbins_cent]->Fill(pt_2[g]);
+	    }else if(jet65_1==1 && L1_sj36_1==1) {
+
+
+	      // if(trgObj_pt_2>=65 && trgObj_pt_2<80){
+	      // 	hpbpb_Pu_TrgObj65[k][j][centBin]->Fill(pt_2[g],jet65_p_1*L1_sj36_p_1);
+	      // 	hpbpb_Pu_TrgObj65[k][j][nbins_cent]->Fill(pt_2[g],jet65_p_1*L1_sj36_p_1);
+		
+	      // 	if(jetCounter>=7){
+	      // 	  hpbpb_Pu_TrgObj65_nJet_g7[k][j][centBin]->Fill(pt_2[g],jet65_p_1*L1_sj36_p_1);
+	      // 	  hpbpb_Pu_TrgObj65_nJet_g7[k][j][nbins_cent]->Fill(pt_2[g],jet65_p_1*L1_sj36_p_1);
+	      // 	}
+	      // 	if(jetCounter<7){
+	      // 	  hpbpb_Pu_TrgObj65_nJet_l7[k][j][centBin]->Fill(pt_2[g],jet65_p_1*L1_sj36_p_1);
+	      // 	  hpbpb_Pu_TrgObj65_nJet_l7[k][j][nbins_cent]->Fill(pt_2[g],jet65_p_1*L1_sj36_p_1);
+	      // 	}
+	      // }
+	      // hpbpb_Pu_Jet65[k][j][centBin]->Fill(pt_2[g],jet65_p_1);
+	      // hpbpb_Pu_Jet65[k][j][nbins_cent]->Fill(pt_2[g],jet65_p_1);
+
+	      if(jet80_1==0){
+		
+		if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
+		  hpbpb_Pu_Jet65[1][1][centBin]->Fill(pt_2[g]);
+		  hpbpb_Pu_Jet65[1][1][nbins_cent]->Fill(pt_2[g]);
+		}
+		if(TMath::Abs(Vs_0_x)<v0_tight && TMath::Abs(Vs_0_y)<v0_tight && TMath::Abs(Vs_1_x)<v1_tight && TMath::Abs(Vs_1_y)<v1_tight && TMath::Abs(Vs_2_x)<v2_tight && TMath::Abs(Vs_2_y)<v2_tight && TMath::Abs(Vs_3_x)<v3_tight && TMath::Abs(Vs_3_y)<v3_tight && TMath::Abs(Vs_4_x)<v4_tight && TMath::Abs(Vs_4_y)<v4_tight){
+		  hpbpb_Pu_Jet65[0][1][centBin]->Fill(pt_2[g]);
+		  hpbpb_Pu_Jet65[0][1][nbins_cent]->Fill(pt_2[g]);
+		}
+		if(TMath::Abs(Vs_0_x)>v0_loose || TMath::Abs(Vs_0_y)>v0_loose || TMath::Abs(Vs_1_x)>v1_loose || TMath::Abs(Vs_1_y)>v1_loose || TMath::Abs(Vs_2_x)>v2_loose || TMath::Abs(Vs_2_y)>v2_loose || TMath::Abs(Vs_3_x)>v3_loose || TMath::Abs(Vs_3_y)>v3_loose || TMath::Abs(Vs_4_x)>v4_loose || TMath::Abs(Vs_4_y)>v4_loose) {
+		  hpbpb_Pu_Jet65[1][0][centBin]->Fill(pt_2[g]);
+		  hpbpb_Pu_Jet65[1][0][nbins_cent]->Fill(pt_2[g]);
+		}
+		if(TMath::Abs(Vs_0_x)<v0_loose && TMath::Abs(Vs_0_y)<v0_loose && TMath::Abs(Vs_1_x)<v1_loose && TMath::Abs(Vs_1_y)<v1_loose && TMath::Abs(Vs_2_x)<v2_loose && TMath::Abs(Vs_2_y)<v2_loose && TMath::Abs(Vs_3_x)<v3_loose && TMath::Abs(Vs_3_y)<v3_loose && TMath::Abs(Vs_4_x)<v4_loose && TMath::Abs(Vs_4_y)<v4_loose){
+		  hpbpb_Pu_Jet65[0][0][centBin]->Fill(pt_2[g]);
+		  hpbpb_Pu_Jet65[0][0][nbins_cent]->Fill(pt_2[g]);
+		}
+	      
+		hpbpb_Pu_FullJet65[centBin]->Fill(pt_2[g]);
+		hpbpb_Pu_FullJet65[nbins_cent]->Fill(pt_2[g]);
+	      }
+
+	    }else if(jet55_1==1 && L1_sj36_1==1) { // passes the jet55 trigger
+#if 0
+	      if(trgObj_pt_2>=55 && trgObj_pt_2<65){ // check for the trigger object pt to lie inbetween the two trigger values 
+		hpbpb_Pu_TrgObj55[k][j][centBin]->Fill(pt_2[g],jet55_p_1*L1_sj36_p_1);
+		hpbpb_Pu_TrgObj55[k][j][nbins_cent]->Fill(pt_2[g],jet55_p_1*L1_sj36_p_1);
+		
+		if(jetCounter>=7){
+		  hpbpb_Pu_TrgObj55_nJet_g7[k][j][centBin]->Fill(pt_2[g],jet55_p_1*L1_sj36_p_1);
+		  hpbpb_Pu_TrgObj55_nJet_g7[k][j][nbins_cent]->Fill(pt_2[g],jet55_p_1*L1_sj36_p_1);
+		}
+		if(jetCounter<7){
+		  hpbpb_Pu_TrgObj55_nJet_l7[k][j][centBin]->Fill(pt_2[g],jet55_p_1*L1_sj36_p_1);
+		  hpbpb_Pu_TrgObj55_nJet_l7[k][j][nbins_cent]->Fill(pt_2[g],jet55_p_1*L1_sj36_p_1);
+		}
+		//if(pt_2[g]>3*trgObj_pt_2){ // get an idea of the event information from these large pt jets 
+		//  fHLT_high[k]<<evt_1<<" "<<run_1<<" "<<lumi_1<<" "<<vz_1<<" "<<centBin<<" "<<trgObj_pt_2<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<pt_2[g]<<" "<<raw_1[g]<<" "<<eta_1[g]<<" "<<phi_1[g]<<" "<<endl;
+		//}
+	      }
+	      // hpbpb_Pu_Jet55[k][j][centBin]->Fill(pt_2[g],jet55_p_1);
+	      // hpbpb_Pu_Jet55[k][j][nbins_cent]->Fill(pt_2[g],jet55_p_1);
+#endif
+	      if((jet65_1==0) && (jet80_1==0)){ // this is to just check
+
+		if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
+		  hpbpb_Pu_Jet55[1][1][centBin]->Fill(pt_2[g]);
+		  hpbpb_Pu_Jet55[1][1][nbins_cent]->Fill(pt_2[g]);
+		}
+		if(TMath::Abs(Vs_0_x)<v0_tight && TMath::Abs(Vs_0_y)<v0_tight && TMath::Abs(Vs_1_x)<v1_tight && TMath::Abs(Vs_1_y)<v1_tight && TMath::Abs(Vs_2_x)<v2_tight && TMath::Abs(Vs_2_y)<v2_tight && TMath::Abs(Vs_3_x)<v3_tight && TMath::Abs(Vs_3_y)<v3_tight && TMath::Abs(Vs_4_x)<v4_tight && TMath::Abs(Vs_4_y)<v4_tight){
+		  hpbpb_Pu_Jet55[0][1][centBin]->Fill(pt_2[g]);
+		  hpbpb_Pu_Jet55[0][1][nbins_cent]->Fill(pt_2[g]);
+		}
+		if(TMath::Abs(Vs_0_x)>v0_loose || TMath::Abs(Vs_0_y)>v0_loose || TMath::Abs(Vs_1_x)>v1_loose || TMath::Abs(Vs_1_y)>v1_loose || TMath::Abs(Vs_2_x)>v2_loose || TMath::Abs(Vs_2_y)>v2_loose || TMath::Abs(Vs_3_x)>v3_loose || TMath::Abs(Vs_3_y)>v3_loose || TMath::Abs(Vs_4_x)>v4_loose || TMath::Abs(Vs_4_y)>v4_loose) {
+		  hpbpb_Pu_Jet55[1][0][centBin]->Fill(pt_2[g]);
+		  hpbpb_Pu_Jet55[1][0][nbins_cent]->Fill(pt_2[g]);
+		}
+		if(TMath::Abs(Vs_0_x)<v0_loose && TMath::Abs(Vs_0_y)<v0_loose && TMath::Abs(Vs_1_x)<v1_loose && TMath::Abs(Vs_1_y)<v1_loose && TMath::Abs(Vs_2_x)<v2_loose && TMath::Abs(Vs_2_y)<v2_loose && TMath::Abs(Vs_3_x)<v3_loose && TMath::Abs(Vs_3_y)<v3_loose && TMath::Abs(Vs_4_x)<v4_loose && TMath::Abs(Vs_4_y)<v4_loose){
+		  hpbpb_Pu_Jet55[0][0][centBin]->Fill(pt_2[g]);
+		  hpbpb_Pu_Jet55[0][0][nbins_cent]->Fill(pt_2[g]);
+		}
+	      
+		hpbpb_Pu_FullJet55[centBin]->Fill(pt_2[g]);
+		hpbpb_Pu_FullJet55[nbins_cent]->Fill(pt_2[g]);
+	      
+	      }
+	    }
+	  
+	  }// QA cuts - for now its always true. 
+
+	}// pu jets 
 	
-	for(int g = 0;g<nrefe_1;g++){
+	for(int g = 0;g<nrefe_1;g++){ // this is the loop for the Vs Jets 
 	  
 	  //if((chMax_1[g]/pt_1[g]>0.05) && (chMax_1[g]/pt_1[g]<1.00)){
 	  
@@ -1564,7 +1724,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 	      if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
 		hpbpb_Jet80[1][1][centBin]->Fill(pt_1[g]);
 		hpbpb_Jet80[1][1][nbins_cent]->Fill(pt_1[g]);
-	      }else if(TMath::Abs(Vs_0_x)<v0_tight && TMath::Abs(Vs_0_y)<v0_tight && TMath::Abs(Vs_1_x)<v1_tight && TMath::Abs(Vs_1_y)<v1_tight && TMath::Abs(Vs_2_x)<v2_tight && TMath::Abs(Vs_2_y)<v2_tight && TMath::Abs(Vs_3_x)<v3_tight && TMath::Abs(Vs_3_y)<v3_tight && TMath::Abs(Vs_4_x)<v4_tight && TMath::Abs(Vs_4_y)<v4_tight){
+	      }
+	      if(TMath::Abs(Vs_0_x)<v0_tight && TMath::Abs(Vs_0_y)<v0_tight && TMath::Abs(Vs_1_x)<v1_tight && TMath::Abs(Vs_1_y)<v1_tight && TMath::Abs(Vs_2_x)<v2_tight && TMath::Abs(Vs_2_y)<v2_tight && TMath::Abs(Vs_3_x)<v3_tight && TMath::Abs(Vs_3_y)<v3_tight && TMath::Abs(Vs_4_x)<v4_tight && TMath::Abs(Vs_4_y)<v4_tight){
 		hpbpb_Jet80[0][1][centBin]->Fill(pt_1[g]);
 		hpbpb_Jet80[0][1][nbins_cent]->Fill(pt_1[g]);
 	      }
@@ -1572,7 +1733,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 	      if(TMath::Abs(Vs_0_x)>v0_loose || TMath::Abs(Vs_0_y)>v0_loose || TMath::Abs(Vs_1_x)>v1_loose || TMath::Abs(Vs_1_y)>v1_loose || TMath::Abs(Vs_2_x)>v2_loose || TMath::Abs(Vs_2_y)>v2_loose || TMath::Abs(Vs_3_x)>v3_loose || TMath::Abs(Vs_3_y)>v3_loose || TMath::Abs(Vs_4_x)>v4_loose || TMath::Abs(Vs_4_y)>v4_loose) {
 		hpbpb_Jet80[1][0][centBin]->Fill(pt_1[g]);
 		hpbpb_Jet80[1][0][nbins_cent]->Fill(pt_1[g]);
-	      }else if(TMath::Abs(Vs_0_x)<v0_loose && TMath::Abs(Vs_0_y)<v0_loose && TMath::Abs(Vs_1_x)<v1_loose && TMath::Abs(Vs_1_y)<v1_loose && TMath::Abs(Vs_2_x)<v2_loose && TMath::Abs(Vs_2_y)<v2_loose && TMath::Abs(Vs_3_x)<v3_loose && TMath::Abs(Vs_3_y)<v3_loose && TMath::Abs(Vs_4_x)<v4_loose && TMath::Abs(Vs_4_y)<v4_loose){
+	      }
+	      if(TMath::Abs(Vs_0_x)<v0_loose && TMath::Abs(Vs_0_y)<v0_loose && TMath::Abs(Vs_1_x)<v1_loose && TMath::Abs(Vs_1_y)<v1_loose && TMath::Abs(Vs_2_x)<v2_loose && TMath::Abs(Vs_2_y)<v2_loose && TMath::Abs(Vs_3_x)<v3_loose && TMath::Abs(Vs_3_y)<v3_loose && TMath::Abs(Vs_4_x)<v4_loose && TMath::Abs(Vs_4_y)<v4_loose){
 		hpbpb_Jet80[0][0][centBin]->Fill(pt_1[g]);
 		hpbpb_Jet80[0][0][nbins_cent]->Fill(pt_1[g]);
 	      }
@@ -1600,346 +1762,365 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Vs", c
 	      // hpbpb_Jet65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
 
 	      if(jet80_1==0){
+		
+		if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
+		  hpbpb_Jet65[1][1][centBin]->Fill(pt_1[g]);
+		  hpbpb_Jet65[1][1][nbins_cent]->Fill(pt_1[g]);
+		}
+		if(TMath::Abs(Vs_0_x)<v0_tight && TMath::Abs(Vs_0_y)<v0_tight && TMath::Abs(Vs_1_x)<v1_tight && TMath::Abs(Vs_1_y)<v1_tight && TMath::Abs(Vs_2_x)<v2_tight && TMath::Abs(Vs_2_y)<v2_tight && TMath::Abs(Vs_3_x)<v3_tight && TMath::Abs(Vs_3_y)<v3_tight && TMath::Abs(Vs_4_x)<v4_tight && TMath::Abs(Vs_4_y)<v4_tight){
+		  hpbpb_Jet65[0][1][centBin]->Fill(pt_1[g]);
+		  hpbpb_Jet65[0][1][nbins_cent]->Fill(pt_1[g]);
+		}
+		if(TMath::Abs(Vs_0_x)>v0_loose || TMath::Abs(Vs_0_y)>v0_loose || TMath::Abs(Vs_1_x)>v1_loose || TMath::Abs(Vs_1_y)>v1_loose || TMath::Abs(Vs_2_x)>v2_loose || TMath::Abs(Vs_2_y)>v2_loose || TMath::Abs(Vs_3_x)>v3_loose || TMath::Abs(Vs_3_y)>v3_loose || TMath::Abs(Vs_4_x)>v4_loose || TMath::Abs(Vs_4_y)>v4_loose) {
+		  hpbpb_Jet65[1][0][centBin]->Fill(pt_1[g]);
+		  hpbpb_Jet65[1][0][nbins_cent]->Fill(pt_1[g]);
+		}
+		if(TMath::Abs(Vs_0_x)<v0_loose && TMath::Abs(Vs_0_y)<v0_loose && TMath::Abs(Vs_1_x)<v1_loose && TMath::Abs(Vs_1_y)<v1_loose && TMath::Abs(Vs_2_x)<v2_loose && TMath::Abs(Vs_2_y)<v2_loose && TMath::Abs(Vs_3_x)<v3_loose && TMath::Abs(Vs_3_y)<v3_loose && TMath::Abs(Vs_4_x)<v4_loose && TMath::Abs(Vs_4_y)<v4_loose){
+		  hpbpb_Jet65[0][0][centBin]->Fill(pt_1[g]);
+		  hpbpb_Jet65[0][0][nbins_cent]->Fill(pt_1[g]);
+		}
 	      
-	      if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
-	      hpbpb_Jet65[1][1][centBin]->Fill(pt_1[g]);
-	      hpbpb_Jet65[1][1][nbins_cent]->Fill(pt_1[g]);
-	    }else if(TMath::Abs(Vs_0_x)<v0_tight && TMath::Abs(Vs_0_y)<v0_tight && TMath::Abs(Vs_1_x)<v1_tight && TMath::Abs(Vs_1_y)<v1_tight && TMath::Abs(Vs_2_x)<v2_tight && TMath::Abs(Vs_2_y)<v2_tight && TMath::Abs(Vs_3_x)<v3_tight && TMath::Abs(Vs_3_y)<v3_tight && TMath::Abs(Vs_4_x)<v4_tight && TMath::Abs(Vs_4_y)<v4_tight){
-	      hpbpb_Jet65[0][1][centBin]->Fill(pt_1[g]);
-	      hpbpb_Jet65[0][1][nbins_cent]->Fill(pt_1[g]);
-	    }
-	      if(TMath::Abs(Vs_0_x)>v0_loose || TMath::Abs(Vs_0_y)>v0_loose || TMath::Abs(Vs_1_x)>v1_loose || TMath::Abs(Vs_1_y)>v1_loose || TMath::Abs(Vs_2_x)>v2_loose || TMath::Abs(Vs_2_y)>v2_loose || TMath::Abs(Vs_3_x)>v3_loose || TMath::Abs(Vs_3_y)>v3_loose || TMath::Abs(Vs_4_x)>v4_loose || TMath::Abs(Vs_4_y)>v4_loose) {
-	      hpbpb_Jet65[1][0][centBin]->Fill(pt_1[g]);
-	      hpbpb_Jet65[1][0][nbins_cent]->Fill(pt_1[g]);
-	    }else if(TMath::Abs(Vs_0_x)<v0_loose && TMath::Abs(Vs_0_y)<v0_loose && TMath::Abs(Vs_1_x)<v1_loose && TMath::Abs(Vs_1_y)<v1_loose && TMath::Abs(Vs_2_x)<v2_loose && TMath::Abs(Vs_2_y)<v2_loose && TMath::Abs(Vs_3_x)<v3_loose && TMath::Abs(Vs_3_y)<v3_loose && TMath::Abs(Vs_4_x)<v4_loose && TMath::Abs(Vs_4_y)<v4_loose){
-	      hpbpb_Jet65[0][0][centBin]->Fill(pt_1[g]);
-	      hpbpb_Jet65[0][0][nbins_cent]->Fill(pt_1[g]);
-	    }
-	      
-	      hpbpb_FullJet65[centBin]->Fill(pt_1[g]);
-	      hpbpb_FullJet65[nbins_cent]->Fill(pt_1[g]);
-	    }
+		hpbpb_FullJet65[centBin]->Fill(pt_1[g]);
+		hpbpb_FullJet65[nbins_cent]->Fill(pt_1[g]);
+	      }
+
 	    }else if(jet55_1==1 && L1_sj36_1==1) { // passes the jet55 trigger
 #if 0
 	      if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
-	      hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
-	      hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
 		
-	      if(jetCounter>=7){
-	      hpbpb_TrgObj55_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
-	      hpbpb_TrgObj55_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
-	    }
-	      if(jetCounter<7){
-	      hpbpb_TrgObj55_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
-	      hpbpb_TrgObj55_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
-	    }
-	      //if(pt_1[g]>3*trgObj_pt_1){ // get an idea of the event information from these large pt jets 
-	      //  fHLT_high[k]<<evt_1<<" "<<run_1<<" "<<lumi_1<<" "<<vz_1<<" "<<centBin<<" "<<trgObj_pt_1<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<pt_1[g]<<" "<<raw_1[g]<<" "<<eta_1[g]<<" "<<phi_1[g]<<" "<<endl;
-	      //}
-	    }
+		if(jetCounter>=7){
+		  hpbpb_TrgObj55_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		  hpbpb_TrgObj55_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		}
+		if(jetCounter<7){
+		  hpbpb_TrgObj55_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		  hpbpb_TrgObj55_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		}
+		//if(pt_1[g]>3*trgObj_pt_1){ // get an idea of the event information from these large pt jets 
+		//  fHLT_high[k]<<evt_1<<" "<<run_1<<" "<<lumi_1<<" "<<vz_1<<" "<<centBin<<" "<<trgObj_pt_1<<" "<<trgObj_eta_1<<" "<<trgObj_phi_1<<" "<<pt_1[g]<<" "<<raw_1[g]<<" "<<eta_1[g]<<" "<<phi_1[g]<<" "<<endl;
+		//}
+	      }
 	      // hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
 	      // hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
 #endif
 	      if((jet65_1==0) && (jet80_1==0)){ // this is to just check
 
-	      if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
-	      hpbpb_Jet55[1][1][centBin]->Fill(pt_1[g]);
-	      hpbpb_Jet55[1][1][nbins_cent]->Fill(pt_1[g]);
-	    }else if(TMath::Abs(Vs_0_x)<v0_tight && TMath::Abs(Vs_0_y)<v0_tight && TMath::Abs(Vs_1_x)<v1_tight && TMath::Abs(Vs_1_y)<v1_tight && TMath::Abs(Vs_2_x)<v2_tight && TMath::Abs(Vs_2_y)<v2_tight && TMath::Abs(Vs_3_x)<v3_tight && TMath::Abs(Vs_3_y)<v3_tight && TMath::Abs(Vs_4_x)<v4_tight && TMath::Abs(Vs_4_y)<v4_tight){
-	      hpbpb_Jet55[0][1][centBin]->Fill(pt_1[g]);
-	      hpbpb_Jet55[0][1][nbins_cent]->Fill(pt_1[g]);
-	    }
-	      if(TMath::Abs(Vs_0_x)>v0_loose || TMath::Abs(Vs_0_y)>v0_loose || TMath::Abs(Vs_1_x)>v1_loose || TMath::Abs(Vs_1_y)>v1_loose || TMath::Abs(Vs_2_x)>v2_loose || TMath::Abs(Vs_2_y)>v2_loose || TMath::Abs(Vs_3_x)>v3_loose || TMath::Abs(Vs_3_y)>v3_loose || TMath::Abs(Vs_4_x)>v4_loose || TMath::Abs(Vs_4_y)>v4_loose) {
-	      hpbpb_Jet55[1][0][centBin]->Fill(pt_1[g]);
-	      hpbpb_Jet55[1][0][nbins_cent]->Fill(pt_1[g]);
-	      }else if(TMath::Abs(Vs_0_x)<v0_loose && TMath::Abs(Vs_0_y)<v0_loose && TMath::Abs(Vs_1_x)<v1_loose && TMath::Abs(Vs_1_y)<v1_loose && TMath::Abs(Vs_2_x)<v2_loose && TMath::Abs(Vs_2_y)<v2_loose && TMath::Abs(Vs_3_x)<v3_loose && TMath::Abs(Vs_3_y)<v3_loose && TMath::Abs(Vs_4_x)<v4_loose && TMath::Abs(Vs_4_y)<v4_loose){
-	      hpbpb_Jet55[0][0][centBin]->Fill(pt_1[g]);
-	      hpbpb_Jet55[0][0][nbins_cent]->Fill(pt_1[g]);
-	    }
+		if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
+		  hpbpb_Jet55[1][1][centBin]->Fill(pt_1[g]);
+		  hpbpb_Jet55[1][1][nbins_cent]->Fill(pt_1[g]);
+		}
+		if(TMath::Abs(Vs_0_x)<v0_tight && TMath::Abs(Vs_0_y)<v0_tight && TMath::Abs(Vs_1_x)<v1_tight && TMath::Abs(Vs_1_y)<v1_tight && TMath::Abs(Vs_2_x)<v2_tight && TMath::Abs(Vs_2_y)<v2_tight && TMath::Abs(Vs_3_x)<v3_tight && TMath::Abs(Vs_3_y)<v3_tight && TMath::Abs(Vs_4_x)<v4_tight && TMath::Abs(Vs_4_y)<v4_tight){
+		  hpbpb_Jet55[0][1][centBin]->Fill(pt_1[g]);
+		  hpbpb_Jet55[0][1][nbins_cent]->Fill(pt_1[g]);
+		}
+		if(TMath::Abs(Vs_0_x)>v0_loose || TMath::Abs(Vs_0_y)>v0_loose || TMath::Abs(Vs_1_x)>v1_loose || TMath::Abs(Vs_1_y)>v1_loose || TMath::Abs(Vs_2_x)>v2_loose || TMath::Abs(Vs_2_y)>v2_loose || TMath::Abs(Vs_3_x)>v3_loose || TMath::Abs(Vs_3_y)>v3_loose || TMath::Abs(Vs_4_x)>v4_loose || TMath::Abs(Vs_4_y)>v4_loose) {
+		  hpbpb_Jet55[1][0][centBin]->Fill(pt_1[g]);
+		  hpbpb_Jet55[1][0][nbins_cent]->Fill(pt_1[g]);
+		}
+		if(TMath::Abs(Vs_0_x)<v0_loose && TMath::Abs(Vs_0_y)<v0_loose && TMath::Abs(Vs_1_x)<v1_loose && TMath::Abs(Vs_1_y)<v1_loose && TMath::Abs(Vs_2_x)<v2_loose && TMath::Abs(Vs_2_y)<v2_loose && TMath::Abs(Vs_3_x)<v3_loose && TMath::Abs(Vs_3_y)<v3_loose && TMath::Abs(Vs_4_x)<v4_loose && TMath::Abs(Vs_4_y)<v4_loose){
+		  hpbpb_Jet55[0][0][centBin]->Fill(pt_1[g]);
+		  hpbpb_Jet55[0][0][nbins_cent]->Fill(pt_1[g]);
+		}
 	      
-	      hpbpb_FullJet55[centBin]->Fill(pt_1[g]);
-	      hpbpb_FullJet55[nbins_cent]->Fill(pt_1[g]);
+		hpbpb_FullJet55[centBin]->Fill(pt_1[g]);
+		hpbpb_FullJet55[nbins_cent]->Fill(pt_1[g]);
 	      
-	    }
-	    }
-
-	      // if(jet80_1) {
-	      //   hpbpb_Jet80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
-	      //   hpbpb_Jet80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
-	      // }//Jet80 trigger selection
-
-	      // if(jet65_1) {
-	      //   hpbpb_Jet65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
-	      //   hpbpb_Jet65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
-	      // }//Jet65 trigger selection
-
-	      // if(jet55_1) {
-	      //   hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-	      //   hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-	      // }//Jet55 trigger selection
-
-	      // if(jet65_1 && !jet80_1){
-	      //   hpbpb_Jet65_noJet80[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
-	      //   hpbpb_Jet65_noJet80[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
-	      // }//jet65 and not Jet80 selection 
-
-	      // if(jet55_1 && !jet65_1 && !jet80_1){
-	      //   hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-	      //   hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-	      // }//jet55 and not Jet65 and not Jet80 selection 
-
-	      
-	    }//qa cut selection
-	    
-	    }//jet loop
-	  
-	    }//eta bin loop
-    
-	    }//nentries_jet55or65 loop
-    
-    
-	      // //loop for jetpbpb2[2] tree
-	      //   Long64_t nentries_jet80or95 = jetpbpb2[2][k]->GetEntries();
-	      //   if(printDebug)cout<<"nentries_jet80or95 = "<<nentries_jet80or95<<endl;
-	      //   if(printDebug)nentries_jet80or95 = 2;
-
-	      //   for(int jentry = 0;jentry<nentries_jet80or95;jentry++){
-    
-	      //     jetpbpb2[2][k]->GetEntry(jentry);
-	      //     if(printDebug && jentry%100000==0)cout<<"Jet 80or95 file"<<endl;
-	      //     if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_2<<", run = "<<run_2<<endl;
-
-	      //     //
-	      //     int centBin = findBin(hiBin_2);//tells us the centrality of the event
-	      //     if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
-
-	      //     for(int j = 0;j<nbins_eta;j++){
-
-	      //       if(pHBHENoiseFilter_2 && pcollisionEventSelection_2 && (vz_2<15)) {
-    
-	      //         for(int g = 0;g<nrefe_2;g++){
-
-	      //           if(/*put your favourite QA cut here*/chMax_2[g]/pt_2[g]>0.01){
-
-	      //             if(eta_2[g]>=boundaries_eta[j][0] && eta_2[g]<boundaries_eta[j][1]){
-
-	      //               if(jet80_2 && trgObj_pt_2>=80){
-
-	      //                 hpbpb_TrgObj80[k][j][centBin]->Fill(pt_2[g],jet80_p_2);
-	      //                 hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_2[g],jet80_p_2);
-
-	      //               }//80 trg obj selection
-
-	      //             }//eta selection
-
-	      //           }//qa cut selection
-
-	      //         }//jet loop
-
-	      //       }//event selection cuts
-
-	      //     }//eta bin loop  
-    
-	      //   }//nentries_jet80or95 loop
-
-	      //fVs_failure[k].close();
-    
-	    }//radius loop. 
- 
- 
-	      /*
-	      //declare the output file
-	      TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_12003_effPres_severalcut_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
-	      //TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
-  
-	      f.cd();
-  
-	      for(int k = 0;k<no_radius;k++){
-    
-	      for(int j = 0;j<nbins_eta;j++){
-      
-	      for(int i = 0;i<=nbins_cent;i++){
-	
-	      //divide by delta eta, delta pt, luminosity seen by the triggers and ncoll ... and that will give us cross section/ncoll. 
-	      // lumi seen by the respective triggers. - https://twiki.cern.ch/twiki/bin/viewauth/CMS/HIJetRAA#Luminosity_Cross_check_for_HIJet
-	      // once we include the prescl then we have to normalize w.r.t the hightest lumi trigger which would have a prescl of 1 - in this case its the jet80 trigger. 
-
-	      //not dividing by ncoll here. will do that in the plotting macro under RAA. 
-	
-	      //hpbpb_TrgObj80[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
-	      //hpbpb_TrgObj65[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
-	      //hpbpb_TrgObj55[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
-	
-	      // divide by bin width is doing something very weird. Its making histograms which are empty get 40 entries from somewhere - fixed that issue due to empty bins being divided by bin width. 
-
-	      divideBinWidth(hpbpb_TrgObj80[k][j][i]);
-	      divideBinWidth(hpbpb_TrgObj65[k][j][i]);
-	      divideBinWidth(hpbpb_TrgObj55[k][j][i]);
-	
-	      hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj80[k][j][i]);
-	      hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj65[k][j][i]);
-	      hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj55[k][j][i]);
-
-	      hpbpb_TrgObjComb_nJet_g7[k][j][i]->Add(hpbpb_TrgObj80_nJet_g7[k][j][i]);
-	      hpbpb_TrgObjComb_nJet_g7[k][j][i]->Add(hpbpb_TrgObj65_nJet_g7[k][j][i]);
-	      hpbpb_TrgObjComb_nJet_g7[k][j][i]->Add(hpbpb_TrgObj55_nJet_g7[k][j][i]);
-
-	      hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj80_nJet_l7[k][j][i]);
-	      hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj65_nJet_l7[k][j][i]);
-	      hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj55_nJet_l7[k][j][i]);
-	
-	      // old method histograms, just as a test: 
-	
-	      // hpbpb_Jet80[k][j][i]->Scale(1./delta_eta[j]);
-	      // hpbpb_Jet65[k][j][i]->Scale(1./delta_eta[j]);
-	      // hpbpb_Jet55[k][j][i]->Scale(1./delta_eta[j]);
-
-	      // hpbpb_Jet65_noJet80[k][j][i]->Scale(1./delta_eta[j]);
-	      // hpbpb_Jet55_noJet65_80[k][j][i]->Scale(1./delta_eta[j]);
-	
-	      divideBinWidth(hpbpb_Jet80[k][j][i]);
-	      // divideBinWidth(hpbpb_Jet65[k][j][i]);
-	      // divideBinWidth(hpbpb_Jet55[k][j][i]);
-
-	      divideBinWidth(hpbpb_Jet65_noJet80[k][j][i]);
-	      divideBinWidth(hpbpb_Jet55_noJet65_80[k][j][i]);
-	
-	      hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet80[k][j][i]);
-	      hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet65_noJet80[k][j][i]);
-	      hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet55_noJet65_80[k][j][i]);
-	
-	      hpbpb_TrgObjComb[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObjComb[k][j][i]->Print();
-	      hpbpb_TrgObj80[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObj80[k][j][i]->Print();
-	      hpbpb_TrgObj65[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObj65[k][j][i]->Print();
-	      hpbpb_TrgObj55[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObj55[k][j][i]->Print();
-
-	      hpbpb_TrgObjComb_nJet_g7[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObjComb_nJet_g7[k][j][i]->Print();
-	      hpbpb_TrgObj80_nJet_g7[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObj80_nJet_g7[k][j][i]->Print();
-	      hpbpb_TrgObj65_nJet_g7[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObj65_nJet_g7[k][j][i]->Print();
-	      hpbpb_TrgObj55_nJet_g7[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObj55_nJet_g7[k][j][i]->Print();
-
-	      hpbpb_TrgObjComb_nJet_l7[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObjComb_nJet_l7[k][j][i]->Print();
-	      hpbpb_TrgObj80_nJet_l7[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObj80_nJet_l7[k][j][i]->Print();
-	      hpbpb_TrgObj65_nJet_l7[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObj65_nJet_l7[k][j][i]->Print();
-	      hpbpb_TrgObj55_nJet_l7[k][j][i]->Write();
-	      if(printDebug)hpbpb_TrgObj55_nJet_l7[k][j][i]->Print();	
-
-	      hpbpb_Jet80[k][j][i]->Write();
-	      if(printDebug)hpbpb_Jet80[k][j][i]->Print();
-	      // hpbpb_Jet65[k][j][i]->Write();
-	      // if(printDebug)hpbpb_Jet65[k][j][i]->Print();
-	      // hpbpb_Jet55[k][j][i]->Write();
-	      // if(printDebug)hpbpb_Jet55[k][j][i]->Print();
-
-	      hpbpb_Jet65_noJet80[k][j][i]->Write();
-	      if(printDebug)hpbpb_Jet65_noJet80[k][j][i]->Print();
-	      hpbpb_Jet55_noJet65_80[k][j][i]->Write();
-	      if(printDebug)hpbpb_Jet55_noJet65_80[k][j][i]->Print();
-	      hpbpb_JetComb_old[k][j][i]->Write();
-	      if(printDebug)hpbpb_JetComb_old[k][j][i]->Print();
-
-	      }//cent bins loop
-
-	      }//eta bins loop
-
-	      for(int i = 0;i<=nbins_cent;i++){
-
-	      if(printDebug)hpbpb_Npix_before_cut[k][i]->Print("base");
-	      hpbpb_Npix_before_cut[k][i]->Write();
-	      if(printDebug)hpbpb_Npix_after_cut[k][i]->Print("base");
-	      hpbpb_Npix_after_cut[k][i]->Write();
-      
 	      }
-	      if(printDebug)hpbpb_Npix_before_cut[k][nbins_cent+1]->Print("base");
-	      hpbpb_Npix_before_cut[k][nbins_cent+1]->Write();
-
-	      hpbpb_cent[k]->Write();
-	      if(printDebug)hpbpb_cent[k]->Print("base");
-	      hpbpb_vz[k]->Write();
-	      if(printDebug)hpbpb_vz[k]->Print("base");
-	      hpbpb_vx[k]->Write();
-	      if(printDebug)hpbpb_vx[k]->Print("base");
-	      hpbpb_vy[k]->Write();
-	      if(printDebug)hpbpb_vy[k]->Print("base");
-
-	      }//radius loop
-
-	      //hCut1->Write();
-	      //hCut2->Write();
-	      //hCut3->Write();
-	      //hCut4->Write();
-	      //hCut5->Write();
-
-	      hEvents->Write();
-	      hJets->Write();
-	      //jets_ID->Write();
-
-	      //if(printDebug)jets_ID->Print();
-	      if(printDebug)hEvents->Print();
-	      if(printDebug)hJets->Print();
-
-	      f.Write();
-
-	      f.Close();
-	      */
-  
-
-	      TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_HF_divergence_events_spectra_%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
-	      f.cd();
-	      hEvents->Write();
-	      hEvents_Diverge_tight->Write(); 
-	      hEvents_Diverge_loose->Write(); 
-	      hEvents_Diverge_v0_tight->Write(); 
-	      hEvents_Diverge_v0_loose->Write(); 
-	      hEvents_Diverge_v1_tight->Write(); 
-	      hEvents_Diverge_v1_loose->Write();
-	      hEvents_Diverge_v2_tight->Write(); 
-	      hEvents_Diverge_v2_loose->Write();
-	      hEvents_Diverge_v3_tight->Write(); 
-	      hEvents_Diverge_v3_loose->Write();
-	      hEvents_Diverge_v4_tight->Write(); 
-	      hEvents_Diverge_v4_loose->Write();
-
-	      for(int i = 0;i<nbins_cent+1;i++){
-  
-	      for(int a = 0;a<2;a++){
-
-	      for(int b = 0;b<2;b++){
-
-	      hpbpb_Jet80[b][a][i]->Write();
-	      if(printDebug)hpbpb_Jet80[b][a][i]->Print();
-	      hpbpb_Jet65[b][a][i]->Write();
-	      if(printDebug)hpbpb_Jet65[b][a][i]->Print();
-	      hpbpb_Jet55[b][a][i]->Write();
-	      if(printDebug)hpbpb_Jet55[b][a][i]->Print();		
-
 	    }
+
+	    // if(jet80_1) {
+	    //   hpbpb_Jet80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
+	    //   hpbpb_Jet80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
+	    // }//Jet80 trigger selection
+
+	    // if(jet65_1) {
+	    //   hpbpb_Jet65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
+	    //   hpbpb_Jet65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+	    // }//Jet65 trigger selection
+
+	    // if(jet55_1) {
+	    //   hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
+	    //   hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+	    // }//Jet55 trigger selection
+
+	    // if(jet65_1 && !jet80_1){
+	    //   hpbpb_Jet65_noJet80[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
+	    //   hpbpb_Jet65_noJet80[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
+	    // }//jet65 and not Jet80 selection 
+
+	    // if(jet55_1 && !jet65_1 && !jet80_1){
+	    //   hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
+	    //   hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
+	    // }//jet55 and not Jet65 and not Jet80 selection 
+
+	      
+	  }//qa cut selection
+	    
+	}//jet loop
+	  
+      }//eta bin loop
+    
+    }//nentries_jet55or65 loop
+    
+    
+    // //loop for jetpbpb2[2] tree
+    //   Long64_t nentries_jet80or95 = jetpbpb2[2][k]->GetEntries();
+    //   if(printDebug)cout<<"nentries_jet80or95 = "<<nentries_jet80or95<<endl;
+    //   if(printDebug)nentries_jet80or95 = 2;
+
+    //   for(int jentry = 0;jentry<nentries_jet80or95;jentry++){
+    
+    //     jetpbpb2[2][k]->GetEntry(jentry);
+    //     if(printDebug && jentry%100000==0)cout<<"Jet 80or95 file"<<endl;
+    //     if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_2<<", run = "<<run_2<<endl;
+
+    //     //
+    //     int centBin = findBin(hiBin_2);//tells us the centrality of the event
+    //     if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
+
+    //     for(int j = 0;j<nbins_eta;j++){
+
+    //       if(pHBHENoiseFilter_2 && pcollisionEventSelection_2 && (vz_2<15)) {
+    
+    //         for(int g = 0;g<nrefe_2;g++){
+
+    //           if(/*put your favourite QA cut here*/chMax_2[g]/pt_2[g]>0.01){
+
+    //             if(eta_2[g]>=boundaries_eta[j][0] && eta_2[g]<boundaries_eta[j][1]){
+
+    //               if(jet80_2 && trgObj_pt_2>=80){
+
+    //                 hpbpb_TrgObj80[k][j][centBin]->Fill(pt_2[g],jet80_p_2);
+    //                 hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_2[g],jet80_p_2);
+
+    //               }//80 trg obj selection
+
+    //             }//eta selection
+
+    //           }//qa cut selection
+
+    //         }//jet loop
+
+    //       }//event selection cuts
+
+    //     }//eta bin loop  
+    
+    //   }//nentries_jet80or95 loop
+
+    //fVs_failure[k].close();
+    
+  }//radius loop. 
+ 
+ 
+  /*
+  //declare the output file
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_12003_effPres_severalcut_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  //TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  
+  f.cd();
+  
+  for(int k = 0;k<no_radius;k++){
+    
+  for(int j = 0;j<nbins_eta;j++){
       
-	    }
+  for(int i = 0;i<=nbins_cent;i++){
+	
+  //divide by delta eta, delta pt, luminosity seen by the triggers and ncoll ... and that will give us cross section/ncoll. 
+  // lumi seen by the respective triggers. - https://twiki.cern.ch/twiki/bin/viewauth/CMS/HIJetRAA#Luminosity_Cross_check_for_HIJet
+  // once we include the prescl then we have to normalize w.r.t the hightest lumi trigger which would have a prescl of 1 - in this case its the jet80 trigger. 
 
-	      hpbpb_FullJet80[i]->Write();
-	      if(printDebug)hpbpb_FullJet80[i]->Print();
-	      hpbpb_FullJet65[i]->Write();
-	      if(printDebug)hpbpb_FullJet65[i]->Print();
-	      hpbpb_FullJet55[i]->Write();
-	      if(printDebug)hpbpb_FullJet55[i]->Print();
+  //not dividing by ncoll here. will do that in the plotting macro under RAA. 
+	
+  //hpbpb_TrgObj80[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
+  //hpbpb_TrgObj65[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
+  //hpbpb_TrgObj55[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
+	
+  // divide by bin width is doing something very weird. Its making histograms which are empty get 40 entries from somewhere - fixed that issue due to empty bins being divided by bin width. 
+
+  divideBinWidth(hpbpb_TrgObj80[k][j][i]);
+  divideBinWidth(hpbpb_TrgObj65[k][j][i]);
+  divideBinWidth(hpbpb_TrgObj55[k][j][i]);
+	
+  hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj80[k][j][i]);
+  hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj65[k][j][i]);
+  hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj55[k][j][i]);
+
+  hpbpb_TrgObjComb_nJet_g7[k][j][i]->Add(hpbpb_TrgObj80_nJet_g7[k][j][i]);
+  hpbpb_TrgObjComb_nJet_g7[k][j][i]->Add(hpbpb_TrgObj65_nJet_g7[k][j][i]);
+  hpbpb_TrgObjComb_nJet_g7[k][j][i]->Add(hpbpb_TrgObj55_nJet_g7[k][j][i]);
+
+  hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj80_nJet_l7[k][j][i]);
+  hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj65_nJet_l7[k][j][i]);
+  hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj55_nJet_l7[k][j][i]);
+	
+  // old method histograms, just as a test: 
+	
+  // hpbpb_Jet80[k][j][i]->Scale(1./delta_eta[j]);
+  // hpbpb_Jet65[k][j][i]->Scale(1./delta_eta[j]);
+  // hpbpb_Jet55[k][j][i]->Scale(1./delta_eta[j]);
+
+  // hpbpb_Jet65_noJet80[k][j][i]->Scale(1./delta_eta[j]);
+  // hpbpb_Jet55_noJet65_80[k][j][i]->Scale(1./delta_eta[j]);
+	
+  divideBinWidth(hpbpb_Jet80[k][j][i]);
+  // divideBinWidth(hpbpb_Jet65[k][j][i]);
+  // divideBinWidth(hpbpb_Jet55[k][j][i]);
+
+  divideBinWidth(hpbpb_Jet65_noJet80[k][j][i]);
+  divideBinWidth(hpbpb_Jet55_noJet65_80[k][j][i]);
+	
+  hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet80[k][j][i]);
+  hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet65_noJet80[k][j][i]);
+  hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet55_noJet65_80[k][j][i]);
+	
+  hpbpb_TrgObjComb[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObjComb[k][j][i]->Print();
+  hpbpb_TrgObj80[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObj80[k][j][i]->Print();
+  hpbpb_TrgObj65[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObj65[k][j][i]->Print();
+  hpbpb_TrgObj55[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObj55[k][j][i]->Print();
+
+  hpbpb_TrgObjComb_nJet_g7[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObjComb_nJet_g7[k][j][i]->Print();
+  hpbpb_TrgObj80_nJet_g7[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObj80_nJet_g7[k][j][i]->Print();
+  hpbpb_TrgObj65_nJet_g7[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObj65_nJet_g7[k][j][i]->Print();
+  hpbpb_TrgObj55_nJet_g7[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObj55_nJet_g7[k][j][i]->Print();
+
+  hpbpb_TrgObjComb_nJet_l7[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObjComb_nJet_l7[k][j][i]->Print();
+  hpbpb_TrgObj80_nJet_l7[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObj80_nJet_l7[k][j][i]->Print();
+  hpbpb_TrgObj65_nJet_l7[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObj65_nJet_l7[k][j][i]->Print();
+  hpbpb_TrgObj55_nJet_l7[k][j][i]->Write();
+  if(printDebug)hpbpb_TrgObj55_nJet_l7[k][j][i]->Print();	
+
+  hpbpb_Jet80[k][j][i]->Write();
+  if(printDebug)hpbpb_Jet80[k][j][i]->Print();
+  // hpbpb_Jet65[k][j][i]->Write();
+  // if(printDebug)hpbpb_Jet65[k][j][i]->Print();
+  // hpbpb_Jet55[k][j][i]->Write();
+  // if(printDebug)hpbpb_Jet55[k][j][i]->Print();
+
+  hpbpb_Jet65_noJet80[k][j][i]->Write();
+  if(printDebug)hpbpb_Jet65_noJet80[k][j][i]->Print();
+  hpbpb_Jet55_noJet65_80[k][j][i]->Write();
+  if(printDebug)hpbpb_Jet55_noJet65_80[k][j][i]->Print();
+  hpbpb_JetComb_old[k][j][i]->Write();
+  if(printDebug)hpbpb_JetComb_old[k][j][i]->Print();
+
+  }//cent bins loop
+
+  }//eta bins loop
+
+  for(int i = 0;i<=nbins_cent;i++){
+
+  if(printDebug)hpbpb_Npix_before_cut[k][i]->Print("base");
+  hpbpb_Npix_before_cut[k][i]->Write();
+  if(printDebug)hpbpb_Npix_after_cut[k][i]->Print("base");
+  hpbpb_Npix_after_cut[k][i]->Write();
+      
+  }
+  if(printDebug)hpbpb_Npix_before_cut[k][nbins_cent+1]->Print("base");
+  hpbpb_Npix_before_cut[k][nbins_cent+1]->Write();
+
+  hpbpb_cent[k]->Write();
+  if(printDebug)hpbpb_cent[k]->Print("base");
+  hpbpb_vz[k]->Write();
+  if(printDebug)hpbpb_vz[k]->Print("base");
+  hpbpb_vx[k]->Write();
+  if(printDebug)hpbpb_vx[k]->Print("base");
+  hpbpb_vy[k]->Write();
+  if(printDebug)hpbpb_vy[k]->Print("base");
+
+  }//radius loop
+
+  //hCut1->Write();
+  //hCut2->Write();
+  //hCut3->Write();
+  //hCut4->Write();
+  //hCut5->Write();
+
+  hEvents->Write();
+  hJets->Write();
+  //jets_ID->Write();
+
+  //if(printDebug)jets_ID->Print();
+  if(printDebug)hEvents->Print();
+  if(printDebug)hJets->Print();
+
+  f.Write();
+
+  f.Close();
+  */
   
-	    }
 
-	      timer.Stop();
-	      cout<<"Macro finished: "<<endl;
-	      cout<<"CPU time (min)  = "<<(float)timer.CpuTime()/60<<endl;
-	      cout<<"Real time (min) = "<<(float)timer.RealTime()/60<<endl;
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_HF_divergence_events_spectra_%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  f.cd();
+  hEvents->Write();
+  hEvents_Diverge_tight->Write(); 
+  hEvents_Diverge_loose->Write(); 
+  hEvents_Diverge_v0_tight->Write(); 
+  hEvents_Diverge_v0_loose->Write(); 
+  hEvents_Diverge_v1_tight->Write(); 
+  hEvents_Diverge_v1_loose->Write();
+  hEvents_Diverge_v2_tight->Write(); 
+  hEvents_Diverge_v2_loose->Write();
+  hEvents_Diverge_v3_tight->Write(); 
+  hEvents_Diverge_v3_loose->Write();
+  hEvents_Diverge_v4_tight->Write(); 
+  hEvents_Diverge_v4_loose->Write();
+
+  for(int i = 0;i<nbins_cent+1;i++){
+  
+    for(int a = 0;a<2;a++){
+
+      for(int b = 0;b<2;b++){
+
+	hpbpb_Jet80[b][a][i]->Write();
+	if(printDebug)hpbpb_Jet80[b][a][i]->Print();
+	hpbpb_Jet65[b][a][i]->Write();
+	if(printDebug)hpbpb_Jet65[b][a][i]->Print();
+	hpbpb_Jet55[b][a][i]->Write();
+	if(printDebug)hpbpb_Jet55[b][a][i]->Print();		
+
+	hpbpb_Pu_Jet80[b][a][i]->Write();
+	if(printDebug)hpbpb_Pu_Jet80[b][a][i]->Print();
+	hpbpb_Pu_Jet65[b][a][i]->Write();
+	if(printDebug)hpbpb_Pu_Jet65[b][a][i]->Print();
+	hpbpb_Pu_Jet55[b][a][i]->Write();
+	if(printDebug)hpbpb_Pu_Jet55[b][a][i]->Print();
+
+      }
+      
+    }
+
+    hpbpb_FullJet80[i]->Write();
+    if(printDebug)hpbpb_FullJet80[i]->Print();
+    hpbpb_FullJet65[i]->Write();
+    if(printDebug)hpbpb_FullJet65[i]->Print();
+    hpbpb_FullJet55[i]->Write();
+    if(printDebug)hpbpb_FullJet55[i]->Print();
+  
+    hpbpb_Pu_FullJet80[i]->Write();
+    if(printDebug)hpbpb_Pu_FullJet80[i]->Print();
+    hpbpb_Pu_FullJet65[i]->Write();
+    if(printDebug)hpbpb_Pu_FullJet65[i]->Print();
+    hpbpb_Pu_FullJet55[i]->Write();
+    if(printDebug)hpbpb_Pu_FullJet55[i]->Print();
+    
+  }
+
+  timer.Stop();
+  cout<<"Macro finished: "<<endl;
+  cout<<"CPU time (min)  = "<<(float)timer.CpuTime()/60<<endl;
+  cout<<"Real time (min) = "<<(float)timer.RealTime()/60<<endl;
 
 }
