@@ -7,6 +7,12 @@
 // based on Yue Shi's macros ver0 to ver4. 
 // 
 
+// Dec 4th - checking for the divergences in the polynomials compared to the different flow candidates. 
+//         - the values for the divergences are given here:  https://twiki.cern.ch/twiki/pub/CMS/HiVsValidation/4Dec2014_VsValidation_divergence.pdf 
+//         - And these are compared with Yue Shi's macro subtraction_internal_v4.cc which plots the polynomials 
+//         - these above plots were made from the training code. we are going to check the data and the MC for such a difference. 
+//         - this is the x axis for cos:  vn = sumpt[0]*vn[n][0]*cos(n*Psi_[n][0]) + sumpt[14]*vn[n][14]*cos(n*Psi_[n][14])
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -64,10 +70,10 @@ size_t pf_id_reduce(const Int_t pf_id)
   return 0;
 }
 
-void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WORK/RAA/Output/bad_allpthat.root", const int data = 0, const int calorimetric = 0){
+void subtraction_internal_ver5_raghav(const char *filename = "/Users/keraghav/WORK/RAA/Output/PbPb_data_bad_events.root", const int data = 1, const int calorimetric = 0){
 
   gStyle->SetPalette(55);
-  bool printDebug = true;
+  bool printDebug = false;
   bool printDebug2 = false;
   
   static const size_t nfourier = 5;
@@ -86,6 +92,9 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WO
   Float_t pfEta[NOBJECT_MAX];
   Float_t pfPhi[NOBJECT_MAX];
   Float_t pfArea[NOBJECT_MAX];
+  Float_t v_n[5][15];
+  Float_t psi_n[5][15];
+  Float_t sumpT[15];
 
   if (calorimetric) {
     root_tree->SetBranchAddress("n", &nPFpart);
@@ -103,6 +112,9 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WO
     root_tree->SetBranchAddress("pfEta", pfEta);
     root_tree->SetBranchAddress("pfPhi", pfPhi);
     root_tree->SetBranchAddress("pfArea", pfArea);
+    root_tree->SetBranchAddress("vn",&v_n);
+    root_tree->SetBranchAddress("psin",&psi_n);
+    root_tree->SetBranchAddress("sumpt",&sumpT);
   }
 
   TTree *hiTree = dynamic_cast<TTree *>(gDirectory->Get("hiEvtAnalyzer/HiTree"));
@@ -277,21 +289,27 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WO
       for(int k = 0;k<2;k++){
 	for(int l = 0;l<82;l++){
 	  //std::cout<<ue_predictor_pf[i][j][0][k][l]<<std::endl;
+	  /*
 	  if(TMath::Abs(ue_predictor_pf[i][j][0][k][l])>1e6){
 	    if(printDebug)std::cout<<i<<" "<<j<<" 0 "<<k<<" "<<l<<" = "<<ue_predictor_pf[i][j][0][k][l]<<std::endl; 
 	  }
+	  
 	  if(TMath::Abs(ue_predictor_pf[i][j][1][k][l])>1e6){
 	    if(printDebug)std::cout<<i<<" "<<j<<" 1 "<<k<<" "<<l<<" = "<<ue_predictor_pf[i][j][1][k][l]<<std::endl; 
 	  }
+	  
 	  if(TMath::Abs(ue_predictor_pf[i][j][2][k][l])>1e6){
 	    if(printDebug)std::cout<<i<<" "<<j<<" 2 "<<k<<" "<<l<<" = "<<ue_predictor_pf[i][j][2][k][l]<<std::endl; 
 	  }
+	  
 	  if(TMath::Abs(ue_predictor_pf[i][j][3][k][l])>1e6){
 	    if(printDebug)std::cout<<i<<" "<<j<<" 3 "<<k<<" "<<l<<" = "<<ue_predictor_pf[i][j][3][k][l]<<std::endl; 
 	  }
+	  
 	  if(TMath::Abs(ue_predictor_pf[i][j][4][k][l])>1e6){
 	    if(printDebug)std::cout<<i<<" "<<j<<" 4 "<<k<<" "<<l<<" = "<<ue_predictor_pf[i][j][4][k][l]<<std::endl; 
 	  }
+	  */
 	}
       }
     }
@@ -348,9 +366,6 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WO
       }
     }
 
-
-    // look at the different v0 and v2 values. 
-    // for(int i)
     
     // Event selection
   
@@ -378,7 +393,7 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WO
 	 perp_fourier[nedge_pseudorapidity - 2][l][0][0]);
     }
     if (i == 6 || i == 11 || i == 12  || i == 14)
-      fprintf(stderr, "%s:%d: HF bulk: %f scaled, %f GeV/c unscaled\n", __FILE__, __LINE__, feature[0], feature[0] / scale[0]);
+      //fprintf(stderr, "%s:%d: HF bulk: %f scaled, %f GeV/c unscaled\n", __FILE__, __LINE__, feature[0], feature[0] / scale[0]);
     for (size_t k = 1; k < nfourier; k++) {
       feature[2 * k - 1] = 0;
       for (size_t l = 0; l < nreduced_id; l++) {
@@ -387,7 +402,7 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WO
 	   perp_fourier[nedge_pseudorapidity - 2][l][k][0]);
       }
       if (i == 6 || i == 11 || i == 12  || i == 14)
-	fprintf(stderr, "%s:%d: HF order %lu flow: cos %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k - 1], feature[2 * k - 1] / scale[k]);
+	//fprintf(stderr, "%s:%d: HF order %lu flow: cos %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k - 1], feature[2 * k - 1] / scale[k]);
       feature[2 * k] = 0;
       for (size_t l = 0; l < nreduced_id; l++) {
 	feature[2 * k] += scale[k] *
@@ -395,7 +410,7 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WO
 	   perp_fourier[nedge_pseudorapidity - 2][l][k][1]);
       }
       if (i == 6 || i == 11 || i == 12  || i == 14)
-	fprintf(stderr, "%s:%d: HF order %lu flow: sin %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k], feature[2 * k] / scale[k]);
+	//fprintf(stderr, "%s:%d: HF order %lu flow: sin %f scaled, %f GeV/c unsacaled\n", __FILE__, __LINE__, k, feature[2 * k], feature[2 * k] / scale[k]);
     }
 
 #if 0
@@ -547,7 +562,6 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WO
   
   }
   
-#if 0
 
   // declare the histograms we want here: 
   // Sum$(PfVsPtInitial) as a function of the 15 eta bins. -> 15 histograms. since i want the RMS value for each of them. 
@@ -584,25 +598,75 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WO
     hiTree->GetEntry(i);
     t->GetEntry(i);
 
+    Float_t Vs_0_x_minus = sumpT[0]*v_n[0][0]*TMath::Cos(0*psi_n[0][0]);
+    Float_t Vs_0_x_plus = sumpT[14]*v_n[0][14]*TMath::Cos(0*psi_n[0][14]);
+    Float_t Vs_0_y_minus = sumpT[0]*v_n[0][0]*TMath::Sin(0*psi_n[0][0]);
+    Float_t Vs_0_y_plus = sumpT[14]*v_n[0][14]*TMath::Sin(0*psi_n[0][14]);
+    Float_t Vs_0_x = Vs_0_x_minus + Vs_0_x_plus;
+    Float_t Vs_0_y = Vs_0_y_minus + Vs_0_y_plus;
+    if(printDebug)std::cout<<"Vs_0_x = "<<Vs_0_x<<"; Vs_0_y =  "<<Vs_0_y<<std::endl;
+    if(TMath::Abs(Vs_0_x)>5200) std::cout<<"event "<<i<<" has sumpT* cos v0 > 5200"<<std::endl;
+    if(TMath::Abs(Vs_0_y)>5200) std::cout<<"event "<<i<<" has sumpT* sin v0 > 5200"<<std::endl;
+
+    Float_t Vs_1_x_minus = sumpT[0]*v_n[1][0]*TMath::Cos(2*psi_n[1][0]);
+    Float_t Vs_1_x_plus = sumpT[14]*v_n[1][14]*TMath::Cos(2*psi_n[1][14]);
+    Float_t Vs_1_y_minus = sumpT[0]*v_n[1][0]*TMath::Sin(2*psi_n[1][0]);
+    Float_t Vs_1_y_plus = sumpT[14]*v_n[1][14]*TMath::Sin(2*psi_n[1][14]);
+    Float_t Vs_1_x = Vs_1_x_minus + Vs_1_x_plus;
+    Float_t Vs_1_y = Vs_1_y_minus + Vs_1_y_plus;
+    if(printDebug)std::cout<<"Vs_1_x = "<<Vs_1_x<<"; Vs_1_y =  "<<Vs_1_y<<std::endl;
+    if(TMath::Abs(Vs_1_x)>100) std::cout<<"event "<<i<<" has sumpT* cos v1 > 100"<<std::endl;
+    if(TMath::Abs(Vs_1_y)>100) std::cout<<"event "<<i<<" has sumpT* sin v1 > 100"<<std::endl;
+
+    Float_t Vs_2_x_minus = sumpT[0]*v_n[2][0]*TMath::Cos(2*psi_n[2][0]);
+    Float_t Vs_2_x_plus = sumpT[14]*v_n[2][14]*TMath::Cos(2*psi_n[2][14]);
+    Float_t Vs_2_y_minus = sumpT[0]*v_n[2][0]*TMath::Sin(2*psi_n[2][0]);
+    Float_t Vs_2_y_plus = sumpT[14]*v_n[2][14]*TMath::Sin(2*psi_n[2][14]);
+    Float_t Vs_2_x = Vs_2_x_minus + Vs_2_x_plus;
+    Float_t Vs_2_y = Vs_2_y_minus + Vs_2_y_plus;
+    if(printDebug)std::cout<<"Vs_2_x = "<<Vs_2_x<<"; Vs_2_y =  "<<Vs_2_y<<std::endl;
+    if(TMath::Abs(Vs_2_x)>140) std::cout<<"event "<<i<<" has sumpT* cos v2 > 140"<<std::endl;
+    if(TMath::Abs(Vs_2_y)>140) std::cout<<"event "<<i<<" has sumpT* sin v2 > 140"<<std::endl;
+
+    Float_t Vs_3_x_minus = sumpT[0]*v_n[3][0]*TMath::Cos(2*psi_n[3][0]);
+    Float_t Vs_3_x_plus = sumpT[14]*v_n[3][14]*TMath::Cos(2*psi_n[3][14]);
+    Float_t Vs_3_y_minus = sumpT[0]*v_n[3][0]*TMath::Sin(2*psi_n[3][0]);
+    Float_t Vs_3_y_plus = sumpT[14]*v_n[3][14]*TMath::Sin(2*psi_n[3][14]);
+    Float_t Vs_3_x = Vs_3_x_minus + Vs_3_x_plus;
+    Float_t Vs_3_y = Vs_3_y_minus + Vs_3_y_plus;
+    if(printDebug)std::cout<<"Vs_3_x = "<<Vs_3_x<<"; Vs_3_y =  "<<Vs_3_y<<std::endl;
+    if(TMath::Abs(Vs_3_x)>120) std::cout<<"event "<<i<<" has sumpT* cos v3 > 120"<<std::endl;
+    if(TMath::Abs(Vs_3_y)>120) std::cout<<"event "<<i<<" has sumpT* sin v3 > 120"<<std::endl;
+
+    Float_t Vs_4_x_minus = sumpT[0]*v_n[4][0]*TMath::Cos(2*psi_n[4][0]);
+    Float_t Vs_4_x_plus = sumpT[14]*v_n[4][14]*TMath::Cos(2*psi_n[4][14]);
+    Float_t Vs_4_y_minus = sumpT[0]*v_n[4][0]*TMath::Sin(2*psi_n[4][0]);
+    Float_t Vs_4_y_plus = sumpT[14]*v_n[4][14]*TMath::Sin(2*psi_n[4][14]);
+    Float_t Vs_4_x = Vs_4_x_minus + Vs_4_x_plus;
+    Float_t Vs_4_y = Vs_4_y_minus + Vs_4_y_plus;
+    if(printDebug)std::cout<<"Vs_4_x = "<<Vs_4_x<<"; Vs_4_y =  "<<Vs_4_y<<std::endl;
+    if(TMath::Abs(Vs_3_x)>140) std::cout<<"event "<<i<<" has sumpT* cos v4 > 140"<<std::endl;
+    if(TMath::Abs(Vs_3_y)>140) std::cout<<"event "<<i<<" has sumpT* sin v4 > 140"<<std::endl;
+
     // declare the variables to hold the values per event per eta bin. 
     Float_t SumPfVsPtInitial[nedge_pseudorapidity-1], SumPfVsPt[nedge_pseudorapidity-1], SumPfPt[nedge_pseudorapidity-1];
     for(int k = 0;k<nedge_pseudorapidity-1;k++) {SumPfVsPtInitial[k] = 0; SumPfVsPt[k] = 0; SumPfPt[k] = 0;}
-    if(printDebug)std::cout<<"entry = "<< i<<endl;
+    if(printDebug2)std::cout<<"entry = "<< i<<endl;
 
     for(int ij = 0; ij < nPFpart; ij++){
-      if(printDebug)std::cout<<"pfcand = "<<ij<<endl;
+      if(printDebug2)std::cout<<"pfcand = "<<ij<<endl;
 
       for(int k = 0;k<nedge_pseudorapidity-1;k++){
-	if(printDebug)std::cout<<"eta bin = "<<k<<endl;
-	if(printDebug)std::cout<<"pfeta = "<<pfEta[ij]<<endl;
-	if(printDebug)std::cout<<"eta boundaries = "<<edge_pseudorapidity[k]<<" "<<edge_pseudorapidity[k+1]<<endl;
+	if(printDebug2)std::cout<<"eta bin = "<<k<<endl;
+	if(printDebug2)std::cout<<"pfeta = "<<pfEta[ij]<<endl;
+	if(printDebug2)std::cout<<"eta boundaries = "<<edge_pseudorapidity[k]<<" "<<edge_pseudorapidity[k+1]<<endl;
 	if(pfEta[ij]>= edge_pseudorapidity[k] && pfEta[ij]< edge_pseudorapidity[k+1]){
-	  if(printDebug)std::cout<<"inside eta bin"<<endl;
+	  if(printDebug2)std::cout<<"inside eta bin"<<endl;
 	  hetabin_test->Fill(edge_pseudorapidity[k]);
 	  SumPfVsPtInitial[k] += pfVsPtInitial[ij];
 	  SumPfVsPt[k] += pfVsPt[ij];
 	  SumPfPt[k] += pfPt[ij];
-	  if(printDebug)std::cout<<SumPfVsPtInitial[k]<<endl;
+	  if(printDebug2)std::cout<<SumPfVsPtInitial[k]<<endl;
 	}// eta selection statement 
 
       }// eta bin loop
@@ -670,6 +734,5 @@ void subtraction_internal_ver5_raghav(const char *filename = "/Users/raghavke/WO
   f.Write();
   f.Close();
 
-#endif
 
 }
