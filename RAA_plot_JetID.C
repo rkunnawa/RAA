@@ -147,7 +147,10 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 
   TFile *fDatain = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_output.root");
-  TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_output.root");
+  TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_MC_withAndWithoutRatio.root");
+
+  //TFile *fDatain = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_withCutHasAllExceptElecRejection.root");
+  //TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root.root.root");
   
   TH1F *hData[3][2][nbins_cent+1];
   TH1F *hData_Ratio[TrigValue][nbins_cent+1];
@@ -160,19 +163,19 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
       for(int b = 0;b<CutValue;b++){
 
-	hData[a][b][i] = (TH1F*)fin->Get(Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
+	hData[a][b][i] = (TH1F*)fDatain->Get(Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
 	hData[a][b][i] = (TH1F*)hData[a][b][i]->Rebin(nbins_pt,Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),boundaries_pt);
 	divideBinWidth(hData[a][b][i]);
-	hMC[a][b][i] = (TH1F*)fin->Get(Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
+	hMC[a][b][i] = (TH1F*)fMCin->Get(Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
 	hMC[a][b][i] = (TH1F*)hMC[a][b][i]->Rebin(nbins_pt,Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),boundaries_pt);
 	divideBinWidth(hMC[a][b][i]);
       }
 
-      hData_Ratio[a][i] = (TH1F*)fin->Get(Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
+      hData_Ratio[a][i] = (TH1F*)fDatain->Get(Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
       hData_Ratio[a][i] = (TH1F*)hData_Ratio[a][i]->Rebin(nbins_pt,Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i),boundaries_pt);
       divideBinWidth(hData_Ratio[a][i]);
-      hMC_Ratio[a][i] = (TH1F*)fin->Get(Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
-      hMC_Ratio[a][i] = (TH1F*)hMC_Ratio[a][i]->Rebin(nbins_pt,Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i),boundaries_pt);
+      hMC_Ratio[a][i] = (TH1F*)fMCin->Get(Form("hMC_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
+      hMC_Ratio[a][i] = (TH1F*)hMC_Ratio[a][i]->Rebin(nbins_pt,Form("hMC_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i),boundaries_pt);
       divideBinWidth(hMC_Ratio[a][i]);
     }
 
@@ -194,35 +197,35 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   // TCut muRjc = "muMax/(chMax+neMax+phMax)<0.9";
 
   TCanvas *cData_Ratio = new TCanvas("cData_Ratio","",1000,800);
-  makeMultiPanelCanvas(cData_Ratio,,3,2,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_Ratio,3,2,0.0,0.0,0.2,0.15,0.07);
 
   for(int i = 0;i<nbins_cent;i++){
 
     cData_Ratio->cd(nbins_cent-i);
     
     makeHistTitle(hData_Ratio[0][i],"","Jet p_{T} (GeV/c)","Jet ID over no Jet ID");
-    hData_Ratio[0][i]->SetMarkerStyle(24);
+    hData_Ratio[0][i]->SetMarkerStyle(29);
     hData_Ratio[0][i]->SetMarkerColor(kBlack);
     hData_Ratio[0][i]->SetAxisRange(30,500,"X");
     hData_Ratio[0][i]->SetAxisRange(0,1.4,"Y");
     hData_Ratio[0][i]->Draw();
 
-    hData_Ratio[1][i]->SetMarkerStyle(25);
+    hData_Ratio[1][i]->SetMarkerStyle(33);
     hData_Ratio[1][i]->SetMarkerColor(kRed);
     hData_Ratio[1][i]->Draw("same");
 
-    hData_Ratio[2][i]->SetMarkerStyle(25);
-    hData_Ratio[2][i]->SetMarkerColor(kRed);
+    hData_Ratio[2][i]->SetMarkerStyle(34);
+    hData_Ratio[2][i]->SetMarkerColor(kBlue);
     hData_Ratio[2][i]->Draw("same");
         
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.85,15);
   }
 
   cData_Ratio->cd(1);
-  TLegend *LRatio = myLegend(0.15,0.2,0.8,0.45);
-  LRatio->AddEntry(hData_Ratio[0][i],"HLT55 && L1SJ36 && !HLT65 && !HLT80","pl");
-  LRatio->AddEntry(hData_Ratio[1][i],"HLT65 && L1SJ26 && !HLT80","pl");
-  LRatio->AddEntry(hData_Ratio[2][i],"HLT80 && L1SJ52","pl");
+  TLegend *LRatio = myLegend(0.3,0.2,0.8,0.45);
+  LRatio->AddEntry(hData_Ratio[0][0],"HLT55 && L1SJ36 && !HLT65 && !HLT80","pl");
+  LRatio->AddEntry(hData_Ratio[1][0],"HLT65 && L1SJ36 && !HLT80","pl");
+  LRatio->AddEntry(hData_Ratio[2][0],"HLT80 && L1SJ52","pl");
   LRatio->SetTextSize(0.04);
   LRatio->Draw();
 
@@ -239,8 +242,11 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   drawText("phMax/(chMax+neMax+phMax)<0.9",0.2,0.4,16);
 
   cData_Ratio->cd(4);
-  drawText("chMax/jtpt>0.05",0.2,0.3,16);
-  drawText("muMax/(chMax+neMax+phMax)<0.9",0.2,0.4,16);
+  drawText("chMax/jtpt>0.05",0.3,0.3,16);
+  drawText("muMax/(chMax+neMax+phMax)<0.9",0.3,0.4,16);
+
+  cData_Ratio->cd(5);
+  drawText("Data",0.3,0.75,20);
 
   cData_Ratio->SaveAs("PbPb_data_akPu3PF_Ratio_JetID_cut.pdf","RECREATE");
 
@@ -253,23 +259,23 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   for(int a = 0;a<TrigValue;a++){
 
     cData_Spectra[a] = new TCanvas(Form("cData_Spectra_%d",a),"",1000,800);
-    makeMultiPanelCanvas(cData_Spectra[a],,3,2,0.0,0.0,0.2,0.15,0.07);
+    makeMultiPanelCanvas(cData_Spectra[a],3,2,0.0,0.0,0.2,0.15,0.07);
 
     for(int i = 0;i<nbins_cent;i++){
 
       cData_Spectra[a]->cd(nbins_cent-i);
       cData_Spectra[a]->cd(nbins_cent-i)->SetLogy();
     
-      makeHistTitle(hData_Spectra[a][0][i],"","Jet p_{T} (GeV/c)","N / #Delta p_{T}");
-      hData_Spectra[a][0][i]->SetMarkerStyle(24);
-      hData_Spectra[a][0][i]->SetMarkerColor(kBlack);
-      hData_Spectra[a][0][i]->SetAxisRange(30,500,"X");
-      // hData_Spectra[a][0][i]->SetAxisRange(0,1.4,"Y");
-      hData_Spectra[a][0][i]->Draw();
+      makeHistTitle(hData[a][0][i],"","Jet p_{T} (GeV/c)","N / #Delta p_{T}");
+      hData[a][0][i]->SetMarkerStyle(25);
+      hData[a][0][i]->SetMarkerColor(kBlack);
+      hData[a][0][i]->SetAxisRange(30,500,"X");
+      // hData[a][0][i]->SetAxisRange(0,1.4,"Y");
+      hData[a][0][i]->Draw();
       
-      hData_Spectra[a][1][i]->SetMarkerStyle(25);
-      hData_Spectra[a][1][i]->SetMarkerColor(kRed);
-      hData_Spectra[a][1][i]->Draw("same");
+      hData[a][1][i]->SetMarkerStyle(20);
+      hData[a][1][i]->SetMarkerColor(kRed);
+      hData[a][1][i]->Draw("same");
       
       drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
     
@@ -277,8 +283,8 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
     cData_Spectra[a]->cd(1);
     TLegend *LSpectra = myLegend(0.15,0.2,0.8,0.45);
-    LSpectra->AddEntry(hData_Spectra[a][0][i],"Without Jet ID Cut","pl");
-    LSpectra->AddEntry(hData_Spectra[a][1][i],"With Jet ID Cuts","pl");
+    LSpectra->AddEntry(hData[a][0][0],"Without Jet ID Cut","pl");
+    LSpectra->AddEntry(hData[a][1][0],"With Jet ID Cuts","pl");
     LSpectra->SetTextSize(0.04);
     LSpectra->Draw();
 
@@ -311,35 +317,35 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
 
   TCanvas *cMC_Ratio = new TCanvas("cMC_Ratio","",1000,800);
-  makeMultiPanelCanvas(cMC_Ratio,,3,2,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_Ratio,3,2,0.0,0.0,0.2,0.15,0.07);
 
   for(int i = 0;i<nbins_cent;i++){
 
     cMC_Ratio->cd(nbins_cent-i);
     
     makeHistTitle(hMC_Ratio[0][i],"","Jet p_{T} (GeV/c)","Jet ID over no Jet ID");
-    hMC_Ratio[0][i]->SetMarkerStyle(24);
+    hMC_Ratio[0][i]->SetMarkerStyle(29);
     hMC_Ratio[0][i]->SetMarkerColor(kBlack);
     hMC_Ratio[0][i]->SetAxisRange(30,500,"X");
     hMC_Ratio[0][i]->SetAxisRange(0,1.4,"Y");
     hMC_Ratio[0][i]->Draw();
 
-    hMC_Ratio[1][i]->SetMarkerStyle(25);
+    hMC_Ratio[1][i]->SetMarkerStyle(33);
     hMC_Ratio[1][i]->SetMarkerColor(kRed);
     hMC_Ratio[1][i]->Draw("same");
 
-    hMC_Ratio[2][i]->SetMarkerStyle(25);
-    hMC_Ratio[2][i]->SetMarkerColor(kRed);
+    hMC_Ratio[2][i]->SetMarkerStyle(34);
+    hMC_Ratio[2][i]->SetMarkerColor(kBlue);
     hMC_Ratio[2][i]->Draw("same");
         
     drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
   }
 
   cMC_Ratio->cd(1);
-  TLegend *LMCRatio = myLegend(0.15,0.2,0.8,0.45);
-  LMCRatio->AddEntry(hMC_Ratio[0][i],"HLT55 && !HLT65 && !HLT80","pl");
-  LMCRatio->AddEntry(hMC_Ratio[1][i],"HLT65 && !HLT80","pl");
-  LMCRatio->AddEntry(hMC_Ratio[2][i],"HLT80","pl");
+  TLegend *LMCRatio = myLegend(0.3,0.2,0.8,0.45);
+  LMCRatio->AddEntry(hMC_Ratio[0][0],"HLT55 && !HLT65 && !HLT80","pl");
+  LMCRatio->AddEntry(hMC_Ratio[1][0],"HLT65 && !HLT80","pl");
+  LMCRatio->AddEntry(hMC_Ratio[2][0],"HLT80","pl");
   LMCRatio->SetTextSize(0.04);
   LMCRatio->Draw();
 
@@ -359,6 +365,9 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   drawText("chMax/jtpt>0.05",0.2,0.3,16);
   drawText("muMax/(chMax+neMax+phMax)<0.9",0.2,0.4,16);
 
+  cMC_Ratio->cd(5);
+  drawText("MC",0.3,0.75,20);
+
   cMC_Ratio->SaveAs("PbPb_MC_akPu3PF_Ratio_JetID_cut.pdf","RECREATE");
 
 
@@ -370,23 +379,23 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   for(int a = 0;a<TrigValue;a++){
 
     cMC_Spectra[a] = new TCanvas(Form("cMC_Spectra_%d",a),"",1000,800);
-    makeMultiPanelCanvas(cMC_Spectra[a],,3,2,0.0,0.0,0.2,0.15,0.07);
+    makeMultiPanelCanvas(cMC_Spectra[a],3,2,0.0,0.0,0.2,0.15,0.07);
 
     for(int i = 0;i<nbins_cent;i++){
 
       cMC_Spectra[a]->cd(nbins_cent-i);
       cMC_Spectra[a]->cd(nbins_cent-i)->SetLogy();
     
-      makeHistTitle(hMC_Spectra[a][0][i],"","Jet p_{T} (GeV/c)","N / #Delta p_{T}");
-      hMC_Spectra[a][0][i]->SetMarkerStyle(24);
-      hMC_Spectra[a][0][i]->SetMarkerColor(kBlack);
-      hMC_Spectra[a][0][i]->SetAxisRange(30,500,"X");
-      // hMC_Spectra[a][0][i]->SetAxisRange(0,1.4,"Y");
-      hMC_Spectra[a][0][i]->Draw();
+      makeHistTitle(hMC[a][0][i],"","Jet p_{T} (GeV/c)","N / #Delta p_{T}");
+      hMC[a][0][i]->SetMarkerStyle(25);
+      hMC[a][0][i]->SetMarkerColor(kBlack);
+      hMC[a][0][i]->SetAxisRange(30,500,"X");
+      // hMC[a][0][i]->SetAxisRange(0,1.4,"Y");
+      hMC[a][0][i]->Draw();
       
-      hMC_Spectra[a][1][i]->SetMarkerStyle(25);
-      hMC_Spectra[a][1][i]->SetMarkerColor(kRed);
-      hMC_Spectra[a][1][i]->Draw("same");
+      hMC[a][1][i]->SetMarkerStyle(20);
+      hMC[a][1][i]->SetMarkerColor(kRed);
+      hMC[a][1][i]->Draw("same");
       
       drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
     
@@ -394,8 +403,8 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
     cMC_Spectra[a]->cd(1);
     TLegend *LSpectra = myLegend(0.15,0.2,0.8,0.45);
-    LSpectra->AddEntry(hMC_Spectra[a][0][i],"Without Jet ID Cut","pl");
-    LSpectra->AddEntry(hMC_Spectra[a][1][i],"With Jet ID Cuts","pl");
+    LSpectra->AddEntry(hMC[a][0][0],"Without Jet ID Cut","pl");
+    LSpectra->AddEntry(hMC[a][1][0],"With Jet ID Cuts","pl");
     LSpectra->SetTextSize(0.04);
     LSpectra->Draw();
 
