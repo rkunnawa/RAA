@@ -129,15 +129,15 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   bool printDebug = true;
 
   // Get the input files for Data and MC including the trees that are necessary 
-  TFile *fDatain = TFile::Open(Form("/Users/keraghav/WORK/RAA/Output/PbPb_jetntuple_withEvtCuts_SuperNovaRejected_ak%s%d%s_20141209.root",algo,radius,jet_type));
-  //TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_pp_mc_nocut_ak%s%s_20141118.root",algo,jet_type));
+  TFile *fDatain = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_jetntuple_withEvtCuts_SuperNovaRejected_ak%s%d%s_20141209.root",algo,radius,jet_type));
+  TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_nocut_ak%s%s_20141210.root",algo,jet_type));
 
   TTree *jetData = (TTree*)fDatain->Get("jets_ID");
-  //TTree *jetMC = (TTree*)fMCin->Get("jets_ID");
+  TTree *jetMC = (TTree*)fMCin->Get("jets_ID");
 
   //check if the trees are filled. 
-  if(printDebug)cout<<"jetData entries = "<<jetData->GetEntries()<<endl;
-  //if(printDebug)cout<<"jetMC entries   = "<<jetMC->GetEntries()<<endl;
+  if(printDebug)cout<<"jetData no of jets = "<<jetData->GetEntries()<<endl;
+  if(printDebug)cout<<"jetMC no of jets  = "<<jetMC->GetEntries()<<endl;
 
   // lets think about what we want to plot here: 
   // i want to plot the ratio of jet spectra (from the specific triggers Jet55 or Jet65 or Jet80) with cut over without cut. 
@@ -166,6 +166,11 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   TH1F *hData[3][2][nbins_cent+1];
   TH1F *hData_Ratio[TrigValue][nbins_cent+1];
+  TH1F *hMC[3][2][nbins_cent+1];
+  TH1F *hMC_Ratio[TrigValue][nbins_cent+1];
+
+  // need to make 2d histograms like what Yetkin showed plotting the ratio of species fraction/jtpt vs jtpt and for genpt for MC. 
+  // need to run it for MC. 
 
   for(int i = 0;i<=nbins_cent;i++){
 
@@ -173,7 +178,8 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
       for(int b = 0;b<CutValue;b++){
 
-        hData[a][b][i] = new TH1F(Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),Form("Jet Spectra from %s trigger %s JetID cuts in the centrality bin %s",TrigName[a],isJetID[b],centWidth[i]),1000,0,1000);
+        hData[a][b][i] = new TH1F(Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),Form("Data Jet Spectra from %s trigger %s JetID cuts in the centrality bin %s",TrigName[a],isJetID[b],centWidth[i]),1000,0,1000);
+	hMC[a][b][i] = new TH1F(Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),Form("MC Jet Spectra from %s trigger %s JetID cuts in the centrality bin %s",TrigName[a],isJetID[b],centWidth[i]),1000,0,1000);
 
       }
       
@@ -198,7 +204,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   Float_t jet65_p_1;
   Float_t jet80_p_1;
   float trgObjpt_1;
-  float cent;
+  float cent_1;
   float jtpt_1;
   float raw_1;
   // float eta_1;
@@ -232,7 +238,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   jetData->SetBranchAddress("jet80",&jet80_1);
   jetData->SetBranchAddress("jet80_prescl",&jet80_p_1);
   jetData->SetBranchAddress("trgObjpt",&trgObjpt_1);
-  jetData->SetBranchAddress("cent",&cent);
+  jetData->SetBranchAddress("cent",&cent_1);
   jetData->SetBranchAddress("chMax",&chMax_1);
   jetData->SetBranchAddress("chSum",&chSum_1);
   jetData->SetBranchAddress("phMax",&phMax_1);
@@ -243,44 +249,100 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   jetData->SetBranchAddress("muSum",&muSum_1);
   jetData->SetBranchAddress("eMax",&eMax_1);
   jetData->SetBranchAddress("eSum",&eSum_1);
-
   Float_t effecPrescl = 2.047507;
+  int centBin_1 = 0;
 
-  int centBin = cent;
+  // Set Variables for MC. (_2) 
+  Float_t jet55_2;
+  Float_t jet65_2;
+  Float_t jet80_2;
+  Float_t jet55_p_2;
+  Float_t jet65_p_2;
+  Float_t jet80_p_2;
+  float cent_2;
+  float jtpt_2;
+  float raw_2;
+  float refpt_2;
+  float scale_2;
+  float weight_vz_2;
+  float weight_cent_2;
+  float subid_2;
+  float chMax_2;
+  float chSum_2;
+  float phSum_2;
+  float neSum_2;
+  float phMax_2;
+  float neMax_2;
+  float eMax_2;
+  float muMax_2;
+  float eSum_2;
+  float muSum_2;
+  float jtpu_2;
 
+  jetMC->SetBranchAddress("rawpt",&raw_2);
+  jetMC->SetBranchAddress("jtpt",&jtpt_2);
+  jetMC->SetBranchAddress("jtpu",&jtpu_2);
+  jetMC->SetBranchAddress("refpt",&refpt_2);
+  jetMC->SetBranchAddress("weight_cent",&weight_cent_2);
+  jetMC->SetBranchAddress("weight_vz",&weight_vz_2);
+  jetMC->SetBranchAddress("subid",&subid_2);
+  jetMC->SetBranchAddress("jet55",&jet55_2);
+  jetMC->SetBranchAddress("jet55_prescl",&jet55_p_2);
+  jetMC->SetBranchAddress("jet65",&jet65_2);
+  jetMC->SetBranchAddress("jet65_prescl",&jet65_p_2);
+  jetMC->SetBranchAddress("jet80",&jet80_2);
+  jetMC->SetBranchAddress("jet80_prescl",&jet80_p_2);
+  jetMC->SetBranchAddress("trgObjpt",&trgObjpt_2);
+  jetMC->SetBranchAddress("cent",&cent_2);
+  jetMC->SetBranchAddress("chMax",&chMax_2);
+  jetMC->SetBranchAddress("chSum",&chSum_2);
+  jetMC->SetBranchAddress("phMax",&phMax_2);
+  jetMC->SetBranchAddress("phSum",&phSum_2);
+  jetMC->SetBranchAddress("neMax",&neMax_2);
+  jetMC->SetBranchAddress("neSum",&neSum_2);
+  jetMC->SetBranchAddress("muMax",&muMax_2);
+  jetMC->SetBranchAddress("muSum",&muSum_2);
+  jetMC->SetBranchAddress("eMax",&eMax_2);
+  jetMC->SetBranchAddress("eSum",&eSum_2);
+  int centBin_2 = 0;
+
+  // Data loop
   for(int jentry = 0;jentry<jetData->GetEntries();jentry++){
 
     jetData->GetEntry(jentry);
-
-    if(jentry%10000==0)cout<<jentry<<" of "<<jetData->GetEntries()<<endl;
+    centBin_1 = (int)cent_1;
+    if(jentry%1000000==0)cout<<"Data "<<jentry<<" of "<<jetData->GetEntries()<<endl;
 
     if(jet80_1 && L1_sj52_1){
 
-      hData[2][0][centBin]->Fill(jtpt_1);
-      hData[2][0][nbins_cent]->Fill(jtpt_1);
-      
-      if((eMax_1/jtpt_1<0.3) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
-	hData[2][1][centBin]->Fill(jtpt_1);
+      if((neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+	hData[2][0][centBin_1]->Fill(jtpt_1);
+	hData[2][0][nbins_cent]->Fill(jtpt_1);
+      }
+      if((eMax_1/jtpt_1<0.3) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+	hData[2][1][centBin_1]->Fill(jtpt_1);
 	hData[2][1][nbins_cent]->Fill(jtpt_1);
       }
 
     }else if(jet65_1 && L1_sj36_1 && !jet80_1){
 
-      hData[1][0][centBin]->Fill(jtpt_1);
-      hData[1][0][nbins_cent]->Fill(jtpt_1);
-      
-      if((eMax_1/jtpt_1<0.3) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
-	hData[1][1][centBin]->Fill(jtpt_1);
+      if((neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+	hData[1][0][centBin_1]->Fill(jtpt_1);
+	hData[1][0][nbins_cent]->Fill(jtpt_1);
+      }
+      if((eMax_1/jtpt_1<0.3) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+	hData[1][1][centBin_1]->Fill(jtpt_1);
 	hData[1][1][nbins_cent]->Fill(jtpt_1);
       }
 
     }else if(jet55_1 && L1_sj36_1 && !jet65_1 && !jet80_1){
 
-      hData[0][0][centBin]->Fill(jtpt_1,effecPrescl);
-      hData[0][0][nbins_cent]->Fill(jtpt_1,effecPrescl);
-      
-      if((eMax_1/jtpt_1<0.3) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
-	hData[0][1][centBin]->Fill(jtpt_1,effecPrescl);
+      if((neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+	hData[0][0][centBin_1]->Fill(jtpt_1,effecPrescl);
+	hData[0][0][nbins_cent]->Fill(jtpt_1,effecPrescl);
+      }
+      if((eMax_1/jtpt_1<0.3) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+	hData[0][1][centBin_1]->Fill(jtpt_1,effecPrescl);
 	hData[0][1][nbins_cent]->Fill(jtpt_1,effecPrescl);
       }
 
@@ -319,10 +381,57 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   // hData[2][0][nbins_cent]->Print("base");
   // jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[2],isJetID[1],nbins_cent),"jtpt",Jet80 && elRjc && neRjc && phRjc && chID && muRjc);
   // hData[2][1][nbins_cent]->Print("base");
-  
-
 
   }// entry loop
+
+  Float_t weight = 0;
+  
+  // MC loop
+  for(int jentry = 0;jentry<jetMC->GetEntries();jentry++){
+
+    jetMC->GetEntry(jentry);
+    centBin_2 = (int)cent_2;
+    if(jentry%1000000==0)cout<<"MC "<<jentry<<" of "<<jetMC->GetEntries()<<endl;
+
+    weight = scale * weight_vz * weight_cent;
+
+    if(jet80_2){
+
+      if((neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+	hMC[2][0][centBin_2]->Fill(jtpt_2,weight);
+	hMC[2][0][nbins_cent]->Fill(jtpt_2,weight);
+      }
+      if((eMax_2/jtpt_2<0.3) && (neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+	hMC[2][1][centBin_2]->Fill(jtpt_2,weight);
+	hMC[2][1][nbins_cent]->Fill(jtpt_2,weight);
+      }
+
+    }else if(jet65_2 && L1_sj36_2 && !jet80_2){
+
+      if((neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+	hMC[1][0][centBin_2]->Fill(jtpt_2,weight);
+	hMC[1][0][nbins_cent]->Fill(jtpt_2,weight);
+      }
+      if((eMax_2/jtpt_2<0.3) && (neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+	hMC[1][1][centBin_2]->Fill(jtpt_2,weight);
+	hMC[1][1][nbins_cent]->Fill(jtpt_2,weight);
+      }
+
+    }else if(jet55_2 && L1_sj36_2 && !jet65_2 && !jet80_2){
+
+      if((neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+	hMC[0][0][centBin_2]->Fill(jtpt_2,weight);
+	hMC[0][0][nbins_cent]->Fill(jtpt_2,weight);
+      }
+      if((eMax_2/jtpt_2<0.3) && (neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+	hMC[0][1][centBin_2]->Fill(jtpt_2,weight);
+	hMC[0][1][nbins_cent]->Fill(jtpt_2,weight);
+      }
+
+    }
+
+  }
+  
 
   // Divide the histograms to get an idea of the effect to the Jet Spectra
   
@@ -336,7 +445,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     
   }
 
-  TFile f("/Users/keraghav/WORK/RAA/Output/RAA_JetID_output.root","RECREATE");
+  TFile f("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_withCutHasAllExceptElecRejection.root","RECREATE");
   f.cd();
 
   for(int i = 0;i<=nbins_cent;i++){
