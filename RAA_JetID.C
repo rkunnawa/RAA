@@ -398,6 +398,8 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
     weight = scale_2 * weight_vz_2 * weight_cent_2;
 
+    if(subid_2!=0)continue;
+
     if(jet80_2){
 
       if((neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
