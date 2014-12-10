@@ -146,10 +146,13 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 
-  TFile *fin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_output.root");
+  TFile *fDatain = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_output.root");
+  TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_output.root");
   
   TH1F *hData[3][2][nbins_cent+1];
   TH1F *hData_Ratio[TrigValue][nbins_cent+1];
+  TH1F *hMC[3][2][nbins_cent+1];
+  TH1F *hMC_Ratio[TrigValue][nbins_cent+1];
 
   for(int i = 0;i<nbins_cent+1;i++){
 
@@ -160,11 +163,17 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 	hData[a][b][i] = (TH1F*)fin->Get(Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
 	hData[a][b][i] = (TH1F*)hData[a][b][i]->Rebin(nbins_pt,Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),boundaries_pt);
 	divideBinWidth(hData[a][b][i]);
+	hMC[a][b][i] = (TH1F*)fin->Get(Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
+	hMC[a][b][i] = (TH1F*)hMC[a][b][i]->Rebin(nbins_pt,Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),boundaries_pt);
+	divideBinWidth(hMC[a][b][i]);
       }
 
       hData_Ratio[a][i] = (TH1F*)fin->Get(Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
       hData_Ratio[a][i] = (TH1F*)hData_Ratio[a][i]->Rebin(nbins_pt,Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i),boundaries_pt);
       divideBinWidth(hData_Ratio[a][i]);
+      hMC_Ratio[a][i] = (TH1F*)fin->Get(Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
+      hMC_Ratio[a][i] = (TH1F*)hMC_Ratio[a][i]->Rebin(nbins_pt,Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i),boundaries_pt);
+      divideBinWidth(hMC_Ratio[a][i]);
     }
 
   }
@@ -233,7 +242,7 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   drawText("chMax/jtpt>0.05",0.2,0.3,16);
   drawText("muMax/(chMax+neMax+phMax)<0.9",0.2,0.4,16);
 
-  cData_Ratio->SaveAs("PbPb_akPu3PF_Ratio_JetID_cut.pdf","RECREATE");
+  cData_Ratio->SaveAs("PbPb_data_akPu3PF_Ratio_JetID_cut.pdf","RECREATE");
 
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -294,7 +303,124 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     if(a==1)drawText("HLT65 && L1SJ36 && !HLT80",0.2,0.2,16);
     if(a==2)drawText("HLT80 && L1SJ52",0.2,0.2,16);
 
-    cData_Spectra[a]->SaveAs(Form("PbPb_akPu3PF_Jet_%s_Spectra_JetID_cut.pdf",TrigName[a]),"RECREATE");
+    cData_Spectra[a]->SaveAs(Form("PbPb_data_akPu3PF_Jet_%s_Spectra_JetID_cut.pdf",TrigName[a]),"RECREATE");
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+  TCanvas *cMC_Ratio = new TCanvas("cMC_Ratio","",1000,800);
+  makeMultiPanelCanvas(cMC_Ratio,,3,2,0.0,0.0,0.2,0.15,0.07);
+
+  for(int i = 0;i<nbins_cent;i++){
+
+    cMC_Ratio->cd(nbins_cent-i);
+    
+    makeHistTitle(hMC_Ratio[0][i],"","Jet p_{T} (GeV/c)","Jet ID over no Jet ID");
+    hMC_Ratio[0][i]->SetMarkerStyle(24);
+    hMC_Ratio[0][i]->SetMarkerColor(kBlack);
+    hMC_Ratio[0][i]->SetAxisRange(30,500,"X");
+    hMC_Ratio[0][i]->SetAxisRange(0,1.4,"Y");
+    hMC_Ratio[0][i]->Draw();
+
+    hMC_Ratio[1][i]->SetMarkerStyle(25);
+    hMC_Ratio[1][i]->SetMarkerColor(kRed);
+    hMC_Ratio[1][i]->Draw("same");
+
+    hMC_Ratio[2][i]->SetMarkerStyle(25);
+    hMC_Ratio[2][i]->SetMarkerColor(kRed);
+    hMC_Ratio[2][i]->Draw("same");
+        
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+  }
+
+  cMC_Ratio->cd(1);
+  TLegend *LMCRatio = myLegend(0.15,0.2,0.8,0.45);
+  LMCRatio->AddEntry(hMC_Ratio[0][i],"HLT55 && !HLT65 && !HLT80","pl");
+  LMCRatio->AddEntry(hMC_Ratio[1][i],"HLT65 && !HLT80","pl");
+  LMCRatio->AddEntry(hMC_Ratio[2][i],"HLT80","pl");
+  LMCRatio->SetTextSize(0.04);
+  LMCRatio->Draw();
+
+  putCMSPrel();
+  
+  cMC_Ratio->cd(2);
+  drawText("|#eta|<2, |vz|<15",0.2,0.2,16);
+  drawText("pCES",0.2,0.3,16);
+  //drawText("Supernova Rejection Cut",0.2,0.4,16);
+
+  cMC_Ratio->cd(3);
+  drawText("eMax/jtpt<0.3",0.2,0.2,16);
+  drawText("neMax/(chMax+neMax+phMax)<0.9",0.2,0.3,16);
+  drawText("phMax/(chMax+neMax+phMax)<0.9",0.2,0.4,16);
+
+  cMC_Ratio->cd(4);
+  drawText("chMax/jtpt>0.05",0.2,0.3,16);
+  drawText("muMax/(chMax+neMax+phMax)<0.9",0.2,0.4,16);
+
+  cMC_Ratio->SaveAs("PbPb_MC_akPu3PF_Ratio_JetID_cut.pdf","RECREATE");
+
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  TCanvas *cMC_Spectra[TrigValue];
+
+  for(int a = 0;a<TrigValue;a++){
+
+    cMC_Spectra[a] = new TCanvas(Form("cMC_Spectra_%d",a),"",1000,800);
+    makeMultiPanelCanvas(cMC_Spectra[a],,3,2,0.0,0.0,0.2,0.15,0.07);
+
+    for(int i = 0;i<nbins_cent;i++){
+
+      cMC_Spectra[a]->cd(nbins_cent-i);
+      cMC_Spectra[a]->cd(nbins_cent-i)->SetLogy();
+    
+      makeHistTitle(hMC_Spectra[a][0][i],"","Jet p_{T} (GeV/c)","N / #Delta p_{T}");
+      hMC_Spectra[a][0][i]->SetMarkerStyle(24);
+      hMC_Spectra[a][0][i]->SetMarkerColor(kBlack);
+      hMC_Spectra[a][0][i]->SetAxisRange(30,500,"X");
+      // hMC_Spectra[a][0][i]->SetAxisRange(0,1.4,"Y");
+      hMC_Spectra[a][0][i]->Draw();
+      
+      hMC_Spectra[a][1][i]->SetMarkerStyle(25);
+      hMC_Spectra[a][1][i]->SetMarkerColor(kRed);
+      hMC_Spectra[a][1][i]->Draw("same");
+      
+      drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+    
+    }
+
+    cMC_Spectra[a]->cd(1);
+    TLegend *LSpectra = myLegend(0.15,0.2,0.8,0.45);
+    LSpectra->AddEntry(hMC_Spectra[a][0][i],"Without Jet ID Cut","pl");
+    LSpectra->AddEntry(hMC_Spectra[a][1][i],"With Jet ID Cuts","pl");
+    LSpectra->SetTextSize(0.04);
+    LSpectra->Draw();
+
+    putCMSPrel();
+  
+    cMC_Spectra[a]->cd(2);
+    drawText("|#eta|<2, |vz|<15",0.2,0.2,16);
+    drawText("pCES, HBHE",0.2,0.3,16);
+    drawText("Supernova Rejection Cut",0.2,0.4,16);
+
+    cMC_Spectra[a]->cd(3);
+    drawText("eMax/jtpt<0.3",0.2,0.2,16);
+    drawText("neMax/(chMax+neMax+phMax)<0.9",0.2,0.3,16);
+    drawText("phMax/(chMax+neMax+phMax)<0.9",0.2,0.4,16);
+
+    cMC_Spectra[a]->cd(4);
+    drawText("chMax/jtpt>0.05",0.2,0.3,16);
+    drawText("muMax/(chMax+neMax+phMax)<0.9",0.2,0.4,16);
+
+    cMC_Spectra[a]->cd(5);
+    if(a==0)drawText("HLT55 && L1SJ36 && !HLT65 && !HLT80",0.2,0.2,16);
+    if(a==1)drawText("HLT65 && L1SJ36 && !HLT80",0.2,0.2,16);
+    if(a==2)drawText("HLT80 && L1SJ52",0.2,0.2,16);
+
+    cMC_Spectra[a]->SaveAs(Form("PbPb_MC_akPu3PF_Jet_%s_Spectra_JetID_cut.pdf",TrigName[a]),"RECREATE");
   }
 
 

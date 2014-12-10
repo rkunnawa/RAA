@@ -283,6 +283,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   jetMC->SetBranchAddress("jtpt",&jtpt_2);
   jetMC->SetBranchAddress("jtpu",&jtpu_2);
   jetMC->SetBranchAddress("refpt",&refpt_2);
+  jetMC->SetBranchAddress("scale",&scale_2);
   jetMC->SetBranchAddress("weight_cent",&weight_cent_2);
   jetMC->SetBranchAddress("weight_vz",&weight_vz_2);
   jetMC->SetBranchAddress("subid",&subid_2);
@@ -292,7 +293,6 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   jetMC->SetBranchAddress("jet65_prescl",&jet65_p_2);
   jetMC->SetBranchAddress("jet80",&jet80_2);
   jetMC->SetBranchAddress("jet80_prescl",&jet80_p_2);
-  jetMC->SetBranchAddress("trgObjpt",&trgObjpt_2);
   jetMC->SetBranchAddress("cent",&cent_2);
   jetMC->SetBranchAddress("chMax",&chMax_2);
   jetMC->SetBranchAddress("chSum",&chSum_2);
@@ -306,6 +306,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   jetMC->SetBranchAddress("eSum",&eSum_2);
   int centBin_2 = 0;
 
+#if 0
   // Data loop
   for(int jentry = 0;jentry<jetData->GetEntries();jentry++){
 
@@ -315,7 +316,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
     if(jet80_1 && L1_sj52_1){
 
-      if((neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+      if(/*(neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)*/ 1>0){
 	hData[2][0][centBin_1]->Fill(jtpt_1);
 	hData[2][0][nbins_cent]->Fill(jtpt_1);
       }
@@ -326,7 +327,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
     }else if(jet65_1 && L1_sj36_1 && !jet80_1){
 
-      if((neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+      if(/*(neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)*/ 1>0){
 	hData[1][0][centBin_1]->Fill(jtpt_1);
 	hData[1][0][nbins_cent]->Fill(jtpt_1);
       }
@@ -337,7 +338,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
     }else if(jet55_1 && L1_sj36_1 && !jet65_1 && !jet80_1){
 
-      if((neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+      if(/*(neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)*/ 1>0){
 	hData[0][0][centBin_1]->Fill(jtpt_1,effecPrescl);
 	hData[0][0][nbins_cent]->Fill(jtpt_1,effecPrescl);
       }
@@ -384,6 +385,8 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   }// entry loop
 
+#endif
+
   Float_t weight = 0;
   
   // MC loop
@@ -393,7 +396,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     centBin_2 = (int)cent_2;
     if(jentry%1000000==0)cout<<"MC "<<jentry<<" of "<<jetMC->GetEntries()<<endl;
 
-    weight = scale * weight_vz * weight_cent;
+    weight = scale_2 * weight_vz_2 * weight_cent_2;
 
     if(jet80_2){
 
@@ -406,7 +409,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 	hMC[2][1][nbins_cent]->Fill(jtpt_2,weight);
       }
 
-    }else if(jet65_2 && L1_sj36_2 && !jet80_2){
+    }else if(jet65_2 && !jet80_2){
 
       if((neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
 	hMC[1][0][centBin_2]->Fill(jtpt_2,weight);
@@ -417,7 +420,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 	hMC[1][1][nbins_cent]->Fill(jtpt_2,weight);
       }
 
-    }else if(jet55_2 && L1_sj36_2 && !jet65_2 && !jet80_2){
+    }else if(jet55_2 && !jet65_2 && !jet80_2){
 
       if((neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
 	hMC[0][0][centBin_2]->Fill(jtpt_2,weight);
@@ -439,24 +442,30 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   
     for(int a = 0;a<TrigValue;a++){
 
-      hData_Ratio[a][i] = (TH1F*)hData[a][1][i]->Clone(Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
-      hData_Ratio[a][i]->Divide(hData[a][0][i]);
+      // hData_Ratio[a][i] = (TH1F*)hData[a][1][i]->Clone(Form("hData_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
+      // hData_Ratio[a][i]->Divide(hData[a][0][i]);
+      hMC_Ratio[a][i] = (TH1F*)hMC[a][1][i]->Clone(Form("hMC_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
+      hMC_Ratio[a][i]->Divide(hMC[a][0][i]);
     }
     
   }
 
-  TFile f("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_withCutHasAllExceptElecRejection.root","RECREATE");
+  TFile f("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root","RECREATE");
   f.cd();
 
   for(int i = 0;i<=nbins_cent;i++){
     for(int a = 0;a<TrigValue;a++){
       for(int b = 0;b<CutValue;b++){
-	hData[a][b][i]->Write();
-	hData[a][b][i]->Print("base");
+	// hData[a][b][i]->Write();
+	// hData[a][b][i]->Print("base");
+	hMC[a][b][i]->Write();
+	hMC[a][b][i]->Print("base");
       }
-      hData_Ratio[a][i]->Write();
-      hData_Ratio[a][i]->Print("base");
-    }
+      // hData_Ratio[a][i]->Write();
+      // hData_Ratio[a][i]->Print("base");
+      hMC_Ratio[a][i]->Write();
+      hMC_Ratio[a][i]->Print("base");
+    } 
   }
 
   timer.Stop();
