@@ -146,11 +146,11 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 
-  TFile *fDatain = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_output.root");
-  TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_MC_withAndWithoutRatio.root");
+  TFile *fDatain = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_output.root");
+  TFile *fMCin = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_MC_withAndWithoutRatio.root");
 
-  //TFile *fDatain = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_withCutHasAllExceptElecRejection.root");
-  //TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root.root.root");
+  //TFile *fDatain = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_withCutHasAllExceptElecRejection.root");
+  //TFile *fMCin = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root.root.root");
   
   TH1F *hData[3][2][nbins_cent+1];
   TH1F *hData_Ratio[TrigValue][nbins_cent+1];
@@ -248,7 +248,7 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   cData_Ratio->cd(5);
   drawText("Data",0.3,0.75,20);
 
-  cData_Ratio->SaveAs("PbPb_data_akPu3PF_Ratio_JetID_cut.pdf","RECREATE");
+  cData_Ratio->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_data_akPu3PF_Ratio_JetID_cut.pdf","RECREATE");
 
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -309,7 +309,7 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     if(a==1)drawText("HLT65 && L1SJ36 && !HLT80",0.2,0.2,16);
     if(a==2)drawText("HLT80 && L1SJ52",0.2,0.2,16);
 
-    cData_Spectra[a]->SaveAs(Form("PbPb_data_akPu3PF_Jet_%s_Spectra_JetID_cut.pdf",TrigName[a]),"RECREATE");
+    cData_Spectra[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_data_akPu3PF_Jet_%s_Spectra_JetID_cut.pdf",TrigName[a]),"RECREATE");
   }
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -368,7 +368,7 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   cMC_Ratio->cd(5);
   drawText("MC",0.3,0.75,20);
 
-  cMC_Ratio->SaveAs("PbPb_MC_akPu3PF_Ratio_JetID_cut.pdf","RECREATE");
+  cMC_Ratio->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_MC_akPu3PF_Ratio_JetID_cut.pdf","RECREATE");
 
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -429,7 +429,7 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     if(a==1)drawText("HLT65 && L1SJ36 && !HLT80",0.2,0.2,16);
     if(a==2)drawText("HLT80 && L1SJ52",0.2,0.2,16);
 
-    cMC_Spectra[a]->SaveAs(Form("PbPb_MC_akPu3PF_Jet_%s_Spectra_JetID_cut.pdf",TrigName[a]),"RECREATE");
+    cMC_Spectra[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_MC_akPu3PF_Jet_%s_Spectra_JetID_cut.pdf",TrigName[a]),"RECREATE");
   }
 
 
