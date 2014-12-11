@@ -146,15 +146,15 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 
-  TFile *fin = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_data_MC_withNePhChMuChJtPt0p05_andwithoutCuts_elecRej05.root");
+  //TFile *fin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_data_MC_withNePhChMuChJtPt0p05_andwithoutCuts_elecRej05.root");
 
-  char file_tag[256] = {"withNePhChMuChJtPt0p05_andwithoutCuts_elecRej05"};
+  char file_tag[256] = {"withNePhChMuChJtPt0p05_elecRej05_andwithoutelecRej05"};
 
-  // TFile *fDatain = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_output.root");
-  // TFile *fMCin = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_MC_withAndWithoutRatio.root");
+  //TFile *fDatain = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_output.root");
+  //TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_MC_withAndWithoutRatio.root");
 
-  //TFile *fDatain = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_withCutHasAllExceptElecRejection.root");
-  //TFile *fMCin = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root.root.root");
+  TFile *fDatain = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_withCutHasAllExceptElecRejection.root");
+  TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root");
   
   TH1F *hData[3][2][nbins_cent+1];
   TH1F *hData_Ratio[TrigValue][nbins_cent+1];
@@ -167,18 +167,18 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
       for(int b = 0;b<CutValue;b++){
 
-	hData[a][b][i] = (TH1F*)fin->Get(Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
+	hData[a][b][i] = (TH1F*)fDatain->Get(Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
 	hData[a][b][i] = (TH1F*)hData[a][b][i]->Rebin(nbins_pt,Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),boundaries_pt);
 	divideBinWidth(hData[a][b][i]);
-	hMC[a][b][i] = (TH1F*)fin->Get(Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
+	hMC[a][b][i] = (TH1F*)fMCin->Get(Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
 	hMC[a][b][i] = (TH1F*)hMC[a][b][i]->Rebin(nbins_pt,Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),boundaries_pt);
 	divideBinWidth(hMC[a][b][i]);
       }
 
-      hData_Ratio[a][i] = (TH1F*)fin->Get(Form("hData_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
+      hData_Ratio[a][i] = (TH1F*)fDatain->Get(Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
       hData_Ratio[a][i] = (TH1F*)hData_Ratio[a][i]->Rebin(nbins_pt,Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i),boundaries_pt);
       divideBinWidth(hData_Ratio[a][i]);
-      hMC_Ratio[a][i] = (TH1F*)fin->Get(Form("hMC_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
+      hMC_Ratio[a][i] = (TH1F*)fMCin->Get(Form("hMC_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
       hMC_Ratio[a][i] = (TH1F*)hMC_Ratio[a][i]->Rebin(nbins_pt,Form("hMC_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i),boundaries_pt);
       divideBinWidth(hMC_Ratio[a][i]);
     }
@@ -207,15 +207,22 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   lineRatio->SetLineStyle(2);
   lineRatio->SetLineWidth(2);
 
+  TLine *lineUpper = new TLine(30,1.05,500,1.05);
+  lineUpper->SetLineStyle(3);
+  lineUpper->SetLineWidth(2);
+  TLine *lineLower = new TLine(30,0.95,500,0.95);
+  lineLower->SetLineStyle(3);
+  lineLower->SetLineWidth(2);
+
   for(int i = 0;i<nbins_cent;i++){
 
     cData_Ratio->cd(nbins_cent-i);
     
-    makeHistTitle(hData_Ratio[0][i],"","Jet p_{T} (GeV/c)","Jet ID over no Jet ID");
+    makeHistTitle(hData_Ratio[0][i],"","Jet p_{T} (GeV/c)","Clec Cut over no Elec Cut");
     hData_Ratio[0][i]->SetMarkerStyle(29);
     hData_Ratio[0][i]->SetMarkerColor(kBlack);
     hData_Ratio[0][i]->SetAxisRange(30,500,"X");
-    hData_Ratio[0][i]->SetAxisRange(0,1.4,"Y");
+    hData_Ratio[0][i]->SetAxisRange(0.6,1.2,"Y");
     hData_Ratio[0][i]->Draw();
 
     hData_Ratio[1][i]->SetMarkerStyle(33);
@@ -227,6 +234,8 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hData_Ratio[2][i]->Draw("same");
 
     lineRatio->Draw();
+    lineUpper->Draw();
+    lineLower->Draw();
 
     drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.85,15);
   }
@@ -248,17 +257,20 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   cData_Ratio->cd(3);
   drawText("#frac{eMax}{jtpt}<0.3",0.2,0.2,16);
-  drawText("#frac{ne Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.3,16);
-  drawText("#frac{#gamma Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
+  //drawText("#frac{ne Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.3,16);
+  //drawText("#frac{#gamma Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
 
   cData_Ratio->cd(4);
-  drawText("chMax/jtpt>0.05",0.4,0.3,16);
-  drawText("#frac{#mu Max}{Max(ch + ne + #gamma)}<0.9",0.4,0.4,16);
+  drawText("#frac{chMax}{jtpt}>0.05",0.4,0.3,16);
+  drawText("#frac{#mu & #gamma & ne & ch Max}{Max(ch + ne + #gamma)}<0.9",0.4,0.4,16);
 
   cData_Ratio->cd(5);
   drawText("Data",0.3,0.8,20);
 
-  cData_Ratio->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_data_akPu3PF_Ratio_JetID_cut_%s_%d.pdf",file_tag,date.GetDate()),"RECREATE");
+  cData_Ratio->cd(2);
+  drawText(Form("ak%s%d%s Jets, |#eta|<2",algo,radius,jet_type),0.15,0.8,20);
+
+  cData_Ratio->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_data_akPu3PF_Ratio_JetID_cut_%s_%d.pdf",file_tag,date.GetDate()),"RECREATE");
 
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -328,28 +340,29 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   TCanvas *cMC_Ratio = new TCanvas("cMC_Ratio","",1000,800);
   makeMultiPanelCanvas(cMC_Ratio,3,2,0.0,0.0,0.2,0.15,0.07);
-
   for(int i = 0;i<nbins_cent;i++){
 
     cMC_Ratio->cd(nbins_cent-i);
     
-    makeHistTitle(hMC_Ratio[0][i],"","Jet p_{T} (GeV/c)","Jet ID over no Jet ID");
+    makeHistTitle(hMC_Ratio[0][i],"","Jet p_{T} (GeV/c)","Elec Cut over no Elec Cut");
     hMC_Ratio[0][i]->SetMarkerStyle(29);
     hMC_Ratio[0][i]->SetMarkerColor(kBlack);
     hMC_Ratio[0][i]->SetAxisRange(30,500,"X");
-    hMC_Ratio[0][i]->SetAxisRange(0,1.4,"Y");
+    hMC_Ratio[0][i]->SetAxisRange(0.6,1.2,"Y");
     hMC_Ratio[0][i]->Draw();
 
     hMC_Ratio[1][i]->SetMarkerStyle(33);
     hMC_Ratio[1][i]->SetMarkerColor(kRed);
     hMC_Ratio[1][i]->Draw("same");
-
+    
     hMC_Ratio[2][i]->SetMarkerStyle(34);
     hMC_Ratio[2][i]->SetMarkerColor(kBlue);
     hMC_Ratio[2][i]->Draw("same");
-        
+    
     lineRatio->Draw();
-
+    lineUpper->Draw();
+    lineLower->Draw();
+    
     drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.8,20);
   }
 
@@ -370,17 +383,20 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   cMC_Ratio->cd(3);
   drawText("#frac{eMax}{jtpt}<0.3",0.2,0.2,16);
-  drawText("#frac{ne Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.3,16);
-  drawText("#frac{#gamma Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
+  //drawText("#frac{ne Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.3,16);
+  //drawText("#frac{#gamma Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
 
   cMC_Ratio->cd(4);
   drawText("#frac{chMax}{jtpt}>0.05",0.4,0.3,16);
-  drawText("#frac{#mu Max}{Max(ch + ne + #gamma)}<0.9",0.4,0.4,16);
+  drawText("#frac{#mu & #gamma & ne & ch Max}{Max(ch + ne + #gamma)}<0.9",0.4,0.4,16);
 
   cMC_Ratio->cd(5);
   drawText("MC",0.3,0.8,20);
 
-  cMC_Ratio->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_MC_akPu3PF_Ratio_JetID_cut.pdf","RECREATE");
+  cMC_Ratio->cd(2);
+  drawText(Form("ak%s%d%s Jets, |#eta|<2",algo,radius,jet_type),0.15,0.8,20);
+
+  cMC_Ratio->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_MC_akPu3PF_Ratio_JetID_cut_%s_%d.pdf",file_tag,date.GetDate()),"RECREATE");
 
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
