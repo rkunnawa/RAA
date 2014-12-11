@@ -146,15 +146,15 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 
-  //TFile *fin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_data_MC_withNePhChMuChJtPt0p05_andwithoutCuts_elecRej05.root");
+  TFile *fin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_data_MC_withNePhChMuChJtPt0p05_withAndWithout_elecRej07.root");
 
-  char file_tag[256] = {"withNePhChMuChJtPt0p05_elecRej05_andwithoutelecRej05"};
+  char file_tag[256] = {"withNePhChMuChJtPt0p05_elecRej05_andwithoutelecRej07"};
 
   //TFile *fDatain = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_output.root");
   //TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_MC_withAndWithoutRatio.root");
 
-  TFile *fDatain = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_withCutHasAllExceptElecRejection.root");
-  TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root");
+  //TFile *fDatain = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_withCutHasAllExceptElecRejection.root");
+  //TFile *fMCin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root");
   
   TH1F *hData[3][2][nbins_cent+1];
   TH1F *hData_Ratio[TrigValue][nbins_cent+1];
@@ -167,18 +167,18 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
       for(int b = 0;b<CutValue;b++){
 
-	hData[a][b][i] = (TH1F*)fDatain->Get(Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
+	hData[a][b][i] = (TH1F*)fin->Get(Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
 	hData[a][b][i] = (TH1F*)hData[a][b][i]->Rebin(nbins_pt,Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),boundaries_pt);
 	divideBinWidth(hData[a][b][i]);
-	hMC[a][b][i] = (TH1F*)fMCin->Get(Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
+	hMC[a][b][i] = (TH1F*)fin->Get(Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
 	hMC[a][b][i] = (TH1F*)hMC[a][b][i]->Rebin(nbins_pt,Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),boundaries_pt);
 	divideBinWidth(hMC[a][b][i]);
       }
 
-      hData_Ratio[a][i] = (TH1F*)fDatain->Get(Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
+      hData_Ratio[a][i] = (TH1F*)fin->Get(Form("hData_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
       hData_Ratio[a][i] = (TH1F*)hData_Ratio[a][i]->Rebin(nbins_pt,Form("hRatio_ID_over_noIDCut_%s_cent%d",TrigName[a],i),boundaries_pt);
       divideBinWidth(hData_Ratio[a][i]);
-      hMC_Ratio[a][i] = (TH1F*)fMCin->Get(Form("hMC_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
+      hMC_Ratio[a][i] = (TH1F*)fin->Get(Form("hMC_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
       hMC_Ratio[a][i] = (TH1F*)hMC_Ratio[a][i]->Rebin(nbins_pt,Form("hMC_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i),boundaries_pt);
       divideBinWidth(hMC_Ratio[a][i]);
     }
@@ -256,7 +256,7 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   drawText("Supernova Rejection Cut",0.2,0.4,16);
 
   cData_Ratio->cd(3);
-  drawText("#frac{eMax}{jtpt}<0.3",0.2,0.2,16);
+  drawText("#frac{eMax}{jtpt}<0.7",0.2,0.2,16);
   //drawText("#frac{ne Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.3,16);
   //drawText("#frac{#gamma Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
 
@@ -382,7 +382,7 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   //drawText("Supernova Rejection Cut",0.2,0.4,16);
 
   cMC_Ratio->cd(3);
-  drawText("#frac{eMax}{jtpt}<0.3",0.2,0.2,16);
+  drawText("#frac{eMax}{jtpt}<0.7",0.2,0.2,16);
   //drawText("#frac{ne Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.3,16);
   //drawText("#frac{#gamma Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
 
