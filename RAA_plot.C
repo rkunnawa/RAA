@@ -166,8 +166,8 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   bool doPbPbsigma = false;
   bool doPPsigma = false;
   bool doGenSpectra = false;
-  bool doPbPbTrgComb = true;
-  bool doPbPb12003TrgComb = true;
+  bool doPbPbTrgComb = false;
+  bool doPbPb12003TrgComb = false;
   bool doPPTrgComb = false;
   bool doRandomCone = false;
   bool doSupernovaData = false;
@@ -177,7 +177,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   bool doSupernovaContributionMC = false;
   bool doCentDatavsMC = false;
   bool doVertexDatavsMC = false;
-  bool doJetVariablesCheck = false;
+  bool doJetVariablesCheck = true;
   bool doJetID = false;
   bool do2DCutpTplot = false;
   bool do2DCut1 = false;
@@ -189,7 +189,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TFile *fin; 
   
   //if(location=="MIT") 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfo_mcclosure_oppside_ak%s%d%s_20141111_test.root",algo,radius,jet_type));
+  fin= TFile::Open(Form("/Users/keraghav/WORK/RAA/Output/PbPb_pp_unfo_mcclosure_oppside_ak%s%d%s_20141111_test.root",algo,radius,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
@@ -276,9 +276,10 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   */
 
+
   // get histograms from the MC file. 
-  TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_pp_mc_nocut_ak%s%s_20141117.root",algo,jet_type));
-  TFile *fDatain = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_test12003_cut5_20141117.root",algo,jet_type));
+  TFile *fMCin = TFile::Open(Form("/Users/keraghav/WORK/RAA/Output/PbPb_mc_nocut_ak%s%s_20141210.root",algo,jet_type));
+  TFile *fDatain = TFile::Open(Form("/Users/keraghav/WORK/RAA/Output/PbPb_jetntuple_withEvtCuts_SuperNovaRejected_ak%s%d%s_20141209.root",algo,radius,jet_type));
   
   TH1F *hPbPb_MC_jtpu[no_radius][nbins_eta][nbins_cent+1];
 
@@ -306,13 +307,14 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TH1F *hpbpb_pt_Njet_g7[nbins_cent+1];
   TH1F *hpbpb_pt_Njet_l7[nbins_cent+1];
   
-  hpbpb_Npix_before_cut_data[nbins_cent+1] = (TH2F*)fDatain->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,nbins_cent+1));
-  hpbpb_Npix_before_cut_data[nbins_cent+1]->Print("base");
+  // hpbpb_Npix_before_cut_data[nbins_cent+1] = (TH2F*)fDatain->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,nbins_cent+1));
+  // hpbpb_Npix_before_cut_data[nbins_cent+1]->Print("base");
   
-  hpbpb_Npix_before_cut_mc[nbins_cent+1] = (TH2F*)fMCin->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,nbins_cent+1));
-  hpbpb_Npix_before_cut_mc[nbins_cent+1]->Print("base");
+  // hpbpb_Npix_before_cut_mc[nbins_cent+1] = (TH2F*)fMCin->Get(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",radius,nbins_cent+1));
+  // hpbpb_Npix_before_cut_mc[nbins_cent+1]->Print("base");
   
   // I changed it from <= to < due to a problem with the data macro which is now fixed for the hpbpb_JetComb_oldR%d_n20_eta_p20_cent%d should be hpbpb_JetComb_old_R%d_n20_eta_p20_cent%d
+  /*
   for(int i = 0;i<nbins_cent;i++){
 
     cout<<"cent = "<<i<<endl;
@@ -373,9 +375,11 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 	//hPbPb_MC_jtpu[k][j][i] = (TH1F*)fMCin->Get(Form("hpbpb_jtpu_noScale_R%d_%s_cent%d",list_radius[k],etaWidth[j],i));
 	
       }//eta bins loop  
-    }//centrality loop
+    }//radius loop
     
-  }//radius loop
+  }//centrality loop
+
+  */
   
   if(makeRootFile){
     //intermediate (small) output file for running the unfolding: 
@@ -1859,38 +1863,85 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     cout<<endl<<"Plotting JetVarialbles Check"<<endl;
 
     //get the jetID trees from the MC and data files 
-    TTree *jetID_data = (TTree*)fDatain->Get("jets_ID");
-    TTree *jetID_mc = (TTree*)fMCin->Get("jets_ID");
+    // TTree *jetID_data = (TTree*)fDatain->Get("jets_ID");
+    // TTree *jetID_mc = (TTree*)fMCin->Get("jets_ID");
+
+    TFile * fhistin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_Data_mc_ElecCutRejectionStudy_with2DplotsSumMaxChNePhCut_Pu3PF_20141216.root");
 
     // declare the histograms
     TH1F *hchMax[2][nbins_cent+1], *hchSum[2][nbins_cent+1], *hphMax[2][nbins_cent+1], *hphSum[2][nbins_cent+1], *hneMax[2][nbins_cent+1], *hneSum[2][nbins_cent+1], *hmuMax[2][nbins_cent+1], *hmuSum[2][nbins_cent+1], *heMax[2][nbins_cent+1], *heSum[2][nbins_cent+1], *hjtpu[2][nbins_cent+1]; 
     
-    for(int i = 0;i<nbins_cent;i++){
+    for(int i = 0;i<=nbins_cent;i++){
       cout<<"cent = "<<i<<endl;
-      hchMax[0][i] = new TH1F(Form("hchMax_data_cent%d",i),"",200,0,200);
-      hchSum[0][i] = new TH1F(Form("hchSum_data_cent%d",i),"",200,0,200);
-      hphMax[0][i] = new TH1F(Form("hphMax_data_cent%d",i),"",200,0,200);
-      hphSum[0][i] = new TH1F(Form("hphSum_data_cent%d",i),"",200,0,200);
-      hneMax[0][i] = new TH1F(Form("hneMax_data_cent%d",i),"",200,0,200);
-      hneSum[0][i] = new TH1F(Form("hneSum_data_cent%d",i),"",200,0,200);
-      hmuMax[0][i] = new TH1F(Form("hmuMax_data_cent%d",i),"",200,0,200);
-      hmuSum[0][i] = new TH1F(Form("hmuSum_data_cent%d",i),"",200,0,200);
-      heMax[0][i] = new TH1F(Form("heMax_data_cent%d",i),"",200,0,200);
-      heSum[0][i] = new TH1F(Form("heSum_data_cent%d",i),"",200,0,200);
-      hjtpu[0][i] = new TH1F(Form("hjtpu_data_cent%d",i),"",200,0,200);
+      hchMax[0][i] = (TH1F*)fhistin->Get(Form("hData_chMax_cent%d",i));
+      hchSum[0][i] = (TH1F*)fhistin->Get(Form("hData_chSum_cent%d",i));
+      hphMax[0][i] = (TH1F*)fhistin->Get(Form("hData_phMax_cent%d",i));
+      hphSum[0][i] = (TH1F*)fhistin->Get(Form("hData_phSum_cent%d",i));
+      hneMax[0][i] = (TH1F*)fhistin->Get(Form("hData_neMax_cent%d",i));
+      hneSum[0][i] = (TH1F*)fhistin->Get(Form("hData_neSum_cent%d",i));
+      hmuMax[0][i] = (TH1F*)fhistin->Get(Form("hData_muMax_cent%d",i));
+      hmuSum[0][i] = (TH1F*)fhistin->Get(Form("hData_muSum_cent%d",i));
+      heMax[0][i]  = (TH1F*)fhistin->Get(Form("hData_eMax_cent%d",i));
+      heSum[0][i]  = (TH1F*)fhistin->Get(Form("hData_eSum_cent%d",i));
+      // hjtpu[0][i] = new TH1F(Form("hData_jtpu_cent%d",i));
       
-      hchMax[1][i] = new TH1F(Form("hchMax_mc_cent%d",i),"",200,0,200);
-      hchSum[1][i] = new TH1F(Form("hchSum_mc_cent%d",i),"",200,0,200);
-      hphMax[1][i] = new TH1F(Form("hphMax_mc_cent%d",i),"",200,0,200);
-      hphSum[1][i] = new TH1F(Form("hphSum_mc_cent%d",i),"",200,0,200);
-      hneMax[1][i] = new TH1F(Form("hneMax_mc_cent%d",i),"",200,0,200);
-      hneSum[1][i] = new TH1F(Form("hneSum_mc_cent%d",i),"",200,0,200);
-      hmuMax[1][i] = new TH1F(Form("hmuMax_mc_cent%d",i),"",200,0,200);
-      hmuSum[1][i] = new TH1F(Form("hmuSum_mc_cent%d",i),"",200,0,200);
-      heMax[1][i] = new TH1F(Form("heMax_mc_cent%d",i),"",200,0,200);
-      heSum[1][i] = new TH1F(Form("heSum_mc_cent%d",i),"",200,0,200);
-      hjtpu[1][i] = new TH1F(Form("hjtpu_mc_cent%d",i),"",200,0,200);
-      
+      hchMax[1][i] = (TH1F*)fhistin->Get(Form("hMC_chMax_cent%d",i));
+      hchSum[1][i] = (TH1F*)fhistin->Get(Form("hMC_chSum_cent%d",i));
+      hphMax[1][i] = (TH1F*)fhistin->Get(Form("hMC_phMax_cent%d",i));
+      hphSum[1][i] = (TH1F*)fhistin->Get(Form("hMC_phSum_cent%d",i));
+      hneMax[1][i] = (TH1F*)fhistin->Get(Form("hMC_neMax_cent%d",i));
+      hneSum[1][i] = (TH1F*)fhistin->Get(Form("hMC_neSum_cent%d",i));
+      hmuMax[1][i] = (TH1F*)fhistin->Get(Form("hMC_muMax_cent%d",i));
+      hmuSum[1][i] = (TH1F*)fhistin->Get(Form("hMC_muSum_cent%d",i));
+      heMax[1][i]  = (TH1F*)fhistin->Get(Form("hMC_eMax_cent%d",i));
+      heSum[1][i]  = (TH1F*)fhistin->Get(Form("hMC_eSum_cent%d",i));
+      //hjtpu[1][i] = new TH1F(Form("hMC_jtpu_cent%d",i));
+
+      hchMax[0][i] = (TH1F*)hchMax[0][i]->Rebin(nbins_pt,Form("hData_chMax_cent%d",i),boundaries_pt);
+      hphMax[0][i] = (TH1F*)hphMax[0][i]->Rebin(nbins_pt,Form("hData_phMax_cent%d",i),boundaries_pt);
+      hneMax[0][i] = (TH1F*)hneMax[0][i]->Rebin(nbins_pt,Form("hData_neMax_cent%d",i),boundaries_pt);
+      hmuMax[0][i] = (TH1F*)hmuMax[0][i]->Rebin(nbins_pt,Form("hData_muMax_cent%d",i),boundaries_pt);
+      heMax[0][i] = (TH1F*)heMax[0][i]->Rebin(nbins_pt,Form("hData_eMax_cent%d",i),boundaries_pt);
+      hchSum[0][i] = (TH1F*)hchSum[0][i]->Rebin(nbins_pt,Form("hData_chSum_cent%d",i),boundaries_pt);
+      hphSum[0][i] = (TH1F*)hphSum[0][i]->Rebin(nbins_pt,Form("hData_phSum_cent%d",i),boundaries_pt);
+      hneSum[0][i] = (TH1F*)hneSum[0][i]->Rebin(nbins_pt,Form("hData_neSum_cent%d",i),boundaries_pt);
+      hmuSum[0][i] = (TH1F*)hmuSum[0][i]->Rebin(nbins_pt,Form("hData_muSum_cent%d",i),boundaries_pt);
+      heSum[0][i] = (TH1F*)heSum[0][i]->Rebin(nbins_pt,Form("hData_eSum_cent%d",i),boundaries_pt);
+
+      hchMax[1][i] = (TH1F*)hchMax[1][i]->Rebin(nbins_pt,Form("hMC_chMax_cent%d",i),boundaries_pt);
+      hphMax[1][i] = (TH1F*)hphMax[1][i]->Rebin(nbins_pt,Form("hMC_phMax_cent%d",i),boundaries_pt);
+      hneMax[1][i] = (TH1F*)hneMax[1][i]->Rebin(nbins_pt,Form("hMC_neMax_cent%d",i),boundaries_pt);
+      hmuMax[1][i] = (TH1F*)hmuMax[1][i]->Rebin(nbins_pt,Form("hMC_muMax_cent%d",i),boundaries_pt);
+      heMax[1][i] = (TH1F*)heMax[1][i]->Rebin(nbins_pt,Form("hMC_eMax_cent%d",i),boundaries_pt);
+      hchSum[1][i] = (TH1F*)hchSum[1][i]->Rebin(nbins_pt,Form("hMC_chSum_cent%d",i),boundaries_pt);
+      hphSum[1][i] = (TH1F*)hphSum[1][i]->Rebin(nbins_pt,Form("hMC_phSum_cent%d",i),boundaries_pt);
+      hneSum[1][i] = (TH1F*)hneSum[1][i]->Rebin(nbins_pt,Form("hMC_neSum_cent%d",i),boundaries_pt);
+      hmuSum[1][i] = (TH1F*)hmuSum[1][i]->Rebin(nbins_pt,Form("hMC_muSum_cent%d",i),boundaries_pt);
+      heSum[1][i] = (TH1F*)heSum[1][i]->Rebin(nbins_pt,Form("hMC_eSum_cent%d",i),boundaries_pt);
+
+      divideBinWidth(hchMax[0][i]);
+      divideBinWidth(hphMax[0][i]);
+      divideBinWidth(hneMax[0][i]);
+      divideBinWidth(hmuMax[0][i]);
+      divideBinWidth(heMax[0][i]);
+      divideBinWidth(hchSum[0][i]);
+      divideBinWidth(hphSum[0][i]);
+      divideBinWidth(hneSum[0][i]);
+      divideBinWidth(hmuSum[0][i]);
+      divideBinWidth(heSum[0][i]);
+
+      divideBinWidth(hchMax[1][i]);
+      divideBinWidth(hphMax[1][i]);
+      divideBinWidth(hneMax[1][i]);
+      divideBinWidth(hmuMax[1][i]);
+      divideBinWidth(heMax[1][i]);
+      divideBinWidth(hchSum[1][i]);
+      divideBinWidth(hphSum[1][i]);
+      divideBinWidth(hneSum[1][i]);
+      divideBinWidth(hmuSum[1][i]);
+      divideBinWidth(heSum[1][i]);
+            
+      /*
       //draw the histograms from the trees: 
       jetID_data->Draw(Form("chMax>>hchMax_data_cent%d",i),Form("cent==%d",i),"goff");
       jetID_data->Draw(Form("chSum>>hchSum_data_cent%d",i),Form("cent==%d",i),"goff");
@@ -1920,36 +1971,208 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       //jetID_data->Draw(Form("jtpu>>hjtpu_data_cent%d",i),Form("cent==%d",i),"goff");
       //jetID_mc->Draw(Form("jtpu>>hjtpu_mc_cent%d",i),Form("cent==%d",i),"goff"); 
       //cout<<"got charged histograms for data and MC"<<endl;
+      */
       
+      hchMax[0][i]->Scale(1./hchMax[0][i]->GetEntries());   
+      hchSum[0][i]->Scale(1./hchSum[0][i]->GetEntries());
+      //hchSum[1][i]->Scale(1./hchSum[1][i]->GetEntries());
+      //hchMax[1][i]->Scale(1./hchMax[1][i]->GetEntries());
+      hphSum[0][i]->Scale(1./hphSum[0][i]->GetEntries());
+      hphMax[0][i]->Scale(1./hphMax[0][i]->GetEntries());
+      //hphSum[1][i]->Scale(1./hphSum[1][i]->GetEntries());
+      //hphMax[1][i]->Scale(1./hphMax[1][i]->GetEntries());
+      hneSum[0][i]->Scale(1./hneSum[0][i]->GetEntries());
+      hneMax[0][i]->Scale(1./hneMax[0][i]->GetEntries());
+      //hneSum[1][i]->Scale(1./hneSum[1][i]->GetEntries());
+      //hneMax[1][i]->Scale(1./hneMax[1][i]->GetEntries());
+      hmuSum[0][i]->Scale(1./hmuSum[0][i]->GetEntries());
+      hmuMax[0][i]->Scale(1./hmuMax[0][i]->GetEntries());
+      //hmuSum[1][i]->Scale(1./hmuSum[1][i]->GetEntries());
+      //hmuMax[1][i]->Scale(1./hmuMax[1][i]->GetEntries());
+      heSum[0][i]->Scale(1./heSum[0][i]->GetEntries());
+      heMax[0][i]->Scale(1./heMax[0][i]->GetEntries());
+      //heSum[1][i]->Scale(1./heSum[1][i]->GetEntries());
+      //heMax[1][i]->Scale(1./heMax[1][i]->GetEntries());
       
-      hchMax[0][i]->Scale(1./hchMax[0][i]->Integral());   
-      hchSum[0][i]->Scale(1./hchSum[0][i]->Integral());
-      hchSum[1][i]->Scale(1./hchSum[1][i]->Integral());
-      hchMax[1][i]->Scale(1./hchMax[1][i]->Integral());
-      hphSum[0][i]->Scale(1./hphSum[0][i]->Integral());
-      hphMax[0][i]->Scale(1./hphMax[0][i]->Integral());
-      hphSum[1][i]->Scale(1./hphSum[1][i]->Integral());
-      hphMax[1][i]->Scale(1./hphMax[1][i]->Integral());
-      hneSum[0][i]->Scale(1./hneSum[0][i]->Integral());
-      hneMax[0][i]->Scale(1./hneMax[0][i]->Integral());
-      hneSum[1][i]->Scale(1./hneSum[1][i]->Integral());
-      hneMax[1][i]->Scale(1./hneMax[1][i]->Integral());
-      hmuSum[0][i]->Scale(1./hmuSum[0][i]->Integral());
-      hmuMax[0][i]->Scale(1./hmuMax[0][i]->Integral());
-      hmuSum[1][i]->Scale(1./hmuSum[1][i]->Integral());
-      hmuMax[1][i]->Scale(1./hmuMax[1][i]->Integral());
-      heSum[0][i]->Scale(1./heSum[0][i]->Integral());
-      heMax[0][i]->Scale(1./heMax[0][i]->Integral());
-      heSum[1][i]->Scale(1./heSum[1][i]->Integral());
-      heMax[1][i]->Scale(1./heMax[1][i]->Integral());
-      
-      //hjtpu[0][i]->Scale(1./hjtpu[0][i]->Integral());
-      //hjtpu[1][i]->Scale(1./hjtpu[1][i]->Integral());
+      //hjtpu[0][i]->Scale(1./hjtpu[0][i]->GetEntries());
+      //hjtpu[1][i]->Scale(1./hjtpu[1][i]->GetEntries());
 
     }
 
 
-    //make the plots: 
+    //make the plots:
+    // before doing it in differnet centralities lets do it for the whole range. so two 3x3 plot (with gap) with data and mc in each panel where panel 1 is chMax, 2 is phMax, 3 is neMax, 4 is muMax and 5 is eMax and 6 is where we draw the legend and the useful information about the cuts etc... the second plot will do the same thing for Sum variables. 
+
+    TCanvas *cMaxVariables = new TCanvas("cMaxVariables","",1000,800);
+    makeMultiPanelCanvasWithGap(cMaxVariables,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+
+    cMaxVariables->cd(1);
+    cMaxVariables->cd(1)->SetLogy();
+    makeHistTitle(hchMax[0][nbins_cent],"","chMax p_{T} (GeV/c)","Event Fraction");
+    hchMax[0][nbins_cent]->SetMarkerStyle(24);
+    hchMax[0][nbins_cent]->SetMarkerColor(kBlack);
+    hchMax[0][nbins_cent]->SetAxisRange(0,500,"X");
+    hchMax[0][nbins_cent]->SetAxisRange(1e-11,1,"Y");
+    hchMax[0][nbins_cent]->Draw();
+   
+    hchMax[1][nbins_cent]->SetLineStyle(1);
+    hchMax[1][nbins_cent]->SetLineColor(kRed);
+    hchMax[1][nbins_cent]->Draw("same L");
+    putCMSPrel();
+    
+    cMaxVariables->cd(2);
+    cMaxVariables->cd(2)->SetLogy();
+    makeHistTitle(hphMax[0][nbins_cent],"","phMax p_{T} (GeV/c)","Event Fraction");
+    hphMax[0][nbins_cent]->SetMarkerStyle(24);
+    hphMax[0][nbins_cent]->SetMarkerColor(kBlack);
+    hphMax[0][nbins_cent]->SetAxisRange(0,500,"X");
+    hphMax[0][nbins_cent]->SetAxisRange(1e-11,1,"Y");
+    hphMax[0][nbins_cent]->Draw();
+    
+    hphMax[1][nbins_cent]->SetLineStyle(1);
+    hphMax[1][nbins_cent]->SetLineColor(kRed);
+    hphMax[1][nbins_cent]->Draw("same L");
+
+    cMaxVariables->cd(3);
+    cMaxVariables->cd(3)->SetLogy();
+    makeHistTitle(hneMax[0][nbins_cent],"","neMax p_{T} (GeV/c)","Event Fraction");
+    hneMax[0][nbins_cent]->SetMarkerStyle(24);
+    hneMax[0][nbins_cent]->SetMarkerColor(kBlack);
+    hneMax[0][nbins_cent]->SetAxisRange(0,500,"X");
+    hneMax[0][nbins_cent]->SetAxisRange(1e-11,1,"Y");
+    hneMax[0][nbins_cent]->Draw();
+    
+    hneMax[1][nbins_cent]->SetLineStyle(1);
+    hneMax[1][nbins_cent]->SetLineColor(kRed);
+    hneMax[1][nbins_cent]->Draw("same L");
+
+    cMaxVariables->cd(4);
+    cMaxVariables->cd(4)->SetLogy();
+    makeHistTitle(hmuMax[0][nbins_cent],"","muMax p_{T} (GeV/c)","Event Fraction");
+    hmuMax[0][nbins_cent]->SetMarkerStyle(24);
+    hmuMax[0][nbins_cent]->SetMarkerColor(kBlack);
+    hmuMax[0][nbins_cent]->SetAxisRange(0,500,"X");
+    hmuMax[0][nbins_cent]->SetAxisRange(1e-11,1,"Y");
+    hmuMax[0][nbins_cent]->Draw();
+    
+    hmuMax[1][nbins_cent]->SetLineStyle(33);
+    hmuMax[1][nbins_cent]->SetLineColor(kRed);
+    hmuMax[1][nbins_cent]->Draw("same L");
+
+    cMaxVariables->cd(5);
+    cMaxVariables->cd(5)->SetLogy();
+    makeHistTitle(heMax[0][nbins_cent],"","eMax p_{T} (GeV/c)","Event Fraction");
+    heMax[0][nbins_cent]->SetMarkerStyle(24);
+    heMax[0][nbins_cent]->SetMarkerColor(kBlack);
+    heMax[0][nbins_cent]->SetAxisRange(0,500,"X");
+    heMax[0][nbins_cent]->SetAxisRange(1e-11,1,"Y");
+    heMax[0][nbins_cent]->Draw();
+    
+    heMax[1][nbins_cent]->SetLineStyle(33);
+    heMax[1][nbins_cent]->SetLineColor(kRed);
+    heMax[1][nbins_cent]->Draw("same L");
+
+    cMaxVariables->cd(6);
+    drawText("0-100 %",0.55,0.9,18);
+    TLegend *pbpbMax = myLegend(0.5,0.65,0.9,0.9);
+    pbpbMax->AddEntry(hchMax[0][nbins_cent],"Data","p");
+    pbpbMax->AddEntry(hchMax[1][nbins_cent],"MC","l");
+    pbpbMax->SetTextSize(0.06);
+    pbpbMax->Draw();    
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+
+    cMaxVariables->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_Max_centFull_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+      
+    //
+
+    TCanvas *cSumVariables = new TCanvas("cSumVariables","",1000,800);
+    makeMultiPanelCanvasWithGap(cSumVariables,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+
+    cSumVariables->cd(1);
+    cSumVariables->cd(1)->SetLogy();
+    makeHistTitle(hchSum[0][nbins_cent],"","chSum p_{T} (GeV/c)","Event Fraction");
+    hchSum[0][nbins_cent]->SetMarkerStyle(24);
+    hchSum[0][nbins_cent]->SetMarkerColor(kBlack);
+    hchSum[0][nbins_cent]->SetAxisRange(0,500,"X");
+    hchSum[0][nbins_cent]->SetAxisRange(1e-11,1,"Y");
+    hchSum[0][nbins_cent]->Draw();
+    
+    hchSum[1][nbins_cent]->SetLineStyle(33);
+    hchSum[1][nbins_cent]->SetLineColor(kRed);
+    hchSum[1][nbins_cent]->Draw("same L");
+    putCMSPrel();    
+
+    cSumVariables->cd(2);
+    cSumVariables->cd(2)->SetLogy();
+    makeHistTitle(hphSum[0][nbins_cent],"","phSum p_{T} (GeV/c)","Event Fraction");
+    hphSum[0][nbins_cent]->SetMarkerStyle(24);
+    hphSum[0][nbins_cent]->SetMarkerColor(kBlack);
+    hphSum[0][nbins_cent]->SetAxisRange(0,500,"X");
+    hphSum[0][nbins_cent]->SetAxisRange(1e-11,1,"Y");
+    hphSum[0][nbins_cent]->Draw();
+    
+    hphSum[1][nbins_cent]->SetLineStyle(33);
+    hphSum[1][nbins_cent]->SetLineColor(kRed);
+    hphSum[1][nbins_cent]->Draw("same L");
+
+    cSumVariables->cd(3);
+    cSumVariables->cd(3)->SetLogy();
+    makeHistTitle(hneSum[0][nbins_cent],"","neSum p_{T} (GeV/c)","Event Fraction");
+    hneSum[0][nbins_cent]->SetMarkerStyle(24);
+    hneSum[0][nbins_cent]->SetMarkerColor(kBlack);
+    hneSum[0][nbins_cent]->SetAxisRange(0,500,"X");
+    hneSum[0][nbins_cent]->SetAxisRange(1e-11,1,"Y");
+    hneSum[0][nbins_cent]->Draw();
+    
+    hneSum[1][nbins_cent]->SetLineStyle(33);
+    hneSum[1][nbins_cent]->SetLineColor(kRed);
+    hneSum[1][nbins_cent]->Draw("same L");
+
+    cSumVariables->cd(4);
+    cSumVariables->cd(4)->SetLogy();
+    makeHistTitle(hmuSum[0][nbins_cent],"","muSum p_{T} (GeV/c)","Event Fraction");
+    hmuSum[0][nbins_cent]->SetMarkerStyle(24);
+    hmuSum[0][nbins_cent]->SetMarkerColor(kBlack);
+    hmuSum[0][nbins_cent]->SetAxisRange(0,500,"X");
+    hmuSum[0][nbins_cent]->SetAxisRange(1e-11,1,"Y");
+    hmuSum[0][nbins_cent]->Draw();
+    
+    hmuSum[1][nbins_cent]->SetLineStyle(33);
+    hmuSum[1][nbins_cent]->SetLineColor(kRed);
+    hmuSum[1][nbins_cent]->Draw("same L");
+
+    cSumVariables->cd(5);
+    cSumVariables->cd(5)->SetLogy();
+    makeHistTitle(heSum[0][nbins_cent],"","eSum p_{T} (GeV/c)","Event Fraction");
+    heSum[0][nbins_cent]->SetMarkerStyle(24);
+    heSum[0][nbins_cent]->SetMarkerColor(kBlack);
+    heSum[0][nbins_cent]->SetAxisRange(0,500,"X");
+    heSum[0][nbins_cent]->SetAxisRange(1e-11,1,"Y");
+    heSum[0][nbins_cent]->Draw();
+    
+    heSum[1][nbins_cent]->SetLineStyle(33);
+    heSum[1][nbins_cent]->SetLineColor(kRed);
+    heSum[1][nbins_cent]->Draw("same L");
+
+    cSumVariables->cd(6);
+    drawText("0-100 %",0.55,0.9,18);
+    TLegend *pbpbSum = myLegend(0.5,0.65,0.9,0.9);
+    pbpbSum->AddEntry(hchSum[0][nbins_cent],"Data","p");
+    pbpbSum->AddEntry(hchSum[1][nbins_cent],"MC","l");
+    pbpbSum->SetTextSize(0.06);
+    pbpbSum->Draw();
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+
+    cSumVariables->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_Sum_centFull_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    //
+    //
+    //
+
+ 
     TCanvas *cchMax = new TCanvas("cchMax","",1000,800);
     // make plot for chMax
     makeMultiPanelCanvas(cchMax,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -1960,6 +2183,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       makeHistTitle(hchMax[0][i]," ","chMax p_{T} (GeV/c)","Event Fraction");
       hchMax[0][i]->SetMarkerStyle(24);
       hchMax[0][i]->SetMarkerColor(kBlack);
+      hchMax[0][i]->SetAxisRange(0,500,"X");
       hchMax[0][i]->Draw();
 
       hchMax[1][i]->SetLineStyle(1);
@@ -1976,10 +2200,10 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     pbpbchMax->SetTextSize(0.04);
     pbpbchMax->Draw();
     putCMSPrel();    
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
-    drawText("pCES, HBHE",0.3,0.43,16);
-    cchMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_chMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+    cchMax->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_chMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     
     // make plot for chSum
     TCanvas *cchSum = new TCanvas("cchSum","",1000,800);
@@ -1992,6 +2216,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       makeHistTitle(hchSum[0][i]," ","chSum p_{T} (GeV/c)","Event Fraction");
       hchSum[0][i]->SetMarkerStyle(24);
       hchSum[0][i]->SetMarkerColor(kBlack);
+      hchSum[0][i]->SetAxisRange(0,500,"X");
       hchSum[0][i]->Draw();
 
       hchSum[1][i]->SetLineStyle(1);
@@ -2008,10 +2233,10 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     pbpbchSum->SetTextSize(0.04);
     pbpbchSum->Draw();
     putCMSPrel();    
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
-    drawText("pCES, HBHE",0.3,0.43,16);
-    cchSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_chSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+    cchSum->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_chSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
 
         
@@ -2026,6 +2251,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       makeHistTitle(hphMax[0][i]," ","phMax p_{T} (GeV/c)","Event Fraction");
       hphMax[0][i]->SetMarkerStyle(24);
       hphMax[0][i]->SetMarkerColor(kBlack);
+      hphMax[0][i]->SetAxisRange(0,500,"X");
       hphMax[0][i]->Draw();
 
       hphMax[1][i]->SetLineStyle(1);
@@ -2042,10 +2268,10 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     pbpbphMax->SetTextSize(0.04);
     pbpbphMax->Draw();
     putCMSPrel();    
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
-    drawText("pCES, HBHE",0.3,0.43,16);
-    cphMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_phMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+    cphMax->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_phMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for phSum
     TCanvas *cphSum = new TCanvas("cphSum","",1000,800);
@@ -2058,6 +2284,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       makeHistTitle(hphSum[0][i]," ","phSum p_{T} (GeV/c)","Event Fraction");
       hphSum[0][i]->SetMarkerStyle(24);
       hphSum[0][i]->SetMarkerColor(kBlack);
+      hphSum[0][i]->SetAxisRange(0,500,"X");
       hphSum[0][i]->Draw();
 
       hphSum[1][i]->SetLineStyle(1);
@@ -2074,12 +2301,10 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     pbpbphSum->SetTextSize(0.04);
     pbpbphSum->Draw();
     putCMSPrel();    
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
-    drawText("pCES, HBHE",0.3,0.43,16);
-    cphSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_phSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
-
-
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+    cphSum->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_phSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
         
     // make plot for neMax
@@ -2093,6 +2318,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       makeHistTitle(hneMax[0][i]," ","neMax p_{T} (GeV/c)","Event Fraction");
       hneMax[0][i]->SetMarkerStyle(24);
       hneMax[0][i]->SetMarkerColor(kBlack);
+      hneMax[0][i]->SetAxisRange(0,500,"X");
       hneMax[0][i]->Draw();
 
       hneMax[1][i]->SetLineStyle(1);
@@ -2109,10 +2335,10 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     pbpbneMax->SetTextSize(0.04);
     pbpbneMax->Draw();
     putCMSPrel();    
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
-    drawText("pCES, HBHE",0.3,0.43,16);
-    cneMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_neMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+    cneMax->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_neMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for neSum
     TCanvas *cneSum = new TCanvas("cneSum","",1000,800);
@@ -2125,6 +2351,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       makeHistTitle(hneSum[0][i]," ","neSum p_{T} (GeV/c)","Event Fraction");
       hneSum[0][i]->SetMarkerStyle(24);
       hneSum[0][i]->SetMarkerColor(kBlack);
+      hneSum[0][i]->SetAxisRange(0,500,"X");
       hneSum[0][i]->Draw();
 
       hneSum[1][i]->SetLineStyle(1);
@@ -2141,10 +2368,10 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     pbpbneSum->SetTextSize(0.04);
     pbpbneSum->Draw();
     putCMSPrel();    
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
-    drawText("pCES, HBHE",0.3,0.43,16);
-    cneSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_neSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+    cneSum->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_neSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
 
         
@@ -2159,6 +2386,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       makeHistTitle(hmuMax[0][i]," ","muMax p_{T} (GeV/c)","Event Fraction");
       hmuMax[0][i]->SetMarkerStyle(24);
       hmuMax[0][i]->SetMarkerColor(kBlack);
+      hmuMax[0][i]->SetAxisRange(0,500,"X");
       hmuMax[0][i]->Draw();
 
       hmuMax[1][i]->SetLineStyle(1);
@@ -2175,10 +2403,10 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     pbpbmuMax->SetTextSize(0.04);
     pbpbmuMax->Draw();
     putCMSPrel();    
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
-    drawText("pCES, HBHE",0.3,0.43,16);
-    cmuMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_muMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+    cmuMax->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_muMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for muSum
     TCanvas *cmuSum = new TCanvas("cmuSum","",1000,800);
@@ -2191,6 +2419,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       makeHistTitle(hmuSum[0][i]," ","muSum p_{T} (GeV/c)","Event Fraction");
       hmuSum[0][i]->SetMarkerStyle(24);
       hmuSum[0][i]->SetMarkerColor(kBlack);
+      hmuSum[0][i]->SetAxisRange(0,500,"X");
       hmuSum[0][i]->Draw();
 
       hmuSum[1][i]->SetLineStyle(1);
@@ -2207,10 +2436,10 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     pbpbmuSum->SetTextSize(0.04);
     pbpbmuSum->Draw();
     putCMSPrel();    
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
-    drawText("pCES, HBHE",0.3,0.43,16);
-    cmuSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_muSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+    cmuSum->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_muSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
 
    // make plot for eMax
@@ -2224,6 +2453,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       makeHistTitle(heMax[0][i]," ","eMax p_{T} (GeV/c)","Event Fraction");
       heMax[0][i]->SetMarkerStyle(24);
       heMax[0][i]->SetMarkerColor(kBlack);
+      heMax[0][i]->SetAxisRange(0,500,"X");
       heMax[0][i]->Draw();
 
       heMax[1][i]->SetLineStyle(1);
@@ -2240,10 +2470,10 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     pbpbeMax->SetTextSize(0.04);
     pbpbeMax->Draw();
     putCMSPrel();    
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
-    drawText("pCES, HBHE",0.3,0.43,16);
-    ceMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_eMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+    ceMax->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_eMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for eSum
     TCanvas *ceSum = new TCanvas("ceSum","",1000,800);
@@ -2256,6 +2486,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       makeHistTitle(heSum[0][i]," ","eSum p_{T} (GeV/c)","Event Fraction");
       heSum[0][i]->SetMarkerStyle(24);
       heSum[0][i]->SetMarkerColor(kBlack);
+      heSum[0][i]->SetAxisRange(0,500,"X");
       heSum[0][i]->Draw();
 
       heSum[1][i]->SetLineStyle(1);
@@ -2265,17 +2496,17 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.55,0.83,16);
 
     }
-    cmuSum->cd(1);
+    ceSum->cd(1);
     TLegend *pbpbeSum = myLegend(0.77,0.65,0.9,0.9);
     pbpbeSum->AddEntry(heSum[0][0],"Data","p");
     pbpbeSum->AddEntry(heSum[1][0],"MC","l");
     pbpbeSum->SetTextSize(0.04);
     pbpbeSum->Draw();
     putCMSPrel();    
-    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
-    drawText("pCES, HBHE",0.3,0.43,16);
-    ceSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_eSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
+    drawText("pCES, HBHE(data)",0.5,0.43,16);
+    ceSum->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_JetVariables_eSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     
     /*
     // make plot for jtpu
