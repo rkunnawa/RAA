@@ -131,8 +131,8 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   bool printDebug = true;
 
   // Get the input files for Data and MC including the trees that are necessary 
-  TFile *fDatain = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_jetntuple_withEvtCuts_SuperNovaRejected_ak%s%d%s_20141209.root",algo,radius,jet_type));
-  TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_nocut_ak%s%s_20141210.root",algo,jet_type));
+  TFile *fDatain = TFile::Open(Form("/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/data/PbPb_jetntuple_withEvtCuts_SuperNovaRejected_ak%s%d%s_20141209.root",algo,radius,jet_type));
+  TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_v15_nocut_ak%s%s_20141217.root",algo,jet_type));
 
   TTree *jetData = (TTree*)fDatain->Get("jets_ID");
   TTree *jetMC = (TTree*)fMCin->Get("jets_ID");
@@ -526,6 +526,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   jetMC->SetBranchAddress("eSum",&eSum_2);
   int centBin_2 = 0;
 
+#if 0 
   // Data loop
   for(int jentry = 0;jentry<jetData->GetEntries();jentry++){
 
@@ -715,6 +716,8 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   // hData[2][1][nbins_cent]->Print("base");
 
   }// entry loop
+
+#endif 
  
   Float_t weight = 0;
   
@@ -730,29 +733,29 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hMC_noCut[centBin_2]->Fill(jtpt_2,weight);
     hMC_noCut[nbins_cent]->Fill(jtpt_2,weight);
 
-    hMC_chMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)chMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_phMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)phMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_neMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)neMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_muMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)muMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_eMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)eMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_chMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)chMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
+    hMC_phMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)phMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
+    hMC_neMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)neMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
+    hMC_muMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)muMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
+    hMC_eMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)eMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
 
-    hMC_chMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)chMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_phMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)phMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_neMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)neMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_muMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)muMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_eMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)eMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_chMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)chMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
+    hMC_phMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)phMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
+    hMC_neMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)neMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
+    hMC_muMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)muMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
+    hMC_eMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)eMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
 
-    hMC_chMaxSumMaxChNePh_GenPt[centBin_2]->Fill((Float_t)chMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight_vz_2*weight_cent_2);
-    hMC_phMaxSumMaxChNePh_GenPt[centBin_2]->Fill((Float_t)phMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight_vz_2*weight_cent_2);
-    hMC_neMaxSumMaxChNePh_GenPt[centBin_2]->Fill((Float_t)neMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight_vz_2*weight_cent_2);
-    hMC_muMaxSumMaxChNePh_GenPt[centBin_2]->Fill((Float_t)muMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight_vz_2*weight_cent_2);
-    hMC_eMaxSumMaxChNePh_GenPt[centBin_2]->Fill((Float_t)eMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight_vz_2*weight_cent_2);
+    hMC_chMaxSumMaxChNePh_GenPt[centBin_2]->Fill((Float_t)chMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight);
+    hMC_phMaxSumMaxChNePh_GenPt[centBin_2]->Fill((Float_t)phMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight);
+    hMC_neMaxSumMaxChNePh_GenPt[centBin_2]->Fill((Float_t)neMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight);
+    hMC_muMaxSumMaxChNePh_GenPt[centBin_2]->Fill((Float_t)muMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight);
+    hMC_eMaxSumMaxChNePh_GenPt[centBin_2]->Fill((Float_t)eMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight);
 
-    hMC_chMaxSumMaxChNePh_GenPt[nbins_cent]->Fill((Float_t)chMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight_vz_2*weight_cent_2);
-    hMC_phMaxSumMaxChNePh_GenPt[nbins_cent]->Fill((Float_t)phMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight_vz_2*weight_cent_2);
-    hMC_neMaxSumMaxChNePh_GenPt[nbins_cent]->Fill((Float_t)neMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight_vz_2*weight_cent_2);
-    hMC_muMaxSumMaxChNePh_GenPt[nbins_cent]->Fill((Float_t)muMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight_vz_2*weight_cent_2);
-    hMC_eMaxSumMaxChNePh_GenPt[nbins_cent]->Fill((Float_t)eMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight_vz_2*weight_cent_2);
+    hMC_chMaxSumMaxChNePh_GenPt[nbins_cent]->Fill((Float_t)chMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight);
+    hMC_phMaxSumMaxChNePh_GenPt[nbins_cent]->Fill((Float_t)phMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight);
+    hMC_neMaxSumMaxChNePh_GenPt[nbins_cent]->Fill((Float_t)neMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight);
+    hMC_muMaxSumMaxChNePh_GenPt[nbins_cent]->Fill((Float_t)muMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight);
+    hMC_eMaxSumMaxChNePh_GenPt[nbins_cent]->Fill((Float_t)eMax_2/(chMax_2+neMax_2+phMax_2),refpt_2, weight);
 
     if((Float_t)eMax_2/jtpt_2<0.9) {
       hMC_eMaxJtPt_0p9[centBin_2]->Fill(jtpt_2,weight);
@@ -801,107 +804,107 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
 
 
-    hMC_chMax[centBin_2]->Fill(chMax_2, weight_vz_2*weight_cent_2);
-    hMC_chMax[nbins_cent]->Fill(chMax_2, weight_vz_2*weight_cent_2);
-    hMC_chMaxJtPt_Pt[centBin_2]->Fill((Float_t)chMax_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_chMaxJtPt_Pt[nbins_cent]->Fill((Float_t)chMax_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_chMax[centBin_2]->Fill(chMax_2, weight);
+    hMC_chMax[nbins_cent]->Fill(chMax_2, weight);
+    hMC_chMaxJtPt_Pt[centBin_2]->Fill((Float_t)chMax_2/jtpt_2,jtpt_2, weight);
+    hMC_chMaxJtPt_Pt[nbins_cent]->Fill((Float_t)chMax_2/jtpt_2,jtpt_2, weight);
 
-    hMC_chSum[centBin_2]->Fill(chSum_2, weight_vz_2*weight_cent_2);
-    hMC_chSum[nbins_cent]->Fill(chSum_2, weight_vz_2*weight_cent_2);
-    hMC_chSumJtPt_Pt[centBin_2]->Fill((Float_t)chSum_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_chSumJtPt_Pt[nbins_cent]->Fill((Float_t)chSum_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_chSum[centBin_2]->Fill(chSum_2, weight);
+    hMC_chSum[nbins_cent]->Fill(chSum_2, weight);
+    hMC_chSumJtPt_Pt[centBin_2]->Fill((Float_t)chSum_2/jtpt_2,jtpt_2, weight);
+    hMC_chSumJtPt_Pt[nbins_cent]->Fill((Float_t)chSum_2/jtpt_2,jtpt_2, weight);
 
-    hMC_phMax[centBin_2]->Fill(phMax_2, weight_vz_2*weight_cent_2);
-    hMC_phMax[nbins_cent]->Fill(phMax_2, weight_vz_2*weight_cent_2);
-    hMC_phMaxJtPt_Pt[centBin_2]->Fill((Float_t)phMax_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_phMaxJtPt_Pt[nbins_cent]->Fill((Float_t)phMax_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_phMax[centBin_2]->Fill(phMax_2, weight);
+    hMC_phMax[nbins_cent]->Fill(phMax_2, weight);
+    hMC_phMaxJtPt_Pt[centBin_2]->Fill((Float_t)phMax_2/jtpt_2,jtpt_2, weight);
+    hMC_phMaxJtPt_Pt[nbins_cent]->Fill((Float_t)phMax_2/jtpt_2,jtpt_2, weight);
 
-    hMC_phSum[centBin_2]->Fill(phSum_2, weight_vz_2*weight_cent_2);
-    hMC_phSum[nbins_cent]->Fill(phSum_2, weight_vz_2*weight_cent_2);
-    hMC_phSumJtPt_Pt[centBin_2]->Fill((Float_t)phSum_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_phSumJtPt_Pt[nbins_cent]->Fill((Float_t)phSum_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_phSum[centBin_2]->Fill(phSum_2, weight);
+    hMC_phSum[nbins_cent]->Fill(phSum_2, weight);
+    hMC_phSumJtPt_Pt[centBin_2]->Fill((Float_t)phSum_2/jtpt_2,jtpt_2, weight);
+    hMC_phSumJtPt_Pt[nbins_cent]->Fill((Float_t)phSum_2/jtpt_2,jtpt_2, weight);
 
-    hMC_neMax[centBin_2]->Fill(neMax_2, weight_vz_2*weight_cent_2);
-    hMC_neMax[nbins_cent]->Fill(neMax_2, weight_vz_2*weight_cent_2);
-    hMC_neMaxJtPt_Pt[centBin_2]->Fill((Float_t)neMax_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_neMaxJtPt_Pt[nbins_cent]->Fill((Float_t)neMax_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_neMax[centBin_2]->Fill(neMax_2, weight);
+    hMC_neMax[nbins_cent]->Fill(neMax_2, weight);
+    hMC_neMaxJtPt_Pt[centBin_2]->Fill((Float_t)neMax_2/jtpt_2,jtpt_2, weight);
+    hMC_neMaxJtPt_Pt[nbins_cent]->Fill((Float_t)neMax_2/jtpt_2,jtpt_2, weight);
 
-    hMC_neSum[centBin_2]->Fill(neSum_2, weight_vz_2*weight_cent_2);
-    hMC_neSum[nbins_cent]->Fill(neSum_2, weight_vz_2*weight_cent_2);
-    hMC_neSumJtPt_Pt[centBin_2]->Fill((Float_t)neSum_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_neSumJtPt_Pt[nbins_cent]->Fill((Float_t)neSum_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_neSum[centBin_2]->Fill(neSum_2, weight);
+    hMC_neSum[nbins_cent]->Fill(neSum_2, weight);
+    hMC_neSumJtPt_Pt[centBin_2]->Fill((Float_t)neSum_2/jtpt_2,jtpt_2, weight);
+    hMC_neSumJtPt_Pt[nbins_cent]->Fill((Float_t)neSum_2/jtpt_2,jtpt_2, weight);
 
-    hMC_muMax[centBin_2]->Fill(muMax_2, weight_vz_2*weight_cent_2);
-    hMC_muMax[nbins_cent]->Fill(muMax_2, weight_vz_2*weight_cent_2);
-    hMC_muMaxJtPt_Pt[centBin_2]->Fill((Float_t)muMax_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_muMaxJtPt_Pt[nbins_cent]->Fill((Float_t)muMax_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_muMax[centBin_2]->Fill(muMax_2, weight);
+    hMC_muMax[nbins_cent]->Fill(muMax_2, weight);
+    hMC_muMaxJtPt_Pt[centBin_2]->Fill((Float_t)muMax_2/jtpt_2,jtpt_2, weight);
+    hMC_muMaxJtPt_Pt[nbins_cent]->Fill((Float_t)muMax_2/jtpt_2,jtpt_2, weight);
 
-    hMC_muSum[centBin_2]->Fill(muSum_2, weight_vz_2*weight_cent_2);
-    hMC_muSum[nbins_cent]->Fill(muSum_2, weight_vz_2*weight_cent_2);
-    hMC_muSumJtPt_Pt[centBin_2]->Fill((Float_t)muSum_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_muSumJtPt_Pt[nbins_cent]->Fill((Float_t)muSum_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_muSum[centBin_2]->Fill(muSum_2, weight);
+    hMC_muSum[nbins_cent]->Fill(muSum_2, weight);
+    hMC_muSumJtPt_Pt[centBin_2]->Fill((Float_t)muSum_2/jtpt_2,jtpt_2, weight);
+    hMC_muSumJtPt_Pt[nbins_cent]->Fill((Float_t)muSum_2/jtpt_2,jtpt_2, weight);
 
-    hMC_eMax[centBin_2]->Fill(eMax_2, weight_vz_2*weight_cent_2);
-    hMC_eMax[nbins_cent]->Fill(eMax_2, weight_vz_2*weight_cent_2);
-    hMC_eMaxJtPt_Pt[centBin_2]->Fill((Float_t)eMax_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_eMaxJtPt_Pt[nbins_cent]->Fill((Float_t)eMax_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_eMax[centBin_2]->Fill(eMax_2, weight);
+    hMC_eMax[nbins_cent]->Fill(eMax_2, weight);
+    hMC_eMaxJtPt_Pt[centBin_2]->Fill((Float_t)eMax_2/jtpt_2,jtpt_2, weight);
+    hMC_eMaxJtPt_Pt[nbins_cent]->Fill((Float_t)eMax_2/jtpt_2,jtpt_2, weight);
 
-    hMC_eSum[centBin_2]->Fill(eSum_2, weight_vz_2*weight_cent_2);
-    hMC_eSum[nbins_cent]->Fill(eSum_2, weight_vz_2*weight_cent_2);
-    hMC_eSumJtPt_Pt[centBin_2]->Fill((Float_t)eSum_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
-    hMC_eSumJtPt_Pt[nbins_cent]->Fill((Float_t)eSum_2/jtpt_2,jtpt_2, weight_vz_2*weight_cent_2);
+    hMC_eSum[centBin_2]->Fill(eSum_2, weight);
+    hMC_eSum[nbins_cent]->Fill(eSum_2, weight);
+    hMC_eSumJtPt_Pt[centBin_2]->Fill((Float_t)eSum_2/jtpt_2,jtpt_2, weight);
+    hMC_eSumJtPt_Pt[nbins_cent]->Fill((Float_t)eSum_2/jtpt_2,jtpt_2, weight);
 
     // histograms with refpt instead of jtpt. 
 
-    hMC_chMax[centBin_2]->Fill(chMax_2, weight_vz_2*weight_cent_2);
-    hMC_chMax[nbins_cent]->Fill(chMax_2, weight_vz_2*weight_cent_2);
-    hMC_chMaxGenPt_Pt[centBin_2]->Fill((Float_t)chMax_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
-    hMC_chMaxGenPt_Pt[nbins_cent]->Fill((Float_t)chMax_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
+    hMC_chMax[centBin_2]->Fill(chMax_2, weight);
+    hMC_chMax[nbins_cent]->Fill(chMax_2, weight);
+    hMC_chMaxGenPt_Pt[centBin_2]->Fill((Float_t)chMax_2/refpt_2,refpt_2, weight);
+    hMC_chMaxGenPt_Pt[nbins_cent]->Fill((Float_t)chMax_2/refpt_2,refpt_2, weight);
 
-    hMC_chSum[centBin_2]->Fill(chSum_2, weight_vz_2*weight_cent_2);
-    hMC_chSum[nbins_cent]->Fill(chSum_2, weight_vz_2*weight_cent_2);
-    hMC_chSumGenPt_Pt[centBin_2]->Fill((Float_t)chSum_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
-    hMC_chSumGenPt_Pt[nbins_cent]->Fill((Float_t)chSum_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
+    hMC_chSum[centBin_2]->Fill(chSum_2, weight);
+    hMC_chSum[nbins_cent]->Fill(chSum_2, weight);
+    hMC_chSumGenPt_Pt[centBin_2]->Fill((Float_t)chSum_2/refpt_2,refpt_2, weight);
+    hMC_chSumGenPt_Pt[nbins_cent]->Fill((Float_t)chSum_2/refpt_2,refpt_2, weight);
 
-    hMC_phMax[centBin_2]->Fill(phMax_2, weight_vz_2*weight_cent_2);
-    hMC_phMax[nbins_cent]->Fill(phMax_2, weight_vz_2*weight_cent_2);
-    hMC_phMaxGenPt_Pt[centBin_2]->Fill((Float_t)phMax_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
-    hMC_phMaxGenPt_Pt[nbins_cent]->Fill((Float_t)phMax_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
+    hMC_phMax[centBin_2]->Fill(phMax_2, weight);
+    hMC_phMax[nbins_cent]->Fill(phMax_2, weight);
+    hMC_phMaxGenPt_Pt[centBin_2]->Fill((Float_t)phMax_2/refpt_2,refpt_2, weight);
+    hMC_phMaxGenPt_Pt[nbins_cent]->Fill((Float_t)phMax_2/refpt_2,refpt_2, weight);
 
-    hMC_phSum[centBin_2]->Fill(phSum_2, weight_vz_2*weight_cent_2);
-    hMC_phSum[nbins_cent]->Fill(phSum_2, weight_vz_2*weight_cent_2);
-    hMC_phSumGenPt_Pt[centBin_2]->Fill((Float_t)phSum_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
-    hMC_phSumGenPt_Pt[nbins_cent]->Fill((Float_t)phSum_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
+    hMC_phSum[centBin_2]->Fill(phSum_2, weight);
+    hMC_phSum[nbins_cent]->Fill(phSum_2, weight);
+    hMC_phSumGenPt_Pt[centBin_2]->Fill((Float_t)phSum_2/refpt_2,refpt_2, weight);
+    hMC_phSumGenPt_Pt[nbins_cent]->Fill((Float_t)phSum_2/refpt_2,refpt_2, weight);
 
-    hMC_neMax[centBin_2]->Fill(neMax_2, weight_vz_2*weight_cent_2);
-    hMC_neMax[nbins_cent]->Fill(neMax_2, weight_vz_2*weight_cent_2);
-    hMC_neMaxGenPt_Pt[centBin_2]->Fill((Float_t)neMax_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
-    hMC_neMaxGenPt_Pt[nbins_cent]->Fill((Float_t)neMax_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
+    hMC_neMax[centBin_2]->Fill(neMax_2, weight);
+    hMC_neMax[nbins_cent]->Fill(neMax_2, weight);
+    hMC_neMaxGenPt_Pt[centBin_2]->Fill((Float_t)neMax_2/refpt_2,refpt_2, weight);
+    hMC_neMaxGenPt_Pt[nbins_cent]->Fill((Float_t)neMax_2/refpt_2,refpt_2, weight);
 
-    hMC_neSum[centBin_2]->Fill(neSum_2, weight_vz_2*weight_cent_2);
-    hMC_neSum[nbins_cent]->Fill(neSum_2, weight_vz_2*weight_cent_2);
-    hMC_neSumGenPt_Pt[centBin_2]->Fill((Float_t)neSum_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
-    hMC_neSumGenPt_Pt[nbins_cent]->Fill((Float_t)neSum_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
+    hMC_neSum[centBin_2]->Fill(neSum_2, weight);
+    hMC_neSum[nbins_cent]->Fill(neSum_2, weight);
+    hMC_neSumGenPt_Pt[centBin_2]->Fill((Float_t)neSum_2/refpt_2,refpt_2, weight);
+    hMC_neSumGenPt_Pt[nbins_cent]->Fill((Float_t)neSum_2/refpt_2,refpt_2, weight);
 
-    hMC_muMax[centBin_2]->Fill(muMax_2, weight_vz_2*weight_cent_2);
-    hMC_muMax[nbins_cent]->Fill(muMax_2, weight_vz_2*weight_cent_2);
-    hMC_muMaxGenPt_Pt[centBin_2]->Fill((Float_t)muMax_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
-    hMC_muMaxGenPt_Pt[nbins_cent]->Fill((Float_t)muMax_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
+    hMC_muMax[centBin_2]->Fill(muMax_2, weight);
+    hMC_muMax[nbins_cent]->Fill(muMax_2, weight);
+    hMC_muMaxGenPt_Pt[centBin_2]->Fill((Float_t)muMax_2/refpt_2,refpt_2, weight);
+    hMC_muMaxGenPt_Pt[nbins_cent]->Fill((Float_t)muMax_2/refpt_2,refpt_2, weight);
 
-    hMC_muSum[centBin_2]->Fill(muSum_2, weight_vz_2*weight_cent_2);
-    hMC_muSum[nbins_cent]->Fill(muSum_2, weight_vz_2*weight_cent_2);
-    hMC_muSumGenPt_Pt[centBin_2]->Fill((Float_t)muSum_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
-    hMC_muSumGenPt_Pt[nbins_cent]->Fill((Float_t)muSum_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
+    hMC_muSum[centBin_2]->Fill(muSum_2, weight);
+    hMC_muSum[nbins_cent]->Fill(muSum_2, weight);
+    hMC_muSumGenPt_Pt[centBin_2]->Fill((Float_t)muSum_2/refpt_2,refpt_2, weight);
+    hMC_muSumGenPt_Pt[nbins_cent]->Fill((Float_t)muSum_2/refpt_2,refpt_2, weight);
 
-    hMC_eMax[centBin_2]->Fill(eMax_2, weight_vz_2*weight_cent_2);
-    hMC_eMax[nbins_cent]->Fill(eMax_2, weight_vz_2*weight_cent_2);
-    hMC_eMaxGenPt_Pt[centBin_2]->Fill((Float_t)eMax_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
-    hMC_eMaxGenPt_Pt[nbins_cent]->Fill((Float_t)eMax_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
+    hMC_eMax[centBin_2]->Fill(eMax_2, weight);
+    hMC_eMax[nbins_cent]->Fill(eMax_2, weight);
+    hMC_eMaxGenPt_Pt[centBin_2]->Fill((Float_t)eMax_2/refpt_2,refpt_2, weight);
+    hMC_eMaxGenPt_Pt[nbins_cent]->Fill((Float_t)eMax_2/refpt_2,refpt_2, weight);
 
-    hMC_eSum[centBin_2]->Fill(eSum_2, weight_vz_2*weight_cent_2);
-    hMC_eSum[nbins_cent]->Fill(eSum_2, weight_vz_2*weight_cent_2);
-    hMC_eSumGenPt_Pt[centBin_2]->Fill((Float_t)eSum_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
-    hMC_eSumGenPt_Pt[nbins_cent]->Fill((Float_t)eSum_2/refpt_2,refpt_2, weight_vz_2*weight_cent_2);
+    hMC_eSum[centBin_2]->Fill(eSum_2, weight);
+    hMC_eSum[nbins_cent]->Fill(eSum_2, weight);
+    hMC_eSumGenPt_Pt[centBin_2]->Fill((Float_t)eSum_2/refpt_2,refpt_2, weight);
+    hMC_eSumGenPt_Pt[nbins_cent]->Fill((Float_t)eSum_2/refpt_2,refpt_2, weight);
     
     // if(subid_2!=0)continue;
 
@@ -992,7 +995,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   }
 
   //TFile f("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root","RECREATE");
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_Data_mc_ElecCutRejectionStudy_with2DplotsSumMaxChNePhCut_%s%d%s_%d.root",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_mc_ElecCutRejectionStudy_with2DplotsSumMaxChNePhCut_%s%d%s_%d_pbpb_v15.root",algo,radius,jet_type,date.GetDate()),"RECREATE");
   f.cd();
 
   for(int i = 0;i<=nbins_cent;i++){
