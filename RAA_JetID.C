@@ -132,7 +132,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   // Get the input files for Data and MC including the trees that are necessary 
   TFile *fDatain = TFile::Open(Form("/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/data/PbPb_jetntuple_withEvtCuts_SuperNovaRejected_ak%s%d%s_20141209.root",algo,radius,jet_type));
-  TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_v15_nocut_ak%s%s_20141217.root",algo,jet_type));
+  TFile *fMCin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_nocut_ak%s%s_20141210.root",algo,jet_type));
 
   TTree *jetData = (TTree*)fDatain->Get("jets_ID");
   TTree *jetMC = (TTree*)fMCin->Get("jets_ID");
@@ -728,6 +728,8 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     centBin_2 = (int)cent_2;
     if(jentry%1000000==0)cout<<"MC "<<jentry<<" of "<<jetMC->GetEntries()<<endl;
 
+    if(subid_2!=0)continue;
+
     weight = scale_2 * weight_vz_2 * weight_cent_2;
 
     hMC_noCut[centBin_2]->Fill(jtpt_2,weight);
@@ -906,7 +908,6 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hMC_eSumGenPt_Pt[centBin_2]->Fill((Float_t)eSum_2/refpt_2,refpt_2, weight);
     hMC_eSumGenPt_Pt[nbins_cent]->Fill((Float_t)eSum_2/refpt_2,refpt_2, weight);
     
-    // if(subid_2!=0)continue;
 
     if(jet80_2){
 
@@ -995,7 +996,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   }
 
   //TFile f("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root","RECREATE");
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_mc_ElecCutRejectionStudy_with2DplotsSumMaxChNePhCut_%s%d%s_%d_pbpb_v15.root",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_mc_subid0_ElecCutRejectionStudy_with2DplotsSumMaxChNePhCut_%s%d%s_%d.root",algo,radius,jet_type,date.GetDate()),"RECREATE");
   f.cd();
 
   for(int i = 0;i<=nbins_cent;i++){
