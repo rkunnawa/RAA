@@ -177,7 +177,8 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   bool doSupernovaContributionMC = false;
   bool doCentDatavsMC = false;
   bool doVertexDatavsMC = false;
-  bool doJetVariablesCheck = true;
+  bool doPFElectronCheck = true;
+  bool doJetVariablesCheck = false;
   bool doJetID = false;
   bool do2DCutpTplot = false;
   bool do2DCut1 = false;
@@ -189,7 +190,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TFile *fin; 
   
   //if(location=="MIT") 
-  fin= TFile::Open(Form("/Users/keraghav/WORK/RAA/Output/PbPb_pp_unfo_mcclosure_oppside_ak%s%d%s_20141111_test.root",algo,radius,jet_type));
+  fin= TFile::Open(Form("/Users/raghavke/WORK/RAA/Output/PbPb_pp_unfo_mcclosure_oppside_ak%s%d%s_20141111_test.root",algo,radius,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
@@ -276,7 +277,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   */
 
-
+  /*
   // get histograms from the MC file. 
   TFile *fMCin = TFile::Open(Form("/Users/keraghav/WORK/RAA/Output/PbPb_mc_nocut_ak%s%s_20141210.root",algo,jet_type));
   TFile *fDatain = TFile::Open(Form("/Users/keraghav/WORK/RAA/Output/PbPb_jetntuple_withEvtCuts_SuperNovaRejected_ak%s%d%s_20141209.root",algo,radius,jet_type));
@@ -1853,6 +1854,92 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     cDataMCVertex->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_datavsmc_vertex_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
  
   
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  if(doPFElectronCheck){
+
+    TFile * fhistin = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_Data_mc_ElecCutRejectionStudy_with2DplotsSumMaxChNePhCut_Pu3PF_20141216.root");
+    TFile * fMCsubidin = TFile::Open("/Users/raghavke/WORK/RAA/Output/RAA_JetID_mc_subid0_ElecCutRejectionStudy_with2DplotsSumMaxChNePhCut_Pu3PF_20141217.root");
+    cout<<"checkpoint 1"<<endl;
+    // [3] is 0: Data, 1: MC no subid cut, 2: MC with subid==0 cut; [9] is eMax/jtpt<0.1 to 0.9  
+    TH1F *hElecFracRatio[3][9][nbins_cent+1];
+    //TH1F *hData_nocut[3][nbins_cent+1];
+
+    for(int i = 0;i<nbins_cent+1;i++){
+
+      for(int q = 0;q<9;q++){
+
+	hElecFracRatio[0][q][i] = (TH1F*)fhistin->Get(Form("hData_Ratio_eMaxJtPt_0p%d_cent%d",q+1,i));
+	hElecFracRatio[1][q][i] = (TH1F*)fhistin->Get(Form("hMC_Ratio_eMaxJtPt_0p%d_cent%d",q+1,i));
+	hElecFracRatio[2][q][i] = (TH1F*)fMCsubidin->Get(Form("hMC_Ratio_eMaxJtPt_0p%d_cent%d",q+1,i));
+
+	hElecFracRatio[0][q][i] = (TH1F*)hElecFracRatio[0][q][i]->Rebin(nbins_pt,Form("hData_Ratio_eMaxJtPt_0p%d_cent%d",q+1,i),boundaries_pt);
+	hElecFracRatio[1][q][i] = (TH1F*)hElecFracRatio[1][q][i]->Rebin(nbins_pt,Form("hMC_Ratio_eMaxJtPt_0p%d_cent%d",q+1,i),boundaries_pt);
+	hElecFracRatio[2][q][i] = (TH1F*)hElecFracRatio[2][q][i]->Rebin(nbins_pt,Form("hMC_subid_Ratio_eMaxJtPt_0p%d_cent%d",q+1,i),boundaries_pt);
+
+	divideBinWidth(hElecFracRatio[0][q][i]);
+	divideBinWidth(hElecFracRatio[1][q][i]);
+	divideBinWidth(hElecFracRatio[2][q][i]);
+
+      }
+
+    }
+
+    cout<<"hi check"<<endl;
+
+    //make the plots: 
+
+    TCanvas *cData = new TCanvas("cData","",800,600);
+    cData->makeMultiPanelCanvas(cData,2,2,0.0,0.0,0.2,0.15,0.07);
+
+    cData->cd(1);
+    for(int q = 0;q<9;q++){
+      hElecFracRatio[0][q][nbins_cent]->SetMarkerStyle(29);
+      hElecFracRatio[0][q][nbins_cent]->SetMarkerColor(q);
+      if(q==1)hElecFracRatio[0][q][nbins_cent]->Draw();
+      else hElecFracRatio[0][q][nbins_cent]->Draw("same");
+    }
+    purCMSPrel();
+    drawText("Data",0.3,0.8,20);
+
+    cData->cd(2);
+    for(int q = 0;q<9;q++){
+      hElecFracRatio[1][q][nbins_cent]->SetMarkerStyle(29);
+      hElecFracRatio[1][q][nbins_cent]->SetMarkerColor(q);
+      if(q==1)hElecFracRatio[1][q][nbins_cent]->Draw();
+      else hElecFracRatio[1][q][nbins_cent]->Draw("same");
+    }
+    purCMSPrel();
+    drawText("MC - no SubID cut",0.3,0.8,20);
+    
+    cData->cd(3);
+    for(int q = 0;q<9;q++){
+      hElecFracRatio[2][q][nbins_cent]->SetMarkerStyle(29);
+      hElecFracRatio[2][q][nbins_cent]->SetMarkerColor(q);
+      if(q==1)hElecFracRatio[2][q][nbins_cent]->Draw();
+      else hElecFracRatio[2][q][nbins_cent]->Draw("same");
+    }
+    purCMSPrel();
+    drawText("MC - SubID==0 cut",0.3,0.8,20);
+
+    cData->cd(4);
+    TLegend *Lelec = myLegend(0.35,0.2,0.8,0.9);
+    Lelec->AddEntry(,"eMax/jtpt < ","");
+    for(int q = 8;q>=0;q--) Lelec->AddEntry(hElecFracRatio[0][q][nbins_cent],Form("0.%d",q+1),"pl");
+    Lelec->SetTextSize(0.04);
+    Lelec->DraW();
+
+    drawText("0 - 100 %",0.75,0.85,16);
+    drawText(Form("ak%s%d%s Jets",algo,radius,jet_type),0.15,0.8,20);
+    drawText("|#eta|<2, |vz|<15",0.15,0.7,16);
+    drawText("pCES, HBHE",0.15,0.6,16);
+    drawText("Npix Diag cut",0.15,0.5,16);
+    
+    cData->SaveAs("/Users/raghavke/WORK/RAA/plots/elecfracRatio.pdf","RECREATE");
+
   }
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
