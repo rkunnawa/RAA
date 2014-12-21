@@ -170,7 +170,8 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   // Now im going to change the file reading here for PbPb to look at the unmerged files through condor. 
   std::string infile1;
   //infile1 = "jet55or65_filelist.txt";
-  infile1 = "PbPb_HydjetMinBias_forest.txt";
+  //infile1 = "PbPb_HydjetMinBias_forest.txt";
+  infile1 = "PbPb_MinBiasUPC_forest.txt";
   
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
@@ -181,7 +182,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     instr1>>filename1;
   }
   
-  const int N = 5;
+  const int N = 4;
   
   TChain *jetpbpb1[N][no_radius];
 
@@ -193,7 +194,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     dir[2][k] = Form("ak%s%d%sJetAnalyzer",algo,list_radius[k],jet_type);
     //dir[3][k] = Form("akPu%d%sJetAnalyzer",list_radius[k],jet_type);
     dir[3][k] = "hiEvtAnalyzer";
-    dir[4][k] = "hltobject";
+    //dir[4][k] = "hltobject"; //- not there in MinBias files 
     //dir[6][k] = "pfcandAnalyzer";
   }
 
@@ -203,7 +204,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     "t",
     //"t",
     "HiTree",
-    "jetObjTree",
+    // "jetObjTree",
     //"pfTree"
   };
   
@@ -237,7 +238,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     jetpbpb1[2][k]->AddFriend(jetpbpb1[0][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[1][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[3][k]);
-    jetpbpb1[2][k]->AddFriend(jetpbpb1[4][k]);
+    //jetpbpb1[2][k]->AddFriend(jetpbpb1[4][k]);
   }// radius loop ends
 
   cout<<"total no of entries in the combined forest files = "<<jetpbpb1[2][0]->GetEntries()<<endl;
@@ -361,10 +362,12 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     jetpbpb1[2][k]->SetBranchAddress("eMax",&eMax_1);
     jetpbpb1[2][k]->SetBranchAddress("muSum",&muSum_1);
     jetpbpb1[2][k]->SetBranchAddress("muMax",&muMax_1);
-    //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_1);
-    //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_1);
-    //jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias",&L1_MB_1);
-    //jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_MinBiasHFOrBSC_v5",&jetMB_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_MinBiasHFOrBSC_v5_Prescl",&jetMB_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias",&L1_MB_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
+    
+    /*
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_1);
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1",&jet65_1);
@@ -375,13 +378,14 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND_Prescl",&L1_sj36_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND",&L1_sj52_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND_Prescl",&L1_sj52_p_1);
+    
 
     jetpbpb1[2][k]->SetBranchAddress("id",&trgObj_id_1);
     jetpbpb1[2][k]->SetBranchAddress("pt",&trgObj_pt_1);
     jetpbpb1[2][k]->SetBranchAddress("eta",&trgObj_eta_1);
     jetpbpb1[2][k]->SetBranchAddress("phi",&trgObj_phi_1);
     jetpbpb1[2][k]->SetBranchAddress("mass",&trgObj_mass_1);
-    /*
+    
     jetpbpb1[2][k]->SetBranchAddress("nPFpart", &nPFpart);
     jetpbpb1[2][k]->SetBranchAddress("pfId", pfId);
     jetpbpb1[2][k]->SetBranchAddress("pfPt", pfPt);
@@ -398,8 +402,8 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
 
   // we need to add the histograms to find the jet spectra from normal and failure mode- infact just add them to the ntuples per event the value of the HFSumpT*vn*cos/sin(n*psi_n) so we can plot the spectra at the final stage. this would make things easier. 
-  TNtuple *jets_ID = new TNtuple("jets_ID","","rawpt:jtpt:jtpu:l1sj36:l1sj36_prescl:l1sj52:l1sj52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
-  Float_t arrayValues[25];
+  TNtuple *jets_ID = new TNtuple("jets_ID","","rawpt:jtpt:jtpu:L1_MB:L1_MB_prescl:HLTZeroBias_MB:HLTZeroBias_MB_prescl:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
+  Float_t arrayValues[18];
  
   for(int k = 0;k<no_radius;k++){
 
@@ -415,7 +419,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
       jetpbpb1[1][k]->GetEntry(jentry);
       jetpbpb1[2][k]->GetEntry(jentry);    
       jetpbpb1[3][k]->GetEntry(jentry);
-      jetpbpb1[4][k]->GetEntry(jentry);
+      //jetpbpb1[4][k]->GetEntry(jentry);
 
       //if(printDebug && jentry%100000==0)cout<<"Jet 55or65 file"<<endl;
       if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<endl;
@@ -569,38 +573,30 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 	  //hCut4->Fill(cut4);
 	  //hCut2->Fill(cut2);
 	  //hCut1->Fill(cut1);
-	  
-	  
+
 	  arrayValues[0] = raw_1[g];
 	  arrayValues[1] = pt_1[g];
 	  arrayValues[2] = jtpu_1[g];
-	  arrayValues[3] = L1_sj36_1;
-	  arrayValues[4] = L1_sj36_p_1;
-	  arrayValues[5] = L1_sj52_1;
-	  arrayValues[6] = L1_sj52_p_1;
-	  arrayValues[7] = jet55_1;
-	  arrayValues[8] = jet55_p_1;
-	  arrayValues[9] = jet65_1;
-	  arrayValues[10] = jet65_p_1;
-	  arrayValues[11] = jet80_1;
-	  arrayValues[12] = jet80_p_1;
-	  arrayValues[13] = trgObj_pt_1;
-	  arrayValues[14] = centBin;
-	  arrayValues[15] = chMax_1[g];
-	  arrayValues[16] = chSum_1[g];
-	  arrayValues[17] = phMax_1[g];
-	  arrayValues[18] = phSum_1[g];
-	  arrayValues[19] = neMax_1[g];
-	  arrayValues[20] = neSum_1[g];
-	  arrayValues[21] = muMax_1[g];
-	  arrayValues[22] = muSum_1[g];
-	  arrayValues[23] = eMax_1[g];
-	  arrayValues[24] = eSum_1[g];
+	  arrayValues[3] = L1_MB_1; 
+	  arrayValues[4] = L1_MB_p_1; 
+	  arrayValues[5] = jetMB_1; 
+	  arrayValues[6] = jetMB_p_1; 
+	  arrayValues[7] = centBin;
+	  arrayValues[8] = chMax_1[g];
+	  arrayValues[9] = chSum_1[g];
+	  arrayValues[10] = phMax_1[g];
+	  arrayValues[11] = phSum_1[g];
+	  arrayValues[12] = neMax_1[g];
+	  arrayValues[13] = neSum_1[g];
+	  arrayValues[14] = muMax_1[g];
+	  arrayValues[15] = muSum_1[g];
+	  arrayValues[16] = eMax_1[g];
+	  arrayValues[17] = eSum_1[g];
 
 	  jets_ID->Fill(arrayValues);
 	
 	  // going to use the effective prescl for the Jet55 trigger: 2.0475075465
-	  Float_t effecPrescl = 2.047507;
+	  //Float_t effecPrescl = 2.047507;
 
 #if 0
 
@@ -967,7 +963,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   */
   
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_jetntuple_withEvtCuts_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_jetntuple_withEvtCuts_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   jets_ID->Write();
