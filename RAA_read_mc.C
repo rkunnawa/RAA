@@ -23,7 +23,9 @@
 
 // Dec 9th - going to PU for the Jet RAA. 
 
-// Dec 17th - changing the file list to smaller 50k files on which JEC were derived to check for PF electron problems, requested by Marguerite. 
+// Dec 17th - changing the file list to smaller 50k files on which JEC were derived to check for PF electron problems, requested by Marguerite.
+
+// Jan 13th 2015 - adding in the official pp mc (from Dragos) 
 
 
 #include <iostream>
@@ -428,57 +430,6 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   //get the centrality weight from the root file created in the plotting macro. 
   TFile *fcentin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_DataMC_cent_ratio_20141117.root");
   TH1F *hCentWeight = (TH1F*)fcentin->Get("hCentRatio");
-
-
-  /* 
-     const int nbinsPP_pthat = 11;
-     Double_t boundariesPP_pthat[nbinsPP_pthat+1];
-     char *fileNamePP_pthat[nbinsPP_pthat+1];
-     Double_t xsectionPP[nbinsPP_pthat+1];
-  
-     boundariesPP_pthat[0]=15;
-     fileNamePP_pthat[0]="/mnt/hadoop/cms/store/user/dgulhan/pp2013/P01/prod22/Signal_Pythia_pt15/HiForest_v81_merged01/pt15_pp2013_P01_prod22_v81_merged_forest_0.root";
-     //xsectionPP[0]= 1.079e-02;
-     xsectionPP[0]= 2.034e-01;
-  
-     boundariesPP_pthat[1]=30;
-     fileNamePP_pthat[1]="/mnt/hadoop/cms/store/user/dgulhan/pp2013/P01/prod22/Signal_Pythia_pt30/HiForest_v81_merged01/pt30_pp2013_P01_prod22_v81_merged_forest_0.root";
-     //xsectionPP[1]= 1.021e-03;
-     xsectionPP[1]= 1.075e-02;
-  
-     boundariesPP_pthat[2]=50;
-     fileNamePP_pthat[2]="/mnt/hadoop/cms/store/user/dgulhan/pp2013/P01/prod22/Signal_Pythia_pt50/HiForest_v81_merged01/pt50_pp2013_P01_prod22_v81_merged_forest_0.root";
-     //xsectionPP[2]= 9.913e-05;
-     xsectionPP[2]= 1.025e-03;
-  
-     boundariesPP_pthat[3]=80;
-     fileNamePP_pthat[3]="/mnt/hadoop/cms/store/user/dgulhan/pp2013/P01/prod22/Signal_Pythia_pt80/HiForest_v81_merged01/pt80_pp2013_P01_prod22_v81_merged_forest_0.root";
-     //xsectionPP[3]= 1.128e-05;
-     xsectionPP[3]= 9.865e-05;
-  
-     boundariesPP_pthat[4]=120;
-     fileNamePP_pthat[4]="/mnt/hadoop/cms/store/user/dgulhan/pp2013/P01/prod22/Signal_Pythia_pt120/HiForest_v81_merged01/pt120_pp2013_P01_prod22_v81_merged_forest_0.root";
-     //xsectionPP[4]= 1.470e-06;
-     xsectionPP[4]= 1.129e-05;
-  
-     boundariesPP_pthat[5]=170;
-     fileNamePP_pthat[5]="/mnt/hadoop/cms/store/user/dgulhan/pp2013/P01/prod22/Signal_Pythia_pt170/HiForest_v81_merged01/pt170_pp2013_P01_prod22_v81_merged_forest_0.root";
-     //xsectionPP[5]= 5.310e-07;
-     xsectionPP[5]= 1.465e-06;
-  
-     boundariesPP_pthat[6]=220;
-     fileNamePP_pthat[6]="/mnt/hadoop/cms/store/user/dgulhan/pp2013/P01/prod22/Signal_Pythia_pt220/HiForest_v81_merged01/pt220_pp2013_P01_prod22_v81_merged_forest_0.root";
-     //xsectionPP[6]= 1.192e-07;	
-     xsectionPP[6]= 2.837e-07;
-  
-     boundariesPP_pthat[7]=280;
-     fileNamePP_pthat[7]="/mnt/hadoop/cms/store/user/dgulhan/pp2013/P01/prod22/Signal_Pythia_pt280/HiForest_v81_merged01/pt280_pp2013_P01_prod22_v81_merged_forest_0.root";
-     //xsectionPP[7]= 3.176e-08;
-     xsectionPP[7]= 5.323e-08;
- 
-     xsectionPP[8] = 0;
-     boundariesPP_pthat[8]=1000;
-  */
 
   const int nbinsPP_pthat = 11;
   Double_t boundariesPP_pthat[nbinsPP_pthat+1];

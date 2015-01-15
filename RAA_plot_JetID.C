@@ -5,6 +5,8 @@
 
 // Macro which makes plots to check the Jet ID cut contributions for each triggered dataset. 
 
+// Jan 13th - plot the trigger combination spectra in differnet centrality bins with and without jet ID cut, for data and mc
+//            this should tell us if the Jet 55 trigger is behaving oddly. 
 
 #include <iostream>
 #include <stdio.h>
@@ -146,7 +148,7 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 
-  TFile *fin = TFile::Open("/Users/keraghav/WORK/RAA/Output/RAA_JetID_data_MC_withNePhChMuChJtPt0p05_withAndWithout_elecRej07.root");
+  TFile *fin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_Data_mc_YesSubidCut_ElecCutRejectionStudy_eSumOverchSumphSumneSummuSum0p7_with2DplotsSumMaxChNePhCut_ptGreater30_Pu3PF_20150114.root");
 
   char file_tag[256] = {"withNePhChMuChJtPt0p05_elecRej05_andwithoutelecRej07"};
 
@@ -158,6 +160,10 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   
   TH1F *hData[3][2][nbins_cent+1];
   TH1F *hData_Ratio[TrigValue][nbins_cent+1];
+  
+  TH1F *hDataComb[2][nbins_cent+1];
+  TH1F *hMCComb[2][nbins_cent+1];
+  
   TH1F *hMC[3][2][nbins_cent+1];
   TH1F *hMC_Ratio[TrigValue][nbins_cent+1];
 
@@ -168,11 +174,14 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       for(int b = 0;b<CutValue;b++){
 
 	hData[a][b][i] = (TH1F*)fin->Get(Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
+	hData[a][b][i]->Print("base");
 	hData[a][b][i] = (TH1F*)hData[a][b][i]->Rebin(nbins_pt,Form("hData_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),boundaries_pt);
 	divideBinWidth(hData[a][b][i]);
 	hMC[a][b][i] = (TH1F*)fin->Get(Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i));
+	hMC[a][b][i]->Print("base");
 	hMC[a][b][i] = (TH1F*)hMC[a][b][i]->Rebin(nbins_pt,Form("hMC_%s_%s_JetID_cent%d",TrigName[a],isJetID[b],i),boundaries_pt);
 	divideBinWidth(hMC[a][b][i]);
+
       }
 
       hData_Ratio[a][i] = (TH1F*)fin->Get(Form("hData_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
@@ -183,9 +192,260 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       divideBinWidth(hMC_Ratio[a][i]);
     }
 
+    for(int b = 0;b<CutValue;b++){
+      
+      hDataComb[b][i] = (TH1F*)hData[0][b][i]->Clone(Form("hDataComb_%s_JetID_cent%d",isJetID[b],i));
+      hDataComb[b][i]->Add(hData[1][b][i]);
+      hDataComb[b][i]->Add(hData[2][b][i]);
+
+      hMCComb[b][i] = (TH1F*)hMC[0][b][i]->Clone(Form("hMCComb_%s_JetID_cent%d",isJetID[b],i));
+      hMCComb[b][i]->Add(hMC[1][b][i]);
+      hMCComb[b][i]->Add(hMC[2][b][i]);
+
+    }
+
   }
 
   // start making the plots: 
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  // Trigger combination plot for Data and MC, with and without subid cut. 
+  TCanvas *cDataMerge_withoutJetID = new TCanvas("cDataMerge_withoutJetID","",1000,800);
+  makeMultiPanelCanvas(cDataMerge_withoutJetID,3,2,0.0,0.0,0.2,0.15,0.07);
+  
+  for(int i = 0;i<nbins_cent;i++){
+
+    cDataMerge_withoutJetID->cd(nbins_cent-i);
+    cDataMerge_withoutJetID->cd(nbins_cent-i)->SetLogy();
+    cDataMerge_withoutJetID->cd(nbins_cent-i)->SetLogx();
+
+    makeHistTitle(hDataComb[0][i]," ","Jet p_{T} (GeV/c)","dN/dp_{T}");
+    hDataComb[0][i] = (TH1F*)hDataComb[0][i]->Rebin(nbins_pt,Form("rebin_data_meas_%s_JetID_cent%d",isJetID[0],i),boundaries_pt);
+    hDataComb[0][i]->SetMarkerStyle(25);
+    hDataComb[0][i]->SetMarkerColor(kBlack);
+    hDataComb[0][i]->SetAxisRange(20,500,"X");
+    hDataComb[0][i]->Draw();
+
+    hData[0][0][i]->SetMarkerStyle(20);
+    hData[0][0][i]->SetMarkerColor(kRed);
+    hData[0][0][i] = (TH1F*)hData[0][0][i]->Rebin(nbins_pt,Form("rebin_data_meas_55_%s_JetID_cent%d",isJetID[0],i),boundaries_pt);
+    hData[0][0][i]->Draw("same");
+
+    hData[1][0][i]->SetMarkerStyle(20);
+    hData[1][0][i]->SetMarkerColor(kBlue);
+    hData[1][0][i] = (TH1F*)hData[1][0][i]->Rebin(nbins_pt,Form("rebin_data_meas_65_%s_JetID_cent%d",isJetID[0],i),boundaries_pt);
+    hData[1][0][i]->Draw("same");
+
+    hData[2][0][i]->SetMarkerStyle(24);
+    hData[2][0][i]->SetMarkerColor(kGreen);
+    hData[2][0][i] = (TH1F*)hData[2][0][i]->Rebin(nbins_pt,Form("rebin_data_meas_80_%s_JetID_cent%d",isJetID[0],i),boundaries_pt);
+    hData[2][0][i]->Draw("same");
+
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+  }
+
+  cDataMerge_withoutJetID->cd(1);
+  TLegend *PbPb_dataMerge_withoutJetID = myLegend(0.7,0.75,0.9,0.9);
+  PbPb_dataMerge_withoutJetID->AddEntry(hDataComb[0][0],"Combined","pl");
+  PbPb_dataMerge_withoutJetID->AddEntry(hData[0][0][0],"Jet 55","pl");
+  PbPb_dataMerge_withoutJetID->AddEntry(hData[1][0][0],"Jet 65","pl");
+  PbPb_dataMerge_withoutJetID->AddEntry(hData[2][0][0],"Jet 80","pl");
+  PbPb_dataMerge_withoutJetID->SetTextSize(0.04);
+  PbPb_dataMerge_withoutJetID->Draw();
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.95,15);
+  drawText("|#eta|<2, |vz|<15",0.25,0.2,16);
+  drawText("pCES, HBHE",0.25,0.3,16);
+  cDataMerge_withoutJetID->cd(2);
+  drawText("Data",0.1,0.3,16);
+  drawText("withJet ID cuts",0.1,0.2,16);
+  drawText("raw p_{T} > 30 GeV",0.1,0.4,16);
+  //
+  cDataMerge_withoutJetID->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_without_eSumOverSum0p7_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+
+  
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  // Trigger combination plot for Data and MC, with and without subid cut. 
+  TCanvas *cDataMerge_withJetID = new TCanvas("cDataMerge_withJetID","",1000,800);
+  makeMultiPanelCanvas(cDataMerge_withJetID,3,2,0.0,0.0,0.2,0.15,0.07);
+  
+  for(int i = 0;i<nbins_cent;i++){
+
+    cDataMerge_withJetID->cd(nbins_cent-i);
+    cDataMerge_withJetID->cd(nbins_cent-i)->SetLogy();
+    cDataMerge_withJetID->cd(nbins_cent-i)->SetLogx();
+
+    makeHistTitle(hDataComb[1][i]," ","Jet p_{T} (GeV/c)","dN/dp_{T}");
+    hDataComb[1][i] = (TH1F*)hDataComb[1][i]->Rebin(nbins_pt,Form("rebin_data_meas_%s_JetID_cent%d",isJetID[1],i),boundaries_pt);
+    hDataComb[1][i]->SetMarkerStyle(25);
+    hDataComb[1][i]->SetMarkerColor(kBlack);
+    hDataComb[1][i]->SetAxisRange(20,500,"X");
+    hDataComb[1][i]->Draw();
+
+    hData[0][1][i]->SetMarkerStyle(20);
+    hData[0][1][i]->SetMarkerColor(kRed);
+    hData[0][1][i] = (TH1F*)hData[0][1][i]->Rebin(nbins_pt,Form("rebin_data_meas_55_%s_JetID_cent%d",isJetID[1],i),boundaries_pt);
+    hData[0][1][i]->Draw("same");
+
+    hData[1][1][i]->SetMarkerStyle(20);
+    hData[1][1][i]->SetMarkerColor(kBlue);
+    hData[1][1][i] = (TH1F*)hData[1][1][i]->Rebin(nbins_pt,Form("rebin_data_meas_65_%s_JetID_cent%d",isJetID[1],i),boundaries_pt);
+    hData[1][1][i]->Draw("same");
+
+    hData[2][1][i]->SetMarkerStyle(24);
+    hData[2][1][i]->SetMarkerColor(kGreen);
+    hData[2][1][i] = (TH1F*)hData[2][1][i]->Rebin(nbins_pt,Form("rebin_data_meas_80_%s_JetID_cent%d",isJetID[1],i),boundaries_pt);
+    hData[2][1][i]->Draw("same");
+
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+  }
+
+  cDataMerge_withJetID->cd(1);
+  TLegend *PbPb_dataMerge_withJetID = myLegend(0.7,0.75,0.9,0.9);
+  PbPb_dataMerge_withJetID->AddEntry(hDataComb[1][0],"Combined","pl");
+  PbPb_dataMerge_withJetID->AddEntry(hData[0][1][0],"Jet 55","pl");
+  PbPb_dataMerge_withJetID->AddEntry(hData[1][1][0],"Jet 65","pl");
+  PbPb_dataMerge_withJetID->AddEntry(hData[2][1][0],"Jet 80","pl");
+  PbPb_dataMerge_withJetID->SetTextSize(0.04);
+  PbPb_dataMerge_withJetID->Draw();
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.95,15);
+  drawText("|#eta|<2, |vz|<15",0.25,0.2,16);
+  drawText("pCES, HBHE",0.25,0.3,16);
+  cDataMerge_withJetID->cd(2);
+  drawText("Data",0.1,0.3,16);
+  drawText("#frac{eSum}{Sum ch+ne+ph+mu}<0.7",0.1,0.2,16);
+  drawText("with Jet ID cuts",0.1,0.1,16);
+  drawText("raw p_{T} > 30 GeV",0.1,0.4,16);
+
+  //
+  cDataMerge_withJetID->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_with_eSumOverSum0p7_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  // Trigger combination plot for Data and MC, with and without subid cut. 
+  TCanvas *cMCMerge_withoutJetID = new TCanvas("cMCMerge_withoutJetID","",1000,800);
+  makeMultiPanelCanvas(cMCMerge_withoutJetID,3,2,0.0,0.0,0.2,0.15,0.07);
+  
+  for(int i = 0;i<nbins_cent;i++){
+
+    cMCMerge_withoutJetID->cd(nbins_cent-i);
+    cMCMerge_withoutJetID->cd(nbins_cent-i)->SetLogy();
+    cMCMerge_withoutJetID->cd(nbins_cent-i)->SetLogx();
+
+    makeHistTitle(hMCComb[0][i],"","Jet p_{T} (GeV/c)","dN/dp_{T}");
+    hMCComb[0][i] = (TH1F*)hMCComb[0][i]->Rebin(nbins_pt,Form("rebin_MC_meas_%s_JetID_cent%d",isJetID[0],i),boundaries_pt);
+    hMCComb[0][i]->SetMarkerStyle(25);
+    hMCComb[0][i]->SetMarkerColor(kBlack);
+    hMCComb[0][i]->SetAxisRange(20,500,"X");
+    hMCComb[0][i]->Draw();
+
+    hMC[0][0][i]->SetMarkerStyle(20);
+    hMC[0][0][i]->SetMarkerColor(kRed);
+    hMC[0][0][i] = (TH1F*)hMC[0][0][i]->Rebin(nbins_pt,Form("rebin_MC_meas_55_%s_JetID_cent%d",isJetID[0],i),boundaries_pt);
+    hMC[0][0][i]->Draw("same");
+
+    hMC[1][0][i]->SetMarkerStyle(20);
+    hMC[1][0][i]->SetMarkerColor(kBlue);
+    hMC[1][0][i] = (TH1F*)hMC[1][0][i]->Rebin(nbins_pt,Form("rebin_MC_meas_65_%s_JetID_cent%d",isJetID[0],i),boundaries_pt);
+    hMC[1][0][i]->Draw("same");
+
+    hMC[2][0][i]->SetMarkerStyle(24);
+    hMC[2][0][i]->SetMarkerColor(kGreen);
+    hMC[2][0][i] = (TH1F*)hMC[2][0][i]->Rebin(nbins_pt,Form("rebin_MC_meas_80_%s_JetID_cent%d",isJetID[0],i),boundaries_pt);
+    hMC[2][0][i]->Draw("same");
+
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+  }
+
+  cMCMerge_withoutJetID->cd(1);
+  TLegend *PbPb_MCMerge_withoutJetID = myLegend(0.7,0.75,0.9,0.9);
+  PbPb_MCMerge_withoutJetID->AddEntry(hMCComb[0][0],"Combined","pl");
+  PbPb_MCMerge_withoutJetID->AddEntry(hMC[0][0][0],"Jet 55","pl");
+  PbPb_MCMerge_withoutJetID->AddEntry(hMC[1][0][0],"Jet 65","pl");
+  PbPb_MCMerge_withoutJetID->AddEntry(hMC[2][0][0],"Jet 80","pl");
+  PbPb_MCMerge_withoutJetID->SetTextSize(0.04);
+  PbPb_MCMerge_withoutJetID->Draw();
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.95,15);
+  drawText("|#eta|<2, |vz|<15",0.25,0.2,16);
+  drawText("pCES, HBHE",0.25,0.3,16);
+  cMCMerge_withoutJetID->cd(2);
+  drawText("MC",0.1,0.3,16);
+  drawText("with Jet ID cuts",0.1,0.2,16);
+  drawText("ref p_{T} > 30 GeV",0.1,0.4,16);
+
+  //
+  cMCMerge_withoutJetID->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_MC_trigger_merging_without_eSumOverSum0p7_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+
+  
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  // Trigger combination plot for MC and MC, with and without subid cut. 
+  TCanvas *cMCMerge_withJetID = new TCanvas("cMCMerge_withJetID","",1000,800);
+  makeMultiPanelCanvas(cMCMerge_withJetID,3,2,0.0,0.0,0.2,0.15,0.07);
+  
+  for(int i = 0;i<nbins_cent;i++){
+
+    cMCMerge_withJetID->cd(nbins_cent-i);
+    cMCMerge_withJetID->cd(nbins_cent-i)->SetLogy();
+    cMCMerge_withJetID->cd(nbins_cent-i)->SetLogx();
+
+    makeHistTitle(hMCComb[1][i],"","Jet p_{T} (GeV/c)","dN/dp_{T}");
+    hMCComb[1][i] = (TH1F*)hMCComb[1][i]->Rebin(nbins_pt,Form("rebin_MC_meas_%s_JetID_cent%d",isJetID[1],i),boundaries_pt);
+    hMCComb[1][i]->SetMarkerStyle(25);
+    hMCComb[1][i]->SetMarkerColor(kBlack);
+    hMCComb[1][i]->SetAxisRange(20,500,"X");
+    hMCComb[1][i]->Draw();
+
+    hMC[0][1][i]->SetMarkerStyle(20);
+    hMC[0][1][i]->SetMarkerColor(kRed);
+    hMC[0][1][i] = (TH1F*)hMC[0][1][i]->Rebin(nbins_pt,Form("rebin_MC_meas_55_%s_JetID_cent%d",isJetID[1],i),boundaries_pt);
+    hMC[0][1][i]->Draw("same");
+
+    hMC[1][1][i]->SetMarkerStyle(20);
+    hMC[1][1][i]->SetMarkerColor(kBlue);
+    hMC[1][1][i] = (TH1F*)hMC[1][1][i]->Rebin(nbins_pt,Form("rebin_MC_meas_65_%s_JetID_cent%d",isJetID[1],i),boundaries_pt);
+    hMC[1][1][i]->Draw("same");
+
+    hMC[2][1][i]->SetMarkerStyle(24);
+    hMC[2][1][i]->SetMarkerColor(kGreen);
+    hMC[2][1][i] = (TH1F*)hMC[2][1][i]->Rebin(nbins_pt,Form("rebin_MC_meas_80_%s_JetID_cent%d",isJetID[1],i),boundaries_pt);
+    hMC[2][1][i]->Draw("same");
+
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.7,20);
+  }
+
+  cMCMerge_withJetID->cd(1);
+  TLegend *PbPb_MCMerge_withJetID = myLegend(0.7,0.75,0.9,0.9);
+  PbPb_MCMerge_withJetID->AddEntry(hMCComb[1][0],"Combined","pl");
+  PbPb_MCMerge_withJetID->AddEntry(hMC[0][1][0],"Jet 55","pl");
+  PbPb_MCMerge_withJetID->AddEntry(hMC[1][1][0],"Jet 65","pl");
+  PbPb_MCMerge_withJetID->AddEntry(hMC[2][1][0],"Jet 80","pl");
+  PbPb_MCMerge_withJetID->SetTextSize(0.04);
+  PbPb_MCMerge_withJetID->Draw();
+
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.5,0.95,15);
+  drawText("|#eta|<2, |vz|<15",0.25,0.2,16);
+  drawText("pCES, HBHE",0.25,0.3,16);
+  cMCMerge_withJetID->cd(2);
+  drawText("MC",0.1,0.3,16);
+  drawText("#frac{eSum}{Sum ch+ne+ph+mu}<0.7",0.1,0.2,16);
+  drawText("with Jet ID cuts",0.1,0.1,16);
+  drawText("ref p_{T} > 30 GeV",0.1,0.4,16);
+    
+  //
+  cMCMerge_withJetID->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_MC_trigger_merging_with_eSumOverSum0p7_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -203,14 +463,13 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TCanvas *cData_Ratio = new TCanvas("cData_Ratio","",1000,800);
   makeMultiPanelCanvas(cData_Ratio,3,2,0.0,0.0,0.2,0.15,0.07);
 
-  TLine *lineRatio = new TLine(30,1,500,1);
+  TLine *lineRatio = new TLine(20,1,500,1);
   lineRatio->SetLineStyle(2);
   lineRatio->SetLineWidth(2);
-
-  TLine *lineUpper = new TLine(30,1.05,500,1.05);
+  TLine *lineUpper = new TLine(20,1.05,500,1.05);
   lineUpper->SetLineStyle(3);
   lineUpper->SetLineWidth(2);
-  TLine *lineLower = new TLine(30,0.95,500,0.95);
+  TLine *lineLower = new TLine(20,0.95,500,0.95);
   lineLower->SetLineStyle(3);
   lineLower->SetLineWidth(2);
 
@@ -218,19 +477,19 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
     cData_Ratio->cd(nbins_cent-i);
     
-    makeHistTitle(hData_Ratio[0][i],"","Jet p_{T} (GeV/c)","Clec Cut over no Elec Cut");
-    hData_Ratio[0][i]->SetMarkerStyle(29);
-    hData_Ratio[0][i]->SetMarkerColor(kBlack);
-    hData_Ratio[0][i]->SetAxisRange(30,500,"X");
-    hData_Ratio[0][i]->SetAxisRange(0.6,1.2,"Y");
+    makeHistTitle(hData_Ratio[0][i]," ","Jet p_{T} (GeV/c)"," ratio with to without eSum/Sum(chphnemu)<0.7");
+    hData_Ratio[0][i]->SetMarkerStyle(20);
+    hData_Ratio[0][i]->SetMarkerColor(kRed);
+    hData_Ratio[0][i]->SetAxisRange(20,500,"X");
+    hData_Ratio[0][i]->SetAxisRange(0,1.5,"Y");
     hData_Ratio[0][i]->Draw();
 
-    hData_Ratio[1][i]->SetMarkerStyle(33);
-    hData_Ratio[1][i]->SetMarkerColor(kRed);
+    hData_Ratio[1][i]->SetMarkerStyle(20);
+    hData_Ratio[1][i]->SetMarkerColor(kBlue);
     hData_Ratio[1][i]->Draw("same");
 
-    hData_Ratio[2][i]->SetMarkerStyle(34);
-    hData_Ratio[2][i]->SetMarkerColor(kBlue);
+    hData_Ratio[2][i]->SetMarkerStyle(24);
+    hData_Ratio[2][i]->SetMarkerColor(kGreen);
     hData_Ratio[2][i]->Draw("same");
 
     lineRatio->Draw();
@@ -256,13 +515,13 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   drawText("Supernova Rejection Cut",0.2,0.4,16);
 
   cData_Ratio->cd(3);
-  drawText("#frac{eMax}{jtpt}<0.7",0.2,0.2,16);
+  //drawText("",0.2,0.2,16);
   //drawText("#frac{ne Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.3,16);
   //drawText("#frac{#gamma Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
 
   cData_Ratio->cd(4);
-  drawText("#frac{chMax}{jtpt}>0.05",0.4,0.3,16);
-  drawText("#frac{#mu & #gamma & ne & ch Max}{Max(ch + ne + #gamma)}<0.9",0.4,0.4,16);
+  //drawText("#frac{chMax}{jtpt}>0.05",0.4,0.3,16);
+  //drawText("#frac{#mu & #gamma & ne & ch Max}{Max(ch + ne + #gamma)}<0.9",0.4,0.4,16);
 
   cData_Ratio->cd(5);
   drawText("Data",0.3,0.8,20);
@@ -270,12 +529,12 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   cData_Ratio->cd(2);
   drawText(Form("ak%s%d%s Jets, |#eta|<2",algo,radius,jet_type),0.15,0.8,20);
 
-  cData_Ratio->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_data_akPu3PF_Ratio_JetID_cut_%s_%d.pdf",file_tag,date.GetDate()),"RECREATE");
+  cData_Ratio->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_akPu3PF_Ratio_eSum_OverSum_0p7_JetID_cut_%d.pdf",date.GetDate()),"RECREATE");
 
-
+#if 0
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  /*
+  
   TCanvas *cData_Spectra[TrigValue];
 
   for(int a = 0;a<TrigValue;a++){
@@ -289,14 +548,22 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       cData_Spectra[a]->cd(nbins_cent-i)->SetLogy();
     
       makeHistTitle(hData[a][0][i],"","Jet p_{T} (GeV/c)","N / #Delta p_{T}");
-      hData[a][0][i]->SetMarkerStyle(25);
-      hData[a][0][i]->SetMarkerColor(kBlack);
-      hData[a][0][i]->SetAxisRange(30,500,"X");
+      if(a==2){
+	hData[a][0][i]->SetMarkerStyle(20);
+	hData[a][0][i]->SetMarkerColor(kGreen);
+      }else if(a==1){
+	hData[a][0][i]->SetMarkerStyle(20);
+	hData[a][0][i]->SetMarkerColor(kBlue);
+      }else if(a==0){
+	hData[a][0][i]->SetMarkerStyle(20);
+	hData[a][0][i]->SetMarkerColor(kRed);
+      }
+      hData[a][0][i]->SetAxisRange(20,500,"X");
       // hData[a][0][i]->SetAxisRange(0,1.4,"Y");
       hData[a][0][i]->Draw();
       
-      hData[a][1][i]->SetMarkerStyle(20);
-      hData[a][1][i]->SetMarkerColor(kRed);
+      hData[a][1][i]->SetMarkerStyle(24);
+      hData[a][1][i]->SetMarkerColor(kBlack);
       hData[a][1][i]->Draw("same");
       
       drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.8,20);
@@ -318,22 +585,21 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     drawText("Supernova Rejection Cut",0.2,0.4,16);
 
     cData_Spectra[a]->cd(3);
-    drawText("#frac{eMax}{jtpt}<0.3",0.2,0.2,16);
-    drawText("#frac{ne Max}{Max(ch + ne + #gamma)}",0.2,0.3,16);
-    drawText("#frac{#gamma Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
+    //drawText("#frac{ne Max}{Max(ch + ne + #gamma)}",0.2,0.3,16);
+    //drawText("#frac{#gamma Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
 
     cData_Spectra[a]->cd(4);
-    drawText("chMax/jtpt>0.05",0.2,0.3,16);
-    drawText("#frac{#mu Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
+    //drawText("chMax/jtpt>0.05",0.2,0.3,16);
+    //drawText("#frac{#mu Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
 
     cData_Spectra[a]->cd(5);
     if(a==0)drawText("HLT55 && L1SJ36 && !HLT65 && !HLT80",0.2,0.7,16);
     if(a==1)drawText("HLT65 && L1SJ36 && !HLT80",0.2,0.7,16);
     if(a==2)drawText("HLT80 && L1SJ52",0.2,0.7,16);
 
-    cData_Spectra[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_data_akPu3PF_Jet_%s_Spectra_JetID_cut.pdf",TrigName[a]),"RECREATE");
+    cData_Spectra[a]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_akPu3PF_Jet_%s_Spectra_JetID_cut.pdf",TrigName[a]),"RECREATE");
   }
-  */
+ 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -344,19 +610,19 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
     cMC_Ratio->cd(nbins_cent-i);
     
-    makeHistTitle(hMC_Ratio[0][i],"","Jet p_{T} (GeV/c)","Elec Cut over no Elec Cut");
-    hMC_Ratio[0][i]->SetMarkerStyle(29);
-    hMC_Ratio[0][i]->SetMarkerColor(kBlack);
-    hMC_Ratio[0][i]->SetAxisRange(30,500,"X");
-    hMC_Ratio[0][i]->SetAxisRange(0.6,1.2,"Y");
+    makeHistTitle(hMC_Ratio[0][i],"with Jet ID to no Jet ID cuts ratio","Jet p_{T} (GeV/c)"," Ratio ");
+    hMC_Ratio[0][i]->SetMarkerStyle(20);
+    hMC_Ratio[0][i]->SetMarkerColor(kRed);
+    hMC_Ratio[0][i]->SetAxisRange(20,500,"X");
+    hMC_Ratio[0][i]->SetAxisRange(0,1.2,"Y");
     hMC_Ratio[0][i]->Draw();
 
-    hMC_Ratio[1][i]->SetMarkerStyle(33);
-    hMC_Ratio[1][i]->SetMarkerColor(kRed);
+    hMC_Ratio[1][i]->SetMarkerStyle(20);
+    hMC_Ratio[1][i]->SetMarkerColor(kBlue);
     hMC_Ratio[1][i]->Draw("same");
     
-    hMC_Ratio[2][i]->SetMarkerStyle(34);
-    hMC_Ratio[2][i]->SetMarkerColor(kBlue);
+    hMC_Ratio[2][i]->SetMarkerStyle(24);
+    hMC_Ratio[2][i]->SetMarkerColor(kGreen);
     hMC_Ratio[2][i]->Draw("same");
     
     lineRatio->Draw();
@@ -382,13 +648,13 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   //drawText("Supernova Rejection Cut",0.2,0.4,16);
 
   cMC_Ratio->cd(3);
-  drawText("#frac{eMax}{jtpt}<0.7",0.2,0.2,16);
+  //drawText("#frac{eMax}{jtpt}<0.7",0.2,0.2,16);
   //drawText("#frac{ne Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.3,16);
   //drawText("#frac{#gamma Max}{Max(ch + ne + #gamma)}<0.9",0.2,0.4,16);
 
   cMC_Ratio->cd(4);
-  drawText("#frac{chMax}{jtpt}>0.05",0.4,0.3,16);
-  drawText("#frac{#mu & #gamma & ne & ch Max}{Max(ch + ne + #gamma)}<0.9",0.4,0.4,16);
+  //drawText("#frac{chMax}{jtpt}>0.05",0.4,0.3,16);
+  //drawText("#frac{#mu & #gamma & ne & ch Max}{Max(ch + ne + #gamma)}<0.9",0.4,0.4,16);
 
   cMC_Ratio->cd(5);
   drawText("MC",0.3,0.8,20);
@@ -396,7 +662,7 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   cMC_Ratio->cd(2);
   drawText(Form("ak%s%d%s Jets, |#eta|<2",algo,radius,jet_type),0.15,0.8,20);
 
-  cMC_Ratio->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_MC_akPu3PF_Ratio_JetID_cut_%s_%d.pdf",file_tag,date.GetDate()),"RECREATE");
+  cMC_Ratio->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_MC_akPu3PF_Ratio_JetID_cut_%d.pdf",date.GetDate()),"RECREATE");
 
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -462,6 +728,8 @@ void RAA_plot_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   */
   //
+#endif 
+
   timer.Stop();
   cout<<" Total time taken CPU = "<<timer.CpuTime()<<endl;
   cout<<" Total time taken Real = "<<timer.RealTime()<<endl;
