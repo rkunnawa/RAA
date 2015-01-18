@@ -27,6 +27,7 @@
 // Jet65 - 139.571 ub-1
 // Jet55 - 75.086 ub-1 
 // Jet80 - 149.427 ub-1 
+// the above is old. for updated values check the RAA twiki. 
 
 // And it looks like we have to separate the pp side from this macro due to condor job submission 
 
