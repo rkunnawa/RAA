@@ -28,7 +28,9 @@ echo "Processing..."
 
 #root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
 
-root -b -q RAA_read_MinBias.C\+\($startfile,$endfile\)
+#root -b -q RAA_read_MinBias.C\+\($startfile,$endfile\)
+
+root -b -q RAA_calo_pf_JetCorrelation.C\+\($startfile,$endfile\)
 
 #mv PbPb_data_ak3_Vs_20140820_$endfile.root ../../Output/.
 

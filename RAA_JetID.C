@@ -120,7 +120,6 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-
 void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   
   TH1::SetDefaultSumw2();
