@@ -26,6 +26,7 @@
 // Dec 17th - changing the file list to smaller 50k files on which JEC were derived to check for PF electron problems, requested by Marguerite.
 
 // Jan 13th 2015 - adding in the official pp mc (from Dragos) 
+//               - this is going to be a bit tricky since each file is split up into 4 smaller files. so each pthat will have a TChain!
 
 
 #include <iostream>
@@ -686,7 +687,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 
   // Setup jet data branches - this will be 2D with [radius][pthat-file], but the histogram here is just 1D with [radius]
   JetData *data[no_radius][nbins_pthat]; 
-  // JetData *dataPP[no_radius][nbinsPP_pthat];
+  JetData *dataPP[no_radius][nbinsPP_pthat];
   for(int k = 0;k<no_radius;k++){
     if(printDebug)cout<<"Radius = "<<list_radius[k]<<endl;
     if(printDebug)cout<<"reading all the pbpb mc files"<<endl;
@@ -924,9 +925,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	
 	  //removed the following for no cut histogram: 
 	  if ( data[k][h]->rawpt[g] < 30. ) continue;
-	  //if ( data[k][h]->refpt[g] < 25. ) continue; //to see if we can get a better response matrix 
 	  if ( data[k][h]->subid[g] != sub_id ) continue;
-	  //if ( data[k][h]->jtpt[g] <= 15 ) continue;
 	  if ( data[k][h]->jtpt[g] > 2.*data[k][h]->pthat) continue;
 	  // jet quality cuts here: 
 	  if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.05) continue;
