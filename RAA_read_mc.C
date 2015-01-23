@@ -349,7 +349,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   Double_t boundaries_pthat[nbins_pthat+1];
   char *fileName_pthat[nbins_pthat+1];
   Double_t xsection[nbins_pthat+1];
-  Double_t entries[nbins_pthat]; 
+  //Double_t entries[nbins_pthat]; 
   //there are two ways in which we can select the no of events we use to scale - it has to be between the pthat range. 
   //first file name - partial 50K statistics, second one is full statistics sample. 
   //similarly the entries number is for the small statistics. 
@@ -435,6 +435,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   Double_t boundariesPP_pthat[nbinsPP_pthat+1];
   char *fileNamePP_pthat[nbinsPP_pthat+1];
   Double_t xsectionPP[nbinsPP_pthat+1];
+#if 0
   
   boundariesPP_pthat[0]=15;
   fileNamePP_pthat[0] = "/mnt/hadoop/cms/store/user/velicanu/HiForest_pp_Offical_MC_pthat_15_53X_STARTHI53_V28_5_3_20_correctJEC_pawan_30Nov2014/0.root";
@@ -493,7 +494,8 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   
   xsectionPP[11] = 0;
   boundariesPP_pthat[11]=2000; 
- 
+#endif
+
   // lets declare all the histograms here. 
 
   TH1F *hpbpb_gen[no_radius][nbins_eta][nbins_cent+1],*hpbpb_reco[no_radius][nbins_eta][nbins_cent+1];
@@ -530,7 +532,6 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   TH1F *hPtHat[no_radius];
   TH1F *hPtHatRaw[no_radius];
 
-#if 0
   TH1F *hpp_gen[no_radius][nbins_eta];
   TH1F *hpp_reco[no_radius][nbins_eta];
   TH2F *hpp_matrix[no_radius][nbins_eta];
@@ -544,10 +545,9 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   TH1F *hPP_pthat_fine[no_radius];
   TH1F *hPtHatPP[no_radius];
   TH1F *hPtHatRawPP[no_radius];
-#endif
 
   // histograms for the supernova cut rejection 
-  TH2F *hpbpb_Npix_before_cut[no_radius][nbins_cent+2]; 
+  TH2F *hpbpb_Npix_before_cut[no_radius][nbins_cent+2];// the last cent is for ultra central events.  
   TH2F *hpbpb_Npix_after_cut[no_radius][nbins_cent+1]; 
 
   // histograms to check the contribution of the nJets>7 (with pT>50 and |eta|<2) to the nJets < 7 
@@ -566,9 +566,9 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   // TH1F* hCut5 = new TH1F("hCut5","neMax/(neMax+chMax+phMax)",100,0,10);
  
 //declare the output file 
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_nocut_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
-  TNtuple *jets_ID = new TNtuple("jets_ID","","rawpt:refpt:jtpt:jtpu:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:scale:weight_vz:weight_cent:cent:subid:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
-  Float_t arrayValues[25];
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_final_jetID_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  //TNtuple *jets_ID = new TNtuple("jets_ID","","rawpt:refpt:jtpt:jtpu:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:scale:weight_vz:weight_cent:cent:subid:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
+  //Float_t arrayValues[25];
 
 #if 0
   cout<<" before the output text file declaration "<<endl;
@@ -595,7 +595,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
       //cout<<"eta bin = "<<j<<endl;
       for(int i = 0;i<nbins_cent;i++){
 	//cout<<"cent bin = "<<i<<endl;
-#if 0
+
         hpbpb_gen[k][j][i] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Gen refpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 	//cout<<"A"<<endl;
 	hpbpb_reco[k][j][i] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Reco jtpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
@@ -615,14 +615,13 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	//hpbpb_eta[k][j][i] = new TH1F(Form("hpbpb_eta_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("eta distribution R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],8*boundaries_cent[i],5*boundaries_cent[i+1]),60,-4,+4);
 	//hpbpb_phi[k][j][i] = new TH1F(Form("hpbpb_phi_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("phi distribution R%d in eta widths %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],8*boundaries_cent[i],5*boundaries_cent[i+1]),60,-3.2,+3.2);
 	
-	//cout<<"D"<<endl;
 	//hpbpb_response[h] = new TH2F(Form("hpbpb_response_cent%d",i),Form("response jtpt refpt %2.0f - %2.0f cent",5*boundaries_cent[h],5*boundaries_cent[i+1]),1000,0,1000,1000,0,1000);
 
         hpbpb_Jet80_gen[k][j][i] = new TH1F(Form("hpbpb_Jet80_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Gen refpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
         hpbpb_Jet80_reco[k][j][i] = new TH1F(Form("hpbpb_Jet80_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("reco jtpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);	
-#endif 
+ 
       }// centrality bin loop
-#if 0
+
       hpbpb_pt_Njet_g7[k][j][nbins_cent] = new TH1F(Form("hpbpb_pt_Njet_g7_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jet spectra from the events with Njet(pT>50)>7 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
       hpbpb_pt_Njet_l7[k][j][nbins_cent] = new TH1F(Form("hpbpb_pt_Njet_l7_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jet spectra from the events with Njet(pT>50)<7 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
       
@@ -642,7 +641,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
       hpp_mcclosure_matrix[k][j] = new TH2F(Form("hpp_mcclosure_matrix_R%d_%s",list_radius[k],etaWidth[j]),Form("matrix mcclosure refpt jtpt R%d %s",list_radius[k],etaWidth[j]),1000,0,1000,1000,0,1000);
       //TH2F* hpp_response = new TH2F("hpp_response","response jtpt refpt",1000,0,1000,1000,0,1000);
       hpp_mcclosure_data[k][j] = new TH1F(Form("hpp_mcclosure_data_R%d_%s",list_radius[k],etaWidth[j]),Form("data for unfolding mc closure test pp R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
-#endif 
+
     }// eta bin loop
     
     hVzMC[k] = new TH1F(Form("hVzMC_R%d",list_radius[k]),Form("PbPb MC Vz R%d",list_radius[k]),60,-15,+15);    
@@ -670,18 +669,20 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
     hpp_phi_full[k] = new TH1F(Form("hpp_phi_full_R%d",list_radius[k]),Form("PP phi distribution for R=%d",list_radius[k]),400,-4,+4); 
     hpp_eta_full_noScale[k] = new TH1F(Form("hpp_eta_full_noScale_R%d",list_radius[k]),Form("PP eta distribution for noScale R=%d",list_radius[k]),400,-4,+4);
     hpp_phi_full_noScale[k] = new TH1F(Form("hpp_phi_full_noScale_R%d",list_radius[k]),Form("PP phi distribution for noScale R=%d",list_radius[k]),400,-4,+4);
-
+#endif
     for(int i = 0;i<nbins_cent;i++){
       hpbpb_Npix_before_cut[k][i] = new TH2F(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",list_radius[k],i),Form("Number of pixels hit per no of jets pT>50 before cut R%d n20_eta_p20 %2.0f - %2.0f cent",list_radius[k],5*boundaries_cent[i],5*boundaries_cent[i+1]),50,0,50,100,0,60000);
       hpbpb_Npix_after_cut[k][i] = new TH2F(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",list_radius[k],i),Form("Number of pixels hit per no of jets pT>50 after cut R%d n20_eta_p20 %2.0f - %2.0f cent",list_radius[k],5*boundaries_cent[i],5*boundaries_cent[i+1]),50,0,50,100,0,60000);
     }
-    
+    cout<<"    D"<<endl;
+
     hpbpb_Npix_before_cut[k][nbins_cent] = new TH2F(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),Form("Number of pixels hit per no of jets pT>50 before cut R%d n20_eta_p20 0-200cent",list_radius[k]),50,0,50,100,0,60000);
     hpbpb_Npix_before_cut[k][nbins_cent+1] = new TH2F(Form("hpbpb_Npix_before_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent+1),Form("Number of pixels hit per no of jets pT>50 before cut R%d n20_eta_p20 ultraCentral 0 to 1 centrality",list_radius[k]),50,0,50,100,0,60000);
     hpbpb_Npix_after_cut[k][nbins_cent] = new TH2F(Form("hpbpb_Npix_after_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),Form("Number of pixels hit per no of jets pT>50 after cut R%d n20_eta_p20 0-200cent",list_radius[k]),50,0,50,100,0,60000);
-#endif
+
   }// radii loop
 
+    cout<<"D"<<endl;
 
   // Setup jet data branches - this will be 2D with [radius][pthat-file], but the histogram here is just 1D with [radius]
   JetData *data[no_radius][nbins_pthat]; 
@@ -921,25 +922,27 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	
 	for (int g = 0; g < data[k][h]->njets; g++) {
 	
-	  // hpbpb_eta_full_noScale[k]->Fill(data[k][h]->jteta[g]);
-	  // hpbpb_phi_full_noScale[k]->Fill(data[k][h]->jtphi[g]);
-  
 	  //removed the following for no cut histogram: 
-	  //if ( data[k][h]->rawpt[g] < 20. ) continue;
+	  if ( data[k][h]->rawpt[g] < 30. ) continue;
 	  //if ( data[k][h]->refpt[g] < 25. ) continue; //to see if we can get a better response matrix 
-	  	  
+	  if ( data[k][h]->subid[g] != sub_id ) continue;
 	  //if ( data[k][h]->jtpt[g] <= 15 ) continue;
-	  //if ( data[k][h]->jtpt[g] > 2.*data[k][h]->pthat) continue;
-	  
+	  if ( data[k][h]->jtpt[g] > 2.*data[k][h]->pthat) continue;
 	  // jet quality cuts here: 
-	  //if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.01) continue;
+	  if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.05) continue;
 	  //if ( data[k][h]->neutralMax[g]/TMath::Max(data[h]->chargedSum[k],data[h]->neutralSum[k]) < 0.975)continue;
-
+	  if ( data[k][h]->neutralMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
+	  if ( data[k][h]->photonMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
+	  if ( data[k][h]->chargedMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
+	  if ( data[k][h]->muMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
+	  if ( data[k][h]->eSum[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]) > 0.7 )continue;
 	  //if(((data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->eSum[g] + data[k][h]->muSum[g])/data[k][h]->jtpt[g])>1.01) continue;
 
-	  // hpbpb_eta_full[k]->Fill(data[k][h]->jteta[g],scale*weight_vz*weight_cent);
-	  // hpbpb_phi_full[k]->Fill(data[k][h]->jtphi[g],scale*weight_vz*weight_cent);
-
+	  hpbpb_eta_full[k]->Fill(data[k][h]->jteta[g],scale*weight_vz*weight_cent);
+	  hpbpb_phi_full[k]->Fill(data[k][h]->jtphi[g],scale*weight_vz*weight_cent);
+	  hpbpb_eta_full_noScale[k]->Fill(data[k][h]->jteta[g]);
+	  hpbpb_phi_full_noScale[k]->Fill(data[k][h]->jtphi[g]);
+  
           for(int j = 0;j<nbins_eta;j++){
 
             //int subEvt=-1;
@@ -966,37 +969,36 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 
 	    //if(data[k][h]->rawpt[g])
 	    
-	    arrayValues[0] = data[k][h]->rawpt[g];
-	    arrayValues[1] = data[k][h]->refpt[g];
-	    arrayValues[2] = data[k][h]->jtpt[g];
-	    arrayValues[3] = data[k][h]->jtpu[g];
-	    arrayValues[4] = data[k][h]->jet55_1;
-	    arrayValues[5] = data[k][h]->jet55_p_1;
-	    arrayValues[6] = data[k][h]->jet65_1;
-	    arrayValues[7] = data[k][h]->jet65_p_1;
-	    arrayValues[8] = data[k][h]->jet80_1;
-	    arrayValues[9] = data[k][h]->jet80_p_1;
-	    arrayValues[10] = scale;
-	    arrayValues[11] = weight_vz;
-	    arrayValues[12] = weight_cent;
-	    arrayValues[13] = cent;
-	    arrayValues[14] = data[k][h]->subid[g];
-	    arrayValues[15] = data[k][h]->chargedMax[g];
-	    arrayValues[16] = data[k][h]->chargedSum[g];
-	    arrayValues[17] = data[k][h]->photonMax[g];
-	    arrayValues[18] = data[k][h]->photonSum[g];
-	    arrayValues[19] = data[k][h]->neutralMax[g];
-	    arrayValues[20] = data[k][h]->neutralSum[g];
-	    arrayValues[21] = data[k][h]->muMax[g];
-	    arrayValues[22] = data[k][h]->muSum[g];
-	    arrayValues[23] = data[k][h]->eMax[g];
-	    arrayValues[24] = data[k][h]->eSum[g];
+	    // arrayValues[0] = data[k][h]->rawpt[g];
+	    // arrayValues[1] = data[k][h]->refpt[g];
+	    // arrayValues[2] = data[k][h]->jtpt[g];
+	    // arrayValues[3] = data[k][h]->jtpu[g];
+	    // arrayValues[4] = data[k][h]->jet55_1;
+	    // arrayValues[5] = data[k][h]->jet55_p_1;
+	    // arrayValues[6] = data[k][h]->jet65_1;
+	    // arrayValues[7] = data[k][h]->jet65_p_1;
+	    // arrayValues[8] = data[k][h]->jet80_1;
+	    // arrayValues[9] = data[k][h]->jet80_p_1;
+	    // arrayValues[10] = scale;
+	    // arrayValues[11] = weight_vz;
+	    // arrayValues[12] = weight_cent;
+	    // arrayValues[13] = cent;
+	    // arrayValues[14] = data[k][h]->subid[g];
+	    // arrayValues[15] = data[k][h]->chargedMax[g];
+	    // arrayValues[16] = data[k][h]->chargedSum[g];
+	    // arrayValues[17] = data[k][h]->photonMax[g];
+	    // arrayValues[18] = data[k][h]->photonSum[g];
+	    // arrayValues[19] = data[k][h]->neutralMax[g];
+	    // arrayValues[20] = data[k][h]->neutralSum[g];
+	    // arrayValues[21] = data[k][h]->muMax[g];
+	    // arrayValues[22] = data[k][h]->muSum[g];
+	    // arrayValues[23] = data[k][h]->eMax[g];
+	    // arrayValues[24] = data[k][h]->eSum[g];
 
-	    jets_ID->Fill(arrayValues);
+	    // jets_ID->Fill(arrayValues);
 
 	    //jets_ID->Fill(cut1,cut2,cut3,cut4,cut5,data[k][h]->jtpt[g],data[k][h]->rawpt[g],data[k][h]->refpt[g],cBin,sub_id,data[k][h]->chargedMax[g],data[k][h]->chargedSum[g],data[k][h]->photonMax[g],data[k][h]->photonSum[g],data[k][h]->neutralMax[g],data[k][h]->neutralSum[g],data[k][h]->muMax[g],data[k][h]->muSum[g],data[k][h]->eMax[g],data[k][h]->eSum[g]);
 	    
-	    //if ( data[k][h]->subid[g] != sub_id ) continue;
 
 	    //if (cut1<0.05 || cut1>1) continue;
 	    
@@ -1017,10 +1019,9 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	    //cout<<"fvz = "<<weight_vz<<endl;
 	    
 	    //hpbpb_response[cBin]->Fill(data[h]->jtpt[k],data[h]->refpt[k],scale*weight_vz);
-#if 0
+
 	    if(jetCounter>=7) hpbpb_pt_Njet_g7[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	    if(jetCounter<7) hpbpb_pt_Njet_l7[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-
 
 	    hpbpb_matrix[k][j][cBin]->Fill(data[k][h]->refpt[g],data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	    hpbpb_gen[k][j][cBin]->Fill(data[k][h]->refpt[g],scale*weight_vz*weight_cent);
@@ -1052,7 +1053,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	    }
 	 
 	    //uhist[cBin]-> hMeasJECSys->Fill(data[h]->jtpt[k]*(1.+0.02/nbins_cent*(nbins_cent-i)),scale*weight_cent*weight_pt*weight_vz); 
-#endif
+
 	    
           }// eta bins loop
 	      
@@ -1195,7 +1196,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   
   f.cd();
   
-  /*
+  
   for(int k = 0;k<no_radius;k++){
     
     for(int j=0;j<nbins_eta;j++){
@@ -1207,10 +1208,10 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
         divideBinWidth(hpbpb_gen[k][j][i]);
         divideBinWidth(hpbpb_reco[k][j][i]);
         //divideBinWidth(hpbpb_mcclosure_data[k][j][i]);
-	hpbpb_gen[k][j][i]->Scale(1./(delta_eta[j]));
+	//hpbpb_gen[k][j][i]->Scale(1./(delta_eta[j]));
         hpbpb_gen[k][j][i]->Write();
         if(printDebug)hpbpb_gen[k][j][i]->Print("base");
-	hpbpb_reco[k][j][i]->Scale(1./(delta_eta[j]));
+	//hpbpb_reco[k][j][i]->Scale(1./(delta_eta[j]));
         hpbpb_reco[k][j][i]->Write();
         if(printDebug)hpbpb_reco[k][j][i]->Print("base");
         hpbpb_matrix[k][j][i]->Write();
@@ -1234,7 +1235,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	if(printDebug)hpbpb_pt_Njet_l7[k][j][i]->Print();
 	
       }// cent loop 
-      
+#if 0
       divideBinWidth(hpp_gen[k][j]);
       divideBinWidth(hpp_reco[k][j]);
       divideBinWidth(hpp_mcclosure_data[k][j]);
@@ -1253,7 +1254,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
       if(printDebug)hpp_mcclosure_matrix[k][j]->Print("base");
       hpp_mcclosure_data[k][j]->Write();
       if(printDebug)hpp_mcclosure_data[k][j]->Print("base");
-
+#endif
     }//eta loop
     //just check the Pthat distributions for PbPb and pp. should be fine. 
 
@@ -1261,50 +1262,26 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
     hCentMC[k]->Write();
     if(printDebug)hPtHat[k]->Print("base");
     hPtHat[k]->Write();
-    if(printDebug)hPtHatPP[k]->Print("base");
-    hPtHatPP[k]->Write();
     if(printDebug)hPbPb_pthat_fine[k]->Print("base");
     hPbPb_pthat_fine[k]->Write();
-    if(printDebug)hPP_pthat_fine[k]->Print("base");
-    hPP_pthat_fine[k]->Write();
-
     hpbpb_eta_full[k]->Write();
     if(printDebug)hpbpb_eta_full[k]->Print("base");
     hpbpb_phi_full[k]->Write();
     if(printDebug)hpbpb_phi_full[k]->Print("base");
-
-    hpp_eta_full[k]->Write();
-    if(printDebug)hpp_eta_full[k]->Print("base");
-    hpp_phi_full[k]->Write();
-    if(printDebug)hpp_phi_full[k]->Print("base");
-
     hpbpb_eta_full_noScale[k]->Write();
     if(printDebug)hpbpb_eta_full_noScale[k]->Print("base");
     hpbpb_phi_full_noScale[k]->Write();
     if(printDebug)hpbpb_phi_full_noScale[k]->Print("base");
-
-    hpp_eta_full_noScale[k]->Write();
-    if(printDebug)hpp_eta_full_noScale[k]->Print("base");
-    hpp_phi_full_noScale[k]->Write();
-    if(printDebug)hpp_phi_full_noScale[k]->Print("base");
-
     if(printDebug)hPbPb_pthat_fine_noScale[k]->Print("base");
     hPbPb_pthat_fine_noScale[k]->Write();
-    if(printDebug)hPP_pthat_fine_noScale[k]->Print("base");
-    hPP_pthat_fine_noScale[k]->Write();
-
     for(int i = 0;i<=nbins_cent;i++){
-      
       hpbpb_Npix_before_cut[k][i]->Print("base");
       hpbpb_Npix_before_cut[k][i]->Write();
       hpbpb_Npix_after_cut[k][i]->Print("base");
       hpbpb_Npix_after_cut[k][i]->Write();      
-
     }
-
     hpbpb_Npix_before_cut[k][nbins_cent+1]->Print("base");
     hpbpb_Npix_before_cut[k][nbins_cent+1]->Write();
-
     hpbpb_cent[k]->Write();
     if(printDebug)hpbpb_cent[k]->Print("base");
     hpbpb_vz[k]->Write();
@@ -1314,16 +1291,26 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
     hpbpb_vy[k]->Write();
     if(printDebug)hpbpb_vy[k]->Print("base");
 
+#if 0
+    if(printDebug)hPtHatPP[k]->Print("base");
+    hPtHatPP[k]->Write();
+    if(printDebug)hPP_pthat_fine[k]->Print("base");
+    hPP_pthat_fine[k]->Write();
+    hpp_eta_full[k]->Write();
+    if(printDebug)hpp_eta_full[k]->Print("base");
+    hpp_phi_full[k]->Write();
+    if(printDebug)hpp_phi_full[k]->Print("base");
+    hpp_eta_full_noScale[k]->Write();
+    if(printDebug)hpp_eta_full_noScale[k]->Print("base");
+    hpp_phi_full_noScale[k]->Write();
+    if(printDebug)hpp_phi_full_noScale[k]->Print("base");
+    if(printDebug)hPP_pthat_fine_noScale[k]->Print("base");
+    hPP_pthat_fine_noScale[k]->Write();
+#endif
+    
   }// radius loop
-  
-  hCut1->Write();
-  hCut2->Write();
-  hCut3->Write();
-  hCut4->Write();
-  hCut5->Write();
-  */
 
-  jets_ID->Write();
+  //jets_ID->Write();
 
   f.Write();
   f.Close();

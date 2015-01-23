@@ -388,6 +388,12 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   //for the Jet 55 spectra: 
   Float_t effecPrescl = 2.047507;
 
+  // declare the 2d calo and pf candidate vectors
+  vector<vector<double> > caloJet;
+  vector<vector<double> > pfJet;
+  vector<vector<double> > matchedCaloPFJet;
+  vector<vector<double> > deltaR_calovsPF;
+
   // start the loop process.
 
   for(int k = 0;k<no_radius;k++){
@@ -423,7 +429,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
       	continue;
       }
 #endif
-      
+      // start doing the search for the match. - best thing to do would be to create a 2D match delta R matrix with each calo jet and pf jet. Once thats done - find the smallest entry in that matrix. the i,j of that smallest entry are matched. now remove the row i and column j and then we have a new distance matrix. where we need to find the smallest element again. keep doing this till we have either no rows or no columns.  
       // declare the necessary variables:
       Float_t deltaRCaloPF = 0;
       Float_t calojet_eta = 0;
@@ -433,7 +439,84 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
       Float_t pfjet_phi = 0;
       Float_t pfjet_pt = 0;
       bool selected = false;
-      
+
+      for(int g = 0;g<nrefe_1;g++){
+
+	calojet_eta = eta_1[g];
+	calojet_phi = phi_1[g];
+	calojet_pt = pt_1[g];
+
+	deltaR_calovsPF.push_back(vector<double> ());
+	
+	for(int j = 0;j<nrefe_2;j++){
+
+	  pfjet_eta = eta_2[j];
+	  pfjet_phi = phi_2[j];
+	  pfjet_pt = pt_2[j];
+
+	  deltaRCaloPF = (Float_t)TMath::Sqrt((calojet_eta - pfjet_eta)*(calojet_eta - pfjet_eta) + (calojet_phi - pfjet_phi)*(calojet_phi - pfjet_phi));
+	  deltaR_calovsPF[g].push_back(deltaRCaloPF);
+
+	}
+
+      }
+
+      // now lets find the smallest array element.
+
+      double small = deltaR_calovsPF[0][0];
+      double small_elementx = 0;
+      double small_elementy = 0;
+
+      for(int a = 0;a<deltaR_calovsPF.size();a++){
+
+	for(int b = 0;b<deltaR_calovsPF[a].size();b++){
+
+	  if(small > deltaR_calovsPF[a][b]){
+
+	    small = deltaR_calovsPF[a][b];
+	    small_elementx = a;
+	    small_elementy = b;
+	    
+	  }
+
+	}
+
+      }
+
+      // now our smallest delta R is a and b. so the matched jet is calojet[a] and ptjet[b]
+
+
+#if 0
+      // deltaR_calovsPF
+      // for(int g = 0;g<caloJet.size();g++){
+	
+      // 	for(int j = 0;j<pfJet.size();j++){
+      // 	  deltaRCaloPF = (Float_t)TMath::Sqrt((caloJet[g][1] - pfJet[j][1])*(caloJet[g][1] - pfJet[j][1]) + (caloJet[g][2] - pfJet[j][2])*(caloJet[g][2] - pfJet[j][2]));
+      // 	  deltaR_[j] = deltaRCaloPF;	
+      // 	}
+      // }
+
+      // double small = deltaR_calovsPF[0][0];
+      // double small_elementx = 0;
+      // double small_elementy = 0;
+
+      // for(int j = 1;j<pfJet.size();j++){
+      // 	if(small > deltaR_[j]){
+      // 	  small = deltaR_[j];
+      // 	  small_element = j;
+      // 	}
+      // }
+
+      // 	matchedCaloPFCandidate.push_back(vector<double> ());
+      // 	matchedCaloPFCandidate[g].push_back(caloTower[g][0]);
+      // 	matchedCaloPFCandidate[g].push_back(caloTower[g][1]);
+      // 	matchedCaloPFCandidate[g].push_back(caloTower[g][2]);
+      // 	matchedCaloPFCandidate[g].push_back(pfCandidate[small_element][0]);
+      // 	matchedCaloPFCandidate[g].push_back(pfCandidate[small_element][1]);
+      // 	matchedCaloPFCandidate[g].push_back(pfCandidate[small_element][2]);
+
+      // }
+
       for(int g = 0;g<nrefe_1;g++){
 
 	calojet_eta = eta_1[g];
@@ -487,6 +570,9 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
 	}// pf jet loop
 
       }// calo jet loop
+
+#endif
+      
       
     }// event loop 
 
