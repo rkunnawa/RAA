@@ -546,6 +546,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   //ofstream fHLT_80,fHLT_65,fHLT_55;
 
 
+  TH1F *hEvents_HLT80 = new TH1F("hEvents_HLT80","",2,0,2);
+  TH1F *hEvents_HLT65 = new TH1F("hEvents_HLT65","",2,0,2);
+  TH1F *hEvents_HLT55 = new TH1F("hEvents_HLT55","",2,0,2);
+  
 #if 0
 
   ofstream fVs_failure[no_radius];
@@ -862,7 +866,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
       
       //if(algo=="Vs"){
-      
+     
       for(int j = 0;j<nbins_eta;j++){
 	  
 	for(int g = 0;g<nrefe_1;g++){
@@ -902,6 +906,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       //}//if Vs search for supernova events. 
       
       // hEvents->Fill(1);
+
+      if(jet80_1) hEvents_HLT80->Fill(1);
+      if(jet65_1 && !jet80_1) hEvents_HLT65->Fill(1,jet65_p_1);
+      if(jet55_1 && !jet65_1 && !jet80_1) hEvents_HLT55->Fill(1,jet55_p_1);
+      
       
 #if 0
       Float_t Vs_0_x_minus = sumpT[0]*v_n[0][0]*TMath::Cos(0*psi_n[0][0]);
@@ -975,7 +984,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       }
       
 
-#endif
+
 
       for(int j = 0;j<nbins_eta;j++){
 
@@ -1048,7 +1057,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  // going to use the effective prescl for the Jet55 trigger: 2.0475075465
 	  Float_t effecPrescl = 2.047507;
 
-#if 0
 
 	  //if(cut5<0.95 && cut6<0.95 && cut7<0.95 && cut1>0.05 && cut2<0.95 && cut2b<0.95){
 	  if(1>0){
@@ -1135,7 +1143,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      }
 
 	    }else if(jet55_1==1 && L1_sj36_1==1) { // passes the jet55 trigger
-#if 0
+
 	      if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
 		hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
 		hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
@@ -1154,7 +1162,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      }
 	      // hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
 	      // hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-#endif
 	      if((jet65_1==0) && (jet80_1==0)){ // this is to just check
 
 		if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
@@ -1207,11 +1214,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
 	      
 	  }//qa cut selection
-#endif
 	    
 	}//jet loop
 	  
       }//eta bin loop
+
+#endif
     
     }//nentries_jet55or65 loop
     
@@ -1413,10 +1421,14 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   */
   
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_jetntuple_withEvtCuts_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_eventcountinghistograms_withEvtCuts_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
-  jets_ID->Write();
+  hEvents_HLT80->Write();
+  hEvents_HLT65->Write();
+  hEvents_HLT55->Write();
+
+  //jets_ID->Write();
 
 
   // hEvents->Write();
