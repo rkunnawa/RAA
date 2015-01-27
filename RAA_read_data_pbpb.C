@@ -133,11 +133,11 @@ static const int nbins_cent = 6;
 static Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 5 to get your actual centrality
 static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8 ,362.24}; //last one is for 0-200 bin. 
 
-//static const int no_radius = 3;//necessary for the RAA analysis  
-//static const int list_radius[no_radius] = {2,3,4};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
-static const int no_radius = 1;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3};
+//static const int no_radius = 1;//necessary for the RAA analysis  
+//static const int list_radius[no_radius] = {3};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -752,8 +752,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   // Int_t goodEvent_counter = 0;
 
   // we need to add the histograms to find the jet spectra from normal and failure mode- infact just add them to the ntuples per event the value of the HFSumpT*vn*cos/sin(n*psi_n) so we can plot the spectra at the final stage. this would make things easier. 
-  TNtuple *jets_ID = new TNtuple("jets_ID","","rawpt:jtpt:jtpu:l1sj36:l1sj36_prescl:l1sj52:l1sj52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
-  Float_t arrayValues[25];
+  TNtuple *jets_ID[no_radius];
+
+  for(int k = 0;k<no_radius;k++){
+    jets_ID[k] = new TNtuple(Form("jets_R%d_ID",list_radius[k]),"","rawpt:jtpt:jtpu:l1sj36:l1sj36_prescl:l1sj52:l1sj52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum:trkMax:trkSum");
+  }
+  Float_t arrayValues[27];
  
   // add the histograms: the first array element: 0 - in the polynomial divergence, 1 - less than the divergend (good),
   //                         second array element: 0 - loose cut value, 1 - tight cut value 
@@ -909,7 +913,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
       if(jet80_1) hEvents_HLT80->Fill(1);
       if(jet65_1 && !jet80_1) hEvents_HLT65->Fill(1,jet65_p_1);
+      if(jet65_1 && !jet80_1) hEvents_HLT65->Fill(0);
       if(jet55_1 && !jet65_1 && !jet80_1) hEvents_HLT55->Fill(1,jet55_p_1);
+      if(jet55_1 && !jet65_1 && !jet80_1) hEvents_HLT55->Fill(0);
       
       
 #if 0
@@ -984,7 +990,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       }
       
 
-
+#endif
 
       for(int j = 0;j<nbins_eta;j++){
 
@@ -1051,9 +1057,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  arrayValues[22] = muSum_1[g];
 	  arrayValues[23] = eMax_1[g];
 	  arrayValues[24] = eSum_1[g];
+	  arrayValues[25] = trkMax_1[g];
+	  arrayValues[26] = trkSum_1[g];
 
-	  jets_ID->Fill(arrayValues);
+	  jets_ID[k]->Fill(arrayValues);
 	
+#if 0
 	  // going to use the effective prescl for the Jet55 trigger: 2.0475075465
 	  Float_t effecPrescl = 2.047507;
 
@@ -1272,7 +1281,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     
   }//radius loop. 
  
- 
   /*
   //declare the output file
   TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_12003_effPres_severalcut_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
@@ -1421,15 +1429,19 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   */
   
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_eventcountinghistograms_withEvtCuts_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_withEvtJetCuts_SuperNovaRejected_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   hEvents_HLT80->Write();
   hEvents_HLT65->Write();
   hEvents_HLT55->Write();
 
-  //jets_ID->Write();
+  for(int p = 0;p<no_radius;p++){
+    jets_ID[p]->Write();
+  }
 
+  f.Write();
+  f.Close();
 
   // hEvents->Write();
   // hEvents_Diverge_tight->Write(); 
@@ -1491,3 +1503,5 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   cout<<"Real time (min) = "<<(float)timer.RealTime()/60<<endl;
 
 }
+
+
