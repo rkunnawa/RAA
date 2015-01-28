@@ -546,9 +546,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   //ofstream fHLT_80,fHLT_65,fHLT_55;
 
 
-  TH1F *hEvents_HLT80 = new TH1F("hEvents_HLT80","",2,0,2);
-  TH1F *hEvents_HLT65 = new TH1F("hEvents_HLT65","",2,0,2);
-  TH1F *hEvents_HLT55 = new TH1F("hEvents_HLT55","",2,0,2);
+  TH1F *hEvents_HLT80 = new TH1F("hEvents_HLT80","",4,0,2);
+  TH1F *hEvents_HLT65 = new TH1F("hEvents_HLT65","",4,0,2);
+  TH1F *hEvents_HLT55 = new TH1F("hEvents_HLT55","",4,0,2);
   
 #if 0
 
@@ -1224,12 +1224,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      
 	  }//qa cut selection
 	    
+#endif
 	}//jet loop
 	  
       }//eta bin loop
-
-#endif
-    
+   
     }//nentries_jet55or65 loop
     
     

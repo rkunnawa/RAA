@@ -74,7 +74,7 @@ static const char etaWidth[nbins_eta][256] = {
 
 
 static const int no_radius = 1;//testing purposes 
-static const int list_radius[no_radius] = {3};
+static const int list_radius[no_radius] = {4};
 
 
 // divide by bin width
@@ -206,7 +206,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc_pp(char *jet_type="PF", int radius = 3){
+void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
 
   TStopwatch timer;
   timer.Start();
@@ -427,7 +427,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 3){
     
   }//radius loop
 
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_final_jetID_ak3%s_%d.root",jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_final_jetID_ak%d%s_%d.root",radius,jet_type,date.GetDate()),"RECREATE");
   f.cd();
   
   for(int k = 0;k<no_radius;k++){
@@ -479,7 +479,6 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 3){
   cout<<"Macro finished: "<<endl;
   cout<<"CPU time (min)  = "<<(Float_t)timer.CpuTime()/60<<endl;
   cout<<"Real time (min) = "<<(Float_t)timer.RealTime()/60<<endl;
-  
 
 }
 

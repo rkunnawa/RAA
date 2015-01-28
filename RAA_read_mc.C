@@ -124,8 +124,8 @@ static const char etaWidth[nbins_eta][256] = {
 };
 
 
-static const int no_radius = 1;//testing purposes 
-static const int list_radius[no_radius] = {3};
+static const int no_radius = 3;//testing purposes 
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 3; 

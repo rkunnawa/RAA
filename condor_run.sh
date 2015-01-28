@@ -26,11 +26,13 @@ process=$4
 
 echo "Processing..."
 
-#root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
+root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
+mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_withEvtJetCuts_SuperNovaRejected_akPuPF_20150128_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/data/.
 
 #root -b -q RAA_read_MinBias.C\+\($startfile,$endfile\)
 
-root -b -q RAA_read_data_pp.C\+\($startfile,$endfile\)
+#root -b -q RAA_read_data_pp.C\+\($startfile,$endfile\)
+#mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_akPF_20150127__$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/data/.
 
 #root -b -q RAA_calo_pf_JetCorrelation.C\+\($startfile,$endfile\)
 
@@ -40,7 +42,6 @@ root -b -q RAA_read_data_pp.C\+\($startfile,$endfile\)
 #mv pbpb_ak3_Vs_fakejet_histos_$endfile.root ../../Output/.
 
 #root -b -q RAA_duplicateEventsCheck.C\+\($startfile,$endfile\)
-#mv pbpb_jet55or65_duplicate_events_loop_run_lumi_event_$endfile.txt ../../Output/.
 
 echo "Done!"
 

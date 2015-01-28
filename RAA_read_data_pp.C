@@ -118,8 +118,8 @@ static const char etaWidth [nbins_eta][256] = {
   "n20_eta_p20"
 };
 
-static const int no_radius = 1;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -337,14 +337,17 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   }//radius loop
 
-  TH1F *hEvents_HLT80 = new TH1F("hEvents_HLT80","",2,0,2);
-  TH1F *hEvents_HLT60 = new TH1F("hEvents_HLT60","",2,0,2);
-  TH1F *hEvents_HLT40 = new TH1F("hEvents_HLT40","",2,0,2);
+  TH1F *hEvents_HLT80 = new TH1F("hEvents_HLT80","",4,0,2);
+  TH1F *hEvents_HLT60 = new TH1F("hEvents_HLT60","",4,0,2);
+  TH1F *hEvents_HLT40 = new TH1F("hEvents_HLT40","",4,0,2);
 
   //get all the pp spectra here: 
   //TCut pp3 = "jet40&&!jet60&&!jet80&&(chMax/pt)>0.01&&(TMath::Max(neMax,chMax)/TMath::Max(chSum,neSum))>=0.975";
-  TNtuple *jets_ID = new TNtuple("jets_ID","","rawpt:jtpt:jet40:jet40_prescl:jet60:jet60_prescl:jet80:jet80_prescl:trgObjpt:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
-  Float_t arrayValues[19];
+  TNtuple *jets_ID[no_radius];
+  for(int k = 0;k<no_radius;k++){
+    jets_ID[k] = new TNtuple(Form("jets_R%d_ID",list_radius[k]),"","rawpt:jtpt:jet40:jet40_prescl:jet60:jet60_prescl:jet80:jet80_prescl:trgObjpt:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum:trkMax:trkSum");
+  }  
+  Float_t arrayValues[21];
   
   for(int k = 0;k<no_radius;k++){
 
@@ -368,9 +371,10 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
       if(jet80_1) hEvents_HLT80->Fill(1);
       if(jet60_1 && !jet80_1) hEvents_HLT60->Fill(1,jet60_p_1);
+      if(jet60_1 && !jet80_1) hEvents_HLT60->Fill(0);
       if(jet40_1 && !jet60_1 && !jet80_1) hEvents_HLT40->Fill(1,jet40_p_1);
+      if(jet40_1 && !jet60_1 && !jet80_1) hEvents_HLT40->Fill(0);
 
-#if 0
       for(int j = 0;j<nbins_eta;j++){
 
 	for(int g = 0;g<nrefe_1;g++){
@@ -396,13 +400,14 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	  arrayValues[16] = muSum_1[g];
 	  arrayValues[17] = eMax_1[g];
 	  arrayValues[18] = eSum_1[g];
+	  arrayValues[19] = trkMax_1[g];
+	  arrayValues[20] = trkSum_1[g];
 
-	  jets_ID->Fill(arrayValues);
+	  jets_ID[k]->Fill(arrayValues);
 
 	}// jet loop
 	
       }// eta bins
-#endif
     }// event loop for jet80or100
 
   }// radius loop
@@ -412,14 +417,15 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   TDatime date;
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_eventcountinghistograms_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   hEvents_HLT80->Write();
   hEvents_HLT60->Write();
   hEvents_HLT40->Write();
 
-  //jets_ID->Write();
+  for(int k = 0;k<no_radius;k++) jets_ID[k]->Write();
+
 #if 0
   for(int k = 0;k<no_radius;k++){
 
