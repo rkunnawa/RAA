@@ -124,7 +124,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 3, char* algo = "Pu", char *jet_type = "PF"){
+void RAA_analyze(int radius = 4, char* algo = "Pu", char *jet_type = "PF"){
 
   TStopwatch timer; 
   timer.Start();
@@ -141,12 +141,18 @@ void RAA_analyze(int radius = 3, char* algo = "Pu", char *jet_type = "PF"){
   //TFile* fData_PbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_ak%s%s_testComb2_cut3_test_20141110.root",algo,jet_type));
   //TFile *fData_pp_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_ak%s_20140829.root",jet_type));
   cout<<"before input file declaration 1"<<endl;
-  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_final_jetID_ak%s%s_20150122.root",algo,jet_type));
-  TFile *fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_final_jetID_ak3PF_20150123.root");
+  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_final_jetID_ak%s%s_20150127.root",algo,jet_type));
+  TFile *fMC_pp_in;
+  
+  if(radius == 2) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_final_jetID_ak2PF_20150128.root");
+  if(radius == 3) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_final_jetID_ak3PF_20150123.root");
+  if(radius == 4) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_final_jetID_ak4PF_20150128.root");
+  
   cout<<"before input file declaration 2"<<endl;
-
-  TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/RAA_JetID_Data_mc_YesSubidCut_final_jetIDcut_ptGreater30_Pu3PF_20150122.root");
-  TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/RAA_JetID_pp_data_final_jetIDcut_ptGreater30_3PF_20150124.root");
+  
+  TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_spectra_histograms_akPuPF_20150128.root");
+  TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_akPF_20150128.root");
+     
   cout<<"after input file declaration"<<endl;
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
   // for the above condition, i might have to play with the date stamp. 
@@ -191,7 +197,7 @@ void RAA_analyze(int radius = 3, char* algo = "Pu", char *jet_type = "PF"){
     //dPbPb_TrgComb[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObjComb_R%d_n20_eta_p20_cent%d",radius,i));
     //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
     //dPbPb_TrgComb[i]->Print("base");
-    dPbPb_Trg80[i] = (TH1F*)fData_PbPb_in->Get(Form("hData_HLT80_with_JetID_cent%d",i));
+    dPbPb_Trg80[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_HLT80_R%d_n20_eta_p20_cent%d",radius,i));
     //dPbPb_Trg80[i]->Scale(4*145.156*1e6);
     dPbPb_Trg80[i]->Print("base");
     //dPbPb_Trg65[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj65_R%d_n20_eta_p20_cent%d",radius,i));
@@ -200,8 +206,10 @@ void RAA_analyze(int radius = 3, char* algo = "Pu", char *jet_type = "PF"){
     //dPbPb_Trg55[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_TrgObj55_R%d_n20_eta_p20_cent%d",radius,i));
     //dPbPb_Trg55[i]->Scale(4*145.156*1e6);
     //dPbPb_Trg55[i]->Print("base");
-
     dPbPb_TrgComb[i] = (TH1F*)dPbPb_Trg80[i]->Clone(Form("Jet_80_triggered_spectra_data_PbPb_cent%d",i));
+
+    for(int k = 1;k<=70;k++) dPbPb_TrgComb[i]->SetBinContent(k,0);
+    
   }
 
   if(printDebug)cout<<"loaded the data histograms PbPb"<<endl;
@@ -220,23 +228,39 @@ void RAA_analyze(int radius = 3, char* algo = "Pu", char *jet_type = "PF"){
     mPbPb_mcclosure_gen[i]->Print("base");
     mPbPb_mcclosure_Matrix[i] = (TH2F*)fMC_in->Get(Form("hpbpb_mcclosure_matrix_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_mcclosure_Matrix[i]->Print("base");
+
+    for(int k = 1;k<=70;k++){
+
+      mPbPb_Gen[i]->SetBinContent(k,0);
+      mPbPb_Reco[i]->SetBinContent(k,0);
+      mPbPb_mcclosure_data[i]->SetBinContent(k,0);
+      mPbPb_mcclosure_gen[i]->SetBinContent(k,0);
+      for(int l = 1;l<=1000;l++){
+	mPbPb_Matrix[i]->SetBinContent(k,l,0);
+	mPbPb_mcclosure_Matrix[i]->SetBinContent(k,l,0);
+	mPbPb_Matrix[i]->SetBinContent(l,k,0);
+	mPbPb_mcclosure_Matrix[i]->SetBinContent(l,k,0);	
+      }
+    }
     
     //mPbPb_Response[i] = new TH2F(Form("mPbPb_Response_cent%d",i),"Response Matrix",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
     //mPbPb_ResponseNorm[i] = new TH2F(Form("mPbPb_ResponseNorm_cent%d",i),"Normalized Response Matrix",nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
   }
-
+  
   if(printDebug) cout<<"loaded the data and mc PbPb histograms from the files"<<endl;
   
   // get PP data
   if(printDebug) cout<<"Getting PP data and MC"<<endl;
-  //dPP_1 = (TH1F*)fData_pp_in->Get(Form("hpp_Trg80_R%d_n20_eta_p20",radius));
+  dPP_1 = (TH1F*)fData_pp_in->Get(Form("hpp_Trg80_R%d_n20_eta_p20",radius));
+  
   //dPP_1->Print("base");
   //dPP_2 = (TH1F*)fData_pp_in->Get(Form("hpp_Trg60_R%d_n20_eta_p20",radius));
   //dPP_2->Print("base");
   //dPP_3 = (TH1F*)fData_pp_in->Get(Form("hpp_Trg40_R%d_n20_eta_p20",radius));
   //dPP_3->Print("base");
-  dPP_Comb = (TH1F*)fData_pp_in->Get("hData_HLT80_with_JetID");
+  dPP_Comb = (TH1F*)dPP_1->Clone("Jet_80_triggerd_spectra_data_pp");   
   dPP_Comb->Print("base");
+  for(int k = 1;k<=70;k++) dPP_Comb->SetBinContent(k,0);
   
   // get PP MC
   mPP_Gen = (TH1F*)fMC_pp_in->Get(Form("hpp_gen_R%d_n20_eta_p20",radius));
@@ -250,6 +274,18 @@ void RAA_analyze(int radius = 3, char* algo = "Pu", char *jet_type = "PF"){
   mPP_mcclosure_Matrix = (TH2F*)fMC_pp_in->Get(Form("hpp_mcclosure_matrix_R%d_n20_eta_p20",radius));
   mPP_mcclosure_Matrix->Print("base");
 
+  for(int k = 1;k<=70;k++){
+    mPP_Gen->SetBinContent(k,0);
+    mPP_Reco->SetBinContent(k,0);
+    mPP_mcclosure_data->SetBinContent(k,0);
+    for(int l = 1;l<=1000;l++){
+      mPP_Matrix->SetBinContent(k,l,0);
+      mPP_mcclosure_Matrix->SetBinContent(k,l,0);
+      mPP_Matrix->SetBinContent(l,k,0);
+      mPP_mcclosure_Matrix->SetBinContent(l,k,0);
+    }
+  }
+  
   //mPP_Matrix->Print("base");
   //mPP_Response = (TH2F*)fMc_in->Get("hpp_gen");
   // make the response matrix.
@@ -924,7 +960,7 @@ void RAA_analyze(int radius = 3, char* algo = "Pu", char *jet_type = "PF"){
   
   cout<<"writing to output file"<<endl;
     
-  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_unfold_final_jetID_test_Jet80only_ak%s%d%s_%d_test.root",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfold_final_jetID_test_Jet80only_ak%s%d%s_%d_test.root",algo,radius,jet_type,date.GetDate()),"RECREATE");
   fout.cd();
 
   for(int i = 0;i<=nbins_cent;i++){
