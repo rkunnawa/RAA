@@ -211,10 +211,10 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
     for(int j = 0;j<nbins_eta;j++){
 
-      hpp_Trg80[k][j] = new TH1F(Form("hpp_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
-      hpp_Trg60[k][j] = new TH1F(Form("hpp_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
-      hpp_Trg40[k][j] = new TH1F(Form("hpp_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
-      hpp_TrgComb[k][j] = new TH1F(Form("hpp_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),nbins_pt, boundaries_pt);
+      hpp_Trg80[k][j] = new TH1F(Form("hpp_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_Trg60[k][j] = new TH1F(Form("hpp_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_Trg40[k][j] = new TH1F(Form("hpp_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_TrgComb[k][j] = new TH1F(Form("hpp_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
       
     }// eta bin loop
     
@@ -343,11 +343,11 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   //get all the pp spectra here: 
   //TCut pp3 = "jet40&&!jet60&&!jet80&&(chMax/pt)>0.01&&(TMath::Max(neMax,chMax)/TMath::Max(chSum,neSum))>=0.975";
-  TNtuple *jets_ID[no_radius];
-  for(int k = 0;k<no_radius;k++){
-    jets_ID[k] = new TNtuple(Form("jets_R%d_ID",list_radius[k]),"","rawpt:jtpt:jet40:jet40_prescl:jet60:jet60_prescl:jet80:jet80_prescl:trgObjpt:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum:trkMax:trkSum");
-  }  
-  Float_t arrayValues[21];
+  //TNtuple *jets_ID[no_radius];
+  //for(int k = 0;k<no_radius;k++){
+  //  jets_ID[k] = new TNtuple(Form("jets_R%d_ID",list_radius[k]),"","rawpt:jtpt:jet40:jet40_prescl:jet60:jet60_prescl:jet80:jet80_prescl:trgObjpt:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum:trkMax:trkSum");
+  //}  
+  //Float_t arrayValues[21];
   
   for(int k = 0;k<no_radius;k++){
 
@@ -380,7 +380,8 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	for(int g = 0;g<nrefe_1;g++){
 
 	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
-	  
+
+#if 0
 	  arrayValues[0] = raw_1[g];
 	  arrayValues[1] = pt_1[g];
 	  arrayValues[2] = jet40_1;
@@ -404,12 +405,25 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	  arrayValues[20] = trkSum_1[g];
 
 	  jets_ID[k]->Fill(arrayValues);
+#endif
+
+	  if(raw_1[g] < 30) continue;
+	  if((eSum_1[g]/(chSum_1[g]+neSum_1[g]+phSum_1[g]+muSum_1[g])<0.7) && (neMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (phMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/pt_1[g]>0.05) && (muMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9)){
+	  
+	    if(jet80_1){
+	      hpp_Trg80[k][j]->Fill(pt_1[g]);
+	    }else if(jet60_1==1 && jet80_1==0){
+	      hpp_Trg60[k][j]->Fill(pt_1[g]);
+	    }else if(jet40_1==1 && jet60_1==0 && jet80_1==0){
+	      hpp_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
+	    }
+	    
+	  }// qa condition
 
 	}// jet loop
 	
       }// eta bins
     }// event loop for jet80or100
-
   }// radius loop
 
 
@@ -417,29 +431,28 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   TDatime date;
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   hEvents_HLT80->Write();
   hEvents_HLT60->Write();
   hEvents_HLT40->Write();
 
-  for(int k = 0;k<no_radius;k++) jets_ID[k]->Write();
+  //for(int k = 0;k<no_radius;k++) jets_ID[k]->Write();
 
-#if 0
   for(int k = 0;k<no_radius;k++){
 
     for(int j = 0;j<nbins_eta;j++){
 
       // normalize all the spectra to barns / delta pt delta eta
 
-      hpp_Trg80[k][j]->Scale(1./(5.3*1e12*delta_eta[j]));//5.3 pico barns^-1 is the lumi of the dataset. 
-      hpp_Trg60[k][j]->Scale(1./(5.3*1e12*delta_eta[j]));
-      hpp_Trg40[k][j]->Scale(1./(5.3*1e12*delta_eta[j]));
+      // hpp_Trg80[k][j]->Scale(1./(5.3*1e12*delta_eta[j]));//5.3 pico barns^-1 is the lumi of the dataset. 
+      // hpp_Trg60[k][j]->Scale(1./(5.3*1e12*delta_eta[j]));
+      // hpp_Trg40[k][j]->Scale(1./(5.3*1e12*delta_eta[j]));
       
-      divideBinWidth(hpp_Trg80[k][j]);// divide by delta pt. 
-      divideBinWidth(hpp_Trg60[k][j]);
-      divideBinWidth(hpp_Trg40[k][j]);
+      // divideBinWidth(hpp_Trg80[k][j]);// divide by delta pt. 
+      // divideBinWidth(hpp_Trg60[k][j]);
+      // divideBinWidth(hpp_Trg40[k][j]);
 
       hpp_TrgComb[k][j]->Add(hpp_Trg80[k][j]);
       hpp_TrgComb[k][j]->Add(hpp_Trg60[k][j]);
@@ -458,7 +471,6 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   }// radius loop
 
-#endif
   f.Write();
 
   f.Close();
