@@ -136,7 +136,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
   timer.Start();
 
   bool printDebug = false;
-
+  
   if(printDebug) cout<<"Reading PP 2013 data"<<endl;
 
    // data files - pp 
@@ -407,14 +407,19 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	  jets_ID[k]->Fill(arrayValues);
 #endif
 
-	  if(raw_1[g] < 30) continue;
-	  if((eSum_1[g]/(chSum_1[g]+neSum_1[g]+phSum_1[g]+muSum_1[g])<0.7) && (neMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (phMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/pt_1[g]>0.05) && (muMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9)){
+	  //if(raw_1[g] < 30) continue;
+	  //if((neMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (phMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/pt_1[g]>0.05) && (muMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9)){
+	  //if(eSum_1[g]/(chSum_1[g]+neSum_1[g]+phSum_1[g]+muSum_1[g])<0.7){
+	  if(chMax_1[g]/pt_1[g]>0.05){
+	  //if(1>0){
 	  
-	    if(jet80_1){
-	      hpp_Trg80[k][j]->Fill(pt_1[g]);
-	    }else if(jet60_1==1 && jet80_1==0){
-	      hpp_Trg60[k][j]->Fill(pt_1[g]);
-	    }else if(jet40_1==1 && jet60_1==0 && jet80_1==0){
+	    if(jet80_1 && trgObj_pt_1>=80){
+	      hpp_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
+	    }
+	    if(jet60_1==1 && trgObj_pt_1>=65 && trgObj_pt_1<80){
+	      hpp_Trg60[k][j]->Fill(pt_1[g],jet60_p_1);
+	    }
+	    if(jet40_1==1 && trgObj_pt_1>=55 && trgObj_pt_1<65){
 	      hpp_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
 	    }
 	    
@@ -431,7 +436,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   TDatime date;
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt_norawptcut_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   hEvents_HLT80->Write();

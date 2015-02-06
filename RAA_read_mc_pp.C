@@ -384,16 +384,16 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
 	  hpp_eta_full_noScale[k]->Fill(dataPP[k][h]->jteta[g]);
 	  hpp_phi_full_noScale[k]->Fill(dataPP[k][h]->jtphi[g]);
 
-	  if ( dataPP[k][h]->rawpt[g] < 30. ) continue;
+	  //if ( dataPP[k][h]->rawpt[g] < 30. ) continue;
 	  if ( dataPP[k][h]->jtpt[g] > 2.*dataPP[k][h]->pthat) continue;
 	  
 	  // jet QA cuts: 
 	  if ( dataPP[k][h]->chargedMax[g]/dataPP[k][h]->jtpt[g]<0.05) continue;
-	  if ( dataPP[k][h]->neutralMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
-	  if ( dataPP[k][h]->photonMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
-	  if ( dataPP[k][h]->chargedMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
-	  if ( dataPP[k][h]->muMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
-	  if ( dataPP[k][h]->eSum[g]/(dataPP[k][h]->chargedSum[g] + dataPP[k][h]->photonSum[g] + dataPP[k][h]->neutralSum[g] + dataPP[k][h]->muSum[g]) > 0.7 )continue;
+	  //if ( dataPP[k][h]->neutralMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
+	  //if ( dataPP[k][h]->photonMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
+	  //if ( dataPP[k][h]->chargedMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
+	  //if ( dataPP[k][h]->muMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
+	  //if ( dataPP[k][h]->eSum[g]/(dataPP[k][h]->chargedSum[g] + dataPP[k][h]->photonSum[g] + dataPP[k][h]->neutralSum[g] + dataPP[k][h]->muSum[g]) > 0.7 )continue;
 	  
 	  hpp_eta_full[k]->Fill(dataPP[k][h]->jteta[g],scalepp*weight_vz);
 	  hpp_phi_full[k]->Fill(dataPP[k][h]->jtphi[g],scalepp*weight_vz);
@@ -418,7 +418,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
 	    }
             
           }//eta loop
-	              
+	  
         }//njet loop     
       
       }//nentry loop
@@ -426,8 +426,8 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
     }//ptbins loop
     
   }//radius loop
-
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_final_jetID_ak%d%s_%d.root",radius,jet_type,date.GetDate()),"RECREATE");
+  
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_chMaxjtpt_norawpt_ak%d%s_%d.root",radius,jet_type,date.GetDate()),"RECREATE");
   f.cd();
   
   for(int k = 0;k<no_radius;k++){

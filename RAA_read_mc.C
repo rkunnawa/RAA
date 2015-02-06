@@ -511,6 +511,10 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   TH1F *hpbpb_vy[no_radius];
   TH1F *hpbpb_vz[no_radius];
   TH1F *hpbpb_cent[no_radius];
+  TH1F *hpbpb_RecoOverRaw[no_radius][nbins_eta][nbins_cent+1];
+  TH2F *hpbpb_RecoOverRaw_jtpt[no_radius][nbins_eta][nbins_cent+1];
+  //TH2F *hpbpb_RecoOverref_refpt[no_radius][nbins_eta][nbins_cent+1];
+
 
   //get the spectra with the specific trigger object from the different files. 
   TH1F *hpbpb_Jet80_gen[no_radius][nbins_eta][nbins_cent+1],*hpbpb_Jet80_reco[no_radius][nbins_eta][nbins_cent+1];
@@ -525,7 +529,18 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   //TH1F *hpbpb_eta[no_radius][nbins_eta][nbins_cent+1], *hpbpb_phi[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_eta_full[no_radius], *hpbpb_phi_full[no_radius];
   TH1F *hpbpb_eta_full_noScale[no_radius], *hpbpb_phi_full_noScale[no_radius];
-    
+  
+  TH1F *hpbpb_chMax[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_phMax[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_neMax[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_muMax[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_eMax[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_chSum[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_phSum[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_neSum[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_muSum[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_eSum[no_radius][nbins_eta][nbins_cent+1];
+
   TH1F *hCentMC[no_radius];
   TH1F *hVzMC[no_radius];
   TH1F *hPbPb_pthat_fine[no_radius];
@@ -567,7 +582,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   // TH1F* hCut5 = new TH1F("hCut5","neMax/(neMax+chMax+phMax)",100,0,10);
  
 //declare the output file 
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_final_jetID_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_chMaxjtpt_norawptcut_spectra_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   //TNtuple *jets_ID = new TNtuple("jets_ID","","rawpt:refpt:jtpt:jtpu:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:scale:weight_vz:weight_cent:cent:subid:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
   //Float_t arrayValues[25];
 
@@ -620,11 +635,38 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 
         hpbpb_Jet80_gen[k][j][i] = new TH1F(Form("hpbpb_Jet80_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Gen refpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
         hpbpb_Jet80_reco[k][j][i] = new TH1F(Form("hpbpb_Jet80_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("reco jtpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);	
- 
+	hpbpb_RecoOverRaw[k][j][i] = new TH1F(Form("hpbpb_RecoOverRaw_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("reco over raw ratio R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,10);
+	hpbpb_RecoOverRaw_jtpt[k][j][i] = new TH2F(Form("hpbpb_RecoOverRaw_jtpt_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("reco over raw ratio versus jtpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000,100,0,10);
+	//hpbpb_RecoOverRaw[k][j][i] = new TH2F(Form("hpbpb_RecoOverRaw_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("reco over raw ratio R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,10);
+		hpbpb_chMax[k][j][i] = new TH1F(Form("hpbpb_chMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("chMax variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_phMax[k][j][i] = new TH1F(Form("hpbpb_phMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("phMax variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_neMax[k][j][i] = new TH1F(Form("hpbpb_neMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("neMax variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_muMax[k][j][i] = new TH1F(Form("hpbpb_muMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("muMax variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_eMax[k][j][i] = new TH1F(Form("hpbpb_eMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("eMax variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+
+	hpbpb_chSum[k][j][i] = new TH1F(Form("hpbpb_chSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("chSum variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_phSum[k][j][i] = new TH1F(Form("hpbpb_phSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("phSum variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_neSum[k][j][i] = new TH1F(Form("hpbpb_neSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("neSum variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_muSum[k][j][i] = new TH1F(Form("hpbpb_muSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("muSum variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_eSum[k][j][i] = new TH1F(Form("hpbpb_eSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("eSum variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	
       }// centrality bin loop
 
       hpbpb_pt_Njet_g7[k][j][nbins_cent] = new TH1F(Form("hpbpb_pt_Njet_g7_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jet spectra from the events with Njet(pT>50)>7 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
       hpbpb_pt_Njet_l7[k][j][nbins_cent] = new TH1F(Form("hpbpb_pt_Njet_l7_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jet spectra from the events with Njet(pT>50)<7 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
+
+      
+      hpbpb_chMax[k][j][nbins_cent] = new TH1F(Form("hpbpb_chMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("chMax variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_phMax[k][j][nbins_cent] = new TH1F(Form("hpbpb_phMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("phMax variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_neMax[k][j][nbins_cent] = new TH1F(Form("hpbpb_neMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("neMax variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_muMax[k][j][nbins_cent] = new TH1F(Form("hpbpb_muMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("muMax variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_eMax[k][j][nbins_cent] = new TH1F(Form("hpbpb_eMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("eMax variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      
+      hpbpb_chSum[k][j][nbins_cent] = new TH1F(Form("hpbpb_chSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("chSum variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_phSum[k][j][nbins_cent] = new TH1F(Form("hpbpb_phSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("phSum variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_neSum[k][j][nbins_cent] = new TH1F(Form("hpbpb_neSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("neSum variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_muSum[k][j][nbins_cent] = new TH1F(Form("hpbpb_muSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("muSum variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_eSum[k][j][nbins_cent] = new TH1F(Form("hpbpb_eSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("eSum variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
       
       hpbpb_gen[k][j][nbins_cent] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Gen refpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
       hpbpb_reco[k][j][nbins_cent] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Reco jtpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
@@ -636,6 +678,8 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
       hpbpb_jtpu_noScale[k][j][nbins_cent] = new TH1F(Form("hpbpb_jtpu_noScale_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("jtpu Vs algorithm not Scaled R%d %s",list_radius[k],etaWidth[j]),1000,0,500);
       //hpbpb_response[nbins_cent] = new TH2F(Form("hpbpb_response_cent%d",nbins_cent),"response jtpt refpt 0-200 cent",1000,0,1000,1000,0,1000);
 
+      hpbpb_RecoOverRaw[k][j][nbins_cent] = new TH1F(Form("hpbpb_RecoOverRaw_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("reco over raw ratio R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,10);
+      hpbpb_RecoOverRaw_jtpt[k][j][nbins_cent] = new TH2F(Form("hpbpb_RecoOverRaw_jtpt_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("reco over raw ratio versus jtpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000,100,0,10);
       hpp_gen[k][j] = new TH1F(Form("hpp_gen_R%d_%s",list_radius[k],etaWidth[j]),Form("gen refpt R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
       hpp_reco[k][j] = new TH1F(Form("hpp_reco_R%d_%s",list_radius[k],etaWidth[j]),Form("reco jtpt R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
       hpp_matrix[k][j] = new TH2F(Form("hpp_matrix_R%d_%s",list_radius[k],etaWidth[j]),Form("matrix refpt jtpt R%d %s",list_radius[k],etaWidth[j]),1000,0,1000,1000,0,1000);
@@ -924,17 +968,16 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	for (int g = 0; g < data[k][h]->njets; g++) {
 	
 	  //removed the following for no cut histogram: 
-	  if ( data[k][h]->rawpt[g] < 30. ) continue;
+	  //if ( data[k][h]->rawpt[g] < 30. ) continue;
 	  if ( data[k][h]->subid[g] != sub_id ) continue;
 	  if ( data[k][h]->jtpt[g] > 2.*data[k][h]->pthat) continue;
-	  // jet quality cuts here: 
-	  if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.05) continue;
+	  // jet quality cuts here:
 	  //if ( data[k][h]->neutralMax[g]/TMath::Max(data[h]->chargedSum[k],data[h]->neutralSum[k]) < 0.975)continue;
-	  if ( data[k][h]->neutralMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
-	  if ( data[k][h]->photonMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
-	  if ( data[k][h]->chargedMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
-	  if ( data[k][h]->muMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
-	  if ( data[k][h]->eSum[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]) > 0.7 )continue;
+	  //if ( data[k][h]->neutralMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
+	  //if ( data[k][h]->photonMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
+	  //if ( data[k][h]->chargedMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
+	  //if ( data[k][h]->muMax[g]/(data[k][h]->chargedMax[g] + data[k][h]->photonMax[g] + data[k][h]->neutralMax[g]) > 0.9 )continue;
+	  //if ( data[k][h]->eSum[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]) > 0.7 )continue;
 	  //if(((data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->eSum[g] + data[k][h]->muSum[g])/data[k][h]->jtpt[g])>1.01) continue;
 
 	  hpbpb_eta_full[k]->Fill(data[k][h]->jteta[g],scale*weight_vz*weight_cent);
@@ -947,7 +990,40 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
             //int subEvt=-1;
 	    
             if ( data[k][h]->jteta[g]  > boundaries_eta[j][1] || data[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
-	   
+
+	    
+	    hpbpb_RecoOverRaw[k][j][cBin]->Fill((Float_t)data[k][h]->jtpt[g]/data[k][h]->rawpt[g]);
+	    hpbpb_RecoOverRaw[k][j][nbins_cent]->Fill((Float_t)data[k][h]->jtpt[g]/data[k][h]->rawpt[g]);
+	  
+	    hpbpb_RecoOverRaw_jtpt[k][j][cBin]->Fill(data[k][h]->jtpt[g],(Float_t)data[k][h]->jtpt[g]/data[k][h]->rawpt[g]);
+	    hpbpb_RecoOverRaw_jtpt[k][j][nbins_cent]->Fill(data[k][h]->jtpt[g],(Float_t)data[k][h]->jtpt[g]/data[k][h]->rawpt[g]);
+	    
+	    hpbpb_chMax[k][j][cBin]->Fill(data[k][h]->chargedMax[g],scale*weight_cent*weight_vz);
+	    hpbpb_phMax[k][j][cBin]->Fill(data[k][h]->photonMax[g],scale*weight_cent*weight_vz);
+	    hpbpb_neMax[k][j][cBin]->Fill(data[k][h]->neutralMax[g],scale*weight_cent*weight_vz);
+	    hpbpb_muMax[k][j][cBin]->Fill(data[k][h]->muMax[g],scale*weight_cent*weight_vz);
+	    hpbpb_eMax[k][j][cBin]->Fill(data[k][h]->eMax[g],scale*weight_cent*weight_vz);
+	    
+	    hpbpb_chSum[k][j][cBin]->Fill(data[k][h]->chargedSum[g],scale*weight_cent*weight_vz);
+	    hpbpb_phSum[k][j][cBin]->Fill(data[k][h]->photonSum[g],scale*weight_cent*weight_vz);
+	    hpbpb_neSum[k][j][cBin]->Fill(data[k][h]->neutralSum[g],scale*weight_cent*weight_vz);
+	    hpbpb_muSum[k][j][cBin]->Fill(data[k][h]->muSum[g],scale*weight_cent*weight_vz);
+	    hpbpb_eSum[k][j][cBin]->Fill(data[k][h]->eSum[g],scale*weight_cent*weight_vz);
+	    
+	    hpbpb_chMax[k][j][nbins_cent]->Fill(data[k][h]->chargedMax[g],scale*weight_cent*weight_vz);
+	    hpbpb_phMax[k][j][nbins_cent]->Fill(data[k][h]->photonMax[g],scale*weight_cent*weight_vz);
+	    hpbpb_neMax[k][j][nbins_cent]->Fill(data[k][h]->neutralMax[g],scale*weight_cent*weight_vz);
+	    hpbpb_muMax[k][j][nbins_cent]->Fill(data[k][h]->muMax[g],scale*weight_cent*weight_vz);
+	    hpbpb_eMax[k][j][nbins_cent]->Fill(data[k][h]->eMax[g],scale*weight_cent*weight_vz);
+	    
+	    hpbpb_chSum[k][j][nbins_cent]->Fill(data[k][h]->chargedSum[g],scale*weight_cent*weight_vz);
+	    hpbpb_phSum[k][j][nbins_cent]->Fill(data[k][h]->photonSum[g],scale*weight_cent*weight_vz);
+	    hpbpb_neSum[k][j][nbins_cent]->Fill(data[k][h]->neutralSum[g],scale*weight_cent*weight_vz);
+	    hpbpb_muSum[k][j][nbins_cent]->Fill(data[k][h]->muSum[g],scale*weight_cent*weight_vz);
+	    hpbpb_eSum[k][j][nbins_cent]->Fill(data[k][h]->eSum[g],scale*weight_cent*weight_vz);
+	    
+	    if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.05) continue;
+
 	    // cut3 = (float)(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g] + data[k][h]->eSum[g] - data[k][h]->jtpu[g])/(data[k][h]->jtpt[g]);
 	    // cut1 = (float)data[k][h]->chargedMax[g]/(data[k][h]->jtpt[g]);
 	    // cut2 = (float)data[k][h]->neutralMax[g]/TMath::Max(data[k][h]->chargedSum[g],data[k][h]->neutralSum[g]);
@@ -1232,7 +1308,22 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	if(printDebug)hpbpb_pt_Njet_g7[k][j][i]->Print();
 	hpbpb_pt_Njet_l7[k][j][i]->Write();
 	if(printDebug)hpbpb_pt_Njet_l7[k][j][i]->Print();
-	
+	hpbpb_RecoOverRaw_jtpt[k][j][i]->Write();
+	if(printDebug)hpbpb_RecoOverRaw_jtpt[k][j][i]->Print();
+	hpbpb_RecoOverRaw[k][j][i]->Write();
+	if(printDebug)hpbpb_RecoOverRaw[k][j][i]->Print();
+
+	hpbpb_chMax[k][j][i]->Write();
+	hpbpb_phMax[k][j][i]->Write();
+	hpbpb_neMax[k][j][i]->Write();
+	hpbpb_muMax[k][j][i]->Write();
+	hpbpb_eMax[k][j][i]->Write();
+	hpbpb_chSum[k][j][i]->Write();
+	hpbpb_phSum[k][j][i]->Write();
+	hpbpb_neSum[k][j][i]->Write();
+	hpbpb_muSum[k][j][i]->Write();
+	hpbpb_eSum[k][j][i]->Write();
+
       }// cent loop 
 #if 0
       divideBinWidth(hpp_gen[k][j]);
