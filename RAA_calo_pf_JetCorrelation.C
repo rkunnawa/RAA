@@ -39,6 +39,7 @@
 #include "TLatex.h"
 #include "TMath.h"
 #include "TLine.h"
+#include <vector>
 
 
 static const int nbins_pt = 39;
@@ -106,7 +107,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
 
   cout<<"Running for Algo = "<<algo<<" "<<endl;
   
-  bool printDebug = true;
+  bool printDebug = false;
 
   // Since this has to run on the HiForest files, it is best to run them as condor jobs similar to the PbPb data read macro, along with the jet trees which get their branch address set. 
   
@@ -367,6 +368,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
     */
 
   }// radius loop
+  cout<<"after branch declaration"<<endl;
 
   // declare the histograms:
   TH1F *hCaloPFCorr[TrigValue][nbins_cent+1], *hCalo[TrigValue][nbins_cent+1], *hPF[TrigValue][nbins_cent+1], *hRatio[TrigValue][nbins_cent+1];
@@ -385,31 +387,34 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
       hPF[a][i]->SetYTitle("Counts");
     }
   }
+  cout<<"after histogram declaration"<<endl;
+    
   //for the Jet 55 spectra: 
   Float_t effecPrescl = 2.047507;
 
-  // declare the 2d calo and pf candidate vectors
-  vector<vector<double> > caloJet;
-  vector<vector<double> > pfJet;
-  vector<vector<double> > matchedCaloPFJet;
-  vector<vector<double> > deltaR_calovsPF;
+  // declare the 2d calo and pf candidate vectors, deltaR_calovsPF is going to be a 3d vector like so:
+  // calo jet on x axis, pf jet on y axis, and delta R, calopT, pfpT on z axis.
+  // we also need to add in the trigger information here since we need to know what trigger the matching comes from. maybe i can run that later as an added check. for now just to see if the algorithm is working should try to run things. 
+  //vector<vector<double> > caloJet;
+  //vector<vector<double> > pfJet;
 
   // start the loop process.
 
   for(int k = 0;k<no_radius;k++){
 
     Long64_t nentries = jetpbpb1[2][k]->GetEntries();
-
+    // nentries = 2;
+    
     for(Long64_t nentry = 0; nentry<nentries;nentry++){
-
+      //cout<<"event no = "<<nentry<<endl;
       for(int t = 0;t<N;t++)  jetpbpb1[t][k]->GetEntry(nentry);
-
+      
       int centBin = findBin(hiBin_1);
 
       if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
 
       if(fabs(vz_1)>15) continue;
-
+      //cout<<"passed the selection"<<endl;
 #if 0
       int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
 
@@ -438,54 +443,126 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
       Float_t pfjet_eta = 0;
       Float_t pfjet_phi = 0;
       Float_t pfjet_pt = 0;
-      bool selected = false;
 
+      vector<vector<double> > matchedCaloPFJet;
+      vector<vector<vector<double> > > deltaR_calovsPF;
       for(int g = 0;g<nrefe_1;g++){
 
 	calojet_eta = eta_1[g];
 	calojet_phi = phi_1[g];
 	calojet_pt = pt_1[g];
 
-	deltaR_calovsPF.push_back(vector<double> ());
-	
+	int pfmatchcounter = 0;
+	deltaR_calovsPF.push_back(vector<vector<double> > ());
 	for(int j = 0;j<nrefe_2;j++){
-
+      
 	  pfjet_eta = eta_2[j];
 	  pfjet_phi = phi_2[j];
 	  pfjet_pt = pt_2[j];
 
 	  deltaRCaloPF = (Float_t)TMath::Sqrt((calojet_eta - pfjet_eta)*(calojet_eta - pfjet_eta) + (calojet_phi - pfjet_phi)*(calojet_phi - pfjet_phi));
-	  deltaR_calovsPF[g].push_back(deltaRCaloPF);
+	  if(deltaRCaloPF < (Float_t)radius/10){
+	    //cout<<"            calo jet = "<<g<<endl;
+	    //cout<<"            pf jet = "<<j<<" ";
+	    //cout<<"            inside deltaR < 0.3 "<<endl;
+	    //cout<<"            deltaRCaloPF = "<<deltaRCaloPF<<" calojet="<<calojet_pt<<" pfjet="<<pfjet_pt<<endl;
 
-	}
-
-      }
-
-      // now lets find the smallest array element.
-
-      double small = deltaR_calovsPF[0][0];
-      double small_elementx = 0;
-      double small_elementy = 0;
-
-      for(int a = 0;a<deltaR_calovsPF.size();a++){
-
-	for(int b = 0;b<deltaR_calovsPF[a].size();b++){
-
-	  if(small > deltaR_calovsPF[a][b]){
-
-	    small = deltaR_calovsPF[a][b];
-	    small_elementx = a;
-	    small_elementy = b;
-	    
+	    deltaR_calovsPF[g].push_back(vector<double> ());
+	    deltaR_calovsPF[g][pfmatchcounter].push_back(deltaRCaloPF);
+	    deltaR_calovsPF[g][pfmatchcounter].push_back(g);
+	    deltaR_calovsPF[g][pfmatchcounter].push_back(calojet_pt);
+	    deltaR_calovsPF[g][pfmatchcounter].push_back(j);
+	    deltaR_calovsPF[g][pfmatchcounter].push_back(pfjet_pt);
+	    pfmatchcounter++;
+	    if(pfmatchcounter > 1) cout<<"more than 1 match!"<<endl;
 	  }
+	}// pf jet loop
 
+      }// calo jet loop
+      // now lets find the smallest array element - this has to be repeated till we have matched all the calo jets to pf jets
+      int matchedCounter = 0;
+      int smallcalocounter = 0;
+      int smallpfcounter = 0;
+      //cout<<"before finding the delta R smallest value "<<endl;
+      //cout<<"calo jet size = "<<deltaR_calovsPF.size()<<endl;
+      //cout<<"pf jet size   = "<<deltaR_calovsPF[0].size()<<endl;
+
+      while(deltaR_calovsPF.size()>1 && deltaR_calovsPF[0].size()>1){
+	//cout<<"size of the matrix: calo , pf "<<deltaR_calovsPF.size()<<" ,"<<deltaR_calovsPF[0].size()<<endl;
+	double small = deltaR_calovsPF[0][0][0];
+
+	for(int a = 0;a<deltaR_calovsPF.size();a++){
+	  for(int b = 0;b<deltaR_calovsPF[a].size();b++){
+	    if(small > deltaR_calovsPF[a][b][0]){
+	      small = deltaR_calovsPF[a][b][0];
+	      smallcalocounter = a;
+	      smallpfcounter = b;
+	    }
+	  }
+	}
+	
+	//cout<<"small deltaR = "<<small<<endl;
+	//cout<<"matched calo jet pT = "<<deltaR_calovsPF[smallcalocounter][smallpfcounter][1]<<endl;
+	//cout<<"matched pf jet pT   = "<<deltaR_calovsPF[smallcalocounter][smallpfcounter][2]<<endl;
+	// now our smallest delta R is a and b. so the matched jet is calojet[a] and ptjet[b]
+
+	//remove the respective row and column.
+	if(deltaR_calovsPF.size()>smallcalocounter)
+	  deltaR_calovsPF.erase(deltaR_calovsPF.begin() + smallcalocounter);
+
+	for(unsigned i = 0;i<deltaR_calovsPF.size();i++){
+	  if(deltaR_calovsPF[i].size() > smallpfcounter)
+	    deltaR_calovsPF[i].erase(deltaR_calovsPF[i].begin() + smallpfcounter);
 	}
 
-      }
+      }//while loop
 
-      // now our smallest delta R is a and b. so the matched jet is calojet[a] and ptjet[b]
+#if 0
+	matchedCaloPFJet.push_back(vector<double> ());
+	matchedCaloPFJet[matchedCounter].push_back(deltaR_calovsPF[smallcalocounter][smallpfcounter][1]);// calojet pt
+	matchedCaloPFJet[matchedCounter].push_back(deltaR_calovsPF[smallcalocounter][smallpfcounter][2]);// pf jet pt
+	matchedCounter++;
 
+	//fill histograms. 
+	hCaloPFCorr[3][centBin]->Fill((Float_t)deltaR_calovsPF[smallcalocounter][smallpfcounter][2]/deltaR_calovsPF[smallcalocounter][smallpfcounter][1]);
+	hCaloPFCorr[3][nbins_cent]->Fill((Float_t)deltaR_calovsPF[smallcalocounter][smallpfcounter][2]/deltaR_calovsPF[smallcalocounter][smallpfcounter][1]);
 
+	if(jet80_1) {
+	  hCaloPFCorr[2][centBin]->Fill((Float_t)deltaR_calovsPF[smallcalocounter][smallpfcounter][2]/deltaR_calovsPF[smallcalocounter][smallpfcounter][1]);
+	  hCaloPFCorr[2][nbins_cent]->Fill((Float_t)deltaR_calovsPF[smallcalocounter][smallpfcounter][2]/deltaR_calovsPF[smallcalocounter][smallpfcounter][1]);
+	  hCalo[2][centBin]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][1],1);
+	  hCalo[2][nbins_cent]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][1],1);	      
+	  hPF[2][centBin]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][2],1);
+	  hPF[2][nbins_cent]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][2],1);
+	}
+	if(jet65_1 && !jet80_1) {
+	  hCaloPFCorr[1][centBin]->Fill((Float_t)deltaR_calovsPF[smallcalocounter][smallpfcounter][2]/deltaR_calovsPF[smallcalocounter][smallpfcounter][1]);
+	  hCaloPFCorr[1][nbins_cent]->Fill((Float_t)deltaR_calovsPF[smallcalocounter][smallpfcounter][2]/deltaR_calovsPF[smallcalocounter][smallpfcounter][1]);
+	  hCalo[1][centBin]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][1],1);
+	  hCalo[1][nbins_cent]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][1],1);
+	  hPF[1][centBin]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][2],1);
+	  hPF[1][nbins_cent]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][2],1);
+	}
+	if(jet55_1 && !jet65_1 && !jet80_1) {
+	  hCaloPFCorr[0][centBin]->Fill((Float_t)deltaR_calovsPF[smallcalocounter][smallpfcounter][2]/deltaR_calovsPF[smallcalocounter][smallpfcounter][1]);
+	  hCaloPFCorr[0][nbins_cent]->Fill((Float_t)deltaR_calovsPF[smallcalocounter][smallpfcounter][2]/deltaR_calovsPF[smallcalocounter][smallpfcounter][1]);
+	  hCalo[0][centBin]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][1],effecPrescl);
+	  hCalo[0][nbins_cent]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][1],effecPrescl);
+	  hPF[0][centBin]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][2],effecPrescl);
+	  hPF[0][nbins_cent]->Fill(deltaR_calovsPF[smallcalocounter][smallpfcounter][2],effecPrescl);
+	}
+	
+	//remove the respective row and column.
+	if(deltaR_calovsPF.size()>smallcalocounter)
+	  deltaR_calovsPF.erase(deltaR_calovsPF.begin() + smallcalocounter);
+
+	for(unsigned i = 0;i<deltaR_calovsPF.size();i++){
+	  if(deltaR_calovsPF[i].size() > smallpfcounter)
+	    deltaR_calovsPF[i].erase(deltaR_calovsPF[i].begin() + smallpfcounter);
+	}
+	  
+      }// while loop
+#endif
 #if 0
       // deltaR_calovsPF
       // for(int g = 0;g<caloJet.size();g++){

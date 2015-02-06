@@ -16,7 +16,6 @@ filelist=jetRAA_PbPb_data_forest.txt
 
 nFiles=`wc -l < $filelist`
 
-
 #export X509_USER_PROXY=/net/hisrv0001/home/rkunnawa/myproxy/
 
 echo "nFiles in list: $nFiles"

@@ -27,7 +27,7 @@ process=$4
 echo "Processing..."
 
 root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
-mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_withEvtJetCuts_SuperNovaRejected_akPuPF_20150128_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/data/.
+#mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_spectra_histograms_akPuPF_20150128_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/data/.
 
 #root -b -q RAA_read_MinBias.C\+\($startfile,$endfile\)
 
