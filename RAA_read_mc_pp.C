@@ -156,6 +156,7 @@ public:
     jetPP[2]->SetBranchAddress("vy",&vy);
     jetPP[2]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
     jetPP[2]->SetBranchAddress("pPAcollisionEventSelectionPA",&pPAcollisionEventSelectionPA);
+    jetPP[2]->SetBranchAddress("HLT_PAJet40_noJetID_v1",&jet40_1);
 
   };
 
