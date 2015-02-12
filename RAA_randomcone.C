@@ -30,7 +30,7 @@
 
 using namespace std;
 
-void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",const char *type="MC"){
+void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Pu",const char *type="MC"){
   
   TDatime date;
 
@@ -40,7 +40,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   else if(type=="MC")
     FileA = TFile::Open("/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root");
   
-  TFile* outf = new TFile(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_forward_eta_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
+  TFile* outf = new TFile(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
   
   //TFile *FileA = TFile::Open(Form("/net/hisrv0001/home/icali/hadoop/HIMinBiasUPC_skimmed/MinBias-reTracking-merged/MinBias_Merged_tracking_all.root"));
   //TString outname = "dataAKSkimNtupleRandomConeRings_v4_TkpTCut0_ak3dataMB.root"; 
@@ -76,7 +76,7 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Vs",
   
   // test histogram for ranPFsumEt
   //TH1F *test_ranpfsumet = new TH1F("test_ranpfsumet","",200,0,100);
-
+  
   TTree* ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,rad,jet_type));
   // - TTree* ic      = (TTree*)FileA->Get("icPu5JetAnalyzer/t"); // - not there in the new forest 
   TTree* hlt     = (TTree*)FileA->Get("hltanalysis/HltTree");

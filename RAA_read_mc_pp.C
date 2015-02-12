@@ -6,9 +6,8 @@
 //
 // Read the pp MC files. each pthat is split into 4 files (except pthat 540 which has 5 files). Have a TChain for each pthat that gets the branch address set properly. 
 //
+// similar structure to the read mc macro except it loads a file list for each pthat. similar to whats necessary in the Jet ID workshop! 
 //
-
-
 
 #include <iostream>
 #include <stdio.h>
@@ -74,7 +73,7 @@ static const char etaWidth[nbins_eta][256] = {
 
 
 static const int no_radius = 1;//testing purposes 
-static const int list_radius[no_radius] = {4};
+static const int list_radius[no_radius] = {3};
 
 
 // divide by bin width
@@ -156,6 +155,12 @@ public:
     jetPP[2]->SetBranchAddress("vy",&vy);
     jetPP[2]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
     jetPP[2]->SetBranchAddress("pPAcollisionEventSelectionPA",&pPAcollisionEventSelectionPA);
+    jetPP[2]->SetBranchAddress("HLT_PAJet40_NoJetID_v1",&jet40_1);
+    jetPP[2]->SetBranchAddress("HLT_PAJet40_NoJetID_v1_Prescl",&jet40_p_1);
+    jetPP[2]->SetBranchAddress("HLT_PAJet60_NoJetID_v1",&jet60_1);
+    jetPP[2]->SetBranchAddress("HLT_PAJet60_NoJetID_v1_Prescl",&jet60_p_1);
+    jetPP[2]->SetBranchAddress("HLT_PAJet80_NoJetID_v1",&jet80_1);
+    jetPP[2]->SetBranchAddress("HLT_PAJet80_NoJetID_v1_Prescl",&jet80_p_1);
 
   };
 
@@ -206,7 +211,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
+void RAA_read_mc_pp(char *jet_type="PF", int radius = 3){
 
   TStopwatch timer;
   timer.Start();
@@ -216,7 +221,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
 
   gStyle->SetOptStat(0);
 
-  cout<<"Running for "<<jet_type<<" jets "<<endl;
+  cout<<"Running for "<<jet_type<<" jets, R = "<<radius<<endl;
  
   bool printDebug = true;
   TDatime date;
@@ -289,6 +294,15 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
   TH1F *hpp_gen[no_radius][nbins_eta];
   TH1F *hpp_reco[no_radius][nbins_eta];
   TH2F *hpp_matrix[no_radius][nbins_eta];
+  TH1F *hpp_JetComb_gen[no_radius][nbins_eta];
+  TH1F *hpp_JetComb_reco[no_radius][nbins_eta];
+  TH1F *hpp_Jet80_gen[no_radius][nbins_eta];
+  TH1F *hpp_Jet80_reco[no_radius][nbins_eta];
+  TH1F *hpp_Jet60_gen[no_radius][nbins_eta];
+  TH1F *hpp_Jet60_reco[no_radius][nbins_eta];
+  TH1F *hpp_Jet40_gen[no_radius][nbins_eta];
+  TH1F *hpp_Jet40_reco[no_radius][nbins_eta];
+  TH2F *hpp_matrix_HLT[no_radius][nbins_eta];
   TH2F *hpp_mcclosure_matrix[no_radius][nbins_eta];
   TH1F *hpp_mcclosure_data[no_radius][nbins_eta];
   //TH1F *hpp_eta[no_radius][nbins_eta], *hpp_phi[no_radius][nbins_eta];
@@ -304,7 +318,17 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
     for(int j = 0;j<nbins_eta;j++){
       hpp_gen[k][j] = new TH1F(Form("hpp_gen_R%d_%s",list_radius[k],etaWidth[j]),Form("gen refpt R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
       hpp_reco[k][j] = new TH1F(Form("hpp_reco_R%d_%s",list_radius[k],etaWidth[j]),Form("reco jtpt R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      
+      hpp_JetComb_gen[k][j] = new TH1F(Form("hpp_JetComb_gen_R%d_%s",list_radius[k],etaWidth[j]),Form("gen refpt from JetComb trigger R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_JetComb_reco[k][j] = new TH1F(Form("hpp_JetComb_reco_R%d_%s",list_radius[k],etaWidth[j]),Form("reco jtpt from JetComb trigger R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_Jet80_gen[k][j] = new TH1F(Form("hpp_Jet80_gen_R%d_%s",list_radius[k],etaWidth[j]),Form("gen refpt from Jet80 trigger R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_Jet80_reco[k][j] = new TH1F(Form("hpp_Jet80_reco_R%d_%s",list_radius[k],etaWidth[j]),Form("reco jtpt from Jet80 trigger R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_Jet60_gen[k][j] = new TH1F(Form("hpp_Jet60_gen_R%d_%s",list_radius[k],etaWidth[j]),Form("gen refpt from Jet60 && !Jet80 trigger R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_Jet60_reco[k][j] = new TH1F(Form("hpp_Jet60_reco_R%d_%s",list_radius[k],etaWidth[j]),Form("reco jtpt from Jet60 && !jet80  trigger R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_Jet40_gen[k][j] = new TH1F(Form("hpp_Jet40_gen_R%d_%s",list_radius[k],etaWidth[j]),Form("gen refpt from Jet40 && !jet65 && !jet55 trigger R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_Jet40_reco[k][j] = new TH1F(Form("hpp_Jet40_reco_R%d_%s",list_radius[k],etaWidth[j]),Form("reco jtpt from Jet40 && !jet65 && !jet55 trigger R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
       hpp_matrix[k][j] = new TH2F(Form("hpp_matrix_R%d_%s",list_radius[k],etaWidth[j]),Form("matrix refpt jtpt R%d %s",list_radius[k],etaWidth[j]),1000,0,1000,1000,0,1000);
+      hpp_matrix_HLT[k][j] = new TH2F(Form("hpp_matrix_HLT_R%d_%s",list_radius[k],etaWidth[j]),Form("matrix refpt jtpt from the HLT triggers combined R%d %s",list_radius[k],etaWidth[j]),1000,0,1000,1000,0,1000);
       hpp_mcclosure_matrix[k][j] = new TH2F(Form("hpp_mcclosure_matrix_R%d_%s",list_radius[k],etaWidth[j]),Form("matrix mcclosure refpt jtpt R%d %s",list_radius[k],etaWidth[j]),1000,0,1000,1000,0,1000);
       //TH2F* hpp_response = new TH2F("hpp_response","response jtpt refpt",1000,0,1000,1000,0,1000);
       hpp_mcclosure_data[k][j] = new TH1F(Form("hpp_mcclosure_data_R%d_%s",list_radius[k],etaWidth[j]),Form("data for unfolding mc closure test pp R%d %s",list_radius[k],etaWidth[j]),1000,0,1000);
@@ -377,7 +401,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
 	hPP_pthat_fine_noScale[k]->Fill(dataPP[k][h]->pthat);
         hPtHatPP[k]->Fill(dataPP[k][h]->pthat,scalepp*weight_vz);
         int hasLeadingJet = 0;
-        hVzPPMC[k]->Fill(dataPP[k][h]->vz,scalepp*weight_vz);
+        hVzPPMC[k]->Fill(dataPP[k][h]->vz,scalepp);
 	
         for (int g= 0; g< dataPP[k][h]->njets; g++) { 
 
@@ -397,30 +421,44 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
 	  
 	  hpp_eta_full[k]->Fill(dataPP[k][h]->jteta[g],scalepp*weight_vz);
 	  hpp_phi_full[k]->Fill(dataPP[k][h]->jtphi[g],scalepp*weight_vz);
-
-
+	  
+	  
           for(int j = 0;j<nbins_eta;j++){
-            
+	    
             int subEvt=-1;
-
+	    
             if ( dataPP[k][h]->jteta[g]  > boundaries_eta[j][1] || dataPP[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
-          
+	    
             //hpp_response->Fill(dataPP[k][h]->jtpt[k],dataPP[k][h]->refpt[k],scalepp*weight_vz);
             hpp_matrix[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],scalepp*weight_vz);
             hpp_gen[k][j]->Fill(dataPP[k][h]->refpt[g],scalepp*weight_vz);   
             hpp_reco[k][j]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
-	    	    
+	    
             if(jentry%2==0) {
 	      hpp_mcclosure_data[k][j]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
 	    }
 	    if(jentry%2==1) {
 	      hpp_mcclosure_matrix[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],scalepp*weight_vz);	      
 	    }
-            
+
+	    if(dataPP[k][h]->jet80_1){
+	      hpp_Jet80_gen[k][j]->Fill(dataPP[k][h]->refpt[g],scalepp*weight_vz);
+	      hpp_Jet80_reco[k][j]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      hpp_matrix_HLT[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	    }else if(dataPP[k][h]->jet60_1 && !dataPP[k][h]->jet80_1){
+	      hpp_Jet60_gen[k][j]->Fill(dataPP[k][h]->refpt[g],scalepp*weight_vz);
+	      hpp_Jet60_reco[k][j]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      hpp_matrix_HLT[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	    }else if(dataPP[k][h]->jet40_1 && !dataPP[k][h]->jet60_1 && !dataPP[k][h]->jet80_1){
+	      hpp_Jet40_gen[k][j]->Fill(dataPP[k][h]->refpt[g],scalepp*weight_vz);
+	      hpp_Jet40_reco[k][j]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      hpp_matrix_HLT[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],dataPP[k][h]->jet40_p_1*scalepp*weight_vz);
+	    }
+	    
           }//eta loop
 	  
         }//njet loop     
-      
+	
       }//nentry loop
       
     }//ptbins loop
@@ -438,9 +476,30 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
       divideBinWidth(hpp_reco[k][j]);
       divideBinWidth(hpp_mcclosure_data[k][j]);
 
-      hpp_gen[k][j]->Scale(1./(delta_eta[j]));
-      hpp_reco[k][j]->Scale(1./(delta_eta[j]));
-      hpp_mcclosure_data[k][j]->Scale(1./(delta_eta[j]));
+      //hpp_gen[k][j]->Scale(1./(delta_eta[j]));
+      //hpp_reco[k][j]->Scale(1./(delta_eta[j]));
+      //hpp_mcclosure_data[k][j]->Scale(1./(delta_eta[j]));
+
+      hpp_Jet80_gen[k][j]->Write();
+      hpp_Jet80_reco[k][j]->Write();
+
+      hpp_Jet60_gen[k][j]->Write();
+      hpp_Jet60_reco[k][j]->Write();
+
+      hpp_Jet40_gen[k][j]->Write();
+      hpp_Jet40_reco[k][j]->Write();
+
+      hpp_JetComb_gen[k][j]->Add(hpp_Jet80_gen[k][j]);
+      hpp_JetComb_gen[k][j]->Add(hpp_Jet60_gen[k][j]);
+      hpp_JetComb_gen[k][j]->Add(hpp_Jet40_gen[k][j]);
+      hpp_JetComb_gen[k][j]->Write();
+
+      hpp_JetComb_reco[k][j]->Add(hpp_Jet80_reco[k][j]);
+      hpp_JetComb_reco[k][j]->Add(hpp_Jet60_reco[k][j]);
+      hpp_JetComb_reco[k][j]->Add(hpp_Jet40_reco[k][j]);
+      hpp_JetComb_reco[k][j]->Write();
+
+      hpp_matrix_HLT[k][j]->Write();
 
       hpp_gen[k][j]->Write();
       if(printDebug)hpp_gen[k][j]->Print("base");
@@ -469,6 +528,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 4){
     if(printDebug)hpp_phi_full_noScale[k]->Print("base");
     if(printDebug)hPP_pthat_fine_noScale[k]->Print("base");
     hPP_pthat_fine_noScale[k]->Write();
+    hVzPPMC[k]->Write();
 
   }
 
