@@ -1090,8 +1090,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       }
       
 
-#endif
-
       
       if(jet55_1 && (eMax_1[0]/pt_1[0]>0.8) && pt_1[0]>80) {
 	event_value = evt_1;
@@ -1106,6 +1104,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	lumi_value = lumi_1;
 	evt_electron_good[k]->Fill();
       }
+
+#endif
       
       for(int j = 0;j<nbins_eta;j++){
 
@@ -1186,10 +1186,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  //if((neMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (phMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/pt_1[g]>0.05) && (muMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9)){
 	  //if(1>0){
 
-	  hpbpb_RecoOverRaw[k][j][centBin]->Fill((Float_t)pt_1[g]/raw_1[g]);
-	  hpbpb_RecoOverRaw[k][j][nbins_cent]->Fill((Float_t)pt_1[g]/raw_1[g]);
-	  hpbpb_RecoOverRaw_jtpt[k][j][centBin]->Fill(pt_1[g],(Float_t)pt_1[g]/raw_1[g]);
-	  hpbpb_RecoOverRaw_jtpt[k][j][nbins_cent]->Fill(pt_1[g],(Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw[k][j][centBin]->Fill((Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw[k][j][nbins_cent]->Fill((Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw_rawpt[k][j][centBin]->Fill(raw__1[g],(Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw_rawpt[k][j][nbins_cent]->Fill(raw_1[g],(Float_t)pt_1[g]/raw_1[g]);
 
 	  hpbpb_chMax[k][j][centBin]->Fill(chMax_1[g]);
 	  hpbpb_phMax[k][j][centBin]->Fill(phMax_1[g]);
@@ -1257,7 +1257,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      hpbpb_FullJet80[centBin]->Fill(pt_1[g]);
 	      hpbpb_FullJet80[nbins_cent]->Fill(pt_1[g]);
 #endif
-	    }else if(jet65_1==1 && L1_sj36_1==1) {
+	    }
+	    if(jet65_1==1 && L1_sj36_1==1) {
 
 
 	      // if(trgObj_pt_1>=65 && trgObj_pt_1<80){
@@ -1276,9 +1277,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      // hpbpb_Jet65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
 	      // hpbpb_Jet65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
 
-	      if(jet80_1==0){
-		hpbpb_TrgObj65[k][j][centBin]->Fill(pt_1[g]);
-		hpbpb_TrgObj65[k][j][nbins_cent]->Fill(pt_1[g]);
+	    
+	      hpbpb_TrgObj65[k][j][centBin]->Fill(pt_1[g]);
+	      hpbpb_TrgObj65[k][j][nbins_cent]->Fill(pt_1[g]);
 		
 #if 0		
 		if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
@@ -1301,13 +1302,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 		hpbpb_FullJet65[centBin]->Fill(pt_1[g]);
 		hpbpb_FullJet65[nbins_cent]->Fill(pt_1[g]);
 #endif
-	      }
+	      
 
-	    }else if(jet55_1==1 && L1_sj36_1==1) { // passes the jet55 trigger
-	      if(jet65_1==0 && jet80_1 == 0){
+	    }
+	    if(jet55_1==1 && L1_sj36_1==1 && jet65_1==0 && jet80_1 == 0) { // passes the jet55 trigger
 		hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
 		hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
-	      }
 
 #if 0	      
 	      if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
@@ -1585,7 +1585,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   */
   
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_marguerite_good_skim_ntuple_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_marguerite_comb_chMaxjtpt0p5__ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   //hEvents_HLT80->Write();
@@ -1597,7 +1597,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     for(int j = 0;j<nbins_eta;j++){
       
       for(int i = 0;i<=nbins_cent;i++){
-#if 0
 	//jets_ID[p]->Write();
 	hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj80[k][j][i]);
 	hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj65[k][j][i]);
@@ -1611,10 +1610,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	if(printDebug)hpbpb_TrgObj65[k][j][i]->Print();
 	hpbpb_TrgObj55[k][j][i]->Write();
 	if(printDebug)hpbpb_TrgObj55[k][j][i]->Print();
-	hpbpb_RecoOverRaw_jtpt[k][j][i]->Write();
-	if(printDebug)hpbpb_RecoOverRaw_jtpt[k][j][i]->Print();
-	hpbpb_RecoOverRaw[k][j][i]->Write();
-	if(printDebug)hpbpb_RecoOverRaw[k][j][i]->Print();
+	
+	// hpbpb_RecoOverRaw_jtpt[k][j][i]->Write();
+	// if(printDebug)hpbpb_RecoOverRaw_jtpt[k][j][i]->Print();
+	// hpbpb_RecoOverRaw[k][j][i]->Write();
+	// if(printDebug)hpbpb_RecoOverRaw[k][j][i]->Print();
+
 	hpbpb_chMax[k][j][i]->Write();
 	hpbpb_phMax[k][j][i]->Write();
 	hpbpb_neMax[k][j][i]->Write();
@@ -1625,11 +1626,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	hpbpb_neSum[k][j][i]->Write();
 	hpbpb_muSum[k][j][i]->Write();
 	hpbpb_eSum[k][j][i]->Write();
-#endif
       }
     }
     //evt_electron_failure[k]->Write();
-    evt_electron_good[k]->Write();
+    //evt_electron_good[k]->Write();
   }
   /*
   hEvents->Write();

@@ -30,7 +30,7 @@
 
 using namespace std;
 
-void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Pu",const char *type="MC"){
+void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",const char *type="data"){
   
   TDatime date;
 
@@ -76,8 +76,9 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Pu",
   
   // test histogram for ranPFsumEt
   //TH1F *test_ranpfsumet = new TH1F("test_ranpfsumet","",200,0,100);
-  
-  TTree* ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,rad,jet_type));
+  TTree* ak;
+  if(rad!=2)ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,rad,jet_type));
+  if(rad==2)ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,3,jet_type));
   // - TTree* ic      = (TTree*)FileA->Get("icPu5JetAnalyzer/t"); // - not there in the new forest 
   TTree* hlt     = (TTree*)FileA->Get("hltanalysis/HltTree");
   TTree* skim    = (TTree*)FileA->Get("skimanalysis/HltTree");
@@ -166,14 +167,15 @@ void RAA_randomcone(int rad=3, const char* jet_type="PF", const char *algo="Pu",
   hlt->SetBranchAddress("LumiBlock",&lumiS);
   hiEv->SetBranchAddress("hiBin",&cBin);
   hiEv->SetBranchAddress("vz",&vz);
-  
+  /*
   ak->SetBranchAddress("jteta",&jteta);
   ak->SetBranchAddress("jtpt",&jtpt);
   ak->SetBranchAddress("jtphi",&jtphi);
   ak->SetBranchAddress("jtpu",&jtpu);
   ak->SetBranchAddress("rawpt",&rawpt);
   ak->SetBranchAddress("nref",&nAKJets);
-
+  */
+  
   // ttrack->SetBranchAddress("trkEta",&trkEta);
   // ttrack->SetBranchAddress("trkPt",&trkPt);
   // ttrack->SetBranchAddress("trkPhi",&trkPhi);

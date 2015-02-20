@@ -57,24 +57,22 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 
-
-static const int nbins_eta = 1;
+static const int nbins_eta = 4;
 static const double boundaries_eta[nbins_eta][2] = {
-  {-2.0,+2.0}
+  {0.0,0.5}, {0.5,1.0}, {1.0,1.5}, {1.5,2.0}
 };
 
 static const double delta_eta[nbins_eta] = {
-  4.0
+  1.0, 1.0, 1.0, 1.0
 };
 
-static const char etaWidth[nbins_eta][256] = {
-  "n20_eta_p20"
+static const char etaWidth [nbins_eta][256] = {
+  "0_absEta_05","05_absEta_10","10_absEta_15","15_absEta_20"
 };
 
 
 static const int no_radius = 1;//testing purposes 
-static const int list_radius[no_radius] = {3};
-
+static const int list_radius[no_radius] = {5};
 
 // divide by bin width
 void divideBinWidth(TH1 *h){
@@ -211,7 +209,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc_pp(char *jet_type="PF", int radius = 3){
+void RAA_read_mc_pp(char *jet_type="PF", int radius = 5){
 
   TStopwatch timer;
   timer.Start();
@@ -427,7 +425,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 3){
 	    
             int subEvt=-1;
 	    
-            if ( dataPP[k][h]->jteta[g]  > boundaries_eta[j][1] || dataPP[k][h]->jteta[g] < boundaries_eta[j][0] ) continue;
+            if ( TMath::Abs(dataPP[k][h]->jteta[g])  > boundaries_eta[j][1] || TMath::Abs(dataPP[k][h]->jteta[g]) < boundaries_eta[j][0] ) continue;
 	    
             //hpp_response->Fill(dataPP[k][h]->jtpt[k],dataPP[k][h]->refpt[k],scalepp*weight_vz);
             hpp_matrix[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],scalepp*weight_vz);
@@ -465,7 +463,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 3){
     
   }//radius loop
   
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_chMaxjtpt_norawpt_ak%d%s_%d.root",radius,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_chMaxjtpt_norawpt_absEta_ak%d%s_%d.root",radius,jet_type,date.GetDate()),"RECREATE");
   f.cd();
   
   for(int k = 0;k<no_radius;k++){

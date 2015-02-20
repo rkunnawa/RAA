@@ -80,31 +80,20 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 
-// static const int nbins_eta = 14;
-// static const double boundaries_eta[nbins_eta][2] = {
-//   {-1.0,+1.0}, {-2.0,+2.0}, {-3.0,+3.0},
-//   {-3.0,-2.5}, {-2.5,-2.0}, {-2.0,-1.5}, 
-//   {-1.5,-1.0}, {-1.0,-0.5}, {-0.5,+0.5}, 
-//   {+0.5,+1.0}, {+1.0,+1.5}, {+1.5,+2.0}, 
-//   {+2.0,+2.5}, {+2.5,+3.0}
-// };
+static const int nbins_eta = 4;
+static const double boundaries_eta[nbins_eta][2] = {
+  {0.0,0.5}, {0.5,1.0}, {1.0,1.5}, {1.5,2.0}
+};
 
-// static const double delta_eta[nbins_eta] = {
-//   2.0, 4.0, 6.0, 
-//   0.5, 0.5, 0.5, 
-//   0.5, 0.5, 1.0, 
-//   0.5, 0.5, 0.5, 
-//   0.5, 0.5
-// };
+static const double delta_eta[nbins_eta] = {
+  1.0, 1.0, 1.0, 1.0
+};
 
-// static const char etaWidth [nbins_eta][256] = {
-//   "n10_eta_p10","n20_eta_p20","n30_eta_p30",
-//   "n30_eta_n25","n25_eta_n20","n20_eta_n15",
-//   "n15_eta_n10","n10_eta_n05","n05_eta_p05",
-//   "p05_eta_p10","p10_eta_p15","p15_eta_p20",
-//   "p20_eta_p25","p25_eta_p30"
-// };
+static const char etaWidth [nbins_eta][256] = {
+  "0_absEta_05","05_absEta_10","10_absEta_15","15_absEta_20"
+};
 
+/*
 static const int nbins_eta = 1;
 static const double boundaries_eta[nbins_eta][2] = {
   {-2.0,+2.0}
@@ -117,9 +106,10 @@ static const double delta_eta[nbins_eta] = {
 static const char etaWidth [nbins_eta][256] = {
   "n20_eta_p20"
 };
+*/
 
-static const int no_radius = 3;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {2,3,4};
+static const int no_radius = 2;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {3,5};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -379,7 +369,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
 	for(int g = 0;g<nrefe_1;g++){
 
-	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
+	  if(TMath::Abs(eta_1[g])<boundaries_eta[j][0] || TMath::Abs(eta_1[g])>boundaries_eta[j][1]) continue;
 
 #if 0
 	  arrayValues[0] = raw_1[g];
@@ -436,7 +426,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   TDatime date;
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt_norawptcut_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt_norawptcut_absEta_35_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   hEvents_HLT80->Write();

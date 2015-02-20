@@ -319,13 +319,14 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_HYDJET.root"));
     // TFile *ak5MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_HYDJET.root"));
 
-    TFile *ak3MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs3PF_20141008.root"));
-    TFile *ak4MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs4PF_20141008.root"));
-    TFile *ak5MCFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_MC_akVs5PF_20141008.root"));
+    TFile *ak2MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu2PF_20150217.root"));
+    TFile *ak3MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu3PF_20150206.root"));
+    TFile *ak4MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu4PF_20150206.root"));
+    //TFile *ak5MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu5PF_20150206.root"));
     
-    akTreeMC[0]   = (TTree*)ak3MCFile->Get("nt");
-    akTreeMC[1]   = (TTree*)ak4MCFile->Get("nt");
-    akTreeMC[2]   = (TTree*)ak5MCFile->Get("nt");
+    akTreeMC[0]   = (TTree*)ak2MCFile->Get("nt");
+    akTreeMC[1]   = (TTree*)ak3MCFile->Get("nt");
+    akTreeMC[2]   = (TTree*)ak4MCFile->Get("nt");
     //akTreeMC[3]   = (TTree*)ak5MCFile->Get("nt");
   }
   if(doData){
@@ -333,13 +334,14 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_DATA.root"));
     // TFile *ak5dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_DATA.root"));
 
-    TFile *ak3dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs3PF_20141008.root"));
-    TFile *ak4dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs4PF_20141008.root"));
-    TFile *ak5dataFile = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/test_randomcone_data_akVs5PF_20141008.root"));
+    TFile *ak2dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu2PF_20150217.root"));
+    TFile *ak3dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu3PF_20150206.root"));
+    TFile *ak4dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu4PF_20150206.root"));
+    //TFile *ak5dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu5PF_20150206.root"));
 
-    akTreeData[0]   = (TTree*)ak3dataFile->Get("nt");
-    akTreeData[1]   = (TTree*)ak4dataFile->Get("nt");
-    akTreeData[2]   = (TTree*)ak5dataFile->Get("nt");
+    akTreeData[0]   = (TTree*)ak2dataFile->Get("nt");
+    akTreeData[1]   = (TTree*)ak3dataFile->Get("nt");
+    akTreeData[2]   = (TTree*)ak4dataFile->Get("nt");
     //akTreeData[3]   = (TTree*)ak5dataFile->Get("nt");
     //TFile *ak4pADataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_DATA.root"));
     //TFile *ak4PbPbDataFile = TFile::Open(Form("randomCones_TkpTCut0_ak4_PbPb_DATA.root"));
@@ -488,7 +490,7 @@ void LoopCorrRandomCone_MacroV6(){
    
     const char* var2 = "jpu";
 
-    const char* varLabel[nAlgos] = { "R=0.3","R=0.4","R=0.5" };
+    const char* varLabel[nAlgos] = { "R=0.2","R=0.3","R=0.4" };
     const char* hType[2] = {"MC    ","DataMB"};
    
     double marker [2] = {20,25};//,21,25};//22,26};
@@ -611,7 +613,9 @@ void LoopCorrRandomCone_MacroV6(){
 	// Double_t sigmafitMC=fMC->GetParameter(2);
 	// cout<<"sigmafitMC  "<<sigmafitMC<<endl;
 	// cout<<"i   "<<i<<" ir  "<<ir<<endl;
-	 
+
+	ranConeMC[i][ir]->Rebin(5);
+	ranConeMC[i][ir]->Scale(1./5);
 	if (ir==0) ranConeMC[i][ir]->Draw("");
 	if (ir!=0) ranConeMC[i][ir]->Draw("same");	
 	//if (ir==0)
@@ -635,7 +639,8 @@ void LoopCorrRandomCone_MacroV6(){
 	// sigmaarrayerr[i][ir]=f1->GetParError(2);
 	// cout<<"test "<<sigmaarray[i][ir]<<endl;
 	
-	
+	ranConeData[i][ir]->Rebin(5);
+	ranConeData[i][ir]->Scale(1./5);
 	ranConeData[i][ir]->Draw("same");
 	
 	//TF1 *f2=ranConeData[i][ir]->GetFunction("f1");
@@ -663,10 +668,11 @@ void LoopCorrRandomCone_MacroV6(){
     putCMSSim(0.1,0.95);
     drawText("-2<#eta<2",0.5,0.5,20);
 
-    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_12cent_n2_eta_p2_%d.pdf",date.GetDate()));
-    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_12cent_n2_eta_p2_%d.root",date.GetDate())); 
+    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_12cent_n2_eta_p2_234_%d.pdf",date.GetDate()));
+    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_12cent_n2_eta_p2_234_%d.root",date.GetDate())); 
 
 
+    /*
     // make the jtpu plot from MB hydjet and data. 
     TCanvas *c2MC = new TCanvas("c2MC","c2MC",1400,1200);
     makeMultiPanelCanvas(c2MC,4,3,0.0,0.0,0.2,0.15,0.07);
@@ -779,7 +785,6 @@ void LoopCorrRandomCone_MacroV6(){
 	// sigmaarrayerr[i][ir]=f1->GetParError(2);
 	// cout<<"test "<<sigmaarray[i][ir]<<endl;
 	
-
 	jtpuData[i][ir]->Draw("same");
 	
 	//TF1 *f2=jtpuData[i][ir]->GetFunction("f1");
@@ -791,39 +796,28 @@ void LoopCorrRandomCone_MacroV6(){
 	//drawText(cent[i], 0.83, 0.23);
 	 
 
-	/*	 if (ir==0) ranConeMC[i][ir]->Draw("same");
+		 if (ir==0) ranConeMC[i][ir]->Draw("same");
 		 if (ir!=0) ranConeMC[i][ir]->Draw("same");	
 		 if (ir==0){      leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");}
        
 		 leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [ mean: %5.2f #pm %5.2f ]",varLabel[ir],hType[0],meanMC[i][ir],meanErrMC[i][ir]),"lp");
 		 leg1[i]->Draw();	      
 		 drawText(cent[i], 0.23, 0.83);
-	*/
+	
       
       }
     } 
 
     c2MC->cd(1);
-    putCMSSim(0.1,0.95);
+    putCMSPre(0.1,0.95);
 
     if (doPrint) c2MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_jtpu_12cent_n2_eta_p2_%d.pdf",date.GetDate()));
     if (doPrint) c2MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_jtpu_12cent_n2_eta_p2_%d.root",date.GetDate())); 
 
+    */
 
-
-    //for (int i=0; i<nCent; i++){
-
-      //for(int ir=0; ir<3; ir++){
-      //cout<<"cent  "<<i<<" algos  "<<ir<<"    "<<sigmaarray[i][ir]<<"    "<<sigmaarrayerr[i][ir]<<"\n"<<endl;
-	//cout<<"cent  "<<i<<" algos  "<<ir<<"    "<<sigmaarray[i][ir]<<"\n"<<endl;
-      //}
-     
-    //}
-   
 
   }
 
-  
-  //return;
  
 }

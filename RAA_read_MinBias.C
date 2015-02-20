@@ -154,7 +154,7 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "PF", char *Type = "MC"){
+void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "PF", char *Type = "Data"){
 
   TH1::SetDefaultSumw2();
   
@@ -165,12 +165,13 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   
   cout<<"Running for Algo = "<<algo<<" "<<jet_type<<endl;
   
-  bool printDebug = false;
+  bool printDebug = true;
 
   // Now im going to change the file reading here for PbPb to look at the unmerged files through condor. 
   std::string infile1;
   if(Type=="MC")infile1 = "PbPb_HydjetMinBias_forest.txt";
-  if(Type=="Data")infile1 = "PbPb_MinBiasUPC_forest.txt";
+  //if(Type=="Data")infile1 = "PbPb_MinBiasUPC_forest.txt";
+  if(Type=="Data")infile1 = "jetRAA_MinBiasUPC_forest.txt";
   
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
@@ -365,10 +366,20 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     jetpbpb1[2][k]->SetBranchAddress("eMax",&eMax_1);
     jetpbpb1[2][k]->SetBranchAddress("muSum",&muSum_1);
     jetpbpb1[2][k]->SetBranchAddress("muMax",&muMax_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_MinBiasHFOrBSC_v5",&jetMB_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_MinBiasHFOrBSC_v5_Prescl",&jetMB_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIMinBiasHfOrBSC_v1",&jetMB_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIMinBiasHfOrBSC_v1_Prescl",&jetMB_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias",&L1_MB_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1",&jet65_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1",&jet80_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND",&L1_sj36_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND_Prescl",&L1_sj36_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND",&L1_sj52_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND_Prescl",&L1_sj52_p_1);
     
     /*
     jetpbpb1[2][k]->SetBranchAddress("nPFpart", &nPFpart);
@@ -386,25 +397,50 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   }//radius loop
 
 
-  // we need to add the histograms to find the jet spectra from normal and failure mode- infact just add them to the ntuples per event the value of the HFSumpT*vn*cos/sin(n*psi_n) so we can plot the spectra at the final stage. this would make things easier. 
+  // we need to add the histograms to find the jet spectra from normal and failure mode- infact just add them to the ntuples per event the value of the HFSumpT*vn*cos/sin(n*psi_n) so we can plot the spectra at the final stage. this would make things easier.
+  /*
   TNtuple *jets_ID;
   if(Type=="Data") jets_ID= new TNtuple("jets_ID","","rawpt:jtpt:jtpu:L1_MB:L1_MB_prescl:HLTZeroBias_MB:HLTZeroBias_MB_prescl:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
   if(Type=="MC")  jets_ID= new TNtuple("jets_ID","","rawpt:jtpt:jtpu:L1_MB:L1_MB_prescl:HLTZeroBias_MB:HLTZeroBias_MB_prescl:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum:refpt:subid");
   Float_t arrayValues_Data[18];
   Float_t arrayValues_MC[20];
-
+  */
+  
   TH1F *hEvents  = new TH1F("hEvents","",2,0,1);
   TH1F *hJets = new TH1F("hJets","",2,0,1);
+
+  TH1F *hJetMB = new TH1F("hJetMB","",200,0,200);
+  TH1F *hL1MB = new TH1F("hL1MB","",200,0,200);
+  TH1F *hJet80 = new TH1F("hJet80","",200,0,200);
+  TH1F *hJet65 = new TH1F("hJet65","",200,0,200);
+  TH1F *hJet55 = new TH1F("hJet55","",200,0,200);
+  TH1F *hL1SJ36 = new TH1F("hL1SJ36","",200,0,200);
+  TH1F *hL1SJ52 = new TH1F("hL1SJ52","",200,0,200);
+  TH1F *hL1MB_JetMB = new TH1F("hL1MB_JetMB","",200,0,200);
+  TH1F *hJet80_JetMB = new TH1F("hJet80_JetMB","",200,0,200);
+  TH1F *hJet65_JetMB = new TH1F("hJet65_JetMB","",200,0,200);
+  TH1F *hJet55_JetMB = new TH1F("hJet55_JetMB","",200,0,200);
+  TH1F *hL1SJ36_JetMB = new TH1F("hL1SJ36_JetMB","",200,0,200);
+  TH1F *hL1SJ52_JetMB = new TH1F("hL1SJ52_JetMB","",200,0,200);
  
   for(int k = 0;k<no_radius;k++){
 
     if(printDebug)cout<<"Running data reading for R = "<<list_radius[k]<<endl;
     // loop for the jetpbpb1[2] tree 
-    Long64_t nentries_jet55or65 = jetpbpb1[2][k]->GetEntries();
-    if(printDebug)cout<<"nentries_jet55or65or80 = "<<nentries_jet55or65<<endl;
-    //if(printDebug)nentries_jet55or65 = 2;
+    Long64_t nentries_MB = jetpbpb1[2][k]->GetEntries();
+    if(printDebug)cout<<"nentries_MB = "<<nentries_MB<<endl;
+
+    cout<<"No of events with HLT_HIMinBiasHfOrBSC_v1 = "<<jetpbpb1[2][k]->GetEntries("HLT_HIMinBiasHfOrBSC_v1")<<endl;
+    cout<<"No of events with HLT_HIMinBiasHfOrBSC_v1 = "<<jetpbpb1[2][k]->GetEntries("HLT_HIMinBiasHfOrBSC_v1")<<endl;
+    cout<<"No of events with L1_ZeroBias = "<<jetpbpb1[2][k]->GetEntries("L1_ZeroBias")<<endl;
+    cout<<"No of events with HLT_HIJet55_v1 = "<<jetpbpb1[2][k]->GetEntries("HLT_HIJet55_v1")<<endl;
+    cout<<"No of events with HLT_HIJet65_v1 = "<<jetpbpb1[2][k]->GetEntries("HLT_HIJet65_v1")<<endl;
+    cout<<"No of events with HLT_HIJet80_v1 = "<<jetpbpb1[2][k]->GetEntries("HLT_HIJet80_v1")<<endl;
+    cout<<"No of events with L1_SingleJet36_BptxAND = "<<jetpbpb1[2][k]->GetEntries("L1_SingleJet36_BptxAND")<<endl;
+    cout<<"No of events with L1_SingleJet52_BptxAND = "<<jetpbpb1[2][k]->GetEntries("L1_SingleJet52_BptxAND")<<endl;
+    
    
-    for(int jentry = 0;jentry<nentries_jet55or65;jentry++){
+    for(int jentry = 0;jentry<nentries_MB;jentry++){
 
       jetpbpb1[0][k]->GetEntry(jentry);
       jetpbpb1[1][k]->GetEntry(jentry);
@@ -416,7 +452,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
       if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<endl;
       
       int centBin = findBin(hiBin_1);//tells us the centrality of the event. 
-      
+
       if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
 
       if(fabs(vz_1)>15) continue;
@@ -525,15 +561,48 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 	isDivergeLoose = true;
       }
       
-
 #endif
+
 
       for(int j = 0;j<nbins_eta;j++){
 
 	for(int g = 0;g<nrefe_1;g++){ // this is the loop for the  Jets we are interested in.  
 	  	  
-	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
+	  //if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
+
+	  if(L1_MB_1) cout<<"hi"<<endl;
+
 	  
+	  if(jetMB_1) hJetMB->Fill(pt_1[g],jetMB_p_1);
+	  if(L1_MB_1) hL1MB->Fill(pt_1[g],L1_MB_p_1);
+	  if(L1_sj36_1) hL1SJ36->Fill(pt_1[g],L1_sj36_1);
+	  if(L1_sj52_1) hL1SJ52->Fill(pt_1[g],L1_sj52_1);
+	  if(jet80_1) hJet80->Fill(pt_1[g],jet80_p_1);
+	  if(jet65_1) hJet65->Fill(pt_1[g],jet65_p_1);
+	  if(jet55_1) hJet55->Fill(pt_1[g],jet55_p_1);
+	  if(jetMB_1 && L1_MB_1) hL1MB_JetMB->Fill(pt_1[g],L1_MB_p_1*jetMB_p_1);
+	  if(jetMB_1 && L1_sj36_1) hL1SJ36_JetMB->Fill(pt_1[g],L1_sj36_1*jetMB_p_1);
+	  if(jetMB_1 && L1_sj52_1) hL1SJ52_JetMB->Fill(pt_1[g],L1_sj52_1*jetMB_p_1);
+	  if(jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[g],jet80_p_1*jetMB_p_1);
+	  if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[g],jet65_p_1*jetMB_p_1);
+	  if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[g],jet55_p_1*jetMB_p_1);	  
+	  
+	  /*
+	  if(jetMB_1) hJetMB->Fill(pt_1[g]);
+	  if(L1_MB_1) hL1MB->Fill(pt_1[g]);
+	  if(L1_sj36_1) hL1SJ36->Fill(pt_1[g]);
+	  if(L1_sj52_1) hL1SJ52->Fill(pt_1[g]);
+	  if(jet80_1) hJet80->Fill(pt_1[g]);
+	  if(jet65_1) hJet65->Fill(pt_1[g]);
+	  if(jet55_1) hJet55->Fill(pt_1[g]);
+	  if(jetMB_1 && L1_MB_1) hL1MB_JetMB->Fill(pt_1[g]);
+	  if(jetMB_1 && L1_sj36_1) hL1SJ36_JetMB->Fill(pt_1[g]);
+	  if(jetMB_1 && L1_sj52_1) hL1SJ52_JetMB->Fill(pt_1[g]);
+	  if(jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[g]);
+	  if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[g]);
+	  if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[g]);
+	  */
+	  /*
 	  if(Type=="Data"){
 	    arrayValues_Data[0] = raw_1[g];
 	    arrayValues_Data[1] = pt_1[g];
@@ -582,6 +651,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 	    jets_ID->Fill(arrayValues_MC);
 
 	  }
+	  */
 
 	  hJets->Fill(1);
 	  
@@ -589,28 +659,59 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 	}//jet loop
 	  
       }//eta bin loop
+
     
     }//nentries_jet55or65 loop
     
-  }//radius loop. 
- 
+  }//radius loop.
+
+  TH1F * hJet55_TrigTurnon = (TH1F*)hJet55->Clone("hJet55_TrigTurnon");
+  hJet55_TrigTurnon->Divide(hJet55_JetMB);
+  TH1F * hJet65_TrigTurnon = (TH1F*)hJet65->Clone("hJet65_TrigTurnon");
+  hJet65_TrigTurnon->Divide(hJet65_JetMB);
+  TH1F * hJet80_TrigTurnon = (TH1F*)hJet80->Clone("hJet80_TrigTurnon");
+  hJet80_TrigTurnon->Divide(hJet80_JetMB);
+  TH1F * hL1SJ36_TrigTurnon = (TH1F*)hL1SJ36->Clone("hL1SJ36_TrigTurnon");
+  hL1SJ36_TrigTurnon->Divide(hL1SJ36_JetMB);
+  TH1F * hL1SJ52_TrigTurnon = (TH1F*)hL1SJ52->Clone("hL1SJ52_TrigTurnon");
+  hL1SJ52_TrigTurnon->Divide(hL1SJ52_JetMB); 
  
   if(Type=="Data"){
-    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_jetntuple_withEvtCuts_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
     f.cd();
 
-    jets_ID->Write();
-    hJets->Write();
-    hEvents->Write();
+    //jets_ID->Write();
+    //hJets->Write();
+    //hEvents->Write();
+    
+    hJetMB->Write();
+    hJet80->Write();
+    hJet65->Write();
+    hJet55->Write();
+    hL1MB->Write();
+    hL1SJ36->Write();
+    hL1SJ52->Write();
+    hJet80_JetMB->Write();
+    hJet65_JetMB->Write();
+    hJet55_JetMB->Write();
+    hL1MB_JetMB->Write();
+    hL1SJ36_JetMB->Write();
+    hL1SJ52_JetMB->Write();
+    hJet55_TrigTurnon->Write();
+    hJet65_TrigTurnon->Write();
+    hJet80_TrigTurnon->Write();
+    hL1SJ36_TrigTurnon->Write();
+    hL1SJ52_TrigTurnon->Write();
+    
   }
 
   if(Type=="MC"){
     TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_HydjetMinBias_jetntuple_withEvtCuts_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
     f.cd();
 
-    jets_ID->Write();
-    hJets->Write();
-    hEvents->Write();
+    //jets_ID->Write();
+    //hJets->Write();
+    //hEvents->Write();
   }
   
   timer.Stop();
