@@ -74,8 +74,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
   
-  TFile *fData = TFile::Open("/Users/raghavke/WORK/RAA/Output/PbPb_jetid_checks_akPuPF_20150220.root");
-  TFile *fMC = TFile::Open("/Users/raghavke/WORK/RAA/Output/PbPb_mc_chMaxjtpt_norawptcut_spectra_akPuPF_20150220.root");
+  TFile *fData = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_jetid_checks_akPuPF_20150220.root");
+  TFile *fMC = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_mc_chMaxjtpt_norawptcut_spectra_akPuPF_20150220.root");
 
   //get the histograms: 
   TH1F* hData_Jet80 = (TH1F*)fData->Get("hpbpb_Jet80");
@@ -329,75 +329,78 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet55_chMaxJtpt0p01->SetTitle(" ");
   hData_Jet55_chMaxJtpt0p01->SetXTitle(" Jet p_{T} (GeV/c)");
   hData_Jet55_chMaxJtpt0p01->SetYTitle(" Cut effiiency (with Cut/without Cut) ");
-  hData_Jet55_chMaxJtpt0p01->SetAxisRange(0,2,"Y");
-  hData_Jet55_chMaxJtpt0p01->SetAxisRange(30,300,"X");
-  hData_Jet55_chMaxJtpt0p01->Rebin(10);
-  hData_Jet55_chMaxJtpt0p01->Scale(1./10);
-  hData_Jet55_chMaxJtpt0p01->SetMarkerStyle(24);
+  hData_Jet55_chMaxJtpt0p01->Rebin(5);
+  hData_Jet55_chMaxJtpt0p01->Scale(1./5);
+  hData_Jet55_chMaxJtpt0p01->SetMarkerStyle(33);
   hData_Jet55_chMaxJtpt0p01->SetMarkerColor(1);
+  hData_Jet55_chMaxJtpt0p01->SetAxisRange(30,300,"X");
+  hData_Jet55_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
   hData_Jet55_chMaxJtpt0p01->Draw();
+  drawText("Data",0.5,0.8,14);
 
-  hData_Jet55_chMaxJtpt0p02->Rebin(10);
-  hData_Jet55_chMaxJtpt0p02->Scale(1./10);
-  hData_Jet55_chMaxJtpt0p02->SetMarkerStyle(24);
+  hData_Jet55_chMaxJtpt0p02->Rebin(5);
+  hData_Jet55_chMaxJtpt0p02->Scale(1./5);
+  hData_Jet55_chMaxJtpt0p02->SetMarkerStyle(33);
   hData_Jet55_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet55_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet55_chMaxJtpt0p03->Rebin(10);
-  hData_Jet55_chMaxJtpt0p03->Scale(1./10);
-  hData_Jet55_chMaxJtpt0p03->SetMarkerStyle(24);
+  hData_Jet55_chMaxJtpt0p03->Rebin(5);
+  hData_Jet55_chMaxJtpt0p03->Scale(1./5);
+  hData_Jet55_chMaxJtpt0p03->SetMarkerStyle(33);
   hData_Jet55_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet55_chMaxJtpt0p03->Draw("same");
 
-  hData_Jet55_chMaxJtpt0p04->Rebin(10);
-  hData_Jet55_chMaxJtpt0p04->Scale(1./10);
-  hData_Jet55_chMaxJtpt0p04->SetMarkerStyle(24);
+  hData_Jet55_chMaxJtpt0p04->Rebin(5);
+  hData_Jet55_chMaxJtpt0p04->Scale(1./5);
+  hData_Jet55_chMaxJtpt0p04->SetMarkerStyle(33);
   hData_Jet55_chMaxJtpt0p04->SetMarkerColor(4);
   hData_Jet55_chMaxJtpt0p04->Draw("same");
 
-  hData_Jet55_chMaxJtpt0p05->Rebin(10);
-  hData_Jet55_chMaxJtpt0p05->Scale(1./10);
-  hData_Jet55_chMaxJtpt0p05->SetMarkerStyle(24);
+  hData_Jet55_chMaxJtpt0p05->Rebin(5);
+  hData_Jet55_chMaxJtpt0p05->Scale(1./5);
+  hData_Jet55_chMaxJtpt0p05->SetMarkerStyle(33);
   hData_Jet55_chMaxJtpt0p05->SetMarkerColor(5);
   hData_Jet55_chMaxJtpt0p05->Draw("same");
   line->Draw();
 
   cJet55->cd(2);
-  hMC_Jet55_chMaxJtpt0p01->SetAxisRange(0,2,"Y");
+  hMC_Jet55_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
   hMC_Jet55_chMaxJtpt0p01->SetAxisRange(30,300,"X");
-  hMC_Jet55_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet55_chMaxJtpt0p01->Scale(1./10);
-  hMC_Jet55_chMaxJtpt0p01->SetMarkerStyle(24);
+  hMC_Jet55_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet55_chMaxJtpt0p01->Scale(1./5);
+  hMC_Jet55_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet55_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet55_chMaxJtpt0p01->Draw();
+  drawText("MC",0.2,0.8,14); 
 
-  hMC_Jet55_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet55_chMaxJtpt0p02->Scale(1./10);
-  hMC_Jet55_chMaxJtpt0p02->SetMarkerStyle(24);
+  hMC_Jet55_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet55_chMaxJtpt0p02->Scale(1./5);
+  hMC_Jet55_chMaxJtpt0p02->SetMarkerStyle(33);
   hMC_Jet55_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet55_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet55_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet55_chMaxJtpt0p03->Scale(1./10);
-  hMC_Jet55_chMaxJtpt0p03->SetMarkerStyle(24);
+  hMC_Jet55_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet55_chMaxJtpt0p03->Scale(1./5);
+  hMC_Jet55_chMaxJtpt0p03->SetMarkerStyle(33);
   hMC_Jet55_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet55_chMaxJtpt0p03->Draw("same");
 
-  hMC_Jet55_chMaxJtpt0p04->Rebin(10);
-  hMC_Jet55_chMaxJtpt0p04->Scale(1./10);
-  hMC_Jet55_chMaxJtpt0p04->SetMarkerStyle(24);
+  hMC_Jet55_chMaxJtpt0p04->Rebin(5);
+  hMC_Jet55_chMaxJtpt0p04->Scale(1./5);
+  hMC_Jet55_chMaxJtpt0p04->SetMarkerStyle(33);
   hMC_Jet55_chMaxJtpt0p04->SetMarkerColor(4);
   hMC_Jet55_chMaxJtpt0p04->Draw("same");
 
-  hMC_Jet55_chMaxJtpt0p05->Rebin(10);
-  hMC_Jet55_chMaxJtpt0p05->Scale(1./10);
-  hMC_Jet55_chMaxJtpt0p05->SetMarkerStyle(24);
+  hMC_Jet55_chMaxJtpt0p05->Rebin(5);
+  hMC_Jet55_chMaxJtpt0p05->Scale(1./5);
+  hMC_Jet55_chMaxJtpt0p05->SetMarkerStyle(33);
   hMC_Jet55_chMaxJtpt0p05->SetMarkerColor(5);
   hMC_Jet55_chMaxJtpt0p05->Draw("same");
   line->Draw();
 
   cJet55->cd(3);
   drawText("#frac{charged Max}{Jet p_{T}} > X ",0.2,0.7,16);
+  drawText("Jet 55 trigger (does not include higher triggers)", 0.2,0.8,16);
   TLegend *Jet55_chMax = myLegend(0.2,0.2,0.6,0.6);
   Jet55_chMax->AddEntry(hData_Jet55_chMaxJtpt0p01,"0.01","pl");
   Jet55_chMax->AddEntry(hData_Jet55_chMaxJtpt0p02,"0.02","pl");
@@ -407,114 +410,118 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet55_chMax->Draw();
 
   cJet55->cd(4);
-  hData_Jet55_eMaxJtpt0p1->Rebin(10);
-  hData_Jet55_eMaxJtpt0p1->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p1->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p1->Rebin(5);
+  hData_Jet55_eMaxJtpt0p1->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p1->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p1->SetMarkerColor(1);
+  hData_Jet55_eMaxJtpt0p1->SetAxisRange(0,1.2,"Y");
+  hData_Jet55_eMaxJtpt0p1->SetAxisRange(30,300,"X");
   hData_Jet55_eMaxJtpt0p1->Draw();
 
-  hData_Jet55_eMaxJtpt0p2->Rebin(10);
-  hData_Jet55_eMaxJtpt0p2->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p2->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p2->Rebin(5);
+  hData_Jet55_eMaxJtpt0p2->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p2->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p2->SetMarkerColor(2);
   hData_Jet55_eMaxJtpt0p2->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p3->Rebin(10);
-  hData_Jet55_eMaxJtpt0p3->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p3->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p3->Rebin(5);
+  hData_Jet55_eMaxJtpt0p3->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p3->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p3->SetMarkerColor(3);
   hData_Jet55_eMaxJtpt0p3->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p4->Rebin(10);
-  hData_Jet55_eMaxJtpt0p4->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p4->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p4->Rebin(5);
+  hData_Jet55_eMaxJtpt0p4->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p4->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p4->SetMarkerColor(4);
   hData_Jet55_eMaxJtpt0p4->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p5->Rebin(10);
-  hData_Jet55_eMaxJtpt0p5->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p5->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p5->Rebin(5);
+  hData_Jet55_eMaxJtpt0p5->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p5->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p5->SetMarkerColor(5);
   hData_Jet55_eMaxJtpt0p5->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p6->Rebin(10);
-  hData_Jet55_eMaxJtpt0p6->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p6->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p6->Rebin(5);
+  hData_Jet55_eMaxJtpt0p6->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p6->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p6->SetMarkerColor(6);
   hData_Jet55_eMaxJtpt0p6->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p7->Rebin(10);
-  hData_Jet55_eMaxJtpt0p7->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p7->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p7->Rebin(5);
+  hData_Jet55_eMaxJtpt0p7->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p7->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p7->SetMarkerColor(7);
   hData_Jet55_eMaxJtpt0p7->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p8->Rebin(10);
-  hData_Jet55_eMaxJtpt0p8->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p8->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p8->Rebin(5);
+  hData_Jet55_eMaxJtpt0p8->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p8->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p8->SetMarkerColor(8);
   hData_Jet55_eMaxJtpt0p8->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p9->Rebin(10);
-  hData_Jet55_eMaxJtpt0p9->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p9->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p9->Rebin(5);
+  hData_Jet55_eMaxJtpt0p9->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p9->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p9->SetMarkerColor(9);
   hData_Jet55_eMaxJtpt0p9->Draw("same");
   line->Draw();
 
   cJet55->cd(5);
 
-  hMC_Jet55_eMaxJtpt0p1->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p1->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p1->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p1->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p1->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p1->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p1->SetMarkerColor(1);
+  hMC_Jet55_eMaxJtpt0p1->SetAxisRange(0,1.2,"Y");
+  hMC_Jet55_eMaxJtpt0p1->SetAxisRange(30,300,"X");
   hMC_Jet55_eMaxJtpt0p1->Draw();
 
-  hMC_Jet55_eMaxJtpt0p2->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p2->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p2->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p2->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p2->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p2->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p2->SetMarkerColor(2);
   hMC_Jet55_eMaxJtpt0p2->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p3->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p3->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p3->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p3->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p3->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p3->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p3->SetMarkerColor(3);
   hMC_Jet55_eMaxJtpt0p3->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p4->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p4->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p4->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p4->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p4->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p4->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p4->SetMarkerColor(4);
   hMC_Jet55_eMaxJtpt0p4->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p5->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p5->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p5->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p5->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p5->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p5->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p5->SetMarkerColor(5);
   hMC_Jet55_eMaxJtpt0p5->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p6->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p6->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p6->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p6->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p6->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p6->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p6->SetMarkerColor(6);
   hMC_Jet55_eMaxJtpt0p6->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p7->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p7->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p7->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p7->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p7->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p7->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p7->SetMarkerColor(7);
   hMC_Jet55_eMaxJtpt0p7->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p8->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p8->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p8->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p8->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p8->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p8->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p8->SetMarkerColor(8);
   hMC_Jet55_eMaxJtpt0p8->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p9->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p9->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p9->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p9->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p9->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p9->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p9->SetMarkerColor(9);
   hMC_Jet55_eMaxJtpt0p9->Draw("same");
   line->Draw();
@@ -534,112 +541,118 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet55_eMax->Draw();
 
   cJet55->cd(7);
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(10);
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(5);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(30,300,"X");
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetXTitle("Jet p_{T} (GeV/c)");
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(10);
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(10);
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./10);
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(24);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(5);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./5);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(33);
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(10);
-  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./10);
+  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(5);
+  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./5);
   hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerStyle(25);
   hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(10);
-  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./10);
+  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(5);
+  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./5);
   hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerStyle(25);
   hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(10);
-  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./10);
+  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(5);
+  hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./5);
   hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerStyle(25);
   hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(10);
-  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./10);
+  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(5);
+  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./5);
   hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerStyle(26);
   hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(10);
-  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./10);
+  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(5);
+  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./5);
   hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerStyle(26);
   hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(10);
-  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./10);
+  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(5);
+  hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./5);
   hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerStyle(26);
   hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Draw("same");
   line->Draw();
 
   cJet55->cd(8);
-  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetXTitle("Jet p_{T} (GeV/c)");
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
-  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./10);
-  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(24);
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./5);
+  hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(33);
   hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./10);
+  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerStyle(25);
   hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./10);
+  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./5);
   hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerStyle(25);
   hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./10);
+  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./5);
   hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerStyle(25);
   hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./10);
+  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerStyle(26);
   hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./10);
+  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./5);
   hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerStyle(26);
   hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./10);
+  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./5);
   hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerStyle(26);
   hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Draw("same");
@@ -659,7 +672,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet55_eMax_chMax->AddEntry(hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet55_eMax_chMax->Draw();
 
-  cJet55->SaveAs("PbPb_jet55_spectra_ratio_jetid.pdf","RECREATE");
+  cJet55->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet55_spectra_ratio_jetid.pdf","RECREATE");
 
 
 
@@ -672,72 +685,74 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet65_chMaxJtpt0p01->SetYTitle(" Cut effiiency (with Cut/without Cut) ");
   hData_Jet65_chMaxJtpt0p01->SetAxisRange(0,2,"Y");
   hData_Jet65_chMaxJtpt0p01->SetAxisRange(30,300,"X");
-  hData_Jet65_chMaxJtpt0p01->Rebin(10);
-  hData_Jet65_chMaxJtpt0p01->Scale(1./10);
-  hData_Jet65_chMaxJtpt0p01->SetMarkerStyle(24);
+  hData_Jet65_chMaxJtpt0p01->Rebin(5);
+  hData_Jet65_chMaxJtpt0p01->Scale(1./5);
+  hData_Jet65_chMaxJtpt0p01->SetMarkerStyle(33);
   hData_Jet65_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet65_chMaxJtpt0p01->Draw();
 
-  hData_Jet65_chMaxJtpt0p02->Rebin(10);
-  hData_Jet65_chMaxJtpt0p02->Scale(1./10);
-  hData_Jet65_chMaxJtpt0p02->SetMarkerStyle(24);
+  hData_Jet65_chMaxJtpt0p02->Rebin(5);
+  hData_Jet65_chMaxJtpt0p02->Scale(1./5);
+  hData_Jet65_chMaxJtpt0p02->SetMarkerStyle(33);
   hData_Jet65_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet65_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet65_chMaxJtpt0p03->Rebin(10);
-  hData_Jet65_chMaxJtpt0p03->Scale(1./10);
-  hData_Jet65_chMaxJtpt0p03->SetMarkerStyle(24);
+  hData_Jet65_chMaxJtpt0p03->Rebin(5);
+  hData_Jet65_chMaxJtpt0p03->Scale(1./5);
+  hData_Jet65_chMaxJtpt0p03->SetMarkerStyle(33);
   hData_Jet65_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet65_chMaxJtpt0p03->Draw("same");
 
-  hData_Jet65_chMaxJtpt0p04->Rebin(10);
-  hData_Jet65_chMaxJtpt0p04->Scale(1./10);
-  hData_Jet65_chMaxJtpt0p04->SetMarkerStyle(24);
+  hData_Jet65_chMaxJtpt0p04->Rebin(5);
+  hData_Jet65_chMaxJtpt0p04->Scale(1./5);
+  hData_Jet65_chMaxJtpt0p04->SetMarkerStyle(33);
   hData_Jet65_chMaxJtpt0p04->SetMarkerColor(4);
   hData_Jet65_chMaxJtpt0p04->Draw("same");
 
-  hData_Jet65_chMaxJtpt0p05->Rebin(10);
-  hData_Jet65_chMaxJtpt0p05->Scale(1./10);
-  hData_Jet65_chMaxJtpt0p05->SetMarkerStyle(24);
+  hData_Jet65_chMaxJtpt0p05->Rebin(5);
+  hData_Jet65_chMaxJtpt0p05->Scale(1./5);
+  hData_Jet65_chMaxJtpt0p05->SetMarkerStyle(33);
   hData_Jet65_chMaxJtpt0p05->SetMarkerColor(5);
   hData_Jet65_chMaxJtpt0p05->Draw("same");
   line->Draw();
+  drawText("Data",0.2,0.8,16);
 
   cJet65->cd(2);
   hMC_Jet65_chMaxJtpt0p01->SetAxisRange(0,2,"Y");
   hMC_Jet65_chMaxJtpt0p01->SetAxisRange(30,300,"X");
-  hMC_Jet65_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet65_chMaxJtpt0p01->Scale(1./10);
-  hMC_Jet65_chMaxJtpt0p01->SetMarkerStyle(24);
+  hMC_Jet65_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet65_chMaxJtpt0p01->Scale(1./5);
+  hMC_Jet65_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet65_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet65_chMaxJtpt0p01->Draw();
 
-  hMC_Jet65_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet65_chMaxJtpt0p02->Scale(1./10);
-  hMC_Jet65_chMaxJtpt0p02->SetMarkerStyle(24);
+  hMC_Jet65_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet65_chMaxJtpt0p02->Scale(1./5);
+  hMC_Jet65_chMaxJtpt0p02->SetMarkerStyle(33);
   hMC_Jet65_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet65_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet65_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet65_chMaxJtpt0p03->Scale(1./10);
-  hMC_Jet65_chMaxJtpt0p03->SetMarkerStyle(24);
+  hMC_Jet65_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet65_chMaxJtpt0p03->Scale(1./5);
+  hMC_Jet65_chMaxJtpt0p03->SetMarkerStyle(33);
   hMC_Jet65_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet65_chMaxJtpt0p03->Draw("same");
 
-  hMC_Jet65_chMaxJtpt0p04->Rebin(10);
-  hMC_Jet65_chMaxJtpt0p04->Scale(1./10);
-  hMC_Jet65_chMaxJtpt0p04->SetMarkerStyle(24);
+  hMC_Jet65_chMaxJtpt0p04->Rebin(5);
+  hMC_Jet65_chMaxJtpt0p04->Scale(1./5);
+  hMC_Jet65_chMaxJtpt0p04->SetMarkerStyle(33);
   hMC_Jet65_chMaxJtpt0p04->SetMarkerColor(4);
   hMC_Jet65_chMaxJtpt0p04->Draw("same");
 
-  hMC_Jet65_chMaxJtpt0p05->Rebin(10);
-  hMC_Jet65_chMaxJtpt0p05->Scale(1./10);
-  hMC_Jet65_chMaxJtpt0p05->SetMarkerStyle(24);
+  hMC_Jet65_chMaxJtpt0p05->Rebin(5);
+  hMC_Jet65_chMaxJtpt0p05->Scale(1./5);
+  hMC_Jet65_chMaxJtpt0p05->SetMarkerStyle(33);
   hMC_Jet65_chMaxJtpt0p05->SetMarkerColor(5);
   hMC_Jet65_chMaxJtpt0p05->Draw("same");
   line->Draw();
 
   cJet65->cd(3);
+  drawText("Jet 65 Trigger",0.3,0.8,16);
   drawText("#frac{charged Max}{Jet p_{T}} > X ",0.2,0.7,16);
   TLegend *Jet65_chMax = myLegend(0.2,0.2,0.6,0.6);
   Jet65_chMax->AddEntry(hData_Jet65_chMaxJtpt0p01,"0.01","pl");
@@ -748,114 +763,114 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet65_chMax->Draw();
 
   cJet65->cd(4);
-  hData_Jet65_eMaxJtpt0p1->Rebin(10);
-  hData_Jet65_eMaxJtpt0p1->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p1->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p1->Rebin(5);
+  hData_Jet65_eMaxJtpt0p1->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p1->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p1->SetMarkerColor(1);
   hData_Jet65_eMaxJtpt0p1->Draw();
 
-  hData_Jet65_eMaxJtpt0p2->Rebin(10);
-  hData_Jet65_eMaxJtpt0p2->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p2->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p2->Rebin(5);
+  hData_Jet65_eMaxJtpt0p2->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p2->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p2->SetMarkerColor(2);
   hData_Jet65_eMaxJtpt0p2->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p3->Rebin(10);
-  hData_Jet65_eMaxJtpt0p3->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p3->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p3->Rebin(5);
+  hData_Jet65_eMaxJtpt0p3->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p3->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p3->SetMarkerColor(3);
   hData_Jet65_eMaxJtpt0p3->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p4->Rebin(10);
-  hData_Jet65_eMaxJtpt0p4->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p4->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p4->Rebin(5);
+  hData_Jet65_eMaxJtpt0p4->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p4->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p4->SetMarkerColor(4);
   hData_Jet65_eMaxJtpt0p4->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p5->Rebin(10);
-  hData_Jet65_eMaxJtpt0p5->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p5->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p5->Rebin(5);
+  hData_Jet65_eMaxJtpt0p5->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p5->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p5->SetMarkerColor(5);
   hData_Jet65_eMaxJtpt0p5->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p6->Rebin(10);
-  hData_Jet65_eMaxJtpt0p6->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p6->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p6->Rebin(5);
+  hData_Jet65_eMaxJtpt0p6->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p6->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p6->SetMarkerColor(6);
   hData_Jet65_eMaxJtpt0p6->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p7->Rebin(10);
-  hData_Jet65_eMaxJtpt0p7->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p7->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p7->Rebin(5);
+  hData_Jet65_eMaxJtpt0p7->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p7->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p7->SetMarkerColor(7);
   hData_Jet65_eMaxJtpt0p7->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p8->Rebin(10);
-  hData_Jet65_eMaxJtpt0p8->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p8->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p8->Rebin(5);
+  hData_Jet65_eMaxJtpt0p8->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p8->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p8->SetMarkerColor(8);
   hData_Jet65_eMaxJtpt0p8->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p9->Rebin(10);
-  hData_Jet65_eMaxJtpt0p9->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p9->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p9->Rebin(5);
+  hData_Jet65_eMaxJtpt0p9->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p9->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p9->SetMarkerColor(9);
   hData_Jet65_eMaxJtpt0p9->Draw("same");
   line->Draw();
 
   cJet65->cd(5);
 
-  hMC_Jet65_eMaxJtpt0p1->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p1->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p1->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p1->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p1->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p1->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p1->SetMarkerColor(1);
   hMC_Jet65_eMaxJtpt0p1->Draw();
 
-  hMC_Jet65_eMaxJtpt0p2->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p2->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p2->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p2->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p2->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p2->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p2->SetMarkerColor(2);
   hMC_Jet65_eMaxJtpt0p2->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p3->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p3->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p3->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p3->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p3->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p3->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p3->SetMarkerColor(3);
   hMC_Jet65_eMaxJtpt0p3->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p4->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p4->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p4->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p4->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p4->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p4->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p4->SetMarkerColor(4);
   hMC_Jet65_eMaxJtpt0p4->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p5->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p5->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p5->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p5->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p5->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p5->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p5->SetMarkerColor(5);
   hMC_Jet65_eMaxJtpt0p5->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p6->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p6->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p6->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p6->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p6->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p6->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p6->SetMarkerColor(6);
   hMC_Jet65_eMaxJtpt0p6->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p7->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p7->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p7->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p7->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p7->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p7->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p7->SetMarkerColor(7);
   hMC_Jet65_eMaxJtpt0p7->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p8->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p8->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p8->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p8->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p8->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p8->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p8->SetMarkerColor(8);
   hMC_Jet65_eMaxJtpt0p8->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p9->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p9->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p9->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p9->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p9->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p9->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p9->SetMarkerColor(9);
   hMC_Jet65_eMaxJtpt0p9->Draw("same");
   line->Draw();
@@ -875,112 +890,112 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet65_eMax->Draw();
 
   cJet65->cd(7);
-  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(10);
-  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(5);
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
-  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(10);
-  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(10);
-  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./10);
-  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(24);
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(5);
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./5);
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(10);
-  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./10);
+  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(5);
+  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./5);
   hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerStyle(25);
   hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(10);
-  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./10);
+  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(5);
+  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./5);
   hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerStyle(25);
   hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(10);
-  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./10);
+  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(5);
+  hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./5);
   hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerStyle(25);
   hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(10);
-  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./10);
+  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(5);
+  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./5);
   hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerStyle(26);
   hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(10);
-  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./10);
+  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(5);
+  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./5);
   hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerStyle(26);
   hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(10);
-  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./10);
+  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(5);
+  hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./5);
   hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerStyle(26);
   hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Draw("same");
   line->Draw();
 
   cJet65->cd(8);
-  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
-  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./10);
-  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(24);
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./5);
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./10);
+  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerStyle(25);
   hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./10);
+  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./5);
   hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerStyle(25);
   hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./10);
+  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./5);
   hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerStyle(25);
   hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./10);
+  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerStyle(26);
   hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./10);
+  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./5);
   hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerStyle(26);
   hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./10);
+  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./5);
   hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerStyle(26);
   hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Draw("same");
@@ -1000,9 +1015,9 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet65_eMax_chMax->AddEntry(hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet65_eMax_chMax->Draw();
 
-  cJet65->SaveAs("PbPb_jet65_spectra_ratio_jetid.pdf","RECREATE");
+  cJet65->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet65_spectra_ratio_jetid.pdf","RECREATE");
 
-
+  
   TCanvas * cJet80 = new TCanvas("cJet80","",1200,1000);
   makeMultiPanelCanvas(cJet80,3,3,0.0,0.0,0.2,0.15,0.07);
 
@@ -1012,33 +1027,33 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet80_chMaxJtpt0p01->SetYTitle(" Cut effiiency (with Cut/without Cut) ");
   hData_Jet80_chMaxJtpt0p01->SetAxisRange(0,2,"Y");
   hData_Jet80_chMaxJtpt0p01->SetAxisRange(30,300,"X");
-  hData_Jet80_chMaxJtpt0p01->Rebin(10);
-  hData_Jet80_chMaxJtpt0p01->Scale(1./10);
-  hData_Jet80_chMaxJtpt0p01->SetMarkerStyle(24);
+  hData_Jet80_chMaxJtpt0p01->Rebin(5);
+  hData_Jet80_chMaxJtpt0p01->Scale(1./5);
+  hData_Jet80_chMaxJtpt0p01->SetMarkerStyle(33);
   hData_Jet80_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet80_chMaxJtpt0p01->Draw();
 
-  hData_Jet80_chMaxJtpt0p02->Rebin(10);
-  hData_Jet80_chMaxJtpt0p02->Scale(1./10);
-  hData_Jet80_chMaxJtpt0p02->SetMarkerStyle(24);
+  hData_Jet80_chMaxJtpt0p02->Rebin(5);
+  hData_Jet80_chMaxJtpt0p02->Scale(1./5);
+  hData_Jet80_chMaxJtpt0p02->SetMarkerStyle(33);
   hData_Jet80_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet80_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet80_chMaxJtpt0p03->Rebin(10);
-  hData_Jet80_chMaxJtpt0p03->Scale(1./10);
-  hData_Jet80_chMaxJtpt0p03->SetMarkerStyle(24);
+  hData_Jet80_chMaxJtpt0p03->Rebin(5);
+  hData_Jet80_chMaxJtpt0p03->Scale(1./5);
+  hData_Jet80_chMaxJtpt0p03->SetMarkerStyle(33);
   hData_Jet80_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet80_chMaxJtpt0p03->Draw("same");
 
-  hData_Jet80_chMaxJtpt0p04->Rebin(10);
-  hData_Jet80_chMaxJtpt0p04->Scale(1./10);
-  hData_Jet80_chMaxJtpt0p04->SetMarkerStyle(24);
+  hData_Jet80_chMaxJtpt0p04->Rebin(5);
+  hData_Jet80_chMaxJtpt0p04->Scale(1./5);
+  hData_Jet80_chMaxJtpt0p04->SetMarkerStyle(33);
   hData_Jet80_chMaxJtpt0p04->SetMarkerColor(4);
   hData_Jet80_chMaxJtpt0p04->Draw("same");
 
-  hData_Jet80_chMaxJtpt0p05->Rebin(10);
-  hData_Jet80_chMaxJtpt0p05->Scale(1./10);
-  hData_Jet80_chMaxJtpt0p05->SetMarkerStyle(24);
+  hData_Jet80_chMaxJtpt0p05->Rebin(5);
+  hData_Jet80_chMaxJtpt0p05->Scale(1./5);
+  hData_Jet80_chMaxJtpt0p05->SetMarkerStyle(33);
   hData_Jet80_chMaxJtpt0p05->SetMarkerColor(5);
   hData_Jet80_chMaxJtpt0p05->Draw("same");
   line->Draw();
@@ -1046,33 +1061,33 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   cJet80->cd(2);
   hMC_Jet80_chMaxJtpt0p01->SetAxisRange(0,2,"Y");
   hMC_Jet80_chMaxJtpt0p01->SetAxisRange(30,300,"X");
-  hMC_Jet80_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet80_chMaxJtpt0p01->Scale(1./10);
-  hMC_Jet80_chMaxJtpt0p01->SetMarkerStyle(24);
+  hMC_Jet80_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet80_chMaxJtpt0p01->Scale(1./5);
+  hMC_Jet80_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet80_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet80_chMaxJtpt0p01->Draw();
 
-  hMC_Jet80_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet80_chMaxJtpt0p02->Scale(1./10);
-  hMC_Jet80_chMaxJtpt0p02->SetMarkerStyle(24);
+  hMC_Jet80_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet80_chMaxJtpt0p02->Scale(1./5);
+  hMC_Jet80_chMaxJtpt0p02->SetMarkerStyle(33);
   hMC_Jet80_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet80_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet80_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet80_chMaxJtpt0p03->Scale(1./10);
-  hMC_Jet80_chMaxJtpt0p03->SetMarkerStyle(24);
+  hMC_Jet80_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet80_chMaxJtpt0p03->Scale(1./5);
+  hMC_Jet80_chMaxJtpt0p03->SetMarkerStyle(33);
   hMC_Jet80_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet80_chMaxJtpt0p03->Draw("same");
 
-  hMC_Jet80_chMaxJtpt0p04->Rebin(10);
-  hMC_Jet80_chMaxJtpt0p04->Scale(1./10);
-  hMC_Jet80_chMaxJtpt0p04->SetMarkerStyle(24);
+  hMC_Jet80_chMaxJtpt0p04->Rebin(5);
+  hMC_Jet80_chMaxJtpt0p04->Scale(1./5);
+  hMC_Jet80_chMaxJtpt0p04->SetMarkerStyle(33);
   hMC_Jet80_chMaxJtpt0p04->SetMarkerColor(4);
   hMC_Jet80_chMaxJtpt0p04->Draw("same");
 
-  hMC_Jet80_chMaxJtpt0p05->Rebin(10);
-  hMC_Jet80_chMaxJtpt0p05->Scale(1./10);
-  hMC_Jet80_chMaxJtpt0p05->SetMarkerStyle(24);
+  hMC_Jet80_chMaxJtpt0p05->Rebin(5);
+  hMC_Jet80_chMaxJtpt0p05->Scale(1./5);
+  hMC_Jet80_chMaxJtpt0p05->SetMarkerStyle(33);
   hMC_Jet80_chMaxJtpt0p05->SetMarkerColor(5);
   hMC_Jet80_chMaxJtpt0p05->Draw("same");
   line->Draw();
@@ -1088,114 +1103,114 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet80_chMax->Draw();
 
   cJet80->cd(4);
-  hData_Jet80_eMaxJtpt0p1->Rebin(10);
-  hData_Jet80_eMaxJtpt0p1->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p1->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p1->Rebin(5);
+  hData_Jet80_eMaxJtpt0p1->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p1->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p1->SetMarkerColor(1);
   hData_Jet80_eMaxJtpt0p1->Draw();
 
-  hData_Jet80_eMaxJtpt0p2->Rebin(10);
-  hData_Jet80_eMaxJtpt0p2->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p2->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p2->Rebin(5);
+  hData_Jet80_eMaxJtpt0p2->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p2->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p2->SetMarkerColor(2);
   hData_Jet80_eMaxJtpt0p2->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p3->Rebin(10);
-  hData_Jet80_eMaxJtpt0p3->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p3->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p3->Rebin(5);
+  hData_Jet80_eMaxJtpt0p3->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p3->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p3->SetMarkerColor(3);
   hData_Jet80_eMaxJtpt0p3->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p4->Rebin(10);
-  hData_Jet80_eMaxJtpt0p4->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p4->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p4->Rebin(5);
+  hData_Jet80_eMaxJtpt0p4->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p4->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p4->SetMarkerColor(4);
   hData_Jet80_eMaxJtpt0p4->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p5->Rebin(10);
-  hData_Jet80_eMaxJtpt0p5->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p5->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p5->Rebin(5);
+  hData_Jet80_eMaxJtpt0p5->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p5->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p5->SetMarkerColor(5);
   hData_Jet80_eMaxJtpt0p5->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p6->Rebin(10);
-  hData_Jet80_eMaxJtpt0p6->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p6->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p6->Rebin(5);
+  hData_Jet80_eMaxJtpt0p6->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p6->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p6->SetMarkerColor(6);
   hData_Jet80_eMaxJtpt0p6->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p7->Rebin(10);
-  hData_Jet80_eMaxJtpt0p7->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p7->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p7->Rebin(5);
+  hData_Jet80_eMaxJtpt0p7->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p7->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p7->SetMarkerColor(7);
   hData_Jet80_eMaxJtpt0p7->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p8->Rebin(10);
-  hData_Jet80_eMaxJtpt0p8->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p8->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p8->Rebin(5);
+  hData_Jet80_eMaxJtpt0p8->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p8->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p8->SetMarkerColor(8);
   hData_Jet80_eMaxJtpt0p8->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p9->Rebin(10);
-  hData_Jet80_eMaxJtpt0p9->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p9->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p9->Rebin(5);
+  hData_Jet80_eMaxJtpt0p9->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p9->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p9->SetMarkerColor(9);
   hData_Jet80_eMaxJtpt0p9->Draw("same");
   line->Draw();
 
   cJet80->cd(5);
 
-  hMC_Jet80_eMaxJtpt0p1->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p1->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p1->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p1->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p1->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p1->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p1->SetMarkerColor(1);
   hMC_Jet80_eMaxJtpt0p1->Draw();
 
-  hMC_Jet80_eMaxJtpt0p2->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p2->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p2->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p2->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p2->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p2->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p2->SetMarkerColor(2);
   hMC_Jet80_eMaxJtpt0p2->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p3->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p3->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p3->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p3->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p3->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p3->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p3->SetMarkerColor(3);
   hMC_Jet80_eMaxJtpt0p3->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p4->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p4->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p4->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p4->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p4->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p4->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p4->SetMarkerColor(4);
   hMC_Jet80_eMaxJtpt0p4->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p5->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p5->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p5->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p5->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p5->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p5->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p5->SetMarkerColor(5);
   hMC_Jet80_eMaxJtpt0p5->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p6->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p6->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p6->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p6->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p6->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p6->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p6->SetMarkerColor(6);
   hMC_Jet80_eMaxJtpt0p6->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p7->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p7->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p7->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p7->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p7->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p7->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p7->SetMarkerColor(7);
   hMC_Jet80_eMaxJtpt0p7->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p8->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p8->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p8->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p8->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p8->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p8->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p8->SetMarkerColor(8);
   hMC_Jet80_eMaxJtpt0p8->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p9->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p9->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p9->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p9->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p9->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p9->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p9->SetMarkerColor(9);
   hMC_Jet80_eMaxJtpt0p9->Draw("same");
   line->Draw();
@@ -1215,119 +1230,119 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet80_eMax->Draw();
 
   cJet80->cd(7);
-  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(10);
-  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(5);
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
-  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(10);
-  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(10);
-  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./10);
-  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(24);
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(5);
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./5);
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(10);
-  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./10);
+  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(5);
+  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./5);
   hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerStyle(25);
   hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(10);
-  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./10);
+  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(5);
+  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./5);
   hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerStyle(25);
   hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(10);
-  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./10);
+  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(5);
+  hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./5);
   hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerStyle(25);
   hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(10);
-  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./10);
+  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(5);
+  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./5);
   hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerStyle(26);
   hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerColor(1);
   hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(10);
-  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./10);
+  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(5);
+  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./5);
   hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerStyle(26);
   hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerColor(2);
   hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Draw("same");
 
-  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(10);
-  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./10);
+  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(5);
+  hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./5);
   hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerStyle(26);
   hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerColor(3);
   hData_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Draw("same");
   line->Draw();
 
   cJet80->cd(8);
-  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
-  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./10);
-  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(24);
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Scale(1./5);
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./10);
+  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerStyle(25);
   hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./10);
+  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Scale(1./5);
   hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerStyle(25);
   hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./10);
+  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Scale(1./5);
   hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerStyle(25);
   hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./10);
+  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerStyle(26);
   hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->SetMarkerColor(1);
   hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./10);
+  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Scale(1./5);
   hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerStyle(26);
   hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->SetMarkerColor(2);
   hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Draw("same");
 
-  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(10);
-  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./10);
+  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Rebin(5);
+  hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Scale(1./5);
   hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerStyle(26);
   hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->SetMarkerColor(3);
   hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Draw("same");
   line->Draw();
 
   cJet80->cd(9);
-  drawText("#frac{electron Max}{Jet p_{T}} < X && #frac{charged Max}{Jet p_{T}} < Y",0.2,0.7,16);
+  drawText("#frac{electron Max}{Jet p_{T}} < X && #frac{charged Max}{Jet p_{T}} > Y",0.2,0.7,16);
   TLegend *Jet80_eMax_chMax = myLegend(0.2,0.2,0.6,0.6);
   Jet80_eMax_chMax->AddEntry(hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01,"X = 7, Y = 1","pl");
   Jet80_eMax_chMax->AddEntry(hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p02,"X = 7, Y = 2","pl");
@@ -1340,7 +1355,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet80_eMax_chMax->AddEntry(hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet80_eMax_chMax->Draw();
 
-  cJet80->SaveAs("PbPb_jet80_spectra_ratio_jetid.pdf","RECREATE");
+  cJet80->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet80_spectra_ratio_jetid.pdf","RECREATE");
 
 
 
