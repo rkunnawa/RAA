@@ -10,6 +10,10 @@
 
 // Dec 11th - first include the plots for individual pfcandidate variables like chMax, chSum etc... and also make the 2D scatter plot of their ratio with the pT vs pT. for the individual candidates.  
 
+// Dec 18th - adding plot which shows different values (and ratios) for the cut: eSum/(chSum+phSum+neSum+muSum)<0.# where # can take 9 to 1. 
+
+// Jan 8th 2015 - Need to finally figure out the Jet ID required to remove the fake pf electrons. 
+
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -116,7 +120,6 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-
 void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   
   TH1::SetDefaultSumw2();
@@ -217,6 +220,10 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
 
   TH1F *hMC_Ratio_chMax_SumSumChPhNeEMu[nbins_cent+1], *hMC_Ratio_neMax_SumSumChPhNeEMu[nbins_cent+1], *hMC_Ratio_phMax_SumSumChPhNeEMu[nbins_cent+1], *hMC_Ratio_muMax_SumSumChPhNeEMu[nbins_cent+1], *hMC_Ratio_eMax_SumSumChPhNeEMu[nbins_cent+1];
 
+  TH1F * hData_noCut[nbins_cent+1];
+
+  TH1F * hMC_noCut[nbins_cent+1];
+
   TH1F * hData_eMaxJtPt_0p9[nbins_cent+1];
   TH1F * hData_eMaxJtPt_0p8[nbins_cent+1];
   TH1F * hData_eMaxJtPt_0p7[nbins_cent+1];
@@ -226,8 +233,6 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TH1F * hData_eMaxJtPt_0p3[nbins_cent+1];
   TH1F * hData_eMaxJtPt_0p2[nbins_cent+1];
   TH1F * hData_eMaxJtPt_0p1[nbins_cent+1];
-
-  TH1F * hData_noCut[nbins_cent+1];
 
   TH1F * hData_Ratio_eMaxJtPt_0p9[nbins_cent+1];
   TH1F * hData_Ratio_eMaxJtPt_0p8[nbins_cent+1];
@@ -249,8 +254,6 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TH1F * hMC_eMaxJtPt_0p2[nbins_cent+1];
   TH1F * hMC_eMaxJtPt_0p1[nbins_cent+1];
 
-  TH1F * hMC_noCut[nbins_cent+1];
-
   TH1F * hMC_Ratio_eMaxJtPt_0p9[nbins_cent+1];
   TH1F * hMC_Ratio_eMaxJtPt_0p8[nbins_cent+1];
   TH1F * hMC_Ratio_eMaxJtPt_0p7[nbins_cent+1];
@@ -261,9 +264,58 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   TH1F * hMC_Ratio_eMaxJtPt_0p2[nbins_cent+1];
   TH1F * hMC_Ratio_eMaxJtPt_0p1[nbins_cent+1];
 
+  TH1F * hData_eSumOverSumchphnemu_0p9[nbins_cent+1];
+  TH1F * hData_eSumOverSumchphnemu_0p8[nbins_cent+1];
+  TH1F * hData_eSumOverSumchphnemu_0p7[nbins_cent+1];
+  TH1F * hData_eSumOverSumchphnemu_0p6[nbins_cent+1];
+  TH1F * hData_eSumOverSumchphnemu_0p5[nbins_cent+1];
+  TH1F * hData_eSumOverSumchphnemu_0p4[nbins_cent+1];
+  TH1F * hData_eSumOverSumchphnemu_0p3[nbins_cent+1];
+  TH1F * hData_eSumOverSumchphnemu_0p2[nbins_cent+1];
+  TH1F * hData_eSumOverSumchphnemu_0p1[nbins_cent+1];
 
+  TH1F * hData_Ratio_eSumOverSumchphnemu_0p9[nbins_cent+1];
+  TH1F * hData_Ratio_eSumOverSumchphnemu_0p8[nbins_cent+1];
+  TH1F * hData_Ratio_eSumOverSumchphnemu_0p7[nbins_cent+1];
+  TH1F * hData_Ratio_eSumOverSumchphnemu_0p6[nbins_cent+1];
+  TH1F * hData_Ratio_eSumOverSumchphnemu_0p5[nbins_cent+1];
+  TH1F * hData_Ratio_eSumOverSumchphnemu_0p4[nbins_cent+1];
+  TH1F * hData_Ratio_eSumOverSumchphnemu_0p3[nbins_cent+1];
+  TH1F * hData_Ratio_eSumOverSumchphnemu_0p2[nbins_cent+1];
+  TH1F * hData_Ratio_eSumOverSumchphnemu_0p1[nbins_cent+1];
+
+  TH1F * hMC_eSumOverSumchphnemu_0p9[nbins_cent+1];
+  TH1F * hMC_eSumOverSumchphnemu_0p8[nbins_cent+1];
+  TH1F * hMC_eSumOverSumchphnemu_0p7[nbins_cent+1];
+  TH1F * hMC_eSumOverSumchphnemu_0p6[nbins_cent+1];
+  TH1F * hMC_eSumOverSumchphnemu_0p5[nbins_cent+1];
+  TH1F * hMC_eSumOverSumchphnemu_0p4[nbins_cent+1];
+  TH1F * hMC_eSumOverSumchphnemu_0p3[nbins_cent+1];
+  TH1F * hMC_eSumOverSumchphnemu_0p2[nbins_cent+1];
+  TH1F * hMC_eSumOverSumchphnemu_0p1[nbins_cent+1];
+
+  TH1F * hMC_Ratio_eSumOverSumchphnemu_0p9[nbins_cent+1];
+  TH1F * hMC_Ratio_eSumOverSumchphnemu_0p8[nbins_cent+1];
+  TH1F * hMC_Ratio_eSumOverSumchphnemu_0p7[nbins_cent+1];
+  TH1F * hMC_Ratio_eSumOverSumchphnemu_0p6[nbins_cent+1];
+  TH1F * hMC_Ratio_eSumOverSumchphnemu_0p5[nbins_cent+1];
+  TH1F * hMC_Ratio_eSumOverSumchphnemu_0p4[nbins_cent+1];
+  TH1F * hMC_Ratio_eSumOverSumchphnemu_0p3[nbins_cent+1];
+  TH1F * hMC_Ratio_eSumOverSumchphnemu_0p2[nbins_cent+1];
+  TH1F * hMC_Ratio_eSumOverSumchphnemu_0p1[nbins_cent+1];
+
+  TH2F *hData_eSumOverSumchphnemu_Jtpt[nbins_cent+1], *hData_eSumOverSumchphnemu_eMaxJtpt[nbins_cent+1];
+  TH2F *hMC_eSumOverSumchphnemu_Jtpt[nbins_cent+1], *hMC_eSumOverSumchphnemu_eMaxJtpt[nbins_cent+1];
+  TH2F *hMC_eSumOverSumchphnemu_Genpt[nbins_cent+1], *hMC_eSumOverSumchphnemu_eMaxGenpt[nbins_cent+1];
 
   for(int i = 0;i<=nbins_cent;i++){
+
+    hData_eSumOverSumchphnemu_Jtpt[i] = new TH2F(Form("hData_eSumOverSumchphnemu_Jtpt_cent%d",i),"",100,0,2,1000,0,1000);
+    hData_eSumOverSumchphnemu_eMaxJtpt[i] = new TH2F(Form("hData_eSumOverSumchphnemu_eMaxJtpt_cent%d",i),"",100,0,2,100,0,2);
+    hMC_eSumOverSumchphnemu_Jtpt[i] = new TH2F(Form("hMC_eSumOverSumchphnemu_Jtpt_cent%d",i),"",100,0,2,1000,0,1000);
+    hMC_eSumOverSumchphnemu_eMaxJtpt[i] = new TH2F(Form("hMC_eSumOverSumchphnemu_eMaxJtpt_cent%d",i),"",100,0,2,100,0,2);
+    hMC_eSumOverSumchphnemu_Genpt[i] = new TH2F(Form("hMC_eSumOverSumchphnemu_Genpt_cent%d",i),"",100,0,2,1000,0,1000);
+    hMC_eSumOverSumchphnemu_eMaxGenpt[i] = new TH2F(Form("hMC_eSumOverSumchphnemu_eMaxGentpt_cent%d",i),"",100,0,2,100,0,2);
 
     hData_chMax[i] = new TH1F(Form("hData_chMax_cent%d",i),"",1000,0,1000);
     hData_chSum[i] = new TH1F(Form("hData_chSum_cent%d",i),"",1000,0,1000);
@@ -384,6 +436,8 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     }
 
     hData_noCut[i] = new TH1F(Form("hData_noCut_cent%d",i),"",1000,0,1000);
+    hMC_noCut[i] = new TH1F(Form("hMC_noCut_cent%d",i),"",1000,0,1000);
+
     hData_eMaxJtPt_0p9[i] = new TH1F(Form("hData_eMaxJtPt_0p9_cent%d",i),"",1000,0,1000);
     hData_eMaxJtPt_0p8[i] = new TH1F(Form("hData_eMaxJtPt_0p8_cent%d",i),"",1000,0,1000);
     hData_eMaxJtPt_0p7[i] = new TH1F(Form("hData_eMaxJtPt_0p7_cent%d",i),"",1000,0,1000);
@@ -393,8 +447,6 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hData_eMaxJtPt_0p3[i] = new TH1F(Form("hData_eMaxJtPt_0p3_cent%d",i),"",1000,0,1000);
     hData_eMaxJtPt_0p2[i] = new TH1F(Form("hData_eMaxJtPt_0p2_cent%d",i),"",1000,0,1000);
     hData_eMaxJtPt_0p1[i] = new TH1F(Form("hData_eMaxJtPt_0p1_cent%d",i),"",1000,0,1000);
-
-    hMC_noCut[i] = new TH1F(Form("hMC_noCut_cent%d",i),"",1000,0,1000);
     hMC_eMaxJtPt_0p9[i] = new TH1F(Form("hMC_eMaxJtPt_0p9_cent%d",i),"",1000,0,1000);
     hMC_eMaxJtPt_0p8[i] = new TH1F(Form("hMC_eMaxJtPt_0p8_cent%d",i),"",1000,0,1000);
     hMC_eMaxJtPt_0p7[i] = new TH1F(Form("hMC_eMaxJtPt_0p7_cent%d",i),"",1000,0,1000);
@@ -404,6 +456,25 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hMC_eMaxJtPt_0p3[i] = new TH1F(Form("hMC_eMaxJtPt_0p3_cent%d",i),"",1000,0,1000);
     hMC_eMaxJtPt_0p2[i] = new TH1F(Form("hMC_eMaxJtPt_0p2_cent%d",i),"",1000,0,1000);
     hMC_eMaxJtPt_0p1[i] = new TH1F(Form("hMC_eMaxJtPt_0p1_cent%d",i),"",1000,0,1000);
+
+    hData_eSumOverSumchphnemu_0p9[i] = new TH1F(Form("hData_eSumOverSumchphnemu_0p9_cent%d",i),"",1000,0,1000);
+    hData_eSumOverSumchphnemu_0p8[i] = new TH1F(Form("hData_eSumOverSumchphnemu_0p8_cent%d",i),"",1000,0,1000);
+    hData_eSumOverSumchphnemu_0p7[i] = new TH1F(Form("hData_eSumOverSumchphnemu_0p7_cent%d",i),"",1000,0,1000);
+    hData_eSumOverSumchphnemu_0p6[i] = new TH1F(Form("hData_eSumOverSumchphnemu_0p6_cent%d",i),"",1000,0,1000);
+    hData_eSumOverSumchphnemu_0p5[i] = new TH1F(Form("hData_eSumOverSumchphnemu_0p5_cent%d",i),"",1000,0,1000);
+    hData_eSumOverSumchphnemu_0p4[i] = new TH1F(Form("hData_eSumOverSumchphnemu_0p4_cent%d",i),"",1000,0,1000);
+    hData_eSumOverSumchphnemu_0p3[i] = new TH1F(Form("hData_eSumOverSumchphnemu_0p3_cent%d",i),"",1000,0,1000);
+    hData_eSumOverSumchphnemu_0p2[i] = new TH1F(Form("hData_eSumOverSumchphnemu_0p2_cent%d",i),"",1000,0,1000);
+    hData_eSumOverSumchphnemu_0p1[i] = new TH1F(Form("hData_eSumOverSumchphnemu_0p1_cent%d",i),"",1000,0,1000);
+    hMC_eSumOverSumchphnemu_0p9[i] = new TH1F(Form("hMC_eSumOverSumchphnemu_0p9_cent%d",i),"",1000,0,1000);
+    hMC_eSumOverSumchphnemu_0p8[i] = new TH1F(Form("hMC_eSumOverSumchphnemu_0p8_cent%d",i),"",1000,0,1000);
+    hMC_eSumOverSumchphnemu_0p7[i] = new TH1F(Form("hMC_eSumOverSumchphnemu_0p7_cent%d",i),"",1000,0,1000);
+    hMC_eSumOverSumchphnemu_0p6[i] = new TH1F(Form("hMC_eSumOverSumchphnemu_0p6_cent%d",i),"",1000,0,1000);
+    hMC_eSumOverSumchphnemu_0p5[i] = new TH1F(Form("hMC_eSumOverSumchphnemu_0p5_cent%d",i),"",1000,0,1000);
+    hMC_eSumOverSumchphnemu_0p4[i] = new TH1F(Form("hMC_eSumOverSumchphnemu_0p4_cent%d",i),"",1000,0,1000);
+    hMC_eSumOverSumchphnemu_0p3[i] = new TH1F(Form("hMC_eSumOverSumchphnemu_0p3_cent%d",i),"",1000,0,1000);
+    hMC_eSumOverSumchphnemu_0p2[i] = new TH1F(Form("hMC_eSumOverSumchphnemu_0p2_cent%d",i),"",1000,0,1000);
+    hMC_eSumOverSumchphnemu_0p1[i] = new TH1F(Form("hMC_eSumOverSumchphnemu_0p1_cent%d",i),"",1000,0,1000);
 
   }
 
@@ -526,7 +597,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
   jetMC->SetBranchAddress("eSum",&eSum_2);
   int centBin_2 = 0;
 
-#if 0 
+
   // Data loop
   for(int jentry = 0;jentry<jetData->GetEntries();jentry++){
 
@@ -534,9 +605,11 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     centBin_1 = (int)cent_1;
     if(jentry%1000000==0)cout<<"Data "<<jentry<<" of "<<jetData->GetEntries()<<endl;
 
+    if(raw_1<30) continue;
+
     hData_noCut[centBin_1]->Fill(jtpt_1);
     hData_noCut[nbins_cent]->Fill(jtpt_1);
-
+#if 0
     if((Float_t)eMax_1/jtpt_1<0.9) {
       hData_eMaxJtPt_0p9[centBin_1]->Fill(jtpt_1);
       hData_eMaxJtPt_0p9[nbins_cent]->Fill(jtpt_1);
@@ -582,6 +655,56 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       hData_eMaxJtPt_0p1[nbins_cent]->Fill(jtpt_1);
     }
 
+    if((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.9) {
+      hData_eSumOverSumchphnemu_0p9[centBin_1]->Fill(jtpt_1);
+      hData_eSumOverSumchphnemu_0p9[nbins_cent]->Fill(jtpt_1);
+    }
+
+    if((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.8) {
+      hData_eSumOverSumchphnemu_0p8[centBin_1]->Fill(jtpt_1);
+      hData_eSumOverSumchphnemu_0p8[nbins_cent]->Fill(jtpt_1);
+    }
+
+    if((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.7) {
+      hData_eSumOverSumchphnemu_0p7[centBin_1]->Fill(jtpt_1);
+      hData_eSumOverSumchphnemu_0p7[nbins_cent]->Fill(jtpt_1);
+    }
+
+    if((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.6) {
+      hData_eSumOverSumchphnemu_0p6[centBin_1]->Fill(jtpt_1);
+      hData_eSumOverSumchphnemu_0p6[nbins_cent]->Fill(jtpt_1);
+    }
+
+    if((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.5) {
+      hData_eSumOverSumchphnemu_0p5[centBin_1]->Fill(jtpt_1);
+      hData_eSumOverSumchphnemu_0p5[nbins_cent]->Fill(jtpt_1);
+    }
+
+    if((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.4) {
+      hData_eSumOverSumchphnemu_0p4[centBin_1]->Fill(jtpt_1);
+      hData_eSumOverSumchphnemu_0p4[nbins_cent]->Fill(jtpt_1);
+    }
+
+    if((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.3) {
+      hData_eSumOverSumchphnemu_0p3[centBin_1]->Fill(jtpt_1);
+      hData_eSumOverSumchphnemu_0p3[nbins_cent]->Fill(jtpt_1);
+    }
+
+    if((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.2) {
+      hData_eSumOverSumchphnemu_0p2[centBin_1]->Fill(jtpt_1);
+      hData_eSumOverSumchphnemu_0p2[nbins_cent]->Fill(jtpt_1);
+    }
+
+    if((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.1) {
+      hData_eSumOverSumchphnemu_0p1[centBin_1]->Fill(jtpt_1);
+      hData_eSumOverSumchphnemu_0p1[nbins_cent]->Fill(jtpt_1);
+    }
+
+    hData_eSumOverSumchphnemu_Jtpt[centBin_1]->Fill((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1),jtpt_1);
+    hData_eSumOverSumchphnemu_Jtpt[nbins_cent]->Fill((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1),jtpt_1);
+    hData_eSumOverSumchphnemu_eMaxJtpt[centBin_1]->Fill((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1),(Float_t)eMax_1/jtpt_1);
+    hData_eSumOverSumchphnemu_eMaxJtpt[nbins_cent]->Fill((Float_t)eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1),(Float_t)eMax_1/jtpt_1);
+
     hData_chMaxSumMaxChNePh_Pt[centBin_1]->Fill((Float_t)chMax_1/(chMax_1+neMax_1+phMax_1),jtpt_1);
     hData_phMaxSumMaxChNePh_Pt[centBin_1]->Fill((Float_t)phMax_1/(chMax_1+neMax_1+phMax_1),jtpt_1);
     hData_neMaxSumMaxChNePh_Pt[centBin_1]->Fill((Float_t)neMax_1/(chMax_1+neMax_1+phMax_1),jtpt_1);
@@ -593,7 +716,6 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hData_neMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)neMax_1/(chMax_1+neMax_1+phMax_1),jtpt_1);
     hData_muMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)muMax_1/(chMax_1+neMax_1+phMax_1),jtpt_1);
     hData_eMaxSumMaxChNePh_Pt[nbins_cent]->Fill((Float_t)eMax_1/(chMax_1+neMax_1+phMax_1),jtpt_1);
-
 
     hData_chMax[centBin_1]->Fill(chMax_1);
     hData_chMax[nbins_cent]->Fill(chMax_1);
@@ -644,96 +766,74 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hData_eSum[nbins_cent]->Fill(eSum_1);
     hData_eSumJtPt_Pt[centBin_1]->Fill((Float_t)eSum_1/jtpt_1,jtpt_1);
     hData_eSumJtPt_Pt[nbins_cent]->Fill((Float_t)eSum_1/jtpt_1,jtpt_1);
- 
+
+#endif 
+    
     if(jet80_1 && L1_sj52_1){
 
-      if((neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+      if(1>0){
 	hData[2][0][centBin_1]->Fill(jtpt_1);
 	hData[2][0][nbins_cent]->Fill(jtpt_1);
       }
-      if((eMax_1/jtpt_1<0.7) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+      if((eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.7) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
 	hData[2][1][centBin_1]->Fill(jtpt_1);
 	hData[2][1][nbins_cent]->Fill(jtpt_1);
       }
 
     }else if(jet65_1 && L1_sj36_1 && !jet80_1){
   
-      if((neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+      if(1>0/*(neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)*/){
 	hData[1][0][centBin_1]->Fill(jtpt_1);
 	hData[1][0][nbins_cent]->Fill(jtpt_1);
       }
-      if((eMax_1/jtpt_1<0.7) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) &&  (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+      if((eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.7) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) &&  (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
 	hData[1][1][centBin_1]->Fill(jtpt_1);
 	hData[1][1][nbins_cent]->Fill(jtpt_1);
       }
 
     }else if(jet55_1 && L1_sj36_1 && !jet65_1 && !jet80_1){
 
-      if((neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+      if(1>0/*(neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) && (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)*/){
 	hData[0][0][centBin_1]->Fill(jtpt_1,effecPrescl);
 	hData[0][0][nbins_cent]->Fill(jtpt_1,effecPrescl);
       }
-      if((eMax_1/jtpt_1<0.7) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) &&  (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
+      if((eSum_1/(chSum_1+neSum_1+phSum_1+muSum_1)<0.7) && (neMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (phMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/jtpt_1>0.05) &&  (muMax_1/(chMax_1+neMax_1+phMax_1)<0.9) && (chMax_1/(chMax_1+neMax_1+phMax_1)<0.9)){
 	hData[0][1][centBin_1]->Fill(jtpt_1,effecPrescl);
 	hData[0][1][nbins_cent]->Fill(jtpt_1,effecPrescl);
       }
 
     }
-
   
-  // for(int i = 0;i<nbins_cent;i++){
-    
-  //   jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[0],isJetID[0],i),"jtpt",Jet55&&cent[i]);
-  //   hData[0][0][i]->Print("base");
-  //   jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[0],isJetID[1],i),"jtpt",Jet55&&elRjc&&neRjc&&phRjc&&chID&&muRjc &&cent[i]);
-  //   hData[0][1][i]->Print("base");
-    
-  //   jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[1],isJetID[0],i),"jtpt",Jet65 && cent[i]);
-  //   hData[1][0][i]->Print("base");
-  //   jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[1],isJetID[1],i),"jtpt",Jet65 && elRjc && neRjc && phRjc && chID && muRjc && cent[i]);
-  //   hData[1][1][i]->Print("base");
-    
-  //   jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[2],isJetID[0],i),"jtpt",Jet80 && cent[i]);  
-  //   hData[2][0][i]->Print("base");
-  //   jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[2],isJetID[1],i),"jtpt",Jet80 && elRjc && neRjc && phRjc && chID && muRjc && cent[i]);
-  //   hData[2][1][i]->Print("base");
-    
-  // }
-
-  // jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[0],isJetID[0],nbins_cent),"jtpt",Jet55);
-  // hData[0][0][nbins_cent]->Print("base");
-  // jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[0],isJetID[1],nbins_cent),"jtpt",Jet55 && elRjc && neRjc && phRjc && chID && muRjc);
-  // hData[0][1][nbins_cent]->Print("base");
-
-  // jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[1],isJetID[0],nbins_cent),"jtpt",Jet65);
-  // hData[1][0][nbins_cent]->Print("base");
-  // jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[1],isJetID[1],nbins_cent),"jtpt",Jet65 && elRjc && neRjc && phRjc && chID && muRjc);
-  // hData[1][1][nbins_cent]->Print("base");
-
-  // jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[2],isJetID[0],nbins_cent),"jtpt",Jet80);  
-  // hData[2][0][nbins_cent]->Print("base");
-  // jetData->Project(Form("hData_%s_%s_JetID_cent%d",TrigName[2],isJetID[1],nbins_cent),"jtpt",Jet80 && elRjc && neRjc && phRjc && chID && muRjc);
-  // hData[2][1][nbins_cent]->Print("base");
-
   }// entry loop
 
-#endif 
- 
-  Float_t weight = 0;
   
+  Float_t weight = 0;
   // MC loop
   for(int jentry = 0;jentry<jetMC->GetEntries();jentry++){
 
     jetMC->GetEntry(jentry);
     centBin_2 = (int)cent_2;
     if(jentry%1000000==0)cout<<"MC "<<jentry<<" of "<<jetMC->GetEntries()<<endl;
+    
+    if(raw_2 < 30) continue;
 
     if(subid_2!=0)continue;
 
     weight = scale_2 * weight_vz_2 * weight_cent_2;
 
+#if 0
     hMC_noCut[centBin_2]->Fill(jtpt_2,weight);
     hMC_noCut[nbins_cent]->Fill(jtpt_2,weight);
+
+    hMC_eSumOverSumchphnemu_Jtpt[centBin_2]->Fill((Float_t)eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2),jtpt_2,weight);
+    hMC_eSumOverSumchphnemu_eMaxJtpt[centBin_2]->Fill((Float_t)eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2),(Float_t)eMax_2/jtpt_2,weight);
+    hMC_eSumOverSumchphnemu_Genpt[centBin_2]->Fill((Float_t)eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2),refpt_2,weight);
+    hMC_eSumOverSumchphnemu_eMaxGenpt[centBin_2]->Fill((Float_t)eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2),(Float_t)eMax_2/refpt_2,weight);
+
+    hMC_eSumOverSumchphnemu_Jtpt[nbins_cent]->Fill((Float_t)eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2),jtpt_2,weight);
+    hMC_eSumOverSumchphnemu_eMaxJtpt[nbins_cent]->Fill((Float_t)eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2),(Float_t)eMax_2/jtpt_2,weight);
+    hMC_eSumOverSumchphnemu_Genpt[nbins_cent]->Fill((Float_t)eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2),refpt_2,weight);
+    hMC_eSumOverSumchphnemu_eMaxGenpt[nbins_cent]->Fill((Float_t)eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2),(Float_t)eMax_2/refpt_2,weight);
 
     hMC_chMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)chMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
     hMC_phMaxSumMaxChNePh_Pt[centBin_2]->Fill((Float_t)phMax_2/(chMax_2+neMax_2+phMax_2),jtpt_2, weight);
@@ -804,6 +904,50 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       hMC_eMaxJtPt_0p1[nbins_cent]->Fill(jtpt_2,weight);
     }
 
+    if((Float_t)eSum_2/(chSum_2+phSum_2+neSum_2+muSum_2)<0.9) {
+      hMC_eSumOverSumchphnemu_0p9[centBin_2]->Fill(jtpt_2,weight);
+      hMC_eSumOverSumchphnemu_0p9[nbins_cent]->Fill(jtpt_2,weight);
+    }
+
+    if((Float_t)eSum_2/(chSum_2+phSum_2+neSum_2+muSum_2)<0.8) {
+      hMC_eSumOverSumchphnemu_0p8[centBin_2]->Fill(jtpt_2,weight);
+      hMC_eSumOverSumchphnemu_0p8[nbins_cent]->Fill(jtpt_2,weight);
+    }
+
+    if((Float_t)eSum_2/(chSum_2+phSum_2+neSum_2+muSum_2)<0.7) {
+      hMC_eSumOverSumchphnemu_0p7[centBin_2]->Fill(jtpt_2,weight);
+      hMC_eSumOverSumchphnemu_0p7[nbins_cent]->Fill(jtpt_2,weight);
+    }
+
+    if((Float_t)eSum_2/(chSum_2+phSum_2+neSum_2+muSum_2)<0.6) {
+      hMC_eSumOverSumchphnemu_0p6[centBin_2]->Fill(jtpt_2,weight);
+      hMC_eSumOverSumchphnemu_0p6[nbins_cent]->Fill(jtpt_2,weight);
+    }
+
+    if((Float_t)eSum_2/(chSum_2+phSum_2+neSum_2+muSum_2)<0.5) {
+      hMC_eSumOverSumchphnemu_0p5[centBin_2]->Fill(jtpt_2,weight);
+      hMC_eSumOverSumchphnemu_0p5[nbins_cent]->Fill(jtpt_2,weight);
+    }
+
+    if((Float_t)eSum_2/(chSum_2+phSum_2+neSum_2+muSum_2)<0.4) {
+      hMC_eSumOverSumchphnemu_0p4[centBin_2]->Fill(jtpt_2,weight);
+      hMC_eSumOverSumchphnemu_0p4[nbins_cent]->Fill(jtpt_2,weight);
+    }
+
+    if((Float_t)eSum_2/(chSum_2+phSum_2+neSum_2+muSum_2)<0.3) {
+      hMC_eSumOverSumchphnemu_0p3[centBin_2]->Fill(jtpt_2,weight);
+      hMC_eSumOverSumchphnemu_0p3[nbins_cent]->Fill(jtpt_2,weight);
+    }
+
+    if((Float_t)eSum_2/(chSum_2+phSum_2+neSum_2+muSum_2)<0.2) {
+      hMC_eSumOverSumchphnemu_0p2[centBin_2]->Fill(jtpt_2,weight);
+      hMC_eSumOverSumchphnemu_0p2[nbins_cent]->Fill(jtpt_2,weight);
+    }
+
+    if((Float_t)eSum_2/(chSum_2+phSum_2+neSum_2+muSum_2)<0.1) {
+      hMC_eSumOverSumchphnemu_0p1[centBin_2]->Fill(jtpt_2,weight);
+      hMC_eSumOverSumchphnemu_0p1[nbins_cent]->Fill(jtpt_2,weight);
+    }
 
 
     hMC_chMax[centBin_2]->Fill(chMax_2, weight);
@@ -907,37 +1051,38 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hMC_eSum[nbins_cent]->Fill(eSum_2, weight);
     hMC_eSumGenPt_Pt[centBin_2]->Fill((Float_t)eSum_2/refpt_2,refpt_2, weight);
     hMC_eSumGenPt_Pt[nbins_cent]->Fill((Float_t)eSum_2/refpt_2,refpt_2, weight);
-    
 
+#endif
+    
     if(jet80_2){
 
-      if((neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+      if(1>0/*(neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)*/){
 	hMC[2][0][centBin_2]->Fill(jtpt_2,weight);
 	hMC[2][0][nbins_cent]->Fill(jtpt_2,weight);
       }
-      if((eMax_2/jtpt_2<0.7) && (neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) &&(chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+      if((eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2)<0.7) && (neMax_2/(chMax_2+neMax_2+phMax_2)<0.6) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) &&(chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
 	hMC[2][1][centBin_2]->Fill(jtpt_2,weight);
 	hMC[2][1][nbins_cent]->Fill(jtpt_2,weight);
       }
       
     }else if(jet65_2 && !jet80_2){
       
-      if((neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+      if(1>0/*(neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)*/){
         hMC[1][0][centBin_2]->Fill(jtpt_2,weight);
 	hMC[1][0][nbins_cent]->Fill(jtpt_2,weight);
       }
-      if((eMax_2/jtpt_2<0.7) && (neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+      if((eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2)<0.7) && (neMax_2/(chMax_2+neMax_2+phMax_2)<0.6) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
 	hMC[1][1][centBin_2]->Fill(jtpt_2,weight);
 	hMC[1][1][nbins_cent]->Fill(jtpt_2,weight);
       }
 
     }else if(jet55_2 && !jet65_2 && !jet80_2){
 
-      if((neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+      if(1>0/*(neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)*/){
 	hMC[0][0][centBin_2]->Fill(jtpt_2,weight);
 	hMC[0][0][nbins_cent]->Fill(jtpt_2,weight);
       }
-      if((eMax_2/jtpt_2<0.7) && (neMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
+      if((eSum_2/(chSum_2+neSum_2+phSum_2+muSum_2)<0.7) && (neMax_2/(chMax_2+neMax_2+phMax_2)<0.6) && (phMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/jtpt_2>0.05) && (muMax_2/(chMax_2+neMax_2+phMax_2)<0.9) && (chMax_2/(chMax_2+neMax_2+phMax_2)<0.9)){
 	hMC[0][1][centBin_2]->Fill(jtpt_2,weight);
 	hMC[0][1][nbins_cent]->Fill(jtpt_2,weight);
       }
@@ -955,6 +1100,7 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       hMC_Ratio[a][i] = (TH1F*)hMC[a][1][i]->Clone(Form("hMC_Ratio_ID_over_noIDCut_%s_cent%d",TrigName[a],i));
       hMC_Ratio[a][i]->Divide(hMC[a][0][i]);
     }
+  
     hData_Ratio_eMaxJtPt_0p9[i] = (TH1F*)hData_eMaxJtPt_0p9[i]->Clone(Form("hData_Ratio_emaxJtPt_0p9_cent%d",i));
     hData_Ratio_eMaxJtPt_0p9[i]->Divide(hData_noCut[i]);
     hData_Ratio_eMaxJtPt_0p8[i] = (TH1F*)hData_eMaxJtPt_0p8[i]->Clone(Form("hData_Ratio_emaxJtPt_0p8_cent%d",i));
@@ -993,10 +1139,48 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hMC_Ratio_eMaxJtPt_0p1[i] = (TH1F*)hMC_eMaxJtPt_0p1[i]->Clone(Form("hMC_Ratio_emaxJtPt_0p1_cent%d",i));
     hMC_Ratio_eMaxJtPt_0p1[i]->Divide(hMC_noCut[i]);
 
+    hData_Ratio_eSumOverSumchphnemu_0p9[i] = (TH1F*)hData_eSumOverSumchphnemu_0p9[i]->Clone(Form("hData_Ratio_eSumOverSumchphnemu_0p9_cent%d",i));
+    hData_Ratio_eSumOverSumchphnemu_0p9[i]->Divide(hData_noCut[i]);
+    hData_Ratio_eSumOverSumchphnemu_0p8[i] = (TH1F*)hData_eSumOverSumchphnemu_0p8[i]->Clone(Form("hData_Ratio_eSumOverSumchphnemu_0p8_cent%d",i));
+    hData_Ratio_eSumOverSumchphnemu_0p8[i]->Divide(hData_noCut[i]);
+    hData_Ratio_eSumOverSumchphnemu_0p7[i] = (TH1F*)hData_eSumOverSumchphnemu_0p7[i]->Clone(Form("hData_Ratio_eSumOverSumchphnemu_0p7_cent%d",i));
+    hData_Ratio_eSumOverSumchphnemu_0p7[i]->Divide(hData_noCut[i]);
+    hData_Ratio_eSumOverSumchphnemu_0p6[i] = (TH1F*)hData_eSumOverSumchphnemu_0p6[i]->Clone(Form("hData_Ratio_eSumOverSumchphnemu_0p6_cent%d",i));
+    hData_Ratio_eSumOverSumchphnemu_0p6[i]->Divide(hData_noCut[i]);
+    hData_Ratio_eSumOverSumchphnemu_0p5[i] = (TH1F*)hData_eSumOverSumchphnemu_0p5[i]->Clone(Form("hData_Ratio_eSumOverSumchphnemu_0p5_cent%d",i));
+    hData_Ratio_eSumOverSumchphnemu_0p5[i]->Divide(hData_noCut[i]);
+    hData_Ratio_eSumOverSumchphnemu_0p4[i] = (TH1F*)hData_eSumOverSumchphnemu_0p4[i]->Clone(Form("hData_Ratio_eSumOverSumchphnemu_0p4_cent%d",i));
+    hData_Ratio_eSumOverSumchphnemu_0p4[i]->Divide(hData_noCut[i]);
+    hData_Ratio_eSumOverSumchphnemu_0p3[i] = (TH1F*)hData_eSumOverSumchphnemu_0p3[i]->Clone(Form("hData_Ratio_eSumOverSumchphnemu_0p3_cent%d",i));
+    hData_Ratio_eSumOverSumchphnemu_0p3[i]->Divide(hData_noCut[i]);
+    hData_Ratio_eSumOverSumchphnemu_0p2[i] = (TH1F*)hData_eSumOverSumchphnemu_0p2[i]->Clone(Form("hData_Ratio_eSumOverSumchphnemu_0p2_cent%d",i));
+    hData_Ratio_eSumOverSumchphnemu_0p2[i]->Divide(hData_noCut[i]);
+    hData_Ratio_eSumOverSumchphnemu_0p1[i] = (TH1F*)hData_eSumOverSumchphnemu_0p1[i]->Clone(Form("hData_Ratio_eSumOverSumchphnemu_0p1_cent%d",i));
+    hData_Ratio_eSumOverSumchphnemu_0p1[i]->Divide(hData_noCut[i]);
+
+    hMC_Ratio_eSumOverSumchphnemu_0p9[i] = (TH1F*)hMC_eSumOverSumchphnemu_0p9[i]->Clone(Form("hMC_Ratio_eSumOverSumchphnemu_0p9_cent%d",i));
+    hMC_Ratio_eSumOverSumchphnemu_0p9[i]->Divide(hMC_noCut[i]);
+    hMC_Ratio_eSumOverSumchphnemu_0p8[i] = (TH1F*)hMC_eSumOverSumchphnemu_0p8[i]->Clone(Form("hMC_Ratio_eSumOverSumchphnemu_0p8_cent%d",i));
+    hMC_Ratio_eSumOverSumchphnemu_0p8[i]->Divide(hMC_noCut[i]);
+    hMC_Ratio_eSumOverSumchphnemu_0p7[i] = (TH1F*)hMC_eSumOverSumchphnemu_0p7[i]->Clone(Form("hMC_Ratio_eSumOverSumchphnemu_0p7_cent%d",i));
+    hMC_Ratio_eSumOverSumchphnemu_0p7[i]->Divide(hMC_noCut[i]);
+    hMC_Ratio_eSumOverSumchphnemu_0p6[i] = (TH1F*)hMC_eSumOverSumchphnemu_0p6[i]->Clone(Form("hMC_Ratio_eSumOverSumchphnemu_0p6_cent%d",i));
+    hMC_Ratio_eSumOverSumchphnemu_0p6[i]->Divide(hMC_noCut[i]);
+    hMC_Ratio_eSumOverSumchphnemu_0p5[i] = (TH1F*)hMC_eSumOverSumchphnemu_0p5[i]->Clone(Form("hMC_Ratio_eSumOverSumchphnemu_0p5_cent%d",i));
+    hMC_Ratio_eSumOverSumchphnemu_0p5[i]->Divide(hMC_noCut[i]);
+    hMC_Ratio_eSumOverSumchphnemu_0p4[i] = (TH1F*)hMC_eSumOverSumchphnemu_0p4[i]->Clone(Form("hMC_Ratio_eSumOverSumchphnemu_0p4_cent%d",i));
+    hMC_Ratio_eSumOverSumchphnemu_0p4[i]->Divide(hMC_noCut[i]);
+    hMC_Ratio_eSumOverSumchphnemu_0p3[i] = (TH1F*)hMC_eSumOverSumchphnemu_0p3[i]->Clone(Form("hMC_Ratio_eSumOverSumchphnemu_0p3_cent%d",i));
+    hMC_Ratio_eSumOverSumchphnemu_0p3[i]->Divide(hMC_noCut[i]);
+    hMC_Ratio_eSumOverSumchphnemu_0p2[i] = (TH1F*)hMC_eSumOverSumchphnemu_0p2[i]->Clone(Form("hMC_Ratio_eSumOverSumchphnemu_0p2_cent%d",i));
+    hMC_Ratio_eSumOverSumchphnemu_0p2[i]->Divide(hMC_noCut[i]);
+    hMC_Ratio_eSumOverSumchphnemu_0p1[i] = (TH1F*)hMC_eSumOverSumchphnemu_0p1[i]->Clone(Form("hMC_Ratio_eSumOverSumchphnemu_0p1_cent%d",i));
+    hMC_Ratio_eSumOverSumchphnemu_0p1[i]->Divide(hMC_noCut[i]);
+
   }
 
   //TFile f("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_MC_withCutHasAllExceptElecRejection.root","RECREATE");
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_mc_subid0_ElecCutRejectionStudy_with2DplotsSumMaxChNePhCut_%s%d%s_%d.root",algo,radius,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/RAA_JetID_Data_mc_YesSubidCut_final_jetIDcut_ptGreater30_%s%d%s_%d.root",algo,radius,jet_type,date.GetDate()),"RECREATE");
   f.cd();
 
   for(int i = 0;i<=nbins_cent;i++){
@@ -1011,10 +1195,18 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
       hData_Ratio[a][i]->Print("base");
       hMC_Ratio[a][i]->Write();
       hMC_Ratio[a][i]->Print("base");
-    } 
-
+    }
+    
     hData_noCut[i]->Write();
     hMC_noCut[i]->Write();
+    
+#if 0
+    hData_eSumOverSumchphnemu_Jtpt[i]->Write();
+    hData_eSumOverSumchphnemu_eMaxJtpt[i]->Write();
+    hMC_eSumOverSumchphnemu_Jtpt[i]->Write();
+    hMC_eSumOverSumchphnemu_Genpt[i]->Write();
+    hMC_eSumOverSumchphnemu_eMaxJtpt[i]->Write();
+    hMC_eSumOverSumchphnemu_eMaxGenpt[i]->Write();
     
     hData_chMax[i]->Write();
     hData_chSum[i]->Write();
@@ -1129,6 +1321,48 @@ void RAA_JetID(int radius = 3, char *algo = "Pu", char *jet_type = "PF"){
     hMC_Ratio_eMaxJtPt_0p2[i]->Write();
     hMC_Ratio_eMaxJtPt_0p1[i]->Write();
 
+    hData_eSumOverSumchphnemu_0p9[i]->Write();
+    hData_eSumOverSumchphnemu_0p8[i]->Write();
+    hData_eSumOverSumchphnemu_0p7[i]->Write();
+    hData_eSumOverSumchphnemu_0p6[i]->Write();
+    hData_eSumOverSumchphnemu_0p5[i]->Write();
+    hData_eSumOverSumchphnemu_0p4[i]->Write();
+    hData_eSumOverSumchphnemu_0p3[i]->Write();
+    hData_eSumOverSumchphnemu_0p2[i]->Write();
+    hData_eSumOverSumchphnemu_0p1[i]->Write();
+
+    hData_Ratio_eSumOverSumchphnemu_0p9[i]->Write();
+    hData_Ratio_eSumOverSumchphnemu_0p8[i]->Write();
+    hData_Ratio_eSumOverSumchphnemu_0p7[i]->Write();
+    hData_Ratio_eSumOverSumchphnemu_0p6[i]->Write();
+    hData_Ratio_eSumOverSumchphnemu_0p5[i]->Write();
+    hData_Ratio_eSumOverSumchphnemu_0p4[i]->Write();
+    hData_Ratio_eSumOverSumchphnemu_0p3[i]->Write();
+    hData_Ratio_eSumOverSumchphnemu_0p2[i]->Write();
+    hData_Ratio_eSumOverSumchphnemu_0p1[i]->Write();
+
+    hMC_eSumOverSumchphnemu_0p9[i]->Write();
+    hMC_eSumOverSumchphnemu_0p8[i]->Write();
+    hMC_eSumOverSumchphnemu_0p7[i]->Write();
+    hMC_eSumOverSumchphnemu_0p6[i]->Write();
+    hMC_eSumOverSumchphnemu_0p5[i]->Write();
+    hMC_eSumOverSumchphnemu_0p4[i]->Write();
+    hMC_eSumOverSumchphnemu_0p3[i]->Write();
+    hMC_eSumOverSumchphnemu_0p2[i]->Write();
+    hMC_eSumOverSumchphnemu_0p1[i]->Write();
+
+    hMC_Ratio_eSumOverSumchphnemu_0p9[i]->Write();
+    hMC_Ratio_eSumOverSumchphnemu_0p8[i]->Write();
+    hMC_Ratio_eSumOverSumchphnemu_0p7[i]->Write();
+    hMC_Ratio_eSumOverSumchphnemu_0p6[i]->Write();
+    hMC_Ratio_eSumOverSumchphnemu_0p5[i]->Write();
+    hMC_Ratio_eSumOverSumchphnemu_0p4[i]->Write();
+    hMC_Ratio_eSumOverSumchphnemu_0p3[i]->Write();
+    hMC_Ratio_eSumOverSumchphnemu_0p2[i]->Write();
+    hMC_Ratio_eSumOverSumchphnemu_0p1[i]->Write();
+
+#endif
+    
   }
 
   timer.Stop();

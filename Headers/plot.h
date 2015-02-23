@@ -71,7 +71,6 @@ void drawText(const char *text, float xp, float yp, int size){
   tex->Draw();
 }
 
-
 void putCMSPrel(double x=0.17, double y=0.96, double size=0.04){
   TLatex *tex=0;
   tex = new TLatex(x,y,"CMS Preliminary");
@@ -81,6 +80,23 @@ void putCMSPrel(double x=0.17, double y=0.96, double size=0.04){
   tex->Draw();
 }
 
+void putPbPbLumi(double x=0.5, double y=0.96, double size=0.04){
+  TLatex *tex=0;
+  tex = new TLatex(x,y,"PbPb #int L dt = 145 #mu barns^{-1}");
+  tex->SetTextSize(size);
+  tex->SetLineWidth(2);
+  tex->SetNDC();
+  tex->Draw();
+}
+
+void putPPLumi(double x=0.5, double y=0.96, double size=0.04){
+  TLatex *tex=0;
+  tex = new TLatex(x,y,"pp #int L dt = 5.3 pico barns^{-1}");
+  tex->SetTextSize(size);
+  tex->SetLineWidth(2);
+  tex->SetNDC();
+  tex->Draw();
+}
 
 void putCMSSim(double x=0.17, double y=0.96, double size=0.04){
   TLatex *tex=0;

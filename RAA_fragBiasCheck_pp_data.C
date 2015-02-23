@@ -80,18 +80,20 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 
-static const int nbins_eta = 4;
+static const int nbins_eta = 1;
 static const double boundaries_eta[nbins_eta][2] = {
-  {0.0,0.5}, {0.5,1.0}, {1.0,1.5}, {1.5,2.0}
+  {0.0,2.0}
 };
 
 static const double delta_eta[nbins_eta] = {
-  1.0, 1.0, 1.0, 1.0
+  4.0
 };
 
 static const char etaWidth [nbins_eta][256] = {
-  "0_absEta_05","05_absEta_10","10_absEta_15","15_absEta_20"
+  "0_absEta_20"
 };
+static const int trigValue = 4;
+static const char trigName [trigValue][256] = {"HLT40","HLT60","HLT80","Combined"};
 
 /*
 static const int nbins_eta = 1;
@@ -108,8 +110,8 @@ static const char etaWidth [nbins_eta][256] = {
 };
 */
 
-static const int no_radius = 2;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3,5};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -117,7 +119,7 @@ static const int list_radius[no_radius] = {3,5};
 
 using namespace std;
 
-void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
+void RAA_fragBiasCheck_pp_data(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   TH1::SetDefaultSumw2();
   gStyle->SetOptStat(0);
@@ -142,7 +144,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
     instr1>>filename1;
   }
 
-  const int N = 5;
+  const int N = 6;
   TChain * jetPP[N][no_radius];
   string dir[N][no_radius];
 
@@ -152,6 +154,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
     dir[2][k] = Form("ak%d%sJetAnalyzer",list_radius[k],jet_type);
     dir[3][k] = "hiEvtAnalyzer";
     dir[4][k] = "hltobject";
+    dir[5][k] = "pfcandAnalyzer";
   }
   string trees[N] = {
     "HltTree",
@@ -159,6 +162,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
     "t",
     "HiTree",
     "jetObjTree",
+    "pfTree"
   };
 
   //this loop is to assign the tree values before we go into the file loop. 
@@ -186,6 +190,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
     jetPP[2][k]->AddFriend(jetPP[1][k]);
     jetPP[2][k]->AddFriend(jetPP[3][k]);
     jetPP[2][k]->AddFriend(jetPP[4][k]);
+    jetPP[2][k]->AddFriend(jetPP[5][k]);
   }// radius loop ends
   
   if(printDebug) cout<<"no of entries in the forest = "<<jetPP[0][0]->GetEntries()<<endl;
@@ -270,7 +275,16 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
   float trgObj_phi_1;
   float trgObj_mass_1;
 
-  
+  Int_t nPFpart;
+  Int_t pfID[10000];
+  Float_t pfPt[10000];
+  Float_t pfVsPt[10000];
+  Float_t pfVsPtInitial[10000];
+  Float_t pfArea[10000];
+  Float_t pfEta[10000];
+  Float_t pfPhi[10000];
+
+
   
   for(int k = 0;k<no_radius;k++){
     //set the branch addresses:  - one of the most boring parts of the code: 
@@ -325,6 +339,16 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
     jetPP[2][k]->SetBranchAddress("phi",&trgObj_phi_1);
     jetPP[2][k]->SetBranchAddress("mass",&trgObj_mass_1);
 
+    jetPP[2][k]->SetBranchAddress("nPFpart",&nPFpart);
+    jetPP[2][k]->SetBranchAddress("pfId",&pfID);
+    jetPP[2][k]->SetBranchAddress("pfPt",&pfPt);
+    jetPP[2][k]->SetBranchAddress("pfVsPt",&pfVsPt);
+    jetPP[2][k]->SetBranchAddress("pfVsPtInitial",&pfVsPtInitial);
+    jetPP[2][k]->SetBranchAddress("pfArea",&pfArea);
+    jetPP[2][k]->SetBranchAddress("pfEta",&pfEta);
+    jetPP[2][k]->SetBranchAddress("pfPhi",&pfPhi);
+
+
   }//radius loop
 
   TH1F *hEvents_HLT80 = new TH1F("hEvents_HLT80","",4,0,2);
@@ -338,6 +362,29 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
   //  jets_ID[k] = new TNtuple(Form("jets_R%d_ID",list_radius[k]),"","rawpt:jtpt:jet40:jet40_prescl:jet60:jet60_prescl:jet80:jet80_prescl:trgObjpt:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum:trkMax:trkSum");
   //}  
   //Float_t arrayValues[21];
+
+  TH1F *hJets_noTrkpTCut[no_radius][nbins_eta][trigValue];
+  TH1F *hJets_3TrkpTCut[no_radius][nbins_eta][trigValue];
+  TH1F *hJets_5TrkpTCut[no_radius][nbins_eta][trigValue];
+  TH1F *hJets_7TrkpTCut[no_radius][nbins_eta][trigValue];
+  TH1F *hJets_10TrkpTCut[no_radius][nbins_eta][trigValue];
+
+  for(int k = 0;k<no_radius;k++){
+    for(int l = 0;l<trigValue;l++){
+      for(int j = 0;j<nbins_eta;j++){
+	  hJets_noTrkpTCut[k][j][l] = new TH1F(Form("hJets_noTrkpTCut_%s_R%d_%s",trigName[l],list_radius[k],etaWidth[j]),Form("Jet Spectra with no fragmentation cut %s R%d %s ",trigName[l],list_radius[k],etaWidth[j]),1000,0,1000);
+	  hJets_3TrkpTCut[k][j][l] = new TH1F(Form("hJets_3TrkpTCut_%s_R%d_%s",trigName[l],list_radius[k],etaWidth[j]),Form("Jet Spectra with 3GeV fragmentation cut %s R%d %s ",trigName[l],list_radius[k],etaWidth[j]),1000,0,1000);
+	  hJets_5TrkpTCut[k][j][l] = new TH1F(Form("hJets_5TrkpTCut_%s_R%d_%s",trigName[l],list_radius[k],etaWidth[j]),Form("Jet Spectra with 5GeV fragmentation cut %s R%d %s ",trigName[l],list_radius[k],etaWidth[j]),1000,0,1000);
+	  hJets_7TrkpTCut[k][j][l] = new TH1F(Form("hJets_7TrkpTCut_%s_R%d_%s",trigName[l],list_radius[k],etaWidth[j]),Form("Jet Spectra with 7GeV fragmentation cut %s R%d %s ",trigName[l],list_radius[k],etaWidth[j]),1000,0,1000);
+	  hJets_10TrkpTCut[k][j][l] = new TH1F(Form("hJets_10TrkpTCut_%s_R%d_%s",trigName[l],list_radius[k],etaWidth[j]),Form("Jet Spectra with 10GeV fragmentation cut %s R%d %s ",trigName[l],list_radius[k],etaWidth[j]),1000,0,1000);
+	
+      }// eta loop
+
+    }// trigger loop
+
+  }// radius loop
+
+
   
   for(int k = 0;k<no_radius;k++){
 
@@ -352,6 +399,8 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
       jetPP[2][k]->GetEntry(jentry);
       jetPP[3][k]->GetEntry(jentry);
       jetPP[4][k]->GetEntry(jentry);
+      jetPP[5][k]->GetEntry(jentry);
+
       if(printDebug && jentry%100000==0)cout<<"pp data file"<<endl;
       if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<endl;
 
@@ -370,6 +419,72 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	for(int g = 0;g<nrefe_1;g++){
 
 	  if(TMath::Abs(eta_1[g])<boundaries_eta[j][0] || TMath::Abs(eta_1[g])>boundaries_eta[j][1]) continue;
+
+	  vector <Float_t> inJetPFcand_pT;
+
+	  // have to run through all the particle flow candidates:
+	  for(int ipf = 0; ipf<nPFpart; ipf++){
+
+	    if(TMath::Sqrt((eta_1[g] - pfEta[ipf])*(eta_1[g] - pfEta[ipf]) + (phi_1[g] - pfPhi[ipf])*(phi_1[g] - pfPhi[ipf])) <= (float) list_radius[k]/10){
+
+	      inJetPFcand_pT.push_back(pfPt[ipf]);
+	      
+	    }// checking for candidates to be inside the jet cone 
+
+	  } // pf flow candidate loop
+
+	  // Now find the pT of the largest candidate inside the jet.
+	  float large = inJetPFcand_pT[0];
+	  for(int a = 0;a<inJetPFcand_pT.size()-1;a++){
+	    if(large < inJetPFcand_pT[a]) large = inJetPFcand_pT[a];	      
+	  }
+
+	  // test checking the sum of the pf candidate to equal the jet pt
+	  if(printDebug) cout<<"jtpt = "<<pt_1[g]<<"large candidate = "<<large<<endl;
+	  
+	  // now that we have the smallest candidate we can check for the different fragmentation biases:
+	 	  
+	  if(jet80_1==1  && trgObj_pt_1>=80) {
+
+	    hJets_noTrkpTCut[k][j][2]->Fill(pt_1[g]);
+	    if(large > 3) hJets_3TrkpTCut[k][j][2]->Fill(pt_1[g],jet80_p_1);
+	    if(large > 5) hJets_5TrkpTCut[k][j][2]->Fill(pt_1[g],jet80_p_1);
+	    if(large > 7) hJets_7TrkpTCut[k][j][2]->Fill(pt_1[g],jet80_p_1);
+	    if(large > 10) hJets_10TrkpTCut[k][j][2]->Fill(pt_1[g],jet80_p_1);
+	      
+	  }
+
+	  if(jet60_1==1  && trgObj_pt_1<80  && trgObj_pt_1>=60){
+
+	    hJets_noTrkpTCut[k][j][1]->Fill(pt_1[g]);
+	    if(large > 3) hJets_3TrkpTCut[k][j][1]->Fill(pt_1[g],jet60_p_1);
+	    if(large > 5) hJets_5TrkpTCut[k][j][1]->Fill(pt_1[g],jet60_p_1);
+	    if(large > 7) hJets_7TrkpTCut[k][j][1]->Fill(pt_1[g],jet60_p_1);
+	    if(large > 10) hJets_10TrkpTCut[k][j][1]->Fill(pt_1[g],jet60_p_1);
+
+	  }
+
+	  if(jet40_1==1 && trgObj_pt_1<60  && trgObj_pt_1>=40){
+	    
+	    hJets_noTrkpTCut[k][j][0]->Fill(pt_1[g]);
+	    if(large > 3) hJets_3TrkpTCut[k][j][0]->Fill(pt_1[g],jet40_p_1);
+	    if(large > 5) hJets_5TrkpTCut[k][j][0]->Fill(pt_1[g],jet40_p_1);
+	    if(large > 7) hJets_7TrkpTCut[k][j][0]->Fill(pt_1[g],jet40_p_1);
+	    if(large > 10) hJets_10TrkpTCut[k][j][0]->Fill(pt_1[g],jet40_p_1);
+
+	  }
+	
+	  for(int t = 0;t<trigValue-1;t++) {
+
+	    hJets_noTrkpTCut[k][j][trigValue-1]->Add(hJets_noTrkpTCut[k][j][t]);
+	    hJets_3TrkpTCut[k][j][trigValue-1]->Add(hJets_3TrkpTCut[k][j][t]);
+	    hJets_5TrkpTCut[k][j][trigValue-1]->Add(hJets_5TrkpTCut[k][j][t]);
+	    hJets_7TrkpTCut[k][j][trigValue-1]->Add(hJets_7TrkpTCut[k][j][t]);
+	    hJets_10TrkpTCut[k][j][trigValue-1]->Add(hJets_10TrkpTCut[k][j][t]);
+	    
+	  }
+
+
 
 #if 0
 	  arrayValues[0] = raw_1[g];
@@ -400,6 +515,8 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	  //if(raw_1[g] < 30) continue;
 	  //if((neMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (phMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/pt_1[g]>0.05) && (muMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9)){
 	  //if(eSum_1[g]/(chSum_1[g]+neSum_1[g]+phSum_1[g]+muSum_1[g])<0.7){
+
+#if 0
 	  if(chMax_1[g]/pt_1[g]>0.05){
 	  //if(1>0){
 	  
@@ -414,7 +531,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	    }
 	    
 	  }// qa condition
-
+#endif
 	}// jet loop
 	
       }// eta bins
@@ -426,9 +543,26 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   TDatime date;
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt_norawptcut_absEta_35_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_fragbiascheck_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
+
+  for(int k = 0;k<no_radius;k++){
+    for(int l = 0;l<trigValue;l++){
+      for(int j = 0;j<nbins_eta;j++){
+	hJets_noTrkpTCut[k][j][l]->Write();
+	hJets_3TrkpTCut[k][j][l]->Write();
+	hJets_5TrkpTCut[k][j][l]->Write();
+	hJets_7TrkpTCut[k][j][l]->Write();
+	hJets_10TrkpTCut[k][j][l]->Write();
+	
+      }// eta loop
+
+    }// trigger loop
+
+  }// radius loop
+
+#if 0
   hEvents_HLT80->Write();
   hEvents_HLT60->Write();
   hEvents_HLT40->Write();
@@ -465,6 +599,8 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
     }// eta bin loop
 
   }// radius loop
+
+#endif
 
   f.Write();
 

@@ -30,6 +30,10 @@
 // Dec 9th - Jet RAA is going to Pu Jets! make the macro to load in the jets and make the ntuple to study the jet ID cuts. 
 //           Only going to make the ntuple first. and then we can look at the histograms. 
 
+// Jan 28th forget the ntuples, taking forever. am going directly to the spectra. 
+// Feb 2nd - make the spectra from Doga's jet80 spectra. 
+
+// Feb 7th making the change to a TTree from TNtuple at the request of Alex ($!@#$%^&*^%$%^)
 
 #include <iostream>
 #include <stdio.h>
@@ -133,11 +137,11 @@ static const int nbins_cent = 6;
 static Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 5 to get your actual centrality
 static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8 ,362.24}; //last one is for 0-200 bin. 
 
-//static const int no_radius = 3;//necessary for the RAA analysis  
-//static const int list_radius[no_radius] = {2,3,4};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
-static const int no_radius = 1;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3};
+//static const int no_radius = 1;//necessary for the RAA analysis  
+//static const int list_radius[no_radius] = {3};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -204,6 +208,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   std::string infile1;
   //infile1 = "jet55or65_filelist.txt";
   infile1 = "jetRAA_PbPb_data_forest.txt";
+  //infile1 = "doga_jet80_pbpb_data.txt";
   
   //std::string infile2;
   //infile2 = "jet80_filelist.txt";
@@ -480,6 +485,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     jetpbpb1[2][k]->SetBranchAddress("eMax",&eMax_1);
     jetpbpb1[2][k]->SetBranchAddress("muSum",&muSum_1);
     jetpbpb1[2][k]->SetBranchAddress("muMax",&muMax_1);
+
     /*
     jetpbpb1[3][k]->SetBranchAddress("nref",&nrefe_2);
     jetpbpb1[3][k]->SetBranchAddress("jtpt",&pt_2);
@@ -546,6 +552,82 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   //ofstream fHLT_80,fHLT_65,fHLT_55;
 
 
+  TH1F *hEvents_HLT80 = new TH1F("hEvents_HLT80","",4,0,2);
+  TH1F *hEvents_HLT65 = new TH1F("hEvents_HLT65","",4,0,2);
+  TH1F *hEvents_HLT55 = new TH1F("hEvents_HLT55","",4,0,2);
+  TH1F *hEvents = new TH1F("hEvents","",4,0,2);
+  TH1F *hEvents_pCES = new TH1F("hEvents_pCES","",4,0,2);
+  TH1F *hEvents_pHBHE = new TH1F("hEvents_pHBHE","",4,0,2);
+  TH1F *hEvents_vz15 = new TH1F("hEvents_vz15","",4,0,2);
+  TH1F *hEvents_eta2 = new TH1F("hEvents_eta2","",4,0,2);
+  TH1F *hEvents_supernova = new TH1F("hEvents_supernova","",4,0,2);
+  TH1F *hEvents_chMaxjtpt = new TH1F("hEvents_chMaxjtpt","",4,0,2);
+  TH1F *hpbpb_TrgObj80[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_TrgObj65[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_TrgObj55[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_TrgObjComb[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_RecoOverRaw[no_radius][nbins_eta][nbins_cent+1];
+  TH2F *hpbpb_RecoOverRaw_jtpt[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_chMax[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_phMax[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_neMax[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_muMax[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_eMax[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_chSum[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_phSum[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_neSum[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_muSum[no_radius][nbins_eta][nbins_cent+1];
+  TH1F *hpbpb_eSum[no_radius][nbins_eta][nbins_cent+1];
+
+  for(int k = 0;k<no_radius;k++){
+
+    for(int j = 0;j<nbins_eta;j++){
+
+      for(int i = 0;i<nbins_cent;i++){
+
+        hpbpb_TrgObj80[k][j][i] = new TH1F(Form("hpbpb_HLT80_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+        hpbpb_TrgObj65[k][j][i] = new TH1F(Form("hpbpb_HLT65_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+        hpbpb_TrgObj55[k][j][i] = new TH1F(Form("hpbpb_HLT55_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+	hpbpb_TrgObjComb[k][j][i] = new TH1F(Form("hpbpb_HLTComb_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+
+	hpbpb_RecoOverRaw[k][j][i] = new TH1F(Form("hpbpb_RecoOverRaw_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("reco over raw ratio R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,10);
+	hpbpb_RecoOverRaw_jtpt[k][j][i] = new TH2F(Form("hpbpb_RecoOverRaw_jtpt_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("reco over raw ratio versus jtpt R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000,100,0,10);
+
+	hpbpb_chMax[k][j][i] = new TH1F(Form("hpbpb_chMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("chMax variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_phMax[k][j][i] = new TH1F(Form("hpbpb_phMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("phMax variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_neMax[k][j][i] = new TH1F(Form("hpbpb_neMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("neMax variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_muMax[k][j][i] = new TH1F(Form("hpbpb_muMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("muMax variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_eMax[k][j][i] = new TH1F(Form("hpbpb_eMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("eMax variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+
+	hpbpb_chSum[k][j][i] = new TH1F(Form("hpbpb_chSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("chSum variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_phSum[k][j][i] = new TH1F(Form("hpbpb_phSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("phSum variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_neSum[k][j][i] = new TH1F(Form("hpbpb_neSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("neSum variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_muSum[k][j][i] = new TH1F(Form("hpbpb_muSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("muSum variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);
+	hpbpb_eSum[k][j][i] = new TH1F(Form("hpbpb_eSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],i),Form("eSum variable for R%d %s %2.0f - %2.0f cent",list_radius[k],etaWidth[j],5*boundaries_cent[i],5*boundaries_cent[i+1]),100,0,200);	
+      }//cent bin loop
+
+      hpbpb_TrgObj80[k][j][nbins_cent] = new TH1F(Form("hpbpb_HLT80_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra from Jet 80 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpbpb_TrgObj65[k][j][nbins_cent] = new TH1F(Form("hpbpb_HLT65_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra from Jet 65 && !jet80 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpbpb_TrgObj55[k][j][nbins_cent] = new TH1F(Form("hpbpb_HLT55_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpbpb_TrgObjComb[k][j][nbins_cent] = new TH1F(Form("hpbpb_HLTComb_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("Trig combined spectra R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpbpb_RecoOverRaw[k][j][nbins_cent] = new TH1F(Form("hpbpb_RecoOverRaw_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("reco over raw ratio R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,10);
+      hpbpb_RecoOverRaw_jtpt[k][j][nbins_cent] = new TH2F(Form("hpbpb_RecoOverRaw_jtpt_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("reco over raw ratio versus jtpt R%d %s 0-200 cent",list_radius[k],etaWidth[j]),1000,0,1000,100,0,10);
+
+      
+      hpbpb_chMax[k][j][nbins_cent] = new TH1F(Form("hpbpb_chMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("chMax variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_phMax[k][j][nbins_cent] = new TH1F(Form("hpbpb_phMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("phMax variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_neMax[k][j][nbins_cent] = new TH1F(Form("hpbpb_neMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("neMax variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_muMax[k][j][nbins_cent] = new TH1F(Form("hpbpb_muMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("muMax variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_eMax[k][j][nbins_cent] = new TH1F(Form("hpbpb_eMax_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("eMax variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      
+      hpbpb_chSum[k][j][nbins_cent] = new TH1F(Form("hpbpb_chSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("chSum variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_phSum[k][j][nbins_cent] = new TH1F(Form("hpbpb_phSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("phSum variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_neSum[k][j][nbins_cent] = new TH1F(Form("hpbpb_neSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("neSum variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_muSum[k][j][nbins_cent] = new TH1F(Form("hpbpb_muSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("muSum variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+      hpbpb_eSum[k][j][nbins_cent] = new TH1F(Form("hpbpb_eSum_R%d_%s_cent%d",list_radius[k],etaWidth[j],nbins_cent),Form("eSum variable for R%d %s 0-200 cent",list_radius[k],etaWidth[j]),100,0,200);
+    }
+   }
+   
 #if 0
 
   ofstream fVs_failure[no_radius];
@@ -748,8 +830,25 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   // Int_t goodEvent_counter = 0;
 
   // we need to add the histograms to find the jet spectra from normal and failure mode- infact just add them to the ntuples per event the value of the HFSumpT*vn*cos/sin(n*psi_n) so we can plot the spectra at the final stage. this would make things easier. 
-  TNtuple *jets_ID = new TNtuple("jets_ID","","rawpt:jtpt:jtpu:l1sj36:l1sj36_prescl:l1sj52:l1sj52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
-  Float_t arrayValues[25];
+  //TNtuple *jets_ID[no_radius];
+  TTree *evt_electron_failure[no_radius];
+  TTree *evt_electron_good[no_radius];
+  Int_t event_value;
+  Int_t run_value;
+  Int_t lumi_value;
+  for(int k = 0;k<no_radius;k++){
+  //  jets_ID[k] = new TNtuple(Form("jets_R%d_ID",list_radius[k]),"","rawpt:jtpt:jtpu:l1sj36:l1sj36_prescl:l1sj52:l1sj52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum:trkMax:trkSum");
+    evt_electron_failure[k] = new TTree (Form("evt_electron_failure_R%d",list_radius[k]),"");
+    evt_electron_failure[k]->Branch("run_value",&run_value,"run_value/I");
+    evt_electron_failure[k]->Branch("lumi_value",&lumi_value,"lumi_value/I");
+    evt_electron_failure[k]->Branch("event_value",&event_value,"event_value/I");
+    evt_electron_good[k] = new TTree (Form("evt_electron_good_R%d",list_radius[k]),"");
+    evt_electron_good[k]->Branch("run_value",&run_value,"run_value/I");
+    evt_electron_good[k]->Branch("lumi_value",&lumi_value,"lumi_value/I");
+    evt_electron_good[k]->Branch("event_value",&event_value,"event_value/I");
+  }
+
+  //Float_t arrayValues[27];
  
   // add the histograms: the first array element: 0 - in the polynomial divergence, 1 - less than the divergend (good),
   //                         second array element: 0 - loose cut value, 1 - tight cut value 
@@ -813,6 +912,86 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
 #endif
 
+  //plots for the jet ID (hopefully final check) // will be the same in Data and MC
+  TH1F *hpbpb_Jet80 = new TH1F("hpbpb_Jet80","",100,0,300);
+  TH1F* hpbpb_Jet80_chMaxJtpt0p01 = new TH1F("hpbpb_Jet80_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet80_chMaxJtpt0p02 = new TH1F("hpbpb_Jet80_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet80_chMaxJtpt0p03 = new TH1F("hpbpb_Jet80_chMaxJtpt0p03","",100,0,300);
+  TH1F* hpbpb_Jet80_chMaxJtpt0p04 = new TH1F("hpbpb_Jet80_chMaxJtpt0p04","",100,0,300);
+  TH1F* hpbpb_Jet80_chMaxJtpt0p05 = new TH1F("hpbpb_Jet80_chMaxJtpt0p05","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p1 = new TH1F("hpbpb_Jet80_eMaxJtpt0p1","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p2 = new TH1F("hpbpb_Jet80_eMaxJtpt0p2","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p3 = new TH1F("hpbpb_Jet80_eMaxJtpt0p3","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p4 = new TH1F("hpbpb_Jet80_eMaxJtpt0p4","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p5 = new TH1F("hpbpb_Jet80_eMaxJtpt0p5","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p6 = new TH1F("hpbpb_Jet80_eMaxJtpt0p6","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p7 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p8 = new TH1F("hpbpb_Jet80_eMaxJtpt0p8","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p9 = new TH1F("hpbpb_Jet80_eMaxJtpt0p9","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01 = new TH1F("hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02 = new TH1F("hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03 = new TH1F("hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01 = new TH1F("hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02 = new TH1F("hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03 = new TH1F("hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03","",100,0,300);
+
+  TH1F *hpbpb_Jet65 = new TH1F("hpbpb_Jet65","",100,0,300);
+  TH1F* hpbpb_Jet65_chMaxJtpt0p01 = new TH1F("hpbpb_Jet65_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet65_chMaxJtpt0p02 = new TH1F("hpbpb_Jet65_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet65_chMaxJtpt0p03 = new TH1F("hpbpb_Jet65_chMaxJtpt0p03","",100,0,300);
+  TH1F* hpbpb_Jet65_chMaxJtpt0p04 = new TH1F("hpbpb_Jet65_chMaxJtpt0p04","",100,0,300);
+  TH1F* hpbpb_Jet65_chMaxJtpt0p05 = new TH1F("hpbpb_Jet65_chMaxJtpt0p05","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p1 = new TH1F("hpbpb_Jet65_eMaxJtpt0p1","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p2 = new TH1F("hpbpb_Jet65_eMaxJtpt0p2","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p3 = new TH1F("hpbpb_Jet65_eMaxJtpt0p3","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p4 = new TH1F("hpbpb_Jet65_eMaxJtpt0p4","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p5 = new TH1F("hpbpb_Jet65_eMaxJtpt0p5","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p6 = new TH1F("hpbpb_Jet65_eMaxJtpt0p6","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p7 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p8 = new TH1F("hpbpb_Jet65_eMaxJtpt0p8","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p9 = new TH1F("hpbpb_Jet65_eMaxJtpt0p9","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01 = new TH1F("hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02 = new TH1F("hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03 = new TH1F("hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01 = new TH1F("hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02 = new TH1F("hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03 = new TH1F("hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03","",100,0,300);
+
+  TH1F *hpbpb_Jet55 = new TH1F("hpbpb_Jet55","",100,0,300);
+  TH1F* hpbpb_Jet55_chMaxJtpt0p01 = new TH1F("hpbpb_Jet55_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet55_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet55_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_chMaxJtpt0p03","",100,0,300);
+  TH1F* hpbpb_Jet55_chMaxJtpt0p04 = new TH1F("hpbpb_Jet55_chMaxJtpt0p04","",100,0,300);
+  TH1F* hpbpb_Jet55_chMaxJtpt0p05 = new TH1F("hpbpb_Jet55_chMaxJtpt0p05","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p1 = new TH1F("hpbpb_Jet55_eMaxJtpt0p1","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p2 = new TH1F("hpbpb_Jet55_eMaxJtpt0p2","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p3 = new TH1F("hpbpb_Jet55_eMaxJtpt0p3","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p4 = new TH1F("hpbpb_Jet55_eMaxJtpt0p4","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p5 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p6 = new TH1F("hpbpb_Jet55_eMaxJtpt0p6","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p7 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p8 = new TH1F("hpbpb_Jet55_eMaxJtpt0p8","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p9 = new TH1F("hpbpb_Jet55_eMaxJtpt0p9","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01 = new TH1F("hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03","",100,0,300);
+
+  TH2F* hpbpb_chMaxJtpt_jtpt = new TH2F("hpbpb_chMaxJtpt_jtpt","",100,0,300,200,0,2);
+  TH2F* hpbpb_eMaxJtpt_jtpt = new TH2F("hpbpb_eMaxJtpt_jtpt","",100,0,300,200,0,2);
+  TH2F* hpbpb_eMaxJtpt_chMaxJtpt = new TH2F("hpbpb_eMaxJtpt_chMaxJtpt","",200,0,2,200,0,2);
+  
   for(int k = 0;k<no_radius;k++){
 
     if(printDebug)cout<<"Running data reading for R = "<<list_radius[k]<<endl;
@@ -824,9 +1003,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     // fill the no of pixel vs no of jets histogram here 
     //jetpbpb1[2][k]->Draw(Form("hiNpix:Sum$(jtpt>50&&abs(jteta)<2)>>hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],centBin),"pcollisionEventSelection&&pHBHENoiseFilter","goff");
     //jetpbpb1[2][k]->Project(Form("hpbpb_Npix_cut_R%d_n20_eta_p20_cent%d",list_radius[k],nbins_cent),"hiNpix:Sum$(jtpt>50&&abs(jteta)<2)","pcollisionEventSelection&&pHBHENoiseFilter");
-    
-    for(int jentry = 0;jentry<nentries_jet55or65;jentry++){
 
+    for(int jentry = 0;jentry<nentries_jet55or65;jentry++){
       jetpbpb1[0][k]->GetEntry(jentry);
       jetpbpb1[1][k]->GetEntry(jentry);
       jetpbpb1[2][k]->GetEntry(jentry);    
@@ -834,13 +1012,17 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       jetpbpb1[4][k]->GetEntry(jentry);
 
       //if(printDebug && jentry%100000==0)cout<<"Jet 55or65 file"<<endl;
-      if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<endl;
+      if(printDebug)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<"; lumi = "<<lumi_1<<endl;
       
       // get the stuff required for the trigger turn on curve later. in a separate loop till i understand how to put this in here. 
       
       int centBin = findBin(hiBin_1);//tells us the centrality of the event. 
       //if(printDebug)cout<<"cent bin = "<<centBin<<endl;
       //if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
+      if(k==1)hEvents->Fill(1);
+      if(k==1 && pcollisionEventSelection_1 == 1) hEvents_pCES->Fill(1);
+      if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1) hEvents_pHBHE->Fill(1);
+      if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1 && fabs(vz_1)<15) hEvents_vz15->Fill(1);
       
       if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
 
@@ -851,7 +1033,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       hpbpb_vy[k]->Fill(vy_1);
 #endif
 
-      if(fabs(vz_1)>15) continue;
+      if(TMath::Abs(vz_1)>15) continue;
       
       // if(printDebug)cout<<" trigger object pt =  "<<trgObj_pt_1<<endl;
       // if(printDebug)cout<<" jet80 = "<<jet80_1<<endl;
@@ -862,7 +1044,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
       
       //if(algo=="Vs"){
-      
+     
       for(int j = 0;j<nbins_eta;j++){
 	  
 	for(int g = 0;g<nrefe_1;g++){
@@ -884,6 +1066,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       
       //if(hiBin_1 >= 0 && hiBin_1 < 1) hpbpb_Npix_before_cut[k][nbins_cent+1]->Fill(jetCounter,hiNpix_1);	
 
+      if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1 && fabs(vz_1)<15 && (hiNpix_1 < 38000 - 500*jetCounter)) hEvents_supernova->Fill(1);
+      if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1 && fabs(vz_1)<15 && (hiNpix_1 < 38000 - 500*jetCounter) && eta_1[0] > -2 && eta_1[0] < 2) hEvents_eta2->Fill(1);
+      
+
+      
       // apply the correct supernova selection cut rejection here: 
       if(hiNpix_1 > 38000 - 500*jetCounter){
        	if(printDebug) cout<<"removed this supernova event"<<endl;
@@ -902,6 +1089,13 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       //}//if Vs search for supernova events. 
       
       // hEvents->Fill(1);
+
+      if(jet80_1) hEvents_HLT80->Fill(1);
+      if(jet65_1 && !jet80_1) hEvents_HLT65->Fill(1,jet65_p_1);
+      if(jet65_1 && !jet80_1) hEvents_HLT65->Fill(0);
+      if(jet55_1 && !jet65_1 && !jet80_1) hEvents_HLT55->Fill(1,jet55_p_1);
+      if(jet55_1 && !jet65_1 && !jet80_1) hEvents_HLT55->Fill(0);
+      
       
 #if 0
       Float_t Vs_0_x_minus = sumpT[0]*v_n[0][0]*TMath::Cos(0*psi_n[0][0]);
@@ -975,8 +1169,23 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       }
       
 
-#endif
+      
+      if(jet55_1 && (eMax_1[0]/pt_1[0]>0.8) && pt_1[0]>80) {
+	event_value = evt_1;
+	run_value = run_1;
+	lumi_value = lumi_1;
+	evt_electron_failure[k]->Fill();
+      }
 
+      if(jet55_1 && (eMax_1[0]/pt_1[0]<0.4) && pt_1[0]>80) {
+	event_value = evt_1;
+	run_value = run_1;
+	lumi_value = lumi_1;
+	evt_electron_good[k]->Fill();
+      }
+
+#endif
+      
       for(int j = 0;j<nbins_eta;j++){
 
 	for(int g = 0;g<nrefe_1;g++){ // this is the loop for the  Jets we are interested in.  
@@ -1016,7 +1225,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  //hCut2->Fill(cut2);
 	  //hCut1->Fill(cut1);
 	  
-	  
+#if 0
 	  arrayValues[0] = raw_1[g];
 	  arrayValues[1] = pt_1[g];
 	  arrayValues[2] = jtpu_1[g];
@@ -1042,25 +1251,147 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  arrayValues[22] = muSum_1[g];
 	  arrayValues[23] = eMax_1[g];
 	  arrayValues[24] = eSum_1[g];
+	  arrayValues[25] = trkMax_1[g];
+	  arrayValues[26] = trkSum_1[g];
 
-	  jets_ID->Fill(arrayValues);
-	
+	  jets_ID[k]->Fill(arrayValues);
+#endif
+	  
 	  // going to use the effective prescl for the Jet55 trigger: 2.0475075465
 	  Float_t effecPrescl = 2.047507;
 
-#if 0
-
 	  //if(cut5<0.95 && cut6<0.95 && cut7<0.95 && cut1>0.05 && cut2<0.95 && cut2b<0.95){
-	  if(1>0){
+	  //if(eSum_1[g]/(chSum_1[g]+neSum_1[g]+phSum_1[g]+muSum_1[g])<0.7){
+	  //if((neMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (phMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/pt_1[g]>0.05) && (muMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9)){
+	  //if(1>0){
+
+	  // hpbpb_RecoOverRaw[k][j][centBin]->Fill((Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw[k][j][nbins_cent]->Fill((Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw_rawpt[k][j][centBin]->Fill(raw__1[g],(Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw_rawpt[k][j][nbins_cent]->Fill(raw_1[g],(Float_t)pt_1[g]/raw_1[g]);
+
+	  //get the spectra histograms to make the ratios for the different Jet ID cuts. 0-30%
+	  if(centBin==3 || centBin==4 || centBin==5) continue;
+	  
+	  hpbpb_chMaxJtpt_jtpt->Fill(pt_1[g],chMax_1[g]/pt_1[g]);
+	  hpbpb_eMaxJtpt_jtpt->Fill(pt_1[g],eMax_1[g]/pt_1[g]);
+	  hpbpb_eMaxJtpt_chMaxJtpt->Fill(chMax_1[g]/pt_1[g],eMax_1[g]/pt_1[g]);
+
+	  if(jet80_1){
+	    hpbpb_Jet80->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.01)hpbpb_Jet80_chMaxJtpt0p01->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.02)hpbpb_Jet80_chMaxJtpt0p02->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.03)hpbpb_Jet80_chMaxJtpt0p03->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.04)hpbpb_Jet80_chMaxJtpt0p04->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.05)hpbpb_Jet80_chMaxJtpt0p05->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.1)hpbpb_Jet80_eMaxJtpt0p1->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.2)hpbpb_Jet80_eMaxJtpt0p2->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.3)hpbpb_Jet80_eMaxJtpt0p3->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.4)hpbpb_Jet80_eMaxJtpt0p4->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.8)hpbpb_Jet80_eMaxJtpt0p8->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.9)hpbpb_Jet80_eMaxJtpt0p9->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Fill(pt_1[g]);
+	  }
+	  if(jet65_1){
+	    hpbpb_Jet65->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.01)hpbpb_Jet65_chMaxJtpt0p01->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.02)hpbpb_Jet65_chMaxJtpt0p02->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.03)hpbpb_Jet65_chMaxJtpt0p03->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.04)hpbpb_Jet65_chMaxJtpt0p04->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.05)hpbpb_Jet65_chMaxJtpt0p05->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.1)hpbpb_Jet65_eMaxJtpt0p1->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.2)hpbpb_Jet65_eMaxJtpt0p2->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.3)hpbpb_Jet65_eMaxJtpt0p3->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.4)hpbpb_Jet65_eMaxJtpt0p4->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.8)hpbpb_Jet65_eMaxJtpt0p8->Fill(pt_1[g]);
+	    if(eMax_1[g]/pt_1[g]<0.9)hpbpb_Jet65_eMaxJtpt0p9->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Fill(pt_1[g]);
+	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Fill(pt_1[g]);
+	  }
+	  if(jet55_1 && !jet65_1 && !jet80_1){
+	    hpbpb_Jet55->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.01)hpbpb_Jet55_chMaxJtpt0p01->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.02)hpbpb_Jet55_chMaxJtpt0p02->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.03)hpbpb_Jet55_chMaxJtpt0p03->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.04)hpbpb_Jet55_chMaxJtpt0p04->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.05)hpbpb_Jet55_chMaxJtpt0p05->Fill(pt_1[g],effecPrescl);
+	    if(eMax_1[g]/pt_1[g]<0.1)hpbpb_Jet55_eMaxJtpt0p1->Fill(pt_1[g],effecPrescl);
+	    if(eMax_1[g]/pt_1[g]<0.2)hpbpb_Jet55_eMaxJtpt0p2->Fill(pt_1[g],effecPrescl);
+	    if(eMax_1[g]/pt_1[g]<0.3)hpbpb_Jet55_eMaxJtpt0p3->Fill(pt_1[g],effecPrescl);
+	    if(eMax_1[g]/pt_1[g]<0.4)hpbpb_Jet55_eMaxJtpt0p4->Fill(pt_1[g],effecPrescl);
+	    if(eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5->Fill(pt_1[g],effecPrescl);
+	    if(eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6->Fill(pt_1[g],effecPrescl);
+	    if(eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7->Fill(pt_1[g],effecPrescl);
+	    if(eMax_1[g]/pt_1[g]<0.8)hpbpb_Jet55_eMaxJtpt0p8->Fill(pt_1[g],effecPrescl);
+	    if(eMax_1[g]/pt_1[g]<0.9)hpbpb_Jet55_eMaxJtpt0p9->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Fill(pt_1[g],effecPrescl);
+	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Fill(pt_1[g],effecPrescl);
+	  }
+
+#if 0
+	  
+	  hpbpb_chMax[k][j][centBin]->Fill(chMax_1[g]);
+	  hpbpb_phMax[k][j][centBin]->Fill(phMax_1[g]);
+	  hpbpb_neMax[k][j][centBin]->Fill(neMax_1[g]);
+	  hpbpb_muMax[k][j][centBin]->Fill(muMax_1[g]);
+	  hpbpb_eMax[k][j][centBin]->Fill(eMax_1[g]);
+
+	  hpbpb_chSum[k][j][centBin]->Fill(chSum_1[g]);
+	  hpbpb_phSum[k][j][centBin]->Fill(phSum_1[g]);
+	  hpbpb_neSum[k][j][centBin]->Fill(neSum_1[g]);
+	  hpbpb_muSum[k][j][centBin]->Fill(muSum_1[g]);
+	  hpbpb_eSum[k][j][centBin]->Fill(eSum_1[g]);
+
+	  hpbpb_chMax[k][j][nbins_cent]->Fill(chMax_1[g]);
+	  hpbpb_phMax[k][j][nbins_cent]->Fill(phMax_1[g]);
+	  hpbpb_neMax[k][j][nbins_cent]->Fill(neMax_1[g]);
+	  hpbpb_muMax[k][j][nbins_cent]->Fill(muMax_1[g]);
+	  hpbpb_eMax[k][j][nbins_cent]->Fill(eMax_1[g]);
+
+	  hpbpb_chSum[k][j][nbins_cent]->Fill(chSum_1[g]);
+	  hpbpb_phSum[k][j][nbins_cent]->Fill(phSum_1[g]);
+	  hpbpb_neSum[k][j][nbins_cent]->Fill(neSum_1[g]);
+	  hpbpb_muSum[k][j][nbins_cent]->Fill(muSum_1[g]);
+	  hpbpb_eSum[k][j][nbins_cent]->Fill(eSum_1[g]);
+	  
+	  if(chMax_1[g]/pt_1[g]>0.05){
 
 	    //	    hJets->Fill(1);
-	    //	    if(raw_1[g] < 20) continue;
+	    //if(raw_1[g] < 30) continue;
 
 	    if(jet80_1==1 && L1_sj52_1==1) {
-	      if(trgObj_pt_1>=80){
-		hpbpb_TrgObj80[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
-		hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
-		
+	      //if(trgObj_pt_1>=80){
+		hpbpb_TrgObj80[k][j][centBin]->Fill(pt_1[g]);
+		hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_1[g]);
+#if 0
 		if(jetCounter>=7){
 		  hpbpb_TrgObj80_nJet_g7[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
 		  hpbpb_TrgObj80_nJet_g7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
@@ -1069,8 +1400,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 		  hpbpb_TrgObj80_nJet_l7[k][j][centBin]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
 		  hpbpb_TrgObj80_nJet_l7[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1*L1_sj52_p_1);
 		}
-	      }
-	      
+#endif
+		// }
+#if 0
 	      if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
 		hpbpb_Jet80[1][1][centBin]->Fill(pt_1[g]);
 		hpbpb_Jet80[1][1][nbins_cent]->Fill(pt_1[g]);
@@ -1091,8 +1423,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
 	      hpbpb_FullJet80[centBin]->Fill(pt_1[g]);
 	      hpbpb_FullJet80[nbins_cent]->Fill(pt_1[g]);
-
-	    }else if(jet65_1==1 && L1_sj36_1==1) {
+#endif
+	    }
+	    if(jet65_1==1 && L1_sj36_1==1) {
 
 
 	      // if(trgObj_pt_1>=65 && trgObj_pt_1<80){
@@ -1111,8 +1444,11 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      // hpbpb_Jet65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
 	      // hpbpb_Jet65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
 
-	      if(jet80_1==0){
+	    
+	      hpbpb_TrgObj65[k][j][centBin]->Fill(pt_1[g]);
+	      hpbpb_TrgObj65[k][j][nbins_cent]->Fill(pt_1[g]);
 		
+#if 0		
 		if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
 		  hpbpb_Jet65[1][1][centBin]->Fill(pt_1[g]);
 		  hpbpb_Jet65[1][1][nbins_cent]->Fill(pt_1[g]);
@@ -1132,10 +1468,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      
 		hpbpb_FullJet65[centBin]->Fill(pt_1[g]);
 		hpbpb_FullJet65[nbins_cent]->Fill(pt_1[g]);
-	      }
+#endif
+	      
 
-	    }else if(jet55_1==1 && L1_sj36_1==1) { // passes the jet55 trigger
-#if 0
+	    }
+	    if(jet55_1==1 && L1_sj36_1==1 && jet65_1==0 && jet80_1 == 0) { // passes the jet55 trigger
+		hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+		hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
+
+#if 0	      
 	      if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
 		hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
 		hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
@@ -1154,7 +1495,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      }
 	      // hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
 	      // hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-#endif
 	      if((jet65_1==0) && (jet80_1==0)){ // this is to just check
 
 		if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
@@ -1178,304 +1518,242 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 		hpbpb_FullJet55[nbins_cent]->Fill(pt_1[g]);
 	      
 	      }
+
+#endif
 	    }
-
-	    // if(jet80_1) {
-	    //   hpbpb_Jet80[k][j][centBin]->Fill(pt_1[g],jet80_p_1);
-	    //   hpbpb_Jet80[k][j][nbins_cent]->Fill(pt_1[g],jet80_p_1);
-	    // }//Jet80 trigger selection
-
-	    // if(jet65_1) {
-	    //   hpbpb_Jet65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
-	    //   hpbpb_Jet65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
-	    // }//Jet65 trigger selection
-
-	    // if(jet55_1) {
-	    //   hpbpb_Jet55[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-	    //   hpbpb_Jet55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-	    // }//Jet55 trigger selection
-
-	    // if(jet65_1 && !jet80_1){
-	    //   hpbpb_Jet65_noJet80[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
-	    //   hpbpb_Jet65_noJet80[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
-	    // }//jet65 and not Jet80 selection 
-
-	    // if(jet55_1 && !jet65_1 && !jet80_1){
-	    //   hpbpb_Jet55_noJet65_80[k][j][centBin]->Fill(pt_1[g],jet55_p_1);
-	    //   hpbpb_Jet55_noJet65_80[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1);
-	    // }//jet55 and not Jet65 and not Jet80 selection 
-
 	      
 	  }//qa cut selection
 #endif
-	    
+	  
 	}//jet loop
 	  
       }//eta bin loop
-    
+   
     }//nentries_jet55or65 loop
-    
-    
-    // //loop for jetpbpb2[2] tree
-    //   Long64_t nentries_jet80or95 = jetpbpb2[2][k]->GetEntries();
-    //   if(printDebug)cout<<"nentries_jet80or95 = "<<nentries_jet80or95<<endl;
-    //   if(printDebug)nentries_jet80or95 = 2;
-
-    //   for(int jentry = 0;jentry<nentries_jet80or95;jentry++){
-    
-    //     jetpbpb2[2][k]->GetEntry(jentry);
-    //     if(printDebug && jentry%100000==0)cout<<"Jet 80or95 file"<<endl;
-    //     if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_2<<", run = "<<run_2<<endl;
-
-    //     //
-    //     int centBin = findBin(hiBin_2);//tells us the centrality of the event
-    //     if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
-
-    //     for(int j = 0;j<nbins_eta;j++){
-
-    //       if(pHBHENoiseFilter_2 && pcollisionEventSelection_2 && (vz_2<15)) {
-    
-    //         for(int g = 0;g<nrefe_2;g++){
-
-    //           if(/*put your favourite QA cut here*/chMax_2[g]/pt_2[g]>0.01){
-
-    //             if(eta_2[g]>=boundaries_eta[j][0] && eta_2[g]<boundaries_eta[j][1]){
-
-    //               if(jet80_2 && trgObj_pt_2>=80){
-
-    //                 hpbpb_TrgObj80[k][j][centBin]->Fill(pt_2[g],jet80_p_2);
-    //                 hpbpb_TrgObj80[k][j][nbins_cent]->Fill(pt_2[g],jet80_p_2);
-
-    //               }//80 trg obj selection
-
-    //             }//eta selection
-
-    //           }//qa cut selection
-
-    //         }//jet loop
-
-    //       }//event selection cuts
-
-    //     }//eta bin loop  
-    
-    //   }//nentries_jet80or95 loop
-
-    //fVs_failure[k].close();
     
   }//radius loop. 
  
- 
-  /*
-  //declare the output file
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_12003_effPres_severalcut_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
-  //TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_%d_endfile_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
-  
+
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_jetid_checks_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
+
+  //hEvents_HLT80->Write();
+  //hEvents_HLT65->Write();
+  //hEvents_HLT55->Write();
+
+  hpbpb_Jet80->Write();
+  //hpbpb_Jet80_chMaxJtpt0p01->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_chMaxJtpt0p01->Write();
+  //hpbpb_Jet80_chMaxJtpt0p02->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_chMaxJtpt0p02->Write();
+  //hpbpb_Jet80_chMaxJtpt0p03->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_chMaxJtpt0p03->Write();
+  //hpbpb_Jet80_chMaxJtpt0p04->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_chMaxJtpt0p04->Write();
+  //hpbpb_Jet80_chMaxJtpt0p05->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_chMaxJtpt0p05->Write();
+
+  //hpbpb_Jet80_eMaxJtpt0p1->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p1->Write();
+  //hpbpb_Jet80_eMaxJtpt0p2->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p2->Write();
+  //hpbpb_Jet80_eMaxJtpt0p3->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p3->Write();
+  //hpbpb_Jet80_eMaxJtpt0p4->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p4->Write();
+  //hpbpb_Jet80_eMaxJtpt0p5->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p5->Write();
+  //hpbpb_Jet80_eMaxJtpt0p6->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p6->Write();
+  //hpbpb_Jet80_eMaxJtpt0p7->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p7->Write();
+  //hpbpb_Jet80_eMaxJtpt0p8->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p8->Write();
+  //hpbpb_Jet80_eMaxJtpt0p9->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p9->Write();
+
+  //hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Write();
+  //hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Write();
+  //hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Write();
+  //hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Write();
+  //hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Write();
+  //hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Write();
+  //hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Write();
+  //hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Write();
+  //hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Write();
+
+  hpbpb_Jet65->Write();
+  //hpbpb_Jet65_chMaxJtpt0p01->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_chMaxJtpt0p01->Write();
+  //hpbpb_Jet65_chMaxJtpt0p02->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_chMaxJtpt0p02->Write();
+  //hpbpb_Jet65_chMaxJtpt0p03->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_chMaxJtpt0p03->Write();
+  //hpbpb_Jet65_chMaxJtpt0p04->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_chMaxJtpt0p04->Write();
+  //hpbpb_Jet65_chMaxJtpt0p05->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_chMaxJtpt0p05->Write();
+
+  //hpbpb_Jet65_eMaxJtpt0p1->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p1->Write();
+  //hpbpb_Jet65_eMaxJtpt0p2->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p2->Write();
+  //hpbpb_Jet65_eMaxJtpt0p3->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p3->Write();
+  //hpbpb_Jet65_eMaxJtpt0p4->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p4->Write();
+  //hpbpb_Jet65_eMaxJtpt0p5->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p5->Write();
+  //hpbpb_Jet65_eMaxJtpt0p6->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p6->Write();
+  //hpbpb_Jet65_eMaxJtpt0p7->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p7->Write();
+  //hpbpb_Jet65_eMaxJtpt0p8->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p8->Write();
+  //hpbpb_Jet65_eMaxJtpt0p9->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p9->Write();
+
+  //hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Write();
+  //hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Write();
+  //hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Write();
+  //hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Write();
+  //hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Write();
+  //hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Write();
+  //hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Write();
+  //hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Write();
+  //hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Write();
+
+  hpbpb_Jet55->Write();
+  //hpbpb_Jet55_chMaxJtpt0p01->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_chMaxJtpt0p01->Write();
+  //hpbpb_Jet55_chMaxJtpt0p02->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_chMaxJtpt0p02->Write();
+  //hpbpb_Jet55_chMaxJtpt0p03->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_chMaxJtpt0p03->Write();
+  //hpbpb_Jet55_chMaxJtpt0p04->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_chMaxJtpt0p04->Write();
+  //hpbpb_Jet55_chMaxJtpt0p05->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_chMaxJtpt0p05->Write();
+
+  //hpbpb_Jet55_eMaxJtpt0p1->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p1->Write();
+  //hpbpb_Jet55_eMaxJtpt0p2->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p2->Write();
+  //hpbpb_Jet55_eMaxJtpt0p3->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p3->Write();
+  //hpbpb_Jet55_eMaxJtpt0p4->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p4->Write();
+  //hpbpb_Jet55_eMaxJtpt0p5->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p5->Write();
+  //hpbpb_Jet55_eMaxJtpt0p6->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p6->Write();
+  //hpbpb_Jet55_eMaxJtpt0p7->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p7->Write();
+  //hpbpb_Jet55_eMaxJtpt0p8->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p8->Write();
+  //hpbpb_Jet55_eMaxJtpt0p9->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p9->Write();
+
+  //hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Write();
+  //hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Write();
+  //hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Write();
+  //hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Write();
+  //hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Write();
+  //hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Write();
+  //hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Write();
+  //hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Write();
+  //hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Write();
+
+  hpbpb_chMaxJtpt_jtpt->Write();
+  hpbpb_eMaxJtpt_jtpt->Write();
+  hpbpb_eMaxJtpt_chMaxJtpt->Write();
   
+#if 0
   for(int k = 0;k<no_radius;k++){
-    
-  for(int j = 0;j<nbins_eta;j++){
+
+    for(int j = 0;j<nbins_eta;j++){
       
-  for(int i = 0;i<=nbins_cent;i++){
+      for(int i = 0;i<=nbins_cent;i++){
+	//jets_ID[p]->Write();
+	hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj80[k][j][i]);
+	hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj65[k][j][i]);
+	hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj55[k][j][i]);
+
+	hpbpb_TrgObjComb[k][j][i]->Write();
+	if(printDebug)hpbpb_TrgObjComb[k][j][i]->Print();
+	hpbpb_TrgObj80[k][j][i]->Write();
+	if(printDebug)hpbpb_TrgObj80[k][j][i]->Print();
+	hpbpb_TrgObj65[k][j][i]->Write();
+	if(printDebug)hpbpb_TrgObj65[k][j][i]->Print();
+	hpbpb_TrgObj55[k][j][i]->Write();
+	if(printDebug)hpbpb_TrgObj55[k][j][i]->Print();
 	
-  //divide by delta eta, delta pt, luminosity seen by the triggers and ncoll ... and that will give us cross section/ncoll. 
-  // lumi seen by the respective triggers. - https://twiki.cern.ch/twiki/bin/viewauth/CMS/HIJetRAA#Luminosity_Cross_check_for_HIJet
-  // once we include the prescl then we have to normalize w.r.t the hightest lumi trigger which would have a prescl of 1 - in this case its the jet80 trigger. 
+	// hpbpb_RecoOverRaw_jtpt[k][j][i]->Write();
+	// if(printDebug)hpbpb_RecoOverRaw_jtpt[k][j][i]->Print();
+	// hpbpb_RecoOverRaw[k][j][i]->Write();
+	// if(printDebug)hpbpb_RecoOverRaw[k][j][i]->Print();
 
-  //not dividing by ncoll here. will do that in the plotting macro under RAA. 
-	
-  //hpbpb_TrgObj80[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
-  //hpbpb_TrgObj65[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
-  //hpbpb_TrgObj55[k][j][i]->Scale(1./(delta_eta[j]*145.156*1e6));
-	
-  // divide by bin width is doing something very weird. Its making histograms which are empty get 40 entries from somewhere - fixed that issue due to empty bins being divided by bin width. 
-
-  divideBinWidth(hpbpb_TrgObj80[k][j][i]);
-  divideBinWidth(hpbpb_TrgObj65[k][j][i]);
-  divideBinWidth(hpbpb_TrgObj55[k][j][i]);
-	
-  hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj80[k][j][i]);
-  hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj65[k][j][i]);
-  hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj55[k][j][i]);
-
-  hpbpb_TrgObjComb_nJet_g7[k][j][i]->Add(hpbpb_TrgObj80_nJet_g7[k][j][i]);
-  hpbpb_TrgObjComb_nJet_g7[k][j][i]->Add(hpbpb_TrgObj65_nJet_g7[k][j][i]);
-  hpbpb_TrgObjComb_nJet_g7[k][j][i]->Add(hpbpb_TrgObj55_nJet_g7[k][j][i]);
-
-  hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj80_nJet_l7[k][j][i]);
-  hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj65_nJet_l7[k][j][i]);
-  hpbpb_TrgObjComb_nJet_l7[k][j][i]->Add(hpbpb_TrgObj55_nJet_l7[k][j][i]);
-	
-  // old method histograms, just as a test: 
-	
-  // hpbpb_Jet80[k][j][i]->Scale(1./delta_eta[j]);
-  // hpbpb_Jet65[k][j][i]->Scale(1./delta_eta[j]);
-  // hpbpb_Jet55[k][j][i]->Scale(1./delta_eta[j]);
-
-  // hpbpb_Jet65_noJet80[k][j][i]->Scale(1./delta_eta[j]);
-  // hpbpb_Jet55_noJet65_80[k][j][i]->Scale(1./delta_eta[j]);
-	
-  divideBinWidth(hpbpb_Jet80[k][j][i]);
-  // divideBinWidth(hpbpb_Jet65[k][j][i]);
-  // divideBinWidth(hpbpb_Jet55[k][j][i]);
-
-  divideBinWidth(hpbpb_Jet65_noJet80[k][j][i]);
-  divideBinWidth(hpbpb_Jet55_noJet65_80[k][j][i]);
-	
-  hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet80[k][j][i]);
-  hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet65_noJet80[k][j][i]);
-  hpbpb_JetComb_old[k][j][i]->Add(hpbpb_Jet55_noJet65_80[k][j][i]);
-	
-  hpbpb_TrgObjComb[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObjComb[k][j][i]->Print();
-  hpbpb_TrgObj80[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObj80[k][j][i]->Print();
-  hpbpb_TrgObj65[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObj65[k][j][i]->Print();
-  hpbpb_TrgObj55[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObj55[k][j][i]->Print();
-
-  hpbpb_TrgObjComb_nJet_g7[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObjComb_nJet_g7[k][j][i]->Print();
-  hpbpb_TrgObj80_nJet_g7[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObj80_nJet_g7[k][j][i]->Print();
-  hpbpb_TrgObj65_nJet_g7[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObj65_nJet_g7[k][j][i]->Print();
-  hpbpb_TrgObj55_nJet_g7[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObj55_nJet_g7[k][j][i]->Print();
-
-  hpbpb_TrgObjComb_nJet_l7[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObjComb_nJet_l7[k][j][i]->Print();
-  hpbpb_TrgObj80_nJet_l7[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObj80_nJet_l7[k][j][i]->Print();
-  hpbpb_TrgObj65_nJet_l7[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObj65_nJet_l7[k][j][i]->Print();
-  hpbpb_TrgObj55_nJet_l7[k][j][i]->Write();
-  if(printDebug)hpbpb_TrgObj55_nJet_l7[k][j][i]->Print();	
-
-  hpbpb_Jet80[k][j][i]->Write();
-  if(printDebug)hpbpb_Jet80[k][j][i]->Print();
-  // hpbpb_Jet65[k][j][i]->Write();
-  // if(printDebug)hpbpb_Jet65[k][j][i]->Print();
-  // hpbpb_Jet55[k][j][i]->Write();
-  // if(printDebug)hpbpb_Jet55[k][j][i]->Print();
-
-  hpbpb_Jet65_noJet80[k][j][i]->Write();
-  if(printDebug)hpbpb_Jet65_noJet80[k][j][i]->Print();
-  hpbpb_Jet55_noJet65_80[k][j][i]->Write();
-  if(printDebug)hpbpb_Jet55_noJet65_80[k][j][i]->Print();
-  hpbpb_JetComb_old[k][j][i]->Write();
-  if(printDebug)hpbpb_JetComb_old[k][j][i]->Print();
-
-  }//cent bins loop
-
-  }//eta bins loop
-
-  for(int i = 0;i<=nbins_cent;i++){
-
-  if(printDebug)hpbpb_Npix_before_cut[k][i]->Print("base");
-  hpbpb_Npix_before_cut[k][i]->Write();
-  if(printDebug)hpbpb_Npix_after_cut[k][i]->Print("base");
-  hpbpb_Npix_after_cut[k][i]->Write();
-      
+	hpbpb_chMax[k][j][i]->Write();
+	hpbpb_phMax[k][j][i]->Write();
+	hpbpb_neMax[k][j][i]->Write();
+	hpbpb_muMax[k][j][i]->Write();
+	hpbpb_eMax[k][j][i]->Write();
+	hpbpb_chSum[k][j][i]->Write();
+	hpbpb_phSum[k][j][i]->Write();
+	hpbpb_neSum[k][j][i]->Write();
+	hpbpb_muSum[k][j][i]->Write();
+	hpbpb_eSum[k][j][i]->Write();
+      }
+    }
+    //evt_electron_failure[k]->Write();
+    //evt_electron_good[k]->Write();
   }
-  if(printDebug)hpbpb_Npix_before_cut[k][nbins_cent+1]->Print("base");
-  hpbpb_Npix_before_cut[k][nbins_cent+1]->Write();
 
-  hpbpb_cent[k]->Write();
-  if(printDebug)hpbpb_cent[k]->Print("base");
-  hpbpb_vz[k]->Write();
-  if(printDebug)hpbpb_vz[k]->Print("base");
-  hpbpb_vx[k]->Write();
-  if(printDebug)hpbpb_vx[k]->Print("base");
-  hpbpb_vy[k]->Write();
-  if(printDebug)hpbpb_vy[k]->Print("base");
-
-  }//radius loop
-
-  //hCut1->Write();
-  //hCut2->Write();
-  //hCut3->Write();
-  //hCut4->Write();
-  //hCut5->Write();
-
+#endif
+  /*
   hEvents->Write();
-  hJets->Write();
-  //jets_ID->Write();
-
-  //if(printDebug)jets_ID->Print();
-  if(printDebug)hEvents->Print();
-  if(printDebug)hJets->Print();
-
-  f.Write();
-
-  f.Close();
+  hEvents_pCES->Write();
+  hEvents_pHBHE->Write();
+  hEvents_vz15->Write();
+  hEvents_supernova->Write();
+  hEvents_eta2->Write();
   */
-  
+  f.Write();
+  f.Close();
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_jetntuple_withEvtCuts_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
-  f.cd();
-
-  jets_ID->Write();
-
-
-  // hEvents->Write();
-  // hEvents_Diverge_tight->Write(); 
-  // hEvents_Diverge_loose->Write(); 
-  // hEvents_Diverge_v0_tight->Write(); 
-  // hEvents_Diverge_v0_loose->Write(); 
-  // hEvents_Diverge_v1_tight->Write(); 
-  // hEvents_Diverge_v1_loose->Write();
-  // hEvents_Diverge_v2_tight->Write(); 
-  // hEvents_Diverge_v2_loose->Write();
-  // hEvents_Diverge_v3_tight->Write(); 
-  // hEvents_Diverge_v3_loose->Write();
-  // hEvents_Diverge_v4_tight->Write(); 
-  // hEvents_Diverge_v4_loose->Write();
-
-  // for(int i = 0;i<nbins_cent+1;i++){
-  
-  //   for(int a = 0;a<2;a++){
-
-  //     for(int b = 0;b<2;b++){
-
-  // 	hpbpb_Jet80[b][a][i]->Write();
-  // 	if(printDebug)hpbpb_Jet80[b][a][i]->Print();
-  // 	hpbpb_Jet65[b][a][i]->Write();
-  // 	if(printDebug)hpbpb_Jet65[b][a][i]->Print();
-  // 	hpbpb_Jet55[b][a][i]->Write();
-  // 	if(printDebug)hpbpb_Jet55[b][a][i]->Print();		
-
-  // 	hpbpb_Pu_Jet80[b][a][i]->Write();
-  // 	if(printDebug)hpbpb_Pu_Jet80[b][a][i]->Print();
-  // 	hpbpb_Pu_Jet65[b][a][i]->Write();
-  // 	if(printDebug)hpbpb_Pu_Jet65[b][a][i]->Print();
-  // 	hpbpb_Pu_Jet55[b][a][i]->Write();
-  // 	if(printDebug)hpbpb_Pu_Jet55[b][a][i]->Print();
-
-  //     }
-      
-  //   }
-
-  //   hpbpb_FullJet80[i]->Write();
-  //   if(printDebug)hpbpb_FullJet80[i]->Print();
-  //   hpbpb_FullJet65[i]->Write();
-  //   if(printDebug)hpbpb_FullJet65[i]->Print();
-  //   hpbpb_FullJet55[i]->Write();
-  //   if(printDebug)hpbpb_FullJet55[i]->Print();
-  
-  //   hpbpb_Pu_FullJet80[i]->Write();
-  //   if(printDebug)hpbpb_Pu_FullJet80[i]->Print();
-  //   hpbpb_Pu_FullJet65[i]->Write();
-  //   if(printDebug)hpbpb_Pu_FullJet65[i]->Print();
-  //   hpbpb_Pu_FullJet55[i]->Write();
-  //   if(printDebug)hpbpb_Pu_FullJet55[i]->Print();
-    
-  // }
-
+ 
   timer.Stop();
   cout<<"Macro finished: "<<endl;
   cout<<"CPU time (min)  = "<<(float)timer.CpuTime()/60<<endl;
   cout<<"Real time (min) = "<<(float)timer.RealTime()/60<<endl;
 
 }
+
+
