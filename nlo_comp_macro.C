@@ -194,7 +194,7 @@ void nlo_comp_macro(int radius = 3){
   TFile* fPP_unfo_R4 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/CMSSW_6_0_0/src/pp_2013_2760_abs_eta_2_mc_ak4PF.root");
   TFile* fPP_unfo_R5 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/CMSSW_6_0_0/src/pp_2013_2760_abs_eta_2_mc_ak5PF.root");
   //TFile *f_unfold_R2 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfold_marguerite_jet80_chMaxjtpt_norawptcut_test_65GeVCut_akPu2PF_20150205_test.root");
-  TFile *f_unfold_R3 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_unfold_marguerite_jet80_chMaxjtpt_norawptcut_test_65GeVCut_akPu3PF_20150206_test.root");
+  TFile *f_unfold_R3 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfold_marguerite_comb_chMaxjtpt_norawptcut_test_65GeVCut_akPu3PF_20150206_test.root");
   //TFile *f_unfold_R4 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfold_marguerite_jet80_chMaxjtpt_norawptcut_test_65GeVCut_akPu4PF_20150205_test.root");
 
   TH1F* hPP_data_R_3 = (TH1F*)f_unfold_R3->Get("PP_bayesian_unfolded_spectra");
@@ -304,8 +304,7 @@ void nlo_comp_macro(int radius = 3){
     
     //ostringstream filename;
     //filename<<"/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Macros/RAA/nlo_files/input_np_txtfiles/NPC_ak_"<<radius_lable[i]<<etaWidth[i]<<"_energy"<<energy<<".txt";
-    fin_txt[i].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2/src/Macros/RAA/nlo_files/input_np_txtfiles/NPC_ak_%s_%s_energy%d.txt",radius_lable[i],etaWidth[i],energy));
-    
+    fin_txt[i].open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_8_HI_patch2_old/src/Macros/RAA/nlo_files/input_np_txtfiles/NPC_ak_%s_%s_energy%d.txt",radius_lable[i],etaWidth[i],energy));
   }
 
   //apply the correction factors to the NLO histograms 
@@ -319,14 +318,14 @@ void nlo_comp_macro(int radius = 3){
   while(1){
 
     fin_txt[11]>>bin>>npc;
-    //cout<<bin<<" "<<npc<<endl;
+    cout<<bin<<" "<<npc<<endl;
     if(!fin_txt[11].good())break;
     int bin_no = hPP_nnpdf_NLO->FindBin(bin);
     //cout<<"bin no = "<<bin_no<<endl;
     //cout<<"boundaries_pt of bin no"<<boundaries_yaxian_large[bin_no]<<endl;
-    //cout<<"value before applying = "<<hPP_nnpdf_NLO->GetBinContent(bin_no)<<endl;
+    cout<<"value before applying = "<<hPP_nnpdf_NLO->GetBinContent(bin_no)<<endl;
     hPP_nnpdf_NLO->SetBinContent(bin_no,npc*hPP_nnpdf_NLO->GetBinContent(bin_no));
-    //cout<<"value after applying = "<<hPP_nnpdf_NLO->GetBinContent(bin_no)<<endl;
+    cout<<"value after applying = "<<hPP_nnpdf_NLO->GetBinContent(bin_no)<<endl;
     hPP_cteq_NLO->SetBinContent(bin_no,npc*hPP_cteq_NLO->GetBinContent(bin_no));
     hPP_ct10n_NLO->SetBinContent(bin_no,npc*hPP_ct10n_NLO->GetBinContent(bin_no));
     hPP_hera_NLO->SetBinContent(bin_no,npc*hPP_hera_NLO->GetBinContent(bin_no));

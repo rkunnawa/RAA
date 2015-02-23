@@ -33,6 +33,8 @@
 // Jan 28th forget the ntuples, taking forever. am going directly to the spectra. 
 // Feb 2nd - make the spectra from Doga's jet80 spectra. 
 
+// Feb 7th making the change to a TTree from TNtuple at the request of Alex ($!@#$%^&*^%$%^)
+
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -829,11 +831,23 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
   // we need to add the histograms to find the jet spectra from normal and failure mode- infact just add them to the ntuples per event the value of the HFSumpT*vn*cos/sin(n*psi_n) so we can plot the spectra at the final stage. this would make things easier. 
   //TNtuple *jets_ID[no_radius];
-  TNtuple *evt_chMaxjtpt_failure[no_radius];
+  TTree *evt_electron_failure[no_radius];
+  TTree *evt_electron_good[no_radius];
+  Int_t event_value;
+  Int_t run_value;
+  Int_t lumi_value;
   for(int k = 0;k<no_radius;k++){
   //  jets_ID[k] = new TNtuple(Form("jets_R%d_ID",list_radius[k]),"","rawpt:jtpt:jtpu:l1sj36:l1sj36_prescl:l1sj52:l1sj52_prescl:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:trgObjpt:cent:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum:trkMax:trkSum");
-    evt_chMaxjtpt_failure[k] = new TNtuple(Form("evt_chMaxjtpt_failure_R%d",list_radius[k]),"","run:evt:lumi");
+    evt_electron_failure[k] = new TTree (Form("evt_electron_failure_R%d",list_radius[k]),"");
+    evt_electron_failure[k]->Branch("run_value",&run_value,"run_value/I");
+    evt_electron_failure[k]->Branch("lumi_value",&lumi_value,"lumi_value/I");
+    evt_electron_failure[k]->Branch("event_value",&event_value,"event_value/I");
+    evt_electron_good[k] = new TTree (Form("evt_electron_good_R%d",list_radius[k]),"");
+    evt_electron_good[k]->Branch("run_value",&run_value,"run_value/I");
+    evt_electron_good[k]->Branch("lumi_value",&lumi_value,"lumi_value/I");
+    evt_electron_good[k]->Branch("event_value",&event_value,"event_value/I");
   }
+
   //Float_t arrayValues[27];
  
   // add the histograms: the first array element: 0 - in the polynomial divergence, 1 - less than the divergend (good),
@@ -918,7 +932,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       jetpbpb1[4][k]->GetEntry(jentry);
 
       //if(printDebug && jentry%100000==0)cout<<"Jet 55or65 file"<<endl;
-      //if(jentry%10000==0)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<endl;
+      if(printDebug)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<"; lumi = "<<lumi_1<<endl;
       
       // get the stuff required for the trigger turn on curve later. in a separate loop till i understand how to put this in here. 
       
@@ -1076,8 +1090,22 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       }
       
 
+      
+      if(jet55_1 && (eMax_1[0]/pt_1[0]>0.8) && pt_1[0]>80) {
+	event_value = evt_1;
+	run_value = run_1;
+	lumi_value = lumi_1;
+	evt_electron_failure[k]->Fill();
+      }
+
+      if(jet55_1 && (eMax_1[0]/pt_1[0]<0.4) && pt_1[0]>80) {
+	event_value = evt_1;
+	run_value = run_1;
+	lumi_value = lumi_1;
+	evt_electron_good[k]->Fill();
+      }
+
 #endif
-      if(jet55_1 && (eMax_1[0]/pt_1[0]>0.8) && pt_1[0]>80) evt_chMaxjtpt_failure[k]->Fill(run_1,evt_1,lumi_1);
       
       for(int j = 0;j<nbins_eta;j++){
 
@@ -1158,10 +1186,10 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  //if((neMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (phMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/pt_1[g]>0.05) && (muMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9)){
 	  //if(1>0){
 
-	  hpbpb_RecoOverRaw[k][j][centBin]->Fill((Float_t)pt_1[g]/raw_1[g]);
-	  hpbpb_RecoOverRaw[k][j][nbins_cent]->Fill((Float_t)pt_1[g]/raw_1[g]);
-	  hpbpb_RecoOverRaw_jtpt[k][j][centBin]->Fill(pt_1[g],(Float_t)pt_1[g]/raw_1[g]);
-	  hpbpb_RecoOverRaw_jtpt[k][j][nbins_cent]->Fill(pt_1[g],(Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw[k][j][centBin]->Fill((Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw[k][j][nbins_cent]->Fill((Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw_rawpt[k][j][centBin]->Fill(raw__1[g],(Float_t)pt_1[g]/raw_1[g]);
+	  // hpbpb_RecoOverRaw_rawpt[k][j][nbins_cent]->Fill(raw_1[g],(Float_t)pt_1[g]/raw_1[g]);
 
 	  hpbpb_chMax[k][j][centBin]->Fill(chMax_1[g]);
 	  hpbpb_phMax[k][j][centBin]->Fill(phMax_1[g]);
@@ -1229,7 +1257,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      hpbpb_FullJet80[centBin]->Fill(pt_1[g]);
 	      hpbpb_FullJet80[nbins_cent]->Fill(pt_1[g]);
 #endif
-	    }else if(jet65_1==1 && L1_sj36_1==1) {
+	    }
+	    if(jet65_1==1 && L1_sj36_1==1) {
 
 
 	      // if(trgObj_pt_1>=65 && trgObj_pt_1<80){
@@ -1248,9 +1277,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      // hpbpb_Jet65[k][j][centBin]->Fill(pt_1[g],jet65_p_1);
 	      // hpbpb_Jet65[k][j][nbins_cent]->Fill(pt_1[g],jet65_p_1);
 
-	      if(jet80_1==0){
-		hpbpb_TrgObj65[k][j][centBin]->Fill(pt_1[g]);
-		hpbpb_TrgObj65[k][j][nbins_cent]->Fill(pt_1[g]);
+	    
+	      hpbpb_TrgObj65[k][j][centBin]->Fill(pt_1[g]);
+	      hpbpb_TrgObj65[k][j][nbins_cent]->Fill(pt_1[g]);
 		
 #if 0		
 		if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
@@ -1273,13 +1302,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 		hpbpb_FullJet65[centBin]->Fill(pt_1[g]);
 		hpbpb_FullJet65[nbins_cent]->Fill(pt_1[g]);
 #endif
-	      }
+	      
 
-	    }else if(jet55_1==1 && L1_sj36_1==1) { // passes the jet55 trigger
-	      if(jet65_1==0 && jet80_1 == 0){
+	    }
+	    if(jet55_1==1 && L1_sj36_1==1 && jet65_1==0 && jet80_1 == 0) { // passes the jet55 trigger
 		hpbpb_TrgObj55[k][j][centBin]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
 		hpbpb_TrgObj55[k][j][nbins_cent]->Fill(pt_1[g],jet55_p_1*L1_sj36_p_1);
-	      }
 
 #if 0	      
 	      if(trgObj_pt_1>=55 && trgObj_pt_1<65){ // check for the trigger object pt to lie inbetween the two trigger values 
@@ -1557,19 +1585,18 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   */
   
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_marguerite_chMaxjtpt_norawptcut_electronFailureNtuple_file_spectra_histograms_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_marguerite_comb_chMaxjtpt0p5__ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
-  hEvents_HLT80->Write();
-  hEvents_HLT65->Write();
-  hEvents_HLT55->Write();
+  //hEvents_HLT80->Write();
+  //hEvents_HLT65->Write();
+  //hEvents_HLT55->Write();
 
   for(int k = 0;k<no_radius;k++){
 
     for(int j = 0;j<nbins_eta;j++){
       
       for(int i = 0;i<=nbins_cent;i++){
-#if 0
 	//jets_ID[p]->Write();
 	hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj80[k][j][i]);
 	hpbpb_TrgObjComb[k][j][i]->Add(hpbpb_TrgObj65[k][j][i]);
@@ -1583,11 +1610,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	if(printDebug)hpbpb_TrgObj65[k][j][i]->Print();
 	hpbpb_TrgObj55[k][j][i]->Write();
 	if(printDebug)hpbpb_TrgObj55[k][j][i]->Print();
-	hpbpb_RecoOverRaw_jtpt[k][j][i]->Write();
-	if(printDebug)hpbpb_RecoOverRaw_jtpt[k][j][i]->Print();
-	hpbpb_RecoOverRaw[k][j][i]->Write();
-	if(printDebug)hpbpb_RecoOverRaw[k][j][i]->Print();
-#endif
+	
+	// hpbpb_RecoOverRaw_jtpt[k][j][i]->Write();
+	// if(printDebug)hpbpb_RecoOverRaw_jtpt[k][j][i]->Print();
+	// hpbpb_RecoOverRaw[k][j][i]->Write();
+	// if(printDebug)hpbpb_RecoOverRaw[k][j][i]->Print();
+
 	hpbpb_chMax[k][j][i]->Write();
 	hpbpb_phMax[k][j][i]->Write();
 	hpbpb_neMax[k][j][i]->Write();
@@ -1600,16 +1628,17 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	hpbpb_eSum[k][j][i]->Write();
       }
     }
-    evt_chMaxjtpt_failure[k]->Write();
+    //evt_electron_failure[k]->Write();
+    //evt_electron_good[k]->Write();
   }
-
+  /*
   hEvents->Write();
   hEvents_pCES->Write();
   hEvents_pHBHE->Write();
   hEvents_vz15->Write();
   hEvents_supernova->Write();
   hEvents_eta2->Write();
-  
+  */
   f.Write();
   f.Close();
 
