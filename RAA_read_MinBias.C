@@ -568,11 +568,11 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
 	for(int g = 0;g<nrefe_1;g++){ // this is the loop for the  Jets we are interested in.  
 	  	  
-	  //if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
+	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
 
 	  if(L1_MB_1) cout<<"hi"<<endl;
 
-	  
+	  /*
 	  if(jetMB_1) hJetMB->Fill(pt_1[g],jetMB_p_1);
 	  if(L1_MB_1) hL1MB->Fill(pt_1[g],L1_MB_p_1);
 	  if(L1_sj36_1) hL1SJ36->Fill(pt_1[g],L1_sj36_1);
@@ -586,22 +586,36 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 	  if(jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[g],jet80_p_1*jetMB_p_1);
 	  if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[g],jet65_p_1*jetMB_p_1);
 	  if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[g],jet55_p_1*jetMB_p_1);	  
-	  
-	  /*
-	  if(jetMB_1) hJetMB->Fill(pt_1[g]);
-	  if(L1_MB_1) hL1MB->Fill(pt_1[g]);
-	  if(L1_sj36_1) hL1SJ36->Fill(pt_1[g]);
-	  if(L1_sj52_1) hL1SJ52->Fill(pt_1[g]);
-	  if(jet80_1) hJet80->Fill(pt_1[g]);
-	  if(jet65_1) hJet65->Fill(pt_1[g]);
-	  if(jet55_1) hJet55->Fill(pt_1[g]);
-	  if(jetMB_1 && L1_MB_1) hL1MB_JetMB->Fill(pt_1[g]);
-	  if(jetMB_1 && L1_sj36_1) hL1SJ36_JetMB->Fill(pt_1[g]);
-	  if(jetMB_1 && L1_sj52_1) hL1SJ52_JetMB->Fill(pt_1[g]);
-	  if(jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[g]);
-	  if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[g]);
-	  if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[g]);
 	  */
+
+	  
+	  if(jetMB_1) hJetMB->Fill(pt_1[g]);
+	  
+	  if(L1_MB_1) hL1MB->Fill(pt_1[g]);
+
+	  if(L1_sj36_1) hL1SJ36->Fill(pt_1[g]);
+
+	  if(L1_sj52_1) hL1SJ52->Fill(pt_1[g]);
+
+	  if(jet80_1) hJet80->Fill(pt_1[g]);
+
+	  if(jet65_1) hJet65->Fill(pt_1[g]);
+
+	  if(jet55_1) hJet55->Fill(pt_1[g]);
+
+	  if(jetMB_1 && L1_MB_1) hL1MB_JetMB->Fill(pt_1[g]);
+
+	  if(jetMB_1 && L1_sj36_1) hL1SJ36_JetMB->Fill(pt_1[g]);
+
+	  if(jetMB_1 && L1_sj52_1) hL1SJ52_JetMB->Fill(pt_1[g]);
+
+	  if(jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[g]);
+
+	  if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[g]);
+
+	  if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[g]);
+
+	  
 	  /*
 	  if(Type=="Data"){
 	    arrayValues_Data[0] = raw_1[g];
@@ -665,16 +679,21 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     
   }//radius loop.
 
-  TH1F * hJet55_TrigTurnon = (TH1F*)hJet55->Clone("hJet55_TrigTurnon");
-  hJet55_TrigTurnon->Divide(hJet55_JetMB);
-  TH1F * hJet65_TrigTurnon = (TH1F*)hJet65->Clone("hJet65_TrigTurnon");
-  hJet65_TrigTurnon->Divide(hJet65_JetMB);
-  TH1F * hJet80_TrigTurnon = (TH1F*)hJet80->Clone("hJet80_TrigTurnon");
-  hJet80_TrigTurnon->Divide(hJet80_JetMB);
-  TH1F * hL1SJ36_TrigTurnon = (TH1F*)hL1SJ36->Clone("hL1SJ36_TrigTurnon");
-  hL1SJ36_TrigTurnon->Divide(hL1SJ36_JetMB);
-  TH1F * hL1SJ52_TrigTurnon = (TH1F*)hL1SJ52->Clone("hL1SJ52_TrigTurnon");
-  hL1SJ52_TrigTurnon->Divide(hL1SJ52_JetMB); 
+  
+  // TH1F * hJet55_TrigTurnon = (TH1F*)hJet55_JetMB->Clone("hJet55_TrigTurnon");
+  // hJet55_TrigTurnon->Divide(hJetMB);
+
+  // TH1F * hJet65_TrigTurnon = (TH1F*)hJet65_JetMB->Clone("hJet65_TrigTurnon");
+  // hJet65_TrigTurnon->Divide(hJetMB);
+
+  // TH1F * hJet80_TrigTurnon = (TH1F*)hJet80_JetMB->Clone("hJet80_TrigTurnon");
+  // hJet80_TrigTurnon->Divide(hJetMB);
+
+  // TH1F * hL1SJ36_TrigTurnon = (TH1F*)hL1SJ36_JetMB->Clone("hL1SJ36_TrigTurnon");
+  // hL1SJ36_TrigTurnon->Divide(hJetMB);
+
+  // TH1F * hL1SJ52_TrigTurnon = (TH1F*)hL1SJ52_JetMB->Clone("hL1SJ52_TrigTurnon");
+  // hL1SJ52_TrigTurnon->Divide(hJetMB); 
  
   if(Type=="Data"){
     TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
@@ -697,11 +716,11 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     hL1MB_JetMB->Write();
     hL1SJ36_JetMB->Write();
     hL1SJ52_JetMB->Write();
-    hJet55_TrigTurnon->Write();
-    hJet65_TrigTurnon->Write();
-    hJet80_TrigTurnon->Write();
-    hL1SJ36_TrigTurnon->Write();
-    hL1SJ52_TrigTurnon->Write();
+    // hJet55_TrigTurnon->Write();
+    // hJet65_TrigTurnon->Write();
+    // hJet80_TrigTurnon->Write();
+    // hL1SJ36_TrigTurnon->Write();
+    // hL1SJ52_TrigTurnon->Write();
     
   }
 
