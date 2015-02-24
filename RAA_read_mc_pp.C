@@ -79,7 +79,7 @@ static const char etaWidth [nbins_eta][256] = {
 
 
 static const int no_radius = 1;//testing purposes 
-static const int list_radius[no_radius] = {2};
+static const int list_radius[no_radius] = {4};
 
 // divide by bin width
 void divideBinWidth(TH1 *h){
@@ -165,16 +165,12 @@ public:
     jetPP[2]->SetBranchAddress("vy",&vy);
     jetPP[2]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
     jetPP[2]->SetBranchAddress("pPAcollisionEventSelectionPA",&pPAcollisionEventSelectionPA);
-<<<<<<< HEAD
-    jetPP[2]->SetBranchAddress("HLT_PAJet40_noJetID_v1",&jet40_1);
-=======
     jetPP[2]->SetBranchAddress("HLT_PAJet40_NoJetID_v1",&jet40_1);
     jetPP[2]->SetBranchAddress("HLT_PAJet40_NoJetID_v1_Prescl",&jet40_p_1);
     jetPP[2]->SetBranchAddress("HLT_PAJet60_NoJetID_v1",&jet60_1);
     jetPP[2]->SetBranchAddress("HLT_PAJet60_NoJetID_v1_Prescl",&jet60_p_1);
     jetPP[2]->SetBranchAddress("HLT_PAJet80_NoJetID_v1",&jet80_1);
     jetPP[2]->SetBranchAddress("HLT_PAJet80_NoJetID_v1_Prescl",&jet80_p_1);
->>>>>>> ebe8d1a62d11fe500bdf74e154536b8b51c0ee17
 
     jetPP[2]->SetBranchAddress("nPFpart",&nPFpart);
     jetPP[2]->SetBranchAddress("pfId",&pfID);
@@ -244,7 +240,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
+void RAA_read_mc_pp(char *jet_type="PF"){
 
   TStopwatch timer;
   timer.Start();
@@ -254,7 +250,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
 
   gStyle->SetOptStat(0);
 
-  cout<<"Running for "<<jet_type<<" jets, R = "<<radius<<endl;
+  cout<<"Running for "<<jet_type<<" jets, R = "<<list_radius[0]<<endl;
  
   bool printDebug = true;
   TDatime date;
@@ -422,8 +418,10 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
   if(printDebug)cout<<"Filling PP MC"<<endl;
 
   for(int k = 0;k<no_radius;k++){
+    cout<<"Radius = "<<list_radius[k]<<endl;
     
     for (int h=0;h<nbinsPP_pthat;h++) {
+      cout<<"h = "<<h<<endl;
       if (xsectionPP[h]==0) continue;
       if(printDebug)cout <<"Loading PP pthat"<<boundariesPP_pthat[h]<<" sample, cross section = "<<xsectionPP[h]<< Form(" pthat>%.0f&&pthat<%.0f",boundariesPP_pthat[h],boundariesPP_pthat[h+1])<<endl;
      
@@ -440,10 +438,14 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
       Long64_t nEntries = dataPP[k][h]->jetPP[2]->GetEntries();
       //if(printDebug)nEntries = 2;
       for (Long64_t jentry=0; jentry<nEntries;jentry++) {
+
+	if(jentry%100000 == 0) cout<<" start of event = "<<jentry<<endl;
+	
         dataPP[k][h]->jetPP[2]->GetEntry(jentry);
 	dataPP[k][h]->jetPP[2]->GetEntry(jentry);
 
         int pthatBin = hPtHatPP[k]->FindBin(dataPP[k][h]->pthat);
+	
         float scalepp = (xsectionPP[pthatBin-1]-xsectionPP[pthatBin])/fentries;
 
         if(fabs(dataPP[k][h]->vz)>15) continue;
@@ -461,6 +463,8 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
         hPtHatPP[k]->Fill(dataPP[k][h]->pthat,scalepp*weight_vz);
         int hasLeadingJet = 0;
         hVzPPMC[k]->Fill(dataPP[k][h]->vz,scalepp);
+
+	if(jentry%100000 == 0) cout<<"event passed selection cuts = "<<jentry<<endl;
 	
         for (int g= 0; g< dataPP[k][h]->njets; g++) { 
 
@@ -471,7 +475,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
 	  if ( dataPP[k][h]->jtpt[g] > 2.*dataPP[k][h]->pthat) continue;
 	  
 	  // jet QA cuts: 
-	  //if ( dataPP[k][h]->chargedMax[g]/dataPP[k][h]->jtpt[g]<0.05) continue;
+	  if ( dataPP[k][h]->chargedMax[g]/dataPP[k][h]->jtpt[g]<0.05) continue;
 	  //if ( dataPP[k][h]->neutralMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
 	  //if ( dataPP[k][h]->photonMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
 	  //if ( dataPP[k][h]->chargedMax[g]/(dataPP[k][h]->chargedMax[g] + dataPP[k][h]->photonMax[g] + dataPP[k][h]->neutralMax[g]) > 0.9 )continue;
@@ -483,14 +487,12 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
 	  
 	  
           for(int j = 0;j<nbins_eta;j++){
-	    
+
             int subEvt=-1;
 	    
             if ( TMath::Abs(dataPP[k][h]->jteta[g])  > boundaries_eta[j][1] || TMath::Abs(dataPP[k][h]->jteta[g]) < boundaries_eta[j][0] ) continue;
 
-	    
 	    vector <Float_t> inJetPFcand_pT;
-	    
 	    
 	    // have to run through all the particle flow candidates:
 	    for(int ipf = 0; ipf<dataPP[k][h]->nPFpart; ipf++){
@@ -503,7 +505,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
 
 	    } // pf flow candidate loop
 
-	    // Now find the pT of the smallest candidate inside the jet.
+	    // Now find the pT of the largest candidate inside the jet.
 	    float large = inJetPFcand_pT[0];
 	    for(int a = 1;a<inJetPFcand_pT.size();a++){
 	      if(large < inJetPFcand_pT[a])
@@ -520,31 +522,31 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
 	 	  
 	    if(dataPP[k][h]->jet80_1==1) {
 
-	      hJets_noTrkpTCut[k][j][2]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 3) hJets_3TrkpTCut[k][j][2]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 5) hJets_5TrkpTCut[k][j][2]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 7) hJets_7TrkpTCut[k][j][2]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 10) hJets_10TrkpTCut[k][j][2]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
+	      hJets_noTrkpTCut[k][j][2]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 3) hJets_3TrkpTCut[k][j][2]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 5) hJets_5TrkpTCut[k][j][2]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 7) hJets_7TrkpTCut[k][j][2]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 10) hJets_10TrkpTCut[k][j][2]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
 	      
 	    }
 
 	    if(dataPP[k][h]->jet60_1==1){
 
-	      hJets_noTrkpTCut[k][j][1]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 3) hJets_3TrkpTCut[k][j][1]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 5) hJets_5TrkpTCut[k][j][1]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 7) hJets_7TrkpTCut[k][j][1]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 10) hJets_10TrkpTCut[k][j][1]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
+	      hJets_noTrkpTCut[k][j][1]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 3) hJets_3TrkpTCut[k][j][1]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 5) hJets_5TrkpTCut[k][j][1]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 7) hJets_7TrkpTCut[k][j][1]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 10) hJets_10TrkpTCut[k][j][1]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
 
 	    }
 
 	    if(dataPP[k][h]->jet40_1==1 && dataPP[k][h]->jet60_1==0 && dataPP[k][h]->jet80_1==0){
 	    
-	      hJets_noTrkpTCut[k][j][0]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 3) hJets_3TrkpTCut[k][j][0]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 5) hJets_5TrkpTCut[k][j][0]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 7) hJets_7TrkpTCut[k][j][0]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
-	      if(large > 10) hJets_10TrkpTCut[k][j][0]->Fill(dataPP[k][h]->pfPt[g],scalepp*weight_vz);
+	      hJets_noTrkpTCut[k][j][0]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 3) hJets_3TrkpTCut[k][j][0]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 5) hJets_5TrkpTCut[k][j][0]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 7) hJets_7TrkpTCut[k][j][0]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
+	      if(large > 10) hJets_10TrkpTCut[k][j][0]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
 
 	    }
 	
@@ -558,6 +560,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
 	    
 	    }
 
+	    inJetPFcand_pT.clear();
 #if 0
             //hpp_response->Fill(dataPP[k][h]->jtpt[k],dataPP[k][h]->refpt[k],scalepp*weight_vz);
             hpp_matrix[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],scalepp*weight_vz);
@@ -585,11 +588,11 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
 	      hpp_matrix_HLT[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],dataPP[k][h]->jet40_p_1*scalepp*weight_vz);
 	    }
 	    
-
 #endif
           }//eta loop
 	  
-        }//njet loop     
+        }//njet loop
+	if(jentry%100000 == 0) cout<<"after the jet loop = "<<jentry<<endl;
 	
       }//nentry loop
       
@@ -597,10 +600,9 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
     
   }//radius loop
   
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_fragbiascheck_ak%d%s_%d.root",radius,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_fragBiasCheck_ak%d%s_%d.root",list_radius[0],jet_type,date.GetDate()),"RECREATE");
   f.cd();
   
-#if 0
   for(int k = 0;k<no_radius;k++){
     
     for(int j=0;j<nbins_eta;j++){
@@ -665,9 +667,8 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
 
   }
 
-#endif
 
-
+#if 0
   for(int k = 0;k<no_radius;k++){
     for(int l = 0;l<trigValue;l++){
       for(int j = 0;j<nbins_eta;j++){
@@ -682,6 +683,7 @@ void RAA_read_mc_pp(char *jet_type="PF", int radius = 2){
     }// trigger loop
 
   }// radius loop
+#endif
 
   f.Write();
   f.Close();

@@ -1025,7 +1025,6 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	    }
 
 
-#if 0
 	    //get the spectra histograms to make the ratios for the different Jet ID cuts. 0-30%
 	    if(cBin==3 || cBin==4 || cBin==5) continue;
 	  
@@ -1059,7 +1058,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	      if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	      if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	    }
-	    if(data[k][h]->jet65_1){
+	    if(data[k][h]->jet65_1 && !data[k][h]->jet80_1){
 	      hpbpb_Jet65->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	      if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01)hpbpb_Jet65_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	      if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02)hpbpb_Jet65_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
@@ -1112,7 +1111,6 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	      if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	    }
 
-#endif
 
 #if 0
 	    
@@ -1288,7 +1286,6 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_fragbiascheck_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   f.cd();
 
-#if 0
   hpbpb_Jet80_chMaxJtpt0p01->Divide(hpbpb_Jet80);
   hpbpb_Jet80_chMaxJtpt0p01->Write();
   hpbpb_Jet80_chMaxJtpt0p02->Divide(hpbpb_Jet80);
@@ -1442,7 +1439,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   hpbpb_eMaxJtpt_jtpt->Write();
   hpbpb_eMaxJtpt_chMaxJtpt->Write();
 
-#endif 
+
 
   for(int k = 0;k<no_radius;k++){
 
