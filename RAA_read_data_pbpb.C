@@ -829,6 +829,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
   // Int_t goodEvent_counter = 0;
 
+#if 0
   // we need to add the histograms to find the jet spectra from normal and failure mode- infact just add them to the ntuples per event the value of the HFSumpT*vn*cos/sin(n*psi_n) so we can plot the spectra at the final stage. this would make things easier. 
   //TNtuple *jets_ID[no_radius];
   TTree *evt_electron_failure[no_radius];
@@ -847,7 +848,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     evt_electron_good[k]->Branch("lumi_value",&lumi_value,"lumi_value/I");
     evt_electron_good[k]->Branch("event_value",&event_value,"event_value/I");
   }
-
+#endif
   //Float_t arrayValues[27];
  
   // add the histograms: the first array element: 0 - in the polynomial divergence, 1 - less than the divergend (good),
@@ -1066,8 +1067,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       
       //if(hiBin_1 >= 0 && hiBin_1 < 1) hpbpb_Npix_before_cut[k][nbins_cent+1]->Fill(jetCounter,hiNpix_1);	
 
-      if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1 && fabs(vz_1)<15 && (hiNpix_1 < 38000 - 500*jetCounter)) hEvents_supernova->Fill(1);
-      if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1 && fabs(vz_1)<15 && (hiNpix_1 < 38000 - 500*jetCounter) && eta_1[0] > -2 && eta_1[0] < 2) hEvents_eta2->Fill(1);
+      // if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1 && fabs(vz_1)<15 && (hiNpix_1 < 38000 - 500*jetCounter)) hEvents_supernova->Fill(1);
+      //if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1 && fabs(vz_1)<15 && (hiNpix_1 < 38000 - 500*jetCounter) && eta_1[0] > -2 && eta_1[0] < 2) hEvents_eta2->Fill(1);
       
 
       
@@ -1269,7 +1270,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  // hpbpb_RecoOverRaw[k][j][nbins_cent]->Fill((Float_t)pt_1[g]/raw_1[g]);
 	  // hpbpb_RecoOverRaw_rawpt[k][j][centBin]->Fill(raw__1[g],(Float_t)pt_1[g]/raw_1[g]);
 	  // hpbpb_RecoOverRaw_rawpt[k][j][nbins_cent]->Fill(raw_1[g],(Float_t)pt_1[g]/raw_1[g]);
-
+#if 0
 	  //get the spectra histograms to make the ratios for the different Jet ID cuts. 0-30%
 	  if(centBin==3 || centBin==4 || centBin==5) continue;
 	  
@@ -1303,7 +1304,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Fill(pt_1[g]);
 	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Fill(pt_1[g]);
 	  }
-	  if(jet65_1){
+	  if(jet65_1 && !jet80_1){
 	    hpbpb_Jet65->Fill(pt_1[g]);
 	    if(chMax_1[g]/pt_1[g]>0.01)hpbpb_Jet65_chMaxJtpt0p01->Fill(pt_1[g]);
 	    if(chMax_1[g]/pt_1[g]>0.02)hpbpb_Jet65_chMaxJtpt0p02->Fill(pt_1[g]);
@@ -1355,8 +1356,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	    if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Fill(pt_1[g],effecPrescl);
 	    if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Fill(pt_1[g],effecPrescl);
 	  }
-
-#if 0
+#endif
+	  
 	  
 	  hpbpb_chMax[k][j][centBin]->Fill(chMax_1[g]);
 	  hpbpb_phMax[k][j][centBin]->Fill(phMax_1[g]);
@@ -1370,19 +1371,19 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	  hpbpb_muSum[k][j][centBin]->Fill(muSum_1[g]);
 	  hpbpb_eSum[k][j][centBin]->Fill(eSum_1[g]);
 
-	  hpbpb_chMax[k][j][nbins_cent]->Fill(chMax_1[g]);
-	  hpbpb_phMax[k][j][nbins_cent]->Fill(phMax_1[g]);
-	  hpbpb_neMax[k][j][nbins_cent]->Fill(neMax_1[g]);
-	  hpbpb_muMax[k][j][nbins_cent]->Fill(muMax_1[g]);
-	  hpbpb_eMax[k][j][nbins_cent]->Fill(eMax_1[g]);
+	  // hpbpb_chMax[k][j][nbins_cent]->Fill(chMax_1[g]);
+	  // hpbpb_phMax[k][j][nbins_cent]->Fill(phMax_1[g]);
+	  // hpbpb_neMax[k][j][nbins_cent]->Fill(neMax_1[g]);
+	  // hpbpb_muMax[k][j][nbins_cent]->Fill(muMax_1[g]);
+	  // hpbpb_eMax[k][j][nbins_cent]->Fill(eMax_1[g]);
 
-	  hpbpb_chSum[k][j][nbins_cent]->Fill(chSum_1[g]);
-	  hpbpb_phSum[k][j][nbins_cent]->Fill(phSum_1[g]);
-	  hpbpb_neSum[k][j][nbins_cent]->Fill(neSum_1[g]);
-	  hpbpb_muSum[k][j][nbins_cent]->Fill(muSum_1[g]);
-	  hpbpb_eSum[k][j][nbins_cent]->Fill(eSum_1[g]);
+	  // hpbpb_chSum[k][j][nbins_cent]->Fill(chSum_1[g]);
+	  // hpbpb_phSum[k][j][nbins_cent]->Fill(phSum_1[g]);
+	  // hpbpb_neSum[k][j][nbins_cent]->Fill(neSum_1[g]);
+	  // hpbpb_muSum[k][j][nbins_cent]->Fill(muSum_1[g]);
+	  // hpbpb_eSum[k][j][nbins_cent]->Fill(eSum_1[g]);
 	  
-	  if(chMax_1[g]/pt_1[g]>0.05){
+	  if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.6){
 
 	    //	    hJets->Fill(1);
 	    //if(raw_1[g] < 30) continue;
@@ -1425,7 +1426,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      hpbpb_FullJet80[nbins_cent]->Fill(pt_1[g]);
 #endif
 	    }
-	    if(jet65_1==1 && L1_sj36_1==1) {
+	    if(jet65_1==1 && L1_sj36_1==1 && jet80_1==0) {
 
 
 	      // if(trgObj_pt_1>=65 && trgObj_pt_1<80){
@@ -1523,7 +1524,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	    }
 	      
 	  }//qa cut selection
-#endif
 	  
 	}//jet loop
 	  
@@ -1534,13 +1534,13 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   }//radius loop. 
  
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_jetid_checks_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_spectra_triggered_chMaxjtpt0p02_eMaxjtpt0p6_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   //hEvents_HLT80->Write();
   //hEvents_HLT65->Write();
   //hEvents_HLT55->Write();
-
+  /*
   hpbpb_Jet80->Write();
   //hpbpb_Jet80_chMaxJtpt0p01->Divide(hpbpb_Jet80);
   hpbpb_Jet80_chMaxJtpt0p01->Write();
@@ -1694,8 +1694,9 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   hpbpb_chMaxJtpt_jtpt->Write();
   hpbpb_eMaxJtpt_jtpt->Write();
   hpbpb_eMaxJtpt_chMaxJtpt->Write();
+  */
   
-#if 0
+  
   for(int k = 0;k<no_radius;k++){
 
     for(int j = 0;j<nbins_eta;j++){
@@ -1736,7 +1737,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     //evt_electron_good[k]->Write();
   }
 
-#endif
   /*
   hEvents->Write();
   hEvents_pCES->Write();

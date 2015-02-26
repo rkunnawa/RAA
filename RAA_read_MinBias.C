@@ -410,6 +410,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   TH1F *hJets = new TH1F("hJets","",2,0,1);
 
   TH1F *hJetMB = new TH1F("hJetMB","",200,0,200);
+  TH1F *hJetMBSpectra = new TH1F("hJetMBSpectra","Data from MB trigger alone to add to the Jet triggered data",1000,0,1000);
   TH1F *hL1MB = new TH1F("hL1MB","",200,0,200);
   TH1F *hJet80 = new TH1F("hJet80","",200,0,200);
   TH1F *hJet65 = new TH1F("hJet65","",200,0,200);
@@ -439,7 +440,6 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     cout<<"No of events with L1_SingleJet36_BptxAND = "<<jetpbpb1[2][k]->GetEntries("L1_SingleJet36_BptxAND")<<endl;
     cout<<"No of events with L1_SingleJet52_BptxAND = "<<jetpbpb1[2][k]->GetEntries("L1_SingleJet52_BptxAND")<<endl;
     
-   
     for(int jentry = 0;jentry<nentries_MB;jentry++){
 
       jetpbpb1[0][k]->GetEntry(jentry);
@@ -562,16 +562,18 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
       }
       
 #endif
-
-
+      
+      if(printDebug && jentry%100==0) cout<<"MB prescl = "<<jetMB_p_1<<endl;
+      if(printDebug && jentry%100==0) cout<<"Jet 55 prescl = "<<jet55_p_1<<endl;
+      if(printDebug && jentry%100==0) cout<<"Jet 65 prescl = "<<jet65_p_1<<endl;
+      if(printDebug && jentry%100==0) cout<<"Jet 80 prescl = "<<jet80_p_1<<endl;
+      
       for(int j = 0;j<nbins_eta;j++){
-
+	
 	for(int g = 0;g<nrefe_1;g++){ // this is the loop for the  Jets we are interested in.  
-	  	  
+	  
 	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
-
-	  if(L1_MB_1) cout<<"hi"<<endl;
-
+	  
 	  /*
 	  if(jetMB_1) hJetMB->Fill(pt_1[g],jetMB_p_1);
 	  if(L1_MB_1) hL1MB->Fill(pt_1[g],L1_MB_p_1);
@@ -587,10 +589,12 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 	  if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[g],jet65_p_1*jetMB_p_1);
 	  if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[g],jet55_p_1*jetMB_p_1);	  
 	  */
-
+	  
 	  
 	  if(jetMB_1) hJetMB->Fill(pt_1[g]);
-	  
+
+	  if(jetMB_1 && !jet80_1 && !jet65_1 && !jet55_1) hJetMBSpectra->Fill(pt_1[g],jetMB_p_1);
+
 	  if(L1_MB_1) hL1MB->Fill(pt_1[g]);
 
 	  if(L1_sj36_1) hL1SJ36->Fill(pt_1[g]);
@@ -704,6 +708,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     //hEvents->Write();
     
     hJetMB->Write();
+    hJetMBSpectra->Write();
     hJet80->Write();
     hJet65->Write();
     hJet55->Write();

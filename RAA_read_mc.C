@@ -479,22 +479,22 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   TH1F *hpbpb_neSum[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_muSum[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_eSum[no_radius][nbins_eta][nbins_cent+1];
-
+  
   TH1F *hCentMC[no_radius];
   TH1F *hVzMC[no_radius];
   TH1F *hPbPb_pthat_fine[no_radius];
   TH1F *hPbPb_pthat_fine_noScale[no_radius];
   TH1F *hPtHat[no_radius];
   TH1F *hPtHatRaw[no_radius];
-
+  
   // histograms for the supernova cut rejection 
   TH2F *hpbpb_Npix_before_cut[no_radius][nbins_cent+2];// the last cent is for ultra central events.  
   TH2F *hpbpb_Npix_after_cut[no_radius][nbins_cent+1]; 
-
+  
   // histograms to check the contribution of the nJets>7 (with pT>50 and |eta|<2) to the nJets < 7 
   TH1F *hpbpb_pt_Njet_g7[no_radius][nbins_eta][nbins_cent+1];
   TH1F *hpbpb_pt_Njet_l7[no_radius][nbins_eta][nbins_cent+1];
-
+  
   
   
 //declare the output file 
@@ -951,7 +951,8 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	  hpbpb_phi_full_noScale[k]->Fill(data[k][h]->jtphi[g]);
   
           for(int j = 0;j<nbins_eta;j++){
-	    
+
+#if 0
 	    vector <Float_t> inJetPFcand_pT;
 
             //int subEvt=-1;
@@ -1110,9 +1111,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	      if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	      if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	    }
-
-
-#if 0
+#endif
 	    
 	    hpbpb_RecoOverRaw[k][j][cBin]->Fill((Float_t)data[k][h]->jtpt[g]/data[k][h]->rawpt[g]);
 	    hpbpb_RecoOverRaw[k][j][nbins_cent]->Fill((Float_t)data[k][h]->jtpt[g]/data[k][h]->rawpt[g]);
@@ -1243,8 +1242,6 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	    }
 	    
 	 
-
-#endif
           }// eta bins loop
 	      
         }//njets loop
@@ -1283,9 +1280,10 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   
   
 
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_fragbiascheck_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_spectra_chMaxjtpt0p02_eMaxjtpt0p6_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   f.cd();
 
+#if 0
   hpbpb_Jet80_chMaxJtpt0p01->Divide(hpbpb_Jet80);
   hpbpb_Jet80_chMaxJtpt0p01->Write();
   hpbpb_Jet80_chMaxJtpt0p02->Divide(hpbpb_Jet80);
@@ -1440,7 +1438,6 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   hpbpb_eMaxJtpt_chMaxJtpt->Write();
 
 
-
   for(int k = 0;k<no_radius;k++){
 
     for(int j = 0;j<nbins_eta;j++){
@@ -1460,9 +1457,47 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
       }
 
     }
-
   }
 
+#endif
+
+  for(int k = 0;k<no_radius;k++){
+
+    for(int j = 0;j<nbins_eta;j++){
+
+      for(int i = 0;i<nbins_cent;i++){
+
+  hpbpb_JetComb_gen[k][j][i]->Write();
+  hpbpb_Jet80_gen[k][j][i]->Write();
+  hpbpb_Jet65_gen[k][j][i]->Write();
+  hpbpb_Jet55_gen[k][j][i]->Write();
+  hpbpb_JetComb_reco[k][j][i]->Write();
+  hpbpb_Jet80_reco[k][j][i]->Write();
+  hpbpb_Jet65_reco[k][j][i]->Write();
+  hpbpb_Jet55_reco[k][j][i]->Write();
+
+  hpbpb_mcclosure_JetComb_gen[k][j][i]->Write();
+  hpbpb_mcclosure_Jet80_gen[k][j][i]->Write();
+  hpbpb_mcclosure_Jet65_gen[k][j][i]->Write();
+  hpbpb_mcclosure_Jet55_gen[k][j][i]->Write();
+  hpbpb_mcclosure_JetComb_data[k][j][i]->Write();
+  hpbpb_mcclosure_Jet80_data[k][j][i]->Write();
+  hpbpb_mcclosure_Jet65_data[k][j][i]->Write();
+  hpbpb_mcclosure_Jet55_data[k][j][i]->Write();
+
+  hpbpb_matrix_HLT[k][j][i]->Write();
+  hpbpb_matrix[k][j][i]->Write();
+  hpbpb_gen[k][j][i]->Write();
+  hpbpb_reco[k][j][i]->Write();
+  hpbpb_mcclosure_data[k][j][i]->Write();
+  hpbpb_mcclosure_gen[k][j][i]->Write();
+  hpbpb_mcclosure_matrix[k][j][i]->Write();
+
+      }
+
+    }
+  }
+  
   f.Write();
   f.Close();
 

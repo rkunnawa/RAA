@@ -197,6 +197,18 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
   TH1F *hpp_Trg40[no_radius][nbins_eta];
   TH1F *hpp_TrgComb[no_radius][nbins_eta];
 
+  TH1F * hchMax[no_radius][nbins_eta];
+  TH1F * hphMax[no_radius][nbins_eta];
+  TH1F * hneMax[no_radius][nbins_eta];
+  TH1F * heMax[no_radius][nbins_eta];
+  TH1F * hmuMax[no_radius][nbins_eta];
+
+  TH1F * hchSum[no_radius][nbins_eta];
+  TH1F * hphSum[no_radius][nbins_eta];
+  TH1F * hneSum[no_radius][nbins_eta];
+  TH1F * heSum[no_radius][nbins_eta];
+  TH1F * hmuSum[no_radius][nbins_eta];
+  
   for(int k = 0;k<no_radius;k++){
 
     for(int j = 0;j<nbins_eta;j++){
@@ -205,6 +217,19 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
       hpp_Trg60[k][j] = new TH1F(Form("hpp_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
       hpp_Trg40[k][j] = new TH1F(Form("hpp_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
       hpp_TrgComb[k][j] = new TH1F(Form("hpp_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+
+      hchMax[k][j] = new TH1F(Form("chMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
+      hphMax[k][j] = new TH1F(Form("phMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
+      hneMax[k][j] = new TH1F(Form("neMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
+      heMax[k][j] = new TH1F(Form("eMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
+      hmuMax[k][j] = new TH1F(Form("muMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
+
+      hchSum[k][j] = new TH1F(Form("chSum_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
+      hphSum[k][j] = new TH1F(Form("phSum_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
+      hneSum[k][j] = new TH1F(Form("neSum_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
+      heSum[k][j] = new TH1F(Form("eSum_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
+      hmuSum[k][j] = new TH1F(Form("muSum_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
+            
       
     }// eta bin loop
     
@@ -400,7 +425,20 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	  //if(raw_1[g] < 30) continue;
 	  //if((neMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (phMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/pt_1[g]>0.05) && (muMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9)){
 	  //if(eSum_1[g]/(chSum_1[g]+neSum_1[g]+phSum_1[g]+muSum_1[g])<0.7){
-	  if(chMax_1[g]/pt_1[g]>0.05){
+
+	  hchMax[k][j]->Fill(chMax_1[g]);
+	  hphMax[k][j]->Fill(phMax_1[g]);
+	  hneMax[k][j]->Fill(neMax_1[g]);
+	  heMax[k][j]->Fill(eMax_1[g]);
+	  hmuMax[k][j]->Fill(muMax_1[g]);
+	  
+	  hchSum[k][j]->Fill(chSum_1[g]);
+	  hphSum[k][j]->Fill(phSum_1[g]);
+	  hneSum[k][j]->Fill(neSum_1[g]);
+	  heSum[k][j]->Fill(eSum_1[g]);
+	  hmuSum[k][j]->Fill(muSum_1[g]);
+	  
+	  if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.6){
 	  //if(1>0){
 	  
 	    if(jet80_1 && trgObj_pt_1>=80){
@@ -426,7 +464,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   TDatime date;
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt_norawptcut_absEta_35_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   hEvents_HLT80->Write();
@@ -448,6 +486,18 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
       // divideBinWidth(hpp_Trg80[k][j]);// divide by delta pt. 
       // divideBinWidth(hpp_Trg60[k][j]);
       // divideBinWidth(hpp_Trg40[k][j]);
+      
+      hchMax[k][j]->Write();
+      hphMax[k][j]->Write();
+      hneMax[k][j]->Write();
+      heMax[k][j]->Write();
+      hmuMax[k][j]->Write();
+
+      hchSum[k][j]->Write();
+      hphSum[k][j]->Write();
+      hneSum[k][j]->Write();
+      heSum[k][j]->Write();
+      hmuSum[k][j]->Write();
 
       hpp_TrgComb[k][j]->Add(hpp_Trg80[k][j]);
       hpp_TrgComb[k][j]->Add(hpp_Trg60[k][j]);
