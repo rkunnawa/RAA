@@ -368,6 +368,8 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     jetpbpb1[2][k]->SetBranchAddress("muMax",&muMax_1);
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIMinBiasHfOrBSC_v1",&jetMB_1);
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIMinBiasHfOrBSC_v1_Prescl",&jetMB_p_1);
+    //jetpbpb1[2][k]->SetBranchAddress("L1_HcalHfCoincPmORBscMinBiasThresh1_BptxAND_instance1",&jetMB_1);
+    //jetpbpb1[2][k]->SetBranchAddress("L1_HcalHfCoincPmORBscMinBiasThresh1_BptxAND_instance1_Prescl",&jetMB_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias",&L1_MB_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
@@ -562,12 +564,61 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
       }
       
 #endif
+
       
-      if(printDebug && jentry%100==0) cout<<"MB prescl = "<<jetMB_p_1<<endl;
-      if(printDebug && jentry%100==0) cout<<"Jet 55 prescl = "<<jet55_p_1<<endl;
-      if(printDebug && jentry%100==0) cout<<"Jet 65 prescl = "<<jet65_p_1<<endl;
-      if(printDebug && jentry%100==0) cout<<"Jet 80 prescl = "<<jet80_p_1<<endl;
+      if(eta_1[0]<-2 || eta_1[0]>=2) continue;
+      if(pt_1[0] < 30) continue;
+      /*
+	if(jetMB_1) hJetMB->Fill(pt_1[g],jetMB_p_1);
+	if(L1_MB_1) hL1MB->Fill(pt_1[g],L1_MB_p_1);
+	if(L1_sj36_1) hL1SJ36->Fill(pt_1[g],L1_sj36_1);
+	if(L1_sj52_1) hL1SJ52->Fill(pt_1[g],L1_sj52_1);
+	if(jet80_1) hJet80->Fill(pt_1[g],jet80_p_1);
+	if(jet65_1) hJet65->Fill(pt_1[g],jet65_p_1);
+	if(jet55_1) hJet55->Fill(pt_1[g],jet55_p_1);
+	if(jetMB_1 && L1_MB_1) hL1MB_JetMB->Fill(pt_1[g],L1_MB_p_1*jetMB_p_1);
+	if(jetMB_1 && L1_sj36_1) hL1SJ36_JetMB->Fill(pt_1[g],L1_sj36_1*jetMB_p_1);
+	if(jetMB_1 && L1_sj52_1) hL1SJ52_JetMB->Fill(pt_1[g],L1_sj52_1*jetMB_p_1);
+	if(jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[g],jet80_p_1*jetMB_p_1);
+	if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[g],jet65_p_1*jetMB_p_1);
+	if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[g],jet55_p_1*jetMB_p_1);	  
+      */
+	  
+      if(jetMB_1) hJetMB->Fill(pt_1[0]);
+
+      if(jetMB_1 && !jet80_1 && !jet65_1 && !jet55_1) hJetMBSpectra->Fill(pt_1[0],jetMB_p_1);
+
+      if(L1_MB_1) hL1MB->Fill(pt_1[0]);
+
+      if(L1_sj36_1) hL1SJ36->Fill(pt_1[0]);
+
+      if(L1_sj52_1) hL1SJ52->Fill(pt_1[0]);
+
+      if(jet80_1) hJet80->Fill(pt_1[0]);
+
+      if(jet65_1) hJet65->Fill(pt_1[0]);
+
+      if(jet55_1) hJet55->Fill(pt_1[0]);
+
+      if(jetMB_1 && L1_MB_1) hL1MB_JetMB->Fill(pt_1[0]);
+
+      if(jetMB_1 && L1_sj36_1) hL1SJ36_JetMB->Fill(pt_1[0]);
+
+      if(jetMB_1 && L1_sj52_1) hL1SJ52_JetMB->Fill(pt_1[0]);
+
+      if(jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[0]);
+
+      if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[0]);
+
+      if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[0]);
+
       
+      //if(printDebug && jentry%100==0) cout<<"MB prescl = "<<jetMB_p_1<<endl;
+      //if(printDebug && jentry%100==0) cout<<"Jet 55 prescl = "<<jet55_p_1<<endl;
+      //if(printDebug && jentry%100==0) cout<<"Jet 65 prescl = "<<jet65_p_1<<endl;
+      //if(printDebug && jentry%100==0) cout<<"Jet 80 prescl = "<<jet80_p_1<<endl;
+
+#if 0
       for(int j = 0;j<nbins_eta;j++){
 	
 	for(int g = 0;g<nrefe_1;g++){ // this is the loop for the  Jets we are interested in.  
@@ -678,7 +729,8 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 	  
       }//eta bin loop
 
-    
+#endif
+      
     }//nentries_jet55or65 loop
     
   }//radius loop.

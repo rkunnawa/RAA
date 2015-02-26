@@ -80,17 +80,17 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 
-static const int nbins_eta = 4;
+static const int nbins_eta = 1;
 static const double boundaries_eta[nbins_eta][2] = {
-  {0.0,0.5}, {0.5,1.0}, {1.0,1.5}, {1.5,2.0}
+  {0.0,2.0}
 };
 
 static const double delta_eta[nbins_eta] = {
-  1.0, 1.0, 1.0, 1.0
+  4.0
 };
 
 static const char etaWidth [nbins_eta][256] = {
-  "0_absEta_05","05_absEta_10","10_absEta_15","15_absEta_20"
+  "0_absEta_20"
 };
 
 /*
@@ -108,8 +108,8 @@ static const char etaWidth [nbins_eta][256] = {
 };
 */
 
-static const int no_radius = 2;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3,5};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
