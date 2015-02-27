@@ -74,8 +74,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
   
-  TFile *fData = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_jetid_checks_akPuPF_20150220.root");
-  TFile *fMC = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_mc_chMaxjtpt_norawptcut_spectra_akPuPF_20150220.root");
+  TFile *fData = TFile::Open("/Users/raghavke/WORK/RAA/Output/PbPb_jetid_checks_akPuPF_20150223.root");
+  TFile *fMC = TFile::Open("/Users/raghavke/WORK/RAA/Output/PbPb_mc_jetidcheck_akPuPF_20150226.root");
 
   //get the histograms: 
   TH1F* hData_Jet80 = (TH1F*)fData->Get("hpbpb_Jet80");
@@ -324,6 +324,10 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   TLine *line = new TLine(30,1,300,1);
   line->SetLineStyle(2);
   line->SetLineWidth(2);
+
+  TLine *line3per = new TLine(30,0.97,300,0.97);
+  line3per->SetLineStyle(2);
+  line3per->SetLineWidth(2);
   
   cJet55->cd(1);
   hData_Jet55_chMaxJtpt0p01->SetTitle(" ");
@@ -336,7 +340,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet55_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hData_Jet55_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
   hData_Jet55_chMaxJtpt0p01->Draw();
-  drawText("Data",0.5,0.8,14);
+  drawText("Data 0-30%",0.5,0.8,14);
 
   hData_Jet55_chMaxJtpt0p02->Rebin(5);
   hData_Jet55_chMaxJtpt0p02->Scale(1./5);
@@ -364,14 +368,14 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   line->Draw();
 
   cJet55->cd(2);
-  hMC_Jet55_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
-  hMC_Jet55_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hMC_Jet55_chMaxJtpt0p01->Rebin(5);
   hMC_Jet55_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet55_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet55_chMaxJtpt0p01->SetMarkerColor(1);
+  hMC_Jet55_chMaxJtpt0p01->SetAxisRange(30,300,"X");
+  hMC_Jet55_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
   hMC_Jet55_chMaxJtpt0p01->Draw();
-  drawText("MC",0.2,0.8,14); 
+  drawText("MC 0-30%",0.2,0.8,14); 
 
   hMC_Jet55_chMaxJtpt0p02->Rebin(5);
   hMC_Jet55_chMaxJtpt0p02->Scale(1./5);
@@ -400,7 +404,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
 
   cJet55->cd(3);
   drawText("#frac{charged Max}{Jet p_{T}} > X ",0.2,0.7,16);
-  drawText("Jet 55 trigger (does not include higher triggers)", 0.2,0.8,16);
+  drawText("Jet 55 trigger (does not include higher triggers)", 0.1,0.8,15);
   TLegend *Jet55_chMax = myLegend(0.2,0.2,0.6,0.6);
   Jet55_chMax->AddEntry(hData_Jet55_chMaxJtpt0p01,"0.01","pl");
   Jet55_chMax->AddEntry(hData_Jet55_chMaxJtpt0p02,"0.02","pl");
@@ -544,10 +548,10 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Rebin(5);
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetXTitle("Jet p_{T} (GeV/c)");
-  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);  
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(30,300,"X");
+  hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
   hData_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
@@ -672,7 +676,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet55_eMax_chMax->AddEntry(hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet55_eMax_chMax->Draw();
 
-  cJet55->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet55_spectra_ratio_jetid.pdf","RECREATE");
+  cJet55->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jet55_spectra_ratio_jetid.pdf","RECREATE");
 
 
 
@@ -683,12 +687,12 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet65_chMaxJtpt0p01->SetTitle(" ");
   hData_Jet65_chMaxJtpt0p01->SetXTitle(" Jet p_{T} (GeV/c)");
   hData_Jet65_chMaxJtpt0p01->SetYTitle(" Cut effiiency (with Cut/without Cut) ");
-  hData_Jet65_chMaxJtpt0p01->SetAxisRange(0,2,"Y");
-  hData_Jet65_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hData_Jet65_chMaxJtpt0p01->Rebin(5);
   hData_Jet65_chMaxJtpt0p01->Scale(1./5);
   hData_Jet65_chMaxJtpt0p01->SetMarkerStyle(33);
   hData_Jet65_chMaxJtpt0p01->SetMarkerColor(1);
+  hData_Jet65_chMaxJtpt0p01->SetAxisRange(30,300,"X");
+  hData_Jet65_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
   hData_Jet65_chMaxJtpt0p01->Draw();
 
   hData_Jet65_chMaxJtpt0p02->Rebin(5);
@@ -715,15 +719,15 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet65_chMaxJtpt0p05->SetMarkerColor(5);
   hData_Jet65_chMaxJtpt0p05->Draw("same");
   line->Draw();
-  drawText("Data",0.2,0.8,16);
+  drawText("Data 0-30%",0.5,0.8,16);
 
   cJet65->cd(2);
-  hMC_Jet65_chMaxJtpt0p01->SetAxisRange(0,2,"Y");
-  hMC_Jet65_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hMC_Jet65_chMaxJtpt0p01->Rebin(5);
   hMC_Jet65_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet65_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet65_chMaxJtpt0p01->SetMarkerColor(1);
+  hMC_Jet65_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
+  hMC_Jet65_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hMC_Jet65_chMaxJtpt0p01->Draw();
 
   hMC_Jet65_chMaxJtpt0p02->Rebin(5);
@@ -750,9 +754,10 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_Jet65_chMaxJtpt0p05->SetMarkerColor(5);
   hMC_Jet65_chMaxJtpt0p05->Draw("same");
   line->Draw();
+  drawText("MC 0-30%",0.5,0.8,16);
 
   cJet65->cd(3);
-  drawText("Jet 65 Trigger",0.3,0.8,16);
+  drawText("Jet 65 Trigger without Jet 80",0.1,0.8,15);
   drawText("#frac{charged Max}{Jet p_{T}} > X ",0.2,0.7,16);
   TLegend *Jet65_chMax = myLegend(0.2,0.2,0.6,0.6);
   Jet65_chMax->AddEntry(hData_Jet65_chMaxJtpt0p01,"0.01","pl");
@@ -767,6 +772,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet65_eMaxJtpt0p1->Scale(1./5);
   hData_Jet65_eMaxJtpt0p1->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p1->SetMarkerColor(1);
+  hData_Jet65_eMaxJtpt0p1->SetAxisRange(0,1.2,"Y");
+  hData_Jet65_eMaxJtpt0p1->SetAxisRange(30,300,"X");
   hData_Jet65_eMaxJtpt0p1->Draw();
 
   hData_Jet65_eMaxJtpt0p2->Rebin(5);
@@ -824,6 +831,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_Jet65_eMaxJtpt0p1->Scale(1./5);
   hMC_Jet65_eMaxJtpt0p1->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p1->SetMarkerColor(1);
+  hMC_Jet65_eMaxJtpt0p1->SetAxisRange(0,1.2,"Y");
+  hMC_Jet65_eMaxJtpt0p1->SetAxisRange(30,300,"X");
   hMC_Jet65_eMaxJtpt0p1->Draw();
 
   hMC_Jet65_eMaxJtpt0p2->Rebin(5);
@@ -894,6 +903,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
+  hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
   hData_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
@@ -950,6 +961,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
+  hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
   hMC_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
@@ -1015,7 +1028,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet65_eMax_chMax->AddEntry(hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet65_eMax_chMax->Draw();
 
-  cJet65->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet65_spectra_ratio_jetid.pdf","RECREATE");
+  cJet65->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jet65_spectra_ratio_jetid.pdf","RECREATE");
 
   
   TCanvas * cJet80 = new TCanvas("cJet80","",1200,1000);
@@ -1025,12 +1038,12 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet80_chMaxJtpt0p01->SetTitle(" ");
   hData_Jet80_chMaxJtpt0p01->SetXTitle(" Jet p_{T} (GeV/c)");
   hData_Jet80_chMaxJtpt0p01->SetYTitle(" Cut effiiency (with Cut/without Cut) ");
-  hData_Jet80_chMaxJtpt0p01->SetAxisRange(0,2,"Y");
-  hData_Jet80_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hData_Jet80_chMaxJtpt0p01->Rebin(5);
   hData_Jet80_chMaxJtpt0p01->Scale(1./5);
   hData_Jet80_chMaxJtpt0p01->SetMarkerStyle(33);
   hData_Jet80_chMaxJtpt0p01->SetMarkerColor(1);
+  hData_Jet80_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
+  hData_Jet80_chMaxJtpt0p01->SetAxisRange(30,300,"X");  
   hData_Jet80_chMaxJtpt0p01->Draw();
 
   hData_Jet80_chMaxJtpt0p02->Rebin(5);
@@ -1057,14 +1070,15 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet80_chMaxJtpt0p05->SetMarkerColor(5);
   hData_Jet80_chMaxJtpt0p05->Draw("same");
   line->Draw();
+  drawText("Data 0-30%",0.5,0.8,15);
 
   cJet80->cd(2);
-  hMC_Jet80_chMaxJtpt0p01->SetAxisRange(0,2,"Y");
-  hMC_Jet80_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hMC_Jet80_chMaxJtpt0p01->Rebin(5);
   hMC_Jet80_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet80_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet80_chMaxJtpt0p01->SetMarkerColor(1);
+  hMC_Jet80_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
+  hMC_Jet80_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hMC_Jet80_chMaxJtpt0p01->Draw();
 
   hMC_Jet80_chMaxJtpt0p02->Rebin(5);
@@ -1091,9 +1105,11 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_Jet80_chMaxJtpt0p05->SetMarkerColor(5);
   hMC_Jet80_chMaxJtpt0p05->Draw("same");
   line->Draw();
+  drawText("MC 0-30%",0.5,0.8,15);
 
   cJet80->cd(3);
   drawText("#frac{charged Max}{Jet p_{T}} > X ",0.2,0.7,16);
+  drawText("Jet 80 trigger",0.2,0.8,16);
   TLegend *Jet80_chMax = myLegend(0.2,0.2,0.6,0.6);
   Jet80_chMax->AddEntry(hData_Jet80_chMaxJtpt0p01,"0.01","pl");
   Jet80_chMax->AddEntry(hData_Jet80_chMaxJtpt0p02,"0.02","pl");
@@ -1107,6 +1123,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet80_eMaxJtpt0p1->Scale(1./5);
   hData_Jet80_eMaxJtpt0p1->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p1->SetMarkerColor(1);
+  hData_Jet80_eMaxJtpt0p1->SetAxisRange(0,1.2,"Y");
+  hData_Jet80_eMaxJtpt0p1->SetAxisRange(30,300,"X");
   hData_Jet80_eMaxJtpt0p1->Draw();
 
   hData_Jet80_eMaxJtpt0p2->Rebin(5);
@@ -1164,6 +1182,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_Jet80_eMaxJtpt0p1->Scale(1./5);
   hMC_Jet80_eMaxJtpt0p1->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p1->SetMarkerColor(1);
+  hMC_Jet80_eMaxJtpt0p1->SetAxisRange(0,1.2,"Y");
+  hMC_Jet80_eMaxJtpt0p1->SetAxisRange(30,300,"X");
   hMC_Jet80_eMaxJtpt0p1->Draw();
 
   hMC_Jet80_eMaxJtpt0p2->Rebin(5);
@@ -1234,6 +1254,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
+  hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
   hData_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
@@ -1290,6 +1312,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Scale(1./5);
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerStyle(33);
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetMarkerColor(1);
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(0,1.2,"Y");
+  hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->SetAxisRange(30,300,"X");
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Draw();
 
   hMC_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Rebin(5);
@@ -1355,7 +1379,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet80_eMax_chMax->AddEntry(hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet80_eMax_chMax->Draw();
 
-  cJet80->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet80_spectra_ratio_jetid.pdf","RECREATE");
+  cJet80->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jet80_spectra_ratio_jetid.pdf","RECREATE");
 
 
 
