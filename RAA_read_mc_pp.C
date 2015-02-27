@@ -79,7 +79,7 @@ static const char etaWidth [nbins_eta][256] = {
 
 
 static const int no_radius = 1;//testing purposes 
-static const int list_radius[no_radius] = {4};
+static const int list_radius[no_radius] = {2};
 
 // divide by bin width
 void divideBinWidth(TH1 *h){
@@ -462,7 +462,7 @@ void RAA_read_mc_pp(char *jet_type="PF"){
       delete el;
       
       Long64_t nEntries = dataPP[k][h]->jetPP[2]->GetEntries();
-      //if(printDebug)nEntries = 500000;
+      if(printDebug)nEntries = 500000;
       for (Long64_t jentry=0; jentry<nEntries;jentry++) {
 
 	if(jentry%100000 == 0) cout<<" start of event = "<<jentry<<endl;
@@ -491,10 +491,10 @@ void RAA_read_mc_pp(char *jet_type="PF"){
         hVzPPMC[k]->Fill(dataPP[k][h]->vz,scalepp);
 
 	//if(jentry%100000 == 0) cout<<"event passed selection cuts = "<<jentry<<endl;
-	//vector <Float_t> inJetPFcand_pT;
+	vector <Float_t> inJetPFcand_pT;
 	
         for (int g= 0; g< dataPP[k][h]->njets; g++) { 
-	  //inJetPFcand_pT.clear();
+	  inJetPFcand_pT.clear();
 	  
 	  hpp_eta_full_noScale[k]->Fill(dataPP[k][h]->jteta[g]);
 	  hpp_phi_full_noScale[k]->Fill(dataPP[k][h]->jtphi[g]);
@@ -519,7 +519,6 @@ void RAA_read_mc_pp(char *jet_type="PF"){
 	    
             if ( TMath::Abs(dataPP[k][h]->jteta[g])  > boundaries_eta[j][1] || TMath::Abs(dataPP[k][h]->jteta[g]) < boundaries_eta[j][0] ) continue;
 
-#if 0
 	    // have to run through all the particle flow candidates:
 	    for(int ipf = 0; ipf<dataPP[k][h]->nPFpart; ipf++){
 
@@ -585,8 +584,7 @@ void RAA_read_mc_pp(char *jet_type="PF"){
 	      hJets_10TrkpTCut[k][j][trigValue-1]->Add(hJets_10TrkpTCut[k][j][t]);
 	      
 	    }
-	    
-#endif
+#if 0
 
 	    hchMax[k][j]->Fill(dataPP[k][h]->chargedMax[g],scalepp*weight_vz);
 	    hphMax[k][j]->Fill(dataPP[k][h]->photonMax[g],scalepp*weight_vz);
@@ -627,7 +625,8 @@ void RAA_read_mc_pp(char *jet_type="PF"){
 	      hpp_Jet40_reco[k][j]->Fill(dataPP[k][h]->jtpt[g],scalepp*weight_vz);
 	      hpp_matrix_HLT[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],dataPP[k][h]->jet40_p_1*scalepp*weight_vz);
 	    }
-	    
+	  
+#endif  
           }//eta loop
 	  
         }//njet loop
@@ -638,9 +637,10 @@ void RAA_read_mc_pp(char *jet_type="PF"){
     
   }//radius loop
   
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_spectra_chMaxjtpt0p02_eMaxjtpt0p6_ak%d%s_%d.root",list_radius[0],jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_fragbiascheck_ak%d%s_%d.root",list_radius[0],jet_type,date.GetDate()),"RECREATE");
   f.cd();
 
+#if 0
   for(int k = 0;k<no_radius;k++){
     
     for(int j=0;j<nbins_eta;j++){
@@ -716,8 +716,8 @@ void RAA_read_mc_pp(char *jet_type="PF"){
     hVzPPMC[k]->Write();
 
   }
-
-#if 0  
+#endif
+ 
   for(int k = 0;k<no_radius;k++){
     for(int l = 0;l<trigValue;l++){
       for(int j = 0;j<nbins_eta;j++){
@@ -733,7 +733,6 @@ void RAA_read_mc_pp(char *jet_type="PF"){
 
   }// radius loop
 
-#endif
   f.Write();
   f.Close();
   
