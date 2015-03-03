@@ -113,6 +113,10 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   TH2F* hMC_phMaxJtpt_chMaxJtpt_ptselection[ptSelection];
   TH2F* hMC_muMaxJtpt_chMaxJtpt_ptselection[ptSelection];
   
+  //TCanvas *cchMaxJtpt_jtpt[ptSelection], *cphMaxJtpt_jtpt[ptSelection], *cneMaxJtpt_jtpt[ptSelection], *cmuMaxJtpt_jtpt[ptSelection], *ceMaxJtpt_jtpt[ptSelection], *ceMaxSumcand_jtpt[ptSelection];
+  TCanvas *ceMaxSumcand_chMaxJtpt[ptSelection], *ceMaxJtpt_chMaxJtpt[ptSelection], *cphMaxJtpt_chMaxJtpt[ptSelection], *cneMaxJtpt_chMaxJtpt[ptSelection], *cmuMaxJtpt_chMaxJtpt[ptSelection];
+  
+
   for(int a = 0;a<ptSelection;a++){
 
     hData_chMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_chMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
@@ -142,10 +146,42 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_phMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_phMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
     hMC_muMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_muMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
 
+    ceMaxSumcand_chMaxJtpt[a] = new TCanvas(Form("ceMaxSumcand_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
+    makeMultiPanelCanvas(ceMaxSumcand_chMaxJtpt[a],3,1,0.0,0.0,0.2,0.15,0.07);
+    ceMaxSumcand_chMaxJtpt[a]->cd(1)->SetLogz();
+    hData_eMaxSumcand_chMaxJtpt_ptselection[a]->SetTitle(" ");
+    hData_eMaxSumcand_chMaxJtpt_ptselection[a]->SetXTitle("chMax/jtpt");
+    hData_eMaxSumcand_chMaxJtpt_ptselection[a]->SetYTitle("eMax/Sumcand");
+    hData_eMaxSumcand_chMaxJtpt_ptselection[a]->Draw("colz");
+    drawText("Data",0.45,0.7,15);
+    drawText(Form("%d < reco pt < %d",ptSelection[a],ptSelection[a+1]),0.2,0.8,15);
+    ceMaxSumcand_chMaxJtpt[a]->cd(2)->SetLogz();
+    hMC_eMaxSumcand_chMaxJtpt_ptselection[a]->SetXTitle("chMax/jtpt");
+    hMC_eMaxSumcand_chMaxJtpt_ptselection[a]->SetYTitle("eMax/Sumcand");
+    hMC_eMaxSumcand_chMaxJtpt_ptselection[a]->Draw("colz");
+    drawText(Form("%d < reco pt < %d",ptSelection[a],ptSelection[a+1]),0.2,0.8,15);
+    drawText("MC",0.45,0.7,15);
+    ceMaxSumcand_chMaxJtpt[a]->cd(3)->SetLogz();
+    hMC_eMaxSumcand_chMaxJtpt_refptselection[a]->SetXTitle("chMax/jtpt");
+    hMC_eMaxSumcand_chMaxJtpt_refptselection[a]->SetYTitle("eMax/Sumcand");
+    hMC_eMaxSumcand_chMaxJtpt_refptselection[a]->Draw("colz");
+    drawText(Form("%d < ref pt < %d",ptSelection[a],ptSelection[a+1]),0.2,0.8,15);
+    drawText("MC",0.45,0.7,15);
+
+    ceMaxSumcand_chMaxJtpt[a]->SaveAs(Form("PbPb_jetid_eMaxSumcand_chMaxJtpt_%d_jtpt_%d.pdf",ptSelection[a],ptSelection[a+1]),"RECREATE");
+
+
+
+    ceMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("ceMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
+    cneMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cneMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
+    cphMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cphMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
+    cmuMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cmuMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
+
+    
+
   }
 
-  //TCanvas *cchMaxJtpt_jtpt[ptSelection], *cphMaxJtpt_jtpt[ptSelection], *cneMaxJtpt_jtpt[ptSelection], *cmuMaxJtpt_jtpt[ptSelection], *ceMaxJtpt_jtpt[ptSelection], *ceMaxSumcand_jtpt[ptSelection];
-  TCanvas *ceMaxSumcand_chMaxJtpt[ptSelection], *ceMaxSumcan_chMaxJtpt[ptSelection], 
+  
 
   
   //get the histograms:
