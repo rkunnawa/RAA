@@ -929,6 +929,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   TH1F* hpbpb_Jet80_eMaxJtpt0p7 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7","",100,0,300);
   TH1F* hpbpb_Jet80_eMaxJtpt0p8 = new TH1F("hpbpb_Jet80_eMaxJtpt0p8","",100,0,300);
   TH1F* hpbpb_Jet80_eMaxJtpt0p9 = new TH1F("hpbpb_Jet80_eMaxJtpt0p9","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxSumcand0p1 = new TH1F("hpbpb_Jet80_eMaxSumcand0p1","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxSumcand0p2 = new TH1F("hpbpb_Jet80_eMaxSumcand0p2","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxSumcand0p3 = new TH1F("hpbpb_Jet80_eMaxSumcand0p3","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxSumcand0p4 = new TH1F("hpbpb_Jet80_eMaxSumcand0p4","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxSumcand0p5 = new TH1F("hpbpb_Jet80_eMaxSumcand0p5","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxSumcand0p6 = new TH1F("hpbpb_Jet80_eMaxSumcand0p6","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxSumcand0p7 = new TH1F("hpbpb_Jet80_eMaxSumcand0p7","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxSumcand0p8 = new TH1F("hpbpb_Jet80_eMaxSumcand0p8","",100,0,300);
+  TH1F* hpbpb_Jet80_eMaxSumcand0p9 = new TH1F("hpbpb_Jet80_eMaxSumcand0p9","",100,0,300);
   TH1F* hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01","",100,0,300);
   TH1F* hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02","",100,0,300);
   TH1F* hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03","",100,0,300);
@@ -954,6 +963,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   TH1F* hpbpb_Jet65_eMaxJtpt0p7 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7","",100,0,300);
   TH1F* hpbpb_Jet65_eMaxJtpt0p8 = new TH1F("hpbpb_Jet65_eMaxJtpt0p8","",100,0,300);
   TH1F* hpbpb_Jet65_eMaxJtpt0p9 = new TH1F("hpbpb_Jet65_eMaxJtpt0p9","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxSumcand0p1 = new TH1F("hpbpb_Jet65_eMaxSumcand0p1","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxSumcand0p2 = new TH1F("hpbpb_Jet65_eMaxSumcand0p2","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxSumcand0p3 = new TH1F("hpbpb_Jet65_eMaxSumcand0p3","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxSumcand0p4 = new TH1F("hpbpb_Jet65_eMaxSumcand0p4","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxSumcand0p5 = new TH1F("hpbpb_Jet65_eMaxSumcand0p5","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxSumcand0p6 = new TH1F("hpbpb_Jet65_eMaxSumcand0p6","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxSumcand0p7 = new TH1F("hpbpb_Jet65_eMaxSumcand0p7","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxSumcand0p8 = new TH1F("hpbpb_Jet65_eMaxSumcand0p8","",100,0,300);
+  TH1F* hpbpb_Jet65_eMaxSumcand0p9 = new TH1F("hpbpb_Jet65_eMaxSumcand0p9","",100,0,300);
   TH1F* hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01","",100,0,300);
   TH1F* hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02","",100,0,300);
   TH1F* hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03","",100,0,300);
@@ -979,6 +997,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   TH1F* hpbpb_Jet55_eMaxJtpt0p7 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7","",100,0,300);
   TH1F* hpbpb_Jet55_eMaxJtpt0p8 = new TH1F("hpbpb_Jet55_eMaxJtpt0p8","",100,0,300);
   TH1F* hpbpb_Jet55_eMaxJtpt0p9 = new TH1F("hpbpb_Jet55_eMaxJtpt0p9","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxSumcand0p1 = new TH1F("hpbpb_Jet55_eMaxSumcand0p1","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxSumcand0p2 = new TH1F("hpbpb_Jet55_eMaxSumcand0p2","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxSumcand0p3 = new TH1F("hpbpb_Jet55_eMaxSumcand0p3","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxSumcand0p4 = new TH1F("hpbpb_Jet55_eMaxSumcand0p4","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxSumcand0p5 = new TH1F("hpbpb_Jet55_eMaxSumcand0p5","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxSumcand0p6 = new TH1F("hpbpb_Jet55_eMaxSumcand0p6","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxSumcand0p7 = new TH1F("hpbpb_Jet55_eMaxSumcand0p7","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxSumcand0p8 = new TH1F("hpbpb_Jet55_eMaxSumcand0p8","",100,0,300);
+  TH1F* hpbpb_Jet55_eMaxSumcand0p9 = new TH1F("hpbpb_Jet55_eMaxSumcand0p9","",100,0,300);
   TH1F* hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01","",100,0,300);
   TH1F* hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02","",100,0,300);
   TH1F* hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03","",100,0,300);
@@ -989,25 +1016,43 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   TH1F* hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02","",100,0,300);
   TH1F* hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03","",100,0,300);
 
-  static const int ptSelection = 10;
-  static const int ptBoundary[ptSelection+1] = {30,40,50,60,70,80,90,100,110,120,130};
-  
-  TH2F* hpbpb_chMaxJtpt_jtpt = new TH2F("hpbpb_chMaxJtpt_jtpt","",100,0,300,200,0,2);
-  TH2F* hpbpb_eMaxJtpt_jtpt = new TH2F("hpbpb_eMaxJtpt_jtpt","",100,0,300,200,0,2);
-  TH2F* hpbpb_eMaxJtpt_chMaxJtpt = new TH2F("hpbpb_eMaxJtpt_chMaxJtpt","",200,0,2,200,0,2);
+  static const int ptSelection = 19;
+  static const int ptBoundary[ptSelection+1] = {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200};
+
+  TH2F* hpbpb_chMaxJtpt_jtpt = new TH2F("hpbpb_chMaxJtpt_jtpt","",100,0,300,500,0,5);
+  TH2F* hpbpb_eMaxJtpt_jtpt = new TH2F("hpbpb_eMaxJtpt_jtpt","",100,0,300,500,0,5);
+  TH2F* hpbpb_eMaxSumcand_jtpt = new TH2F("hpbpb_eMaxSumcand_jtpt","",100,0,300,1000,0,10);
+  TH2F* hpbpb_eMaxSumcand_chMaxJtpt = new TH2F("hpbpb_eMaxSumcand_chMaxJtpt","",500,0,5,1000,0,10);
+  TH2F* hpbpb_eMaxJtpt_chMaxJtpt = new TH2F("hpbpb_eMaxJtpt_chMaxJtpt","",500,0,5,500,0,5);
+
   TH2F* hpbpb_chMaxJtpt_jtpt_ptselection[ptSelection];
   TH2F* hpbpb_eMaxJtpt_jtpt_ptselection[ptSelection];
-  TH2F* hpbpb_eMaxJtpt_chMaxJtpt_ptselection[ptSelection];
+  TH2F* hpbpb_phMaxJtpt_jtpt_ptselection[ptSelection];
+  TH2F* hpbpb_neMaxJtpt_jtpt_ptselection[ptSelection];
+  TH2F* hpbpb_muMaxJtpt_jtpt_ptselection[ptSelection];
+  TH2F* hpbpb_eMaxSumcand_jtpt_ptselection[ptSelection];
   TH2F* hpbpb_eMaxSumcand_chMaxJtpt_ptselection[ptSelection];
-  
+  TH2F* hpbpb_eMaxJtpt_chMaxJtpt_ptselection[ptSelection];
+  TH2F* hpbpb_neMaxJtpt_chMaxJtpt_ptselection[ptSelection];
+  TH2F* hpbpb_phMaxJtpt_chMaxJtpt_ptselection[ptSelection];
+  TH2F* hpbpb_muMaxJtpt_chMaxJtpt_ptselection[ptSelection];
+
   for(int a = 0;a<ptSelection;a++){
 
-    hpbpb_chMaxJtpt_jtpt_ptselection[a] = new TH2F(Form("hpbpb_chMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",100,0,300,200,0,2);
-    hpbpb_eMaxJtpt_jtpt_ptselection[a] = new TH2F(Form("hpbpb_eMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",100,0,300,200,0,2);
-    hpbpb_eMaxJtpt_chMaxJtpt_ptselection[a] = new TH2F(Form("hpbpb_eMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",200,0,2,200,0,2);
-    hpbpb_eMaxSumcand_chMaxJtpt_ptselection[a] = new TH2F(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",200,0,2,200,0,2);
+    hpbpb_chMaxJtpt_jtpt_ptselection[a] = new TH2F(Form("hpbpb_chMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",100,0,300,500,0,5);
+    hpbpb_eMaxJtpt_jtpt_ptselection[a] = new TH2F(Form("hpbpb_eMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",100,0,300,500,0,5);
+    hpbpb_phMaxJtpt_jtpt_ptselection[a] = new TH2F(Form("hpbpb_phMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",100,0,300,500,0,5);
+    hpbpb_neMaxJtpt_jtpt_ptselection[a] = new TH2F(Form("hpbpb_neMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",100,0,300,500,0,5);
+    hpbpb_muMaxJtpt_jtpt_ptselection[a] = new TH2F(Form("hpbpb_muMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",100,0,300,500,0,5);
+    hpbpb_eMaxJtpt_chMaxJtpt_ptselection[a] = new TH2F(Form("hpbpb_eMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",500,0,5,500,0,5);
+    hpbpb_phMaxJtpt_chMaxJtpt_ptselection[a] = new TH2F(Form("hpbpb_phMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",500,0,5,500,0,5);
+    hpbpb_neMaxJtpt_chMaxJtpt_ptselection[a] = new TH2F(Form("hpbpb_neMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",500,0,5,500,0,5);
+    hpbpb_muMaxJtpt_chMaxJtpt_ptselection[a] = new TH2F(Form("hpbpb_muMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",500,0,5,500,0,5);
+    hpbpb_eMaxSumcand_chMaxJtpt_ptselection[a] = new TH2F(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",500,0,5,1000,0,10);
+    hpbpb_eMaxSumcand_jtpt_ptselection[a] = new TH2F(Form("hpbpb_eMaxSumcand_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",100,0,300,1000,0,10);
 
   }
+
   
   for(int k = 0;k<no_radius;k++){
 
@@ -1294,11 +1339,22 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	    hpbpb_chMaxJtpt_jtpt->Fill(pt_1[g],chMax_1[g]/pt_1[g]);
 	    hpbpb_eMaxJtpt_jtpt->Fill(pt_1[g],eMax_1[g]/pt_1[g]);
 	    hpbpb_eMaxJtpt_chMaxJtpt->Fill(chMax_1[g]/pt_1[g],eMax_1[g]/pt_1[g]);
+	    hpbpb_eMaxSumcand_jtpt->Fill(pt_1[g],eMax_1[g]/(chSum_1[g]+phSum_1[g]+neSum_1[g]+muSum_1[g]));
+	    hpbpb_eMaxSumcand_chMaxJtpt->Fill(chMax_1[g]/pt_1[g],eMax_1[g]/(chSum_1[g]+phSum_1[g]+neSum_1[g]+muSum_1[g]));
 
 	    for(int a = 0;a<ptSelection;a++) {
 	      if(pt_1[g] >= ptBoundary[a] && pt_1[g] < ptBoundary[a+1]){
+		hpbpb_chMaxJtpt_jtpt_ptselection[a]->Fill(pt_1[g],chMax_1[g]/pt_1[g]);
+		hpbpb_phMaxJtpt_jtpt_ptselection[a]->Fill(pt_1[g],phMax_1[g]/pt_1[g]);
+		hpbpb_neMaxJtpt_jtpt_ptselection[a]->Fill(pt_1[g],neMax_1[g]/pt_1[g]);
+		hpbpb_muMaxJtpt_jtpt_ptselection[a]->Fill(pt_1[g],muMax_1[g]/pt_1[g]);
+		hpbpb_eMaxJtpt_jtpt_ptselection[a]->Fill(pt_1[g],eMax_1[g]/pt_1[g]);
 		hpbpb_eMaxJtpt_chMaxJtpt_ptselection[a]->Fill(chMax_1[g]/pt_1[g],eMax_1[g]/pt_1[g]);
+		hpbpb_phMaxJtpt_chMaxJtpt_ptselection[a]->Fill(chMax_1[g]/pt_1[g],phMax_1[g]/pt_1[g]);
+		hpbpb_neMaxJtpt_chMaxJtpt_ptselection[a]->Fill(chMax_1[g]/pt_1[g],neMax_1[g]/pt_1[g]);
+		hpbpb_muMaxJtpt_chMaxJtpt_ptselection[a]->Fill(chMax_1[g]/pt_1[g],muMax_1[g]/pt_1[g]);
 		hpbpb_eMaxSumcand_chMaxJtpt_ptselection[a]->Fill(chMax_1[g]/pt_1[g],eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g]));
+		hpbpb_eMaxSumcand_jtpt_ptselection[a]->Fill(pt_1[g],eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g]));
 	      }
 	    }
 	  
@@ -1309,6 +1365,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      if(chMax_1[g]/pt_1[g]>0.03)hpbpb_Jet80_chMaxJtpt0p03->Fill(pt_1[g]);
 	      if(chMax_1[g]/pt_1[g]>0.04)hpbpb_Jet80_chMaxJtpt0p04->Fill(pt_1[g]);
 	      if(chMax_1[g]/pt_1[g]>0.05)hpbpb_Jet80_chMaxJtpt0p05->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.1)hpbpb_Jet80_eMaxSumcand0p1->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.2)hpbpb_Jet80_eMaxSumcand0p2->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.3)hpbpb_Jet80_eMaxSumcand0p3->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.4)hpbpb_Jet80_eMaxSumcand0p4->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.5)hpbpb_Jet80_eMaxSumcand0p5->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.6)hpbpb_Jet80_eMaxSumcand0p6->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.7)hpbpb_Jet80_eMaxSumcand0p7->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.8)hpbpb_Jet80_eMaxSumcand0p8->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.9)hpbpb_Jet80_eMaxSumcand0p9->Fill(pt_1[g]);
 	      if(eMax_1[g]/pt_1[g]<0.1)hpbpb_Jet80_eMaxJtpt0p1->Fill(pt_1[g]);
 	      if(eMax_1[g]/pt_1[g]<0.2)hpbpb_Jet80_eMaxJtpt0p2->Fill(pt_1[g]);
 	      if(eMax_1[g]/pt_1[g]<0.3)hpbpb_Jet80_eMaxJtpt0p3->Fill(pt_1[g]);
@@ -1335,6 +1400,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      if(chMax_1[g]/pt_1[g]>0.03)hpbpb_Jet65_chMaxJtpt0p03->Fill(pt_1[g]);
 	      if(chMax_1[g]/pt_1[g]>0.04)hpbpb_Jet65_chMaxJtpt0p04->Fill(pt_1[g]);
 	      if(chMax_1[g]/pt_1[g]>0.05)hpbpb_Jet65_chMaxJtpt0p05->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.1)hpbpb_Jet65_eMaxSumcand0p1->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.2)hpbpb_Jet65_eMaxSumcand0p2->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.3)hpbpb_Jet65_eMaxSumcand0p3->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.4)hpbpb_Jet65_eMaxSumcand0p4->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.5)hpbpb_Jet65_eMaxSumcand0p5->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.6)hpbpb_Jet65_eMaxSumcand0p6->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.7)hpbpb_Jet65_eMaxSumcand0p7->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.8)hpbpb_Jet65_eMaxSumcand0p8->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.9)hpbpb_Jet65_eMaxSumcand0p9->Fill(pt_1[g]);
 	      if(eMax_1[g]/pt_1[g]<0.1)hpbpb_Jet65_eMaxJtpt0p1->Fill(pt_1[g]);
 	      if(eMax_1[g]/pt_1[g]<0.2)hpbpb_Jet65_eMaxJtpt0p2->Fill(pt_1[g]);
 	      if(eMax_1[g]/pt_1[g]<0.3)hpbpb_Jet65_eMaxJtpt0p3->Fill(pt_1[g]);
@@ -1361,6 +1435,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      if(chMax_1[g]/pt_1[g]>0.03)hpbpb_Jet55_chMaxJtpt0p03->Fill(pt_1[g],effecPrescl);
 	      if(chMax_1[g]/pt_1[g]>0.04)hpbpb_Jet55_chMaxJtpt0p04->Fill(pt_1[g],effecPrescl);
 	      if(chMax_1[g]/pt_1[g]>0.05)hpbpb_Jet55_chMaxJtpt0p05->Fill(pt_1[g],effecPrescl);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.1)hpbpb_Jet55_eMaxSumcand0p1->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.2)hpbpb_Jet55_eMaxSumcand0p2->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.3)hpbpb_Jet55_eMaxSumcand0p3->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.4)hpbpb_Jet55_eMaxSumcand0p4->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.5)hpbpb_Jet55_eMaxSumcand0p5->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.6)hpbpb_Jet55_eMaxSumcand0p6->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.7)hpbpb_Jet55_eMaxSumcand0p7->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.8)hpbpb_Jet55_eMaxSumcand0p8->Fill(pt_1[g]);
+	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.9)hpbpb_Jet55_eMaxSumcand0p9->Fill(pt_1[g]);
 	      if(eMax_1[g]/pt_1[g]<0.1)hpbpb_Jet55_eMaxJtpt0p1->Fill(pt_1[g],effecPrescl);
 	      if(eMax_1[g]/pt_1[g]<0.2)hpbpb_Jet55_eMaxJtpt0p2->Fill(pt_1[g],effecPrescl);
 	      if(eMax_1[g]/pt_1[g]<0.3)hpbpb_Jet55_eMaxJtpt0p3->Fill(pt_1[g],effecPrescl);
@@ -1599,6 +1682,25 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   //hpbpb_Jet80_eMaxJtpt0p9->Divide(hpbpb_Jet80);
   hpbpb_Jet80_eMaxJtpt0p9->Write();
 
+  //hpbpb_Jet80_eMaxSumcand0p1->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxSumcand0p1->Write();
+  //hpbpb_Jet80_eMaxSumcand0p2->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxSumcand0p2->Write();
+  //hpbpb_Jet80_eMaxSumcand0p3->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxSumcand0p3->Write();
+  //hpbpb_Jet80_eMaxSumcand0p4->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxSumcand0p4->Write();
+  //hpbpb_Jet80_eMaxSumcand0p5->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxSumcand0p5->Write();
+  //hpbpb_Jet80_eMaxSumcand0p6->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxSumcand0p6->Write();
+  //hpbpb_Jet80_eMaxSumcand0p7->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxSumcand0p7->Write();
+  //hpbpb_Jet80_eMaxSumcand0p8->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxSumcand0p8->Write();
+  //hpbpb_Jet80_eMaxSumcand0p9->Divide(hpbpb_Jet80);
+  hpbpb_Jet80_eMaxSumcand0p9->Write();
+
   //hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Divide(hpbpb_Jet80);
   hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Write();
   //hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Divide(hpbpb_Jet80);
@@ -1648,6 +1750,26 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   hpbpb_Jet65_eMaxJtpt0p8->Write();
   //hpbpb_Jet65_eMaxJtpt0p9->Divide(hpbpb_Jet65);
   hpbpb_Jet65_eMaxJtpt0p9->Write();
+
+
+  //hpbpb_Jet65_eMaxSumcand0p1->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxSumcand0p1->Write();
+  //hpbpb_Jet65_eMaxSumcand0p2->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxSumcand0p2->Write();
+  //hpbpb_Jet65_eMaxSumcand0p3->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxSumcand0p3->Write();
+  //hpbpb_Jet65_eMaxSumcand0p4->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxSumcand0p4->Write();
+  //hpbpb_Jet65_eMaxSumcand0p5->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxSumcand0p5->Write();
+  //hpbpb_Jet65_eMaxSumcand0p6->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxSumcand0p6->Write();
+  //hpbpb_Jet65_eMaxSumcand0p7->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxSumcand0p7->Write();
+  //hpbpb_Jet65_eMaxSumcand0p8->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxSumcand0p8->Write();
+  //hpbpb_Jet65_eMaxSumcand0p9->Divide(hpbpb_Jet65);
+  hpbpb_Jet65_eMaxSumcand0p9->Write();
 
   //hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Divide(hpbpb_Jet65);
   hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Write();
@@ -1699,6 +1821,25 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   //hpbpb_Jet55_eMaxJtpt0p9->Divide(hpbpb_Jet55);
   hpbpb_Jet55_eMaxJtpt0p9->Write();
 
+  //hpbpb_Jet55_eMaxSumcand0p1->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxSumcand0p1->Write();
+  //hpbpb_Jet55_eMaxSumcand0p2->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxSumcand0p2->Write();
+  //hpbpb_Jet55_eMaxSumcand0p3->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxSumcand0p3->Write();
+  //hpbpb_Jet55_eMaxSumcand0p4->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxSumcand0p4->Write();
+  //hpbpb_Jet55_eMaxSumcand0p5->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxSumcand0p5->Write();
+  //hpbpb_Jet55_eMaxSumcand0p6->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxSumcand0p6->Write();
+  //hpbpb_Jet55_eMaxSumcand0p7->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxSumcand0p7->Write();
+  //hpbpb_Jet55_eMaxSumcand0p8->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxSumcand0p8->Write();
+  //hpbpb_Jet55_eMaxSumcand0p9->Divide(hpbpb_Jet55);
+  hpbpb_Jet55_eMaxSumcand0p9->Write();
+
   //hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Divide(hpbpb_Jet55);
   hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Write();
   //hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Divide(hpbpb_Jet55);
@@ -1721,8 +1862,23 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   hpbpb_chMaxJtpt_jtpt->Write();
   hpbpb_eMaxJtpt_jtpt->Write();
   hpbpb_eMaxJtpt_chMaxJtpt->Write();
-  
-  
+  hpbpb_eMaxSumcand_jtpt->Write();
+  hpbpb_eMaxSumcand_chMaxJtpt->Write();
+
+  for(int a = 0;a<ptSelection;a++){
+    hpbpb_eMaxJtpt_chMaxJtpt_ptselection[a]->Write();
+    hpbpb_phMaxJtpt_chMaxJtpt_ptselection[a]->Write();
+    hpbpb_neMaxJtpt_chMaxJtpt_ptselection[a]->Write();
+    hpbpb_muMaxJtpt_chMaxJtpt_ptselection[a]->Write();
+    hpbpb_eMaxSumcand_chMaxJtpt_ptselection[a]->Write();
+    hpbpb_eMaxSumcand_jtpt_ptselection[a]->Write();
+    hpbpb_chMaxJtpt_jtpt_ptselection[a]->Write();
+    hpbpb_phMaxJtpt_jtpt_ptselection[a]->Write();
+    hpbpb_neMaxJtpt_jtpt_ptselection[a]->Write();
+    hpbpb_muMaxJtpt_jtpt_ptselection[a]->Write();
+    hpbpb_eMaxJtpt_jtpt_ptselection[a]->Write();
+  }
+
   
   for(int k = 0;k<no_radius;k++){
 
@@ -1765,10 +1921,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     //evt_electron_good[k]->Write();
   }
 
-  for(int a = 0;a<ptSelection;a++){
-    hpbpb_eMaxJtpt_chMaxJtpt_ptselection[a]->Write();
-    hpbpb_eMaxSumcand_chMaxJtpt_ptselection[a]->Write();
-  }
+
 
 
   /*

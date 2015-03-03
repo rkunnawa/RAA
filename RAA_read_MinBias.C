@@ -154,7 +154,7 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "PF", char *Type = "Data"){
+void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "Calo", char *Type = "Data"){
 
   TH1::SetDefaultSumw2();
   
@@ -242,7 +242,8 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   }// radius loop ends
 
   cout<<"total no of entries in the combined forest files = "<<jetpbpb1[2][0]->GetEntries()<<endl;
-  
+
+  #if 0
   //file 1: 
   // jet tree 1
   int nrefe_1;
@@ -289,7 +290,9 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
   // trigger tree
   int L1_MB_1;
+  int l1MB_1;
   int L1_MB_p_1;
+  int l1MB_p_1;
   int L1_sj36_1;
   int L1_sj52_1;
   int jetMB_1;
@@ -368,8 +371,8 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     jetpbpb1[2][k]->SetBranchAddress("muMax",&muMax_1);
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIMinBiasHfOrBSC_v1",&jetMB_1);
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIMinBiasHfOrBSC_v1_Prescl",&jetMB_p_1);
-    //jetpbpb1[2][k]->SetBranchAddress("L1_HcalHfCoincPmORBscMinBiasThresh1_BptxAND_instance1",&jetMB_1);
-    //jetpbpb1[2][k]->SetBranchAddress("L1_HcalHfCoincPmORBscMinBiasThresh1_BptxAND_instance1_Prescl",&jetMB_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_HcalHfCoincPmORBscMinBiasThresh1_BptxAND_instance1",&l1MB_1);
+    jetpbpb1[2][k]->SetBranchAddress("L1_HcalHfCoincPmORBscMinBiasThresh1_BptxAND_instance1_Prescl",&l1MB_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias",&L1_MB_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
     jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
@@ -398,6 +401,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     */
   }//radius loop
 
+#endif
 
   // we need to add the histograms to find the jet spectra from normal and failure mode- infact just add them to the ntuples per event the value of the HFSumpT*vn*cos/sin(n*psi_n) so we can plot the spectra at the final stage. this would make things easier.
   /*
@@ -412,7 +416,10 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   TH1F *hJets = new TH1F("hJets","",2,0,1);
 
   TH1F *hJetMB = new TH1F("hJetMB","",200,0,200);
-  TH1F *hJetMBSpectra = new TH1F("hJetMBSpectra","Data from MB trigger alone to add to the Jet triggered data",1000,0,1000);
+  TH1F *hJetMBSpectra[nbins_cent];
+  for(int i = 0;i<nbins_cent;i++)
+    hJetMBSpectra[i] = new TH1F(Form("hJetMBSpectra_cent%d",i),"Data from MB trigger alone to add to the Jet triggered data",1000,0,1000);
+  
   TH1F *hL1MB = new TH1F("hL1MB","",200,0,200);
   TH1F *hJet80 = new TH1F("hJet80","",200,0,200);
   TH1F *hJet65 = new TH1F("hJet65","",200,0,200);
@@ -425,7 +432,28 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   TH1F *hJet55_JetMB = new TH1F("hJet55_JetMB","",200,0,200);
   TH1F *hL1SJ36_JetMB = new TH1F("hL1SJ36_JetMB","",200,0,200);
   TH1F *hL1SJ52_JetMB = new TH1F("hL1SJ52_JetMB","",200,0,200);
- 
+
+  jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet80_JetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet80_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
+  jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet65_JetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet65_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
+  jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet55_JetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet55_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
+  jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
+  
+  for(int i = 0;i<nbins_cent;i++){
+    //cout<<Form("%f %f",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
+    //cout<<Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f)",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
+    jetpbpb1[2][0]->Draw(Form("jtpt>>hJetMBSpectra_cent%d",i),Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f)",5*boundaries_cent[i],5*boundaries_cent[i+1]),"goff");
+    //hJetMBSpectra[i]->Print("base");
+  }
+
+  // prescl is calculated as the ratio of the 
+  //minbias prescl = 38.695
+  // jet80  prescl = 1 (same in minbias sample as well)
+  // jet65  prescl = 1.11398 (1.11287)
+  // jet55  prescl = 2.0475 (2.0292)
+
+  // but these prescl values are derived from the triggered data sample, need to check if they are the same in the minbias sample 
+  
+#if 0
   for(int k = 0;k<no_radius;k++){
 
     if(printDebug)cout<<"Running data reading for R = "<<list_radius[k]<<endl;
@@ -584,7 +612,8 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 	if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[g],jet55_p_1*jetMB_p_1);	  
       */
 	  
-      if(jetMB_1) hJetMB->Fill(pt_1[0]);
+      //if(l1MB_1 && jetMB_1) hJetMB->Fill(pt_1[0]);
+      hJetMB->Fill(pt_1[0]);
 
       if(jetMB_1 && !jet80_1 && !jet65_1 && !jet55_1) hJetMBSpectra->Fill(pt_1[0],jetMB_p_1);
 
@@ -606,11 +635,14 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
       if(jetMB_1 && L1_sj52_1) hL1SJ52_JetMB->Fill(pt_1[0]);
 
-      if(jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[0]);
+      //if(l1MB_1 && jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[0]);
+      if(jet80_1) hJet80_JetMB->Fill(pt_1[0]);
 
-      if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[0]);
+      //if(l1MB_1 && jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[0]);
+      if(jet65_1) hJet65_JetMB->Fill(pt_1[0]);
 
-      if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[0]);
+      //if(l1MB_1 && jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[0]);
+      if(jet55_1) hJet55_JetMB->Fill(pt_1[0]);
 
       
       //if(printDebug && jentry%100==0) cout<<"MB prescl = "<<jetMB_p_1<<endl;
@@ -735,6 +767,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     
   }//radius loop.
 
+#endif
   
   // TH1F * hJet55_TrigTurnon = (TH1F*)hJet55_JetMB->Clone("hJet55_TrigTurnon");
   // hJet55_TrigTurnon->Divide(hJetMB);
@@ -760,19 +793,26 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     //hEvents->Write();
     
     hJetMB->Write();
-    hJetMBSpectra->Write();
-    hJet80->Write();
-    hJet65->Write();
-    hJet55->Write();
-    hL1MB->Write();
-    hL1SJ36->Write();
-    hL1SJ52->Write();
+    hJetMB->Print("base");
+    for(int i = 0;i<nbins_cent;i++){
+      hJetMBSpectra[i]->Write();
+      hJetMBSpectra[i]->Print("base");
+    }
+    //hJet80->Write();
+    //hJet65->Write();
+    //hJet55->Write();
+    //hL1MB->Write();
+    //hL1SJ36->Write();
+    //hL1SJ52->Write();
     hJet80_JetMB->Write();
+    hJet80_JetMB->Print("base");
     hJet65_JetMB->Write();
+    hJet65_JetMB->Print("base");
     hJet55_JetMB->Write();
-    hL1MB_JetMB->Write();
-    hL1SJ36_JetMB->Write();
-    hL1SJ52_JetMB->Write();
+    hJet55_JetMB->Print("base");
+    //hL1MB_JetMB->Write();
+    //hL1SJ36_JetMB->Write();
+    //hL1SJ52_JetMB->Write();
     // hJet55_TrigTurnon->Write();
     // hJet65_TrigTurnon->Write();
     // hJet80_TrigTurnon->Write();
