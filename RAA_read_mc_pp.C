@@ -259,7 +259,7 @@ void RAA_read_mc_pp(int startfile = 0, int endfile = 1, char *jet_type="PF"){
   Double_t boundariesPP_pthat[nbinsPP_pthat+1];
   int nofiles_pthat[nbinsPP_pthat];
   string filelistPP_pthat[nbinsPP_pthat];
-  Double_t xsectionPP[nbinsPP_pthat+1];
+  Double_t xsectionPP[nbinsPP_pthat+1]; //mb
 
   boundariesPP_pthat[0]=15;
   filelistPP_pthat[0] = "/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Macros/RAA/jetRAA_pp_mc_pthat15_forest.txt";
@@ -426,7 +426,7 @@ void RAA_read_mc_pp(int startfile = 0, int endfile = 1, char *jet_type="PF"){
   // setup the jet Data branches:
   JetData *dataPP[no_radius][nbinsPP_pthat];
   for(int k = 0;k<no_radius;k++){
-    for(int h = startfile;h<endfile;h++){
+    for(int h = startfile;h<endfile;h++){ //pthat loop
     //for(int h = 0;h<2;h++){
       dataPP[k][h] = new JetData(filelistPP_pthat[h],Form("ak%d%sJetAnalyzer",list_radius[k],jet_type),nofiles_pthat[h]);
       TH1F *hPtHatTmp = new TH1F("hPtHatTmp","",nbinsPP_pthat,boundariesPP_pthat);

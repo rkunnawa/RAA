@@ -1393,7 +1393,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      if(chMax_1[g]/pt_1[g]>0.02 || eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Fill(pt_1[g]);
 	      if(chMax_1[g]/pt_1[g]>0.03 || eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Fill(pt_1[g]);
 	    }
-	    if(jet65_1 || !jet80_1){
+	    if(jet65_1 && !jet80_1){
 	      hpbpb_Jet65->Fill(pt_1[g]);
 	      if(chMax_1[g]/pt_1[g]>0.01)hpbpb_Jet65_chMaxJtpt0p01->Fill(pt_1[g]);
 	      if(chMax_1[g]/pt_1[g]>0.02)hpbpb_Jet65_chMaxJtpt0p02->Fill(pt_1[g]);
@@ -1428,7 +1428,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	      if(chMax_1[g]/pt_1[g]>0.02 || eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Fill(pt_1[g]);
 	      if(chMax_1[g]/pt_1[g]>0.03 || eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Fill(pt_1[g]);
 	    }
-	    if(jet55_1 || !jet65_1 || !jet80_1){
+	    if(jet55_1 && !jet65_1 && !jet80_1){
 	      hpbpb_Jet55->Fill(pt_1[g],effecPrescl);
 	      if(chMax_1[g]/pt_1[g]>0.01)hpbpb_Jet55_chMaxJtpt0p01->Fill(pt_1[g],effecPrescl);
 	      if(chMax_1[g]/pt_1[g]>0.02)hpbpb_Jet55_chMaxJtpt0p02->Fill(pt_1[g],effecPrescl);

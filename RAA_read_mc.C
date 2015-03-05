@@ -29,7 +29,7 @@
 //               - this is going to be a bit tricky since each file is split up into 4 smaller files. so each pthat will have a TChain!
 
 
-// Fen 12th - cleaned up the macro to make it usable (hopefuly) by others. 
+// Feb 12th - cleaned up the macro to make it usable (hopefuly) by others. 
 
 #include <iostream>
 #include <stdio.h>
