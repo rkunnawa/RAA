@@ -79,7 +79,7 @@ static const char etaWidth [nbins_eta][256] = {
 
 
 static const int no_radius = 1;//testing purposes 
-static const int list_radius[no_radius] = {3};
+static const int list_radius[no_radius] = {4};
 
 // divide by bin width
 void divideBinWidth(TH1 *h){
@@ -639,7 +639,7 @@ void RAA_read_mc_pp(int startfile = 0, int endfile = 1, char *jet_type="PF"){
     
   }//radius loop
   
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_mc_ak%d%s_%d_%d.root",list_radius[0],jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_mc_ak%d%s_%d_%d.root",list_radius[0],jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   for(int k = 0;k<no_radius;k++){

@@ -109,8 +109,8 @@ static const int nbins_cent = 6;
 static Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 5 to get your actual centrality
 static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8 ,362.24}; //last one is for 0-200 bin. 
 
-static const int no_radius = 1;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -151,7 +151,7 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "Calo", char *Type = "Data"){
+void RAA_read_MinBias(int startfile = 460, int endfile = 480, char *algo = "Pu", char *jet_type = "PF", char *Type = "Data"){
 
   TH1::SetDefaultSumw2();
   
@@ -434,17 +434,17 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   
   for(int k = 0;k<no_radius;++k){
     
-    jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet80_JetMB","1*(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet80_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&L1_SingleJet52_BptxAND)","goff");
-    jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet65_JetMB","1.11287*(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet65_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&L1_SingleJet36_BptxAND)","goff");
-    jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet55_JetMB","2.0292*(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet55_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&L1_SingleJet36_BptxAND)","goff");
-    jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
+    // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet80_JetMB","1*(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet80_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&L1_SingleJet52_BptxAND)","goff");
+    // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet65_JetMB","1.11287*(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet65_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&L1_SingleJet36_BptxAND)","goff");
+    // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet55_JetMB","2.0292*(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet55_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&L1_SingleJet36_BptxAND)","goff");
+    // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
     
-    // for(int i = 0;i<nbins_cent;i++){
-    //   //cout<<Form("%f %f",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
-    //   //cout<<Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f)",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
-    //   jetpbpb1[2][k]->Draw(Form("jtpt>>hJetMBSpectra_R%d_cent%d",list_radius[k],i),Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f && (chargedMax/jtpt > 0.02 || eMax/jtpt<0.6))",5*boundaries_cent[i],5*boundaries_cent[i+1]),"goff");
-    //   //hJetMBSpectra[i]->Print("base");
-    // }
+    for(int i = 0;i<nbins_cent;i++){
+      //cout<<Form("%f %f",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
+      //cout<<Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f)",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
+      jetpbpb1[2][k]->Draw(Form("jtpt>>hJetMBSpectra_R%d_cent%d",list_radius[k],i),Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f && chargedMax/jtpt>0.02 && eMax/jtpt<0.6)",5*boundaries_cent[i],5*boundaries_cent[i+1]),"goff");
+      //hJetMBSpectra[k][i]->Print("base");
+    }
     
   }
   

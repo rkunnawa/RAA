@@ -459,7 +459,6 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
     }// event loop for jet80or100
   }// radius loop
 
-
   // output file declaration
 
   TDatime date;
