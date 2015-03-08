@@ -109,11 +109,8 @@ static const int nbins_cent = 6;
 static Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 5 to get your actual centrality
 static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8 ,362.24}; //last one is for 0-200 bin. 
 
-//static const int no_radius = 3;//necessary for the RAA analysis  
-//static const int list_radius[no_radius] = {2,3,4};
-
-static const int no_radius = 1;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -154,7 +151,7 @@ int findBin(int hiBin){
 
 using namespace std;
 
-void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "Calo", char *Type = "Data"){
+void RAA_read_MinBias(int startfile = 460, int endfile = 480, char *algo = "Pu", char *jet_type = "PF", char *Type = "Data"){
 
   TH1::SetDefaultSumw2();
   
@@ -416,9 +413,11 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   TH1F *hJets = new TH1F("hJets","",2,0,1);
 
   TH1F *hJetMB = new TH1F("hJetMB","",200,0,200);
-  TH1F *hJetMBSpectra[nbins_cent];
-  for(int i = 0;i<nbins_cent;i++)
-    hJetMBSpectra[i] = new TH1F(Form("hJetMBSpectra_cent%d",i),"Data from MB trigger alone to add to the Jet triggered data",1000,0,1000);
+  TH1F *hJetMBSpectra[no_radius][nbins_cent];
+  for(int k = 0;k<no_radius;++k){
+    for(int i = 0;i<nbins_cent;++i)
+      hJetMBSpectra[k][i] = new TH1F(Form("hJetMBSpectra_R%d_cent%d",list_radius[k],i),"Data from MB trigger alone to add to the Jet triggered data",1000,0,1000);
+  }
   
   TH1F *hL1MB = new TH1F("hL1MB","",200,0,200);
   TH1F *hJet80 = new TH1F("hJet80","",200,0,200);
@@ -432,19 +431,23 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   TH1F *hJet55_JetMB = new TH1F("hJet55_JetMB","",200,0,200);
   TH1F *hL1SJ36_JetMB = new TH1F("hL1SJ36_JetMB","",200,0,200);
   TH1F *hL1SJ52_JetMB = new TH1F("hL1SJ52_JetMB","",200,0,200);
-
-  jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet80_JetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet80_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
-  jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet65_JetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet65_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
-  jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet55_JetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet55_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
-  jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
   
-  for(int i = 0;i<nbins_cent;i++){
-    //cout<<Form("%f %f",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
-    //cout<<Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f)",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
-    jetpbpb1[2][0]->Draw(Form("jtpt>>hJetMBSpectra_cent%d",i),Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f)",5*boundaries_cent[i],5*boundaries_cent[i+1]),"goff");
-    //hJetMBSpectra[i]->Print("base");
+  for(int k = 0;k<no_radius;++k){
+    
+    // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet80_JetMB","1*(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet80_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&L1_SingleJet52_BptxAND)","goff");
+    // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet65_JetMB","1.11287*(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet65_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&L1_SingleJet36_BptxAND)","goff");
+    // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet55_JetMB","2.0292*(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet55_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&L1_SingleJet36_BptxAND)","goff");
+    // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter)","goff");
+    
+    for(int i = 0;i<nbins_cent;i++){
+      //cout<<Form("%f %f",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
+      //cout<<Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f)",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
+      jetpbpb1[2][k]->Draw(Form("jtpt>>hJetMBSpectra_R%d_cent%d",list_radius[k],i),Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f && chargedMax/jtpt>0.02 && eMax/jtpt<0.6)",5*boundaries_cent[i],5*boundaries_cent[i+1]),"goff");
+      //hJetMBSpectra[k][i]->Print("base");
+    }
+    
   }
-
+  
   // prescl is calculated as the ratio of the 
   //minbias prescl = 38.695
   // jet80  prescl = 1 (same in minbias sample as well)
@@ -452,7 +455,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   // jet55  prescl = 2.0475 (2.0292)
 
   // but these prescl values are derived from the triggered data sample, need to check if they are the same in the minbias sample 
-  
+
 #if 0
   for(int k = 0;k<no_radius;k++){
 
@@ -784,8 +787,8 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   // TH1F * hL1SJ52_TrigTurnon = (TH1F*)hL1SJ52_JetMB->Clone("hL1SJ52_TrigTurnon");
   // hL1SJ52_TrigTurnon->Divide(hJetMB); 
  
-  if(Type=="Data"){
-    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+if(Type=="Data"){
+    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
     f.cd();
 
     //jets_ID->Write();
@@ -794,10 +797,13 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     
     hJetMB->Write();
     hJetMB->Print("base");
-    for(int i = 0;i<nbins_cent;i++){
-      hJetMBSpectra[i]->Write();
-      hJetMBSpectra[i]->Print("base");
+    for(int k = 0;k<no_radius;++k){
+      for(int i = 0;i<nbins_cent;++i){
+	hJetMBSpectra[k][i]->Write();
+	hJetMBSpectra[k][i]->Print("base");
+      }
     }
+    
     //hJet80->Write();
     //hJet65->Write();
     //hJet55->Write();

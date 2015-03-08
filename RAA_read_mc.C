@@ -29,7 +29,7 @@
 //               - this is going to be a bit tricky since each file is split up into 4 smaller files. so each pthat will have a TChain!
 
 
-// Fen 12th - cleaned up the macro to make it usable (hopefuly) by others. 
+// Feb 12th - cleaned up the macro to make it usable (hopefuly) by others. 
 
 #include <iostream>
 #include <stdio.h>
@@ -126,8 +126,8 @@ static const char etaWidth[nbins_eta][256] = {
 };
 
 
-static const int no_radius = 1;//testing purposes 
-static const int list_radius[no_radius] = {3};
+static const int no_radius = 3;//testing purposes 
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 3; 
@@ -1096,7 +1096,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	    //get the spectra histograms to make the ratios for the different Jet ID cuts. 0-30%
 	    //if(cBin==3 || cBin==4 || cBin==5) continue;
 
-	    if(k==0){
+	    if(k==1){
 	    
 	      hpbpb_chMaxJtpt_jtpt->Fill(data[k][h]->jtpt[g],data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]);
 	      hpbpb_eMaxJtpt_jtpt->Fill(data[k][h]->jtpt[g],data[k][h]->eMax[g]/data[k][h]->jtpt[g]);
@@ -1160,15 +1160,15 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 		if(data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 		if(data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.8)hpbpb_Jet80_eMaxJtpt0p8->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 		if(data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.9)hpbpb_Jet80_eMaxJtpt0p9->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	      }
 	      if(data[k][h]->jet65_1 && !data[k][h]->jet80_1){
 		hpbpb_Jet65->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
@@ -1199,15 +1199,15 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 		if(data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g])<0.9)hpbpb_Jet65_eMaxSumcand0p9->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 
 
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	      }
 	      if(data[k][h]->jet55_1 && !data[k][h]->jet65_1 && !data[k][h]->jet80_1){
 		hpbpb_Jet55->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
@@ -1236,15 +1236,15 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 		if(data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 		if(data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.8)hpbpb_Jet55_eMaxJtpt0p8->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 		if(data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.9)hpbpb_Jet55_eMaxJtpt0p9->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
-		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
+		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	      }
 
 	    }
@@ -1282,8 +1282,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 	    hpbpb_muSum[k][j][nbins_cent]->Fill(data[k][h]->muSum[g],scale*weight_cent*weight_vz);
 	    hpbpb_eSum[k][j][nbins_cent]->Fill(data[k][h]->eSum[g],scale*weight_cent*weight_vz);
 
-#if 0
-	    if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.05) continue;
+	    if ( data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]<0.02 || data[k][h]->eMax[g]/data[k][h]->jtpt[g]>0.6 ) continue;
 
 	    if(jetCounter>=7) hpbpb_pt_Njet_g7[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	    if(jetCounter<7) hpbpb_pt_Njet_l7[k][j][cBin]->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
@@ -1381,7 +1380,6 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 
 	    }
 	    
-#endif	 
           }// eta bins loop
 	      
         }//njets loop
@@ -1395,7 +1393,6 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 
   }// radius loop
 
-#if 0
   for(int k = 0;k<no_radius;k++){
     for(int j = 0;j<nbins_eta;j++){
       for(int i = 0;i<nbins_cent;i++){
@@ -1419,9 +1416,8 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
     }
   }
   
-  #endif
 
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_jetidcheck_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   f.cd();
 
   hpbpb_Jet80_chMaxJtpt0p01->Divide(hpbpb_Jet80);
@@ -1691,6 +1687,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 
     }
   }
+#endif
 
   for(int k = 0;k<no_radius;k++){
 
@@ -1728,7 +1725,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
       
     }
   }
-#endif
+
   f.Write();
   f.Close();
 
