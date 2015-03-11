@@ -73,7 +73,7 @@ void RAA_plot_triggerTurnon(){
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
-  TFile * fin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_akPu3Calo_20150302.root");
+  TFile * fin = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_akPuCalo_20150303.root");
 
   TH1F * hJet80_MB = (TH1F*)fin->Get("hJet80_JetMB");
   TH1F * hJet65_MB = (TH1F*)fin->Get("hJet65_JetMB");
@@ -152,7 +152,7 @@ void RAA_plot_triggerTurnon(){
   putCMSPrel();
   drawText("HLT turnon curves",0.2,0.8,16);
 
-  cturnon->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_triggerturnon_%d.pdf",date.GetDate()),"RECREATE");
+  cturnon->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_triggerturnon_%d.pdf",date.GetDate()),"RECREATE");
   
 
 }
