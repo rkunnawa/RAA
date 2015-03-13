@@ -438,7 +438,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
   TTree* matchJets = new TTree("matchedJets","Ntuple containing important information about matched jets");
   matchJets->Branch("calopt",&calopt,"calopt/F");   matchJets->Branch("phSum",&phSum,"phSum/F");
   matchJets->Branch("pfpt",&pfpt,"pfpt/F");         matchJets->Branch("neSum",&neSum,"neSum/F");
-  matchJets->Branch("deltar",&deltaR,"deltar/F");   matchJets->Branch("muSum",&muSum,"muSum/F");
+  matchJets->Branch("deltar",&deltar,"deltar/F");   matchJets->Branch("muSum",&muSum,"muSum/F");
   matchJets->Branch("chMax",&chMax,"chMax/F");      matchJets->Branch("eSum",&eSum,"eSum/F");
   matchJets->Branch("phMax",&phMax,"phMax/F");      matchJets->Branch("hiBin",&hiBin,"hiBin/I");
   matchJets->Branch("neMax",&neMax,"neMax/F");      matchJets->Branch("jet80",&jet80,"jet80/I");
@@ -454,7 +454,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
   TTree* unmatchJets = new TTree("unmatchedJets","Ntuple containing important information about unmatched PF jets");
   unmatchJets->Branch("phSum",&phSum,"phSum/F");
   unmatchJets->Branch("pfpt",&pfpt,"pfpt/F");         unmatchJets->Branch("neSum",&neSum,"neSum/F");
-  unmatchJets->Branch("deltaR",&deltaR,"deltaR/F");   unmatchJets->Branch("muSum",&muSum,"muSum/F");
+  unmatchJets->Branch("deltar",&deltar,"deltar/F");   unmatchJets->Branch("muSum",&muSum,"muSum/F");
   unmatchJets->Branch("chMax",&chMax,"chMax/F");      unmatchJets->Branch("eSum",&eSum,"eSum/F");
   unmatchJets->Branch("phMax",&phMax,"phMax/F");      unmatchJets->Branch("hiBin",&hiBin,"hiBin/I");
   unmatchJets->Branch("neMax",&neMax,"neMax/F");      unmatchJets->Branch("jet80",&jet80,"jet80/I");
