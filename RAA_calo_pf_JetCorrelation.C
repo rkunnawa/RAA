@@ -348,12 +348,21 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 9, int radius=3
     //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_1);
     //jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias",&L1_MB_1);
     //jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1",&jet65_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1",&jet80_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_1);
+
+    // dont forget the include this for data and comment out the second set which is for MC. 
+    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v7",&jet55_1);
+    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v7_Prescl",&jet55_p_1);
+    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v7",&jet65_1);
+    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v7_Prescl",&jet65_p_1);
+    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v7",&jet80_1);
+    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v7_Prescl",&jet80_p_1);
+    
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v7",&jet55_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v7_Prescl",&jet55_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v7",&jet65_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v7_Prescl",&jet65_p_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v7",&jet80_1);
+    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v7_Prescl",&jet80_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND",&L1_sj36_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND_Prescl",&L1_sj36_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND",&L1_sj52_1);
@@ -439,7 +448,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 9, int radius=3
   for(int k = 0;k<no_radius;k++){
 
     Long64_t nentries = jetpbpb1[2][k]->GetEntries();
-    if(printDebug)nentries = 10;
+    //nentries = 20;
     
     for(Long64_t nentry = 0; nentry<nentries;nentry++){
       if(printDebug)cout<<"event no = "<<nentry<<endl;
@@ -469,6 +478,10 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 9, int radius=3
        	if(printDebug) cout<<"removed this supernova event"<<endl;
       	continue;
       }
+
+      // if(jet80_1!=0)cout<<"jet80 = "<<jet80_1<<" jet80_prescl = "<<jet80_p_1<<endl;
+      // if(jet65_1!=0)cout<<"jet65 = "<<jet65_1<<" jet65_prescl = "<<jet65_p_1<<endl;
+      // if(jet55_1!=0)cout<<"jet55 = "<<jet55_1<<" jet55_prescl = "<<jet55_p_1<<endl;
 
       // start doing the search for the match. - best thing to do would be to create a 2D match delta R matrix with each calo jet and pf jet. Once thats done - find the smallest entry in that matrix. the i,j of that smallest entry are matched. now remove the row i and column j and then we have a new distance matrix. where we need to find the smallest element again. keep doing this till we have either no rows or no columns.  
       // declare the necessary variables:
@@ -512,6 +525,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 9, int radius=3
 	  if(TMath::Abs(pfjet_eta) > 2.0) continue;
 
 	  deltaRCaloPF = (Float_t)TMath::Sqrt((calojet_eta - pfjet_eta)*(calojet_eta - pfjet_eta) + (calojet_phi - pfjet_phi)*(calojet_phi - pfjet_phi));
+	  
 	  // if(deltaRCaloPF > (Float_t)deltaR/10) continue;
 	  deltapT = TMath::Abs(calojet_pt - pfjet_pt);
 
@@ -544,9 +558,9 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 9, int radius=3
 	
       }// calo jet loop
 
-      if(printDebug)cout<<deltaR_calovsPF.size()<<endl;
-      if(printDebug)for(int a = 0;a<deltaR_calovsPF.size();++a) cout<<deltaR_calovsPF[a].size()<<" ";
-      if(printDebug)cout<<"going to small matching"<<endl;
+      // if(printDebug)cout<<deltaR_calovsPF.size()<<endl;
+      // if(printDebug)for(int a = 0;a<deltaR_calovsPF.size();++a) cout<<deltaR_calovsPF[a].size()<<" ";
+      // if(printDebug)cout<<"going to small matching"<<endl;
       
       // now that we have the 2D matrix, lets find the smallest delta R element from that and fill in the value of the 
 
@@ -555,11 +569,11 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 9, int radius=3
       Int_t small_pf = 0;
 
       for(int c = 0;c<deltaR_calovsPF.size();++c){
-	if(printDebug)cout<<"going through all rows in the  matrix "<<c<<endl;
+	// if(printDebug)cout<<"going through all rows in the  matrix "<<c<<endl;
 	for(int a = 0;a<deltaR_calovsPF.size();++a){
-	  if(printDebug)cout<<"calo jet iteration "<<a<<endl;
+	  // if(printDebug)cout<<"calo jet iteration "<<a<<endl;
 	  for(int b = 0;b<deltaR_calovsPF[a].size();++b){
-	    if(printDebug)cout<<"pf jet iteration "<<b<<endl;
+	    // if(printDebug)cout<<"pf jet iteration "<<b<<endl;
 	    
 	    if(deltaR_calovsPF[a][b][16]==1){ 
 	      break;
@@ -643,12 +657,12 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 9, int radius=3
 
       }// running it for the number of calo jets: 
 
-      if(printDebug)cout<<"now going to find unmatched pf jets"<<endl;
+      //if(printDebug)cout<<"now going to find unmatched pf jets"<<endl;
       // ok Now lets find the un-matched jets and fill the necessary unmatched ntuple:
 
       if(deltaR_calovsPF.size() == 0) continue;
       for(int b = 0;b<deltaR_calovsPF[0].size();++b){
-	if(printDebug)cout<<"pf jet iteration "<<b<<endl;
+	//if(printDebug)cout<<"pf jet iteration "<<b<<endl;
 
 	if(deltaR_calovsPF[0][b][16] == 1) continue;
 	
@@ -688,7 +702,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 9, int radius=3
   }// radius loop
 
   //TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d_test.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
   f.cd();
   matchJets->Write();
   matchJets->Print();
