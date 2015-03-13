@@ -97,7 +97,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/){
+void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 9, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0){
 
   TH1::SetDefaultSumw2();
 
@@ -113,7 +113,9 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   // Since this has to run on the HiForest files, it is best to run them as condor jobs similar to the PbPb data read macro, along with the jet trees which get their branch address set. 
   
   std::string infile1;
-  infile1 = "jetRAA_PbPb_data_forest.txt";
+  //infile1 = "jetRAA_PbPb_data_forest.txt";
+  infile1 = "jetRAA_PbPb_mc_forest.txt";
+  //infile1 = "jetRAA_MinBiasUPC_forest.txt";
   
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
@@ -124,7 +126,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
     instr1>>filename1;
   }
   
-  const int N = 6;
+  const int N = 5;
   
   TChain *jetpbpb1[N][no_radius];
 
@@ -136,7 +138,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
     dir[2][k] = Form("ak%s%dCaloJetAnalyzer",algo,list_radius[k]);
     dir[3][k] = Form("ak%s%dPFJetAnalyzer",algo,list_radius[k]);
     dir[4][k] = "hiEvtAnalyzer";
-    dir[5][k] = "hltobject";
+    //dir[5][k] = "hltobject";
     //dir[6][k] = "pfcandAnalyzer";
   }
   
@@ -146,8 +148,8 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
     "HltTree",
     "t",
     "t",
-    "HiTree",
-    "jetObjTree",
+    "HiTree"
+    //"jetObjTree",
     //"pfTree"
   };
   
@@ -180,12 +182,12 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
     jetpbpb1[2][k]->AddFriend(jetpbpb1[0][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[1][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[4][k]);
-    jetpbpb1[2][k]->AddFriend(jetpbpb1[5][k]);
+    //jetpbpb1[2][k]->AddFriend(jetpbpb1[5][k]);
     
     jetpbpb1[3][k]->AddFriend(jetpbpb1[0][k]);
     jetpbpb1[3][k]->AddFriend(jetpbpb1[1][k]);
     jetpbpb1[3][k]->AddFriend(jetpbpb1[4][k]);
-    jetpbpb1[3][k]->AddFriend(jetpbpb1[5][k]);
+    //jetpbpb1[3][k]->AddFriend(jetpbpb1[5][k]);
     
   }// radius loop ends
  
@@ -214,6 +216,8 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   float eSum_1[1000];
   float muSum_1[1000];
   float jtpu_1[1000];
+  float hcalSum_1[1000];
+  float ecalSum_1[1000];
   
   // jet tree 2 - PF
   int nrefe_2;
@@ -235,6 +239,8 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   float eSum_2[1000];
   float muSum_2[1000];
   float jtpu_2[1000];
+  float hcalSum_2[1000];
+  float ecalSum_2[1000];
   
   // event tree
   int evt_1;
@@ -313,6 +319,8 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
     jetpbpb1[2][k]->SetBranchAddress("eMax",&eMax_1);
     jetpbpb1[2][k]->SetBranchAddress("muSum",&muSum_1);
     jetpbpb1[2][k]->SetBranchAddress("muMax",&muMax_1);
+    jetpbpb1[2][k]->SetBranchAddress("ecalSum",&ecalSum_1);
+    jetpbpb1[2][k]->SetBranchAddress("hcalSum",&hcalSum_1);
     
     jetpbpb1[3][k]->SetBranchAddress("nref",&nrefe_2);
     jetpbpb1[3][k]->SetBranchAddress("jtpt",&pt_2);
@@ -332,6 +340,9 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
     jetpbpb1[3][k]->SetBranchAddress("eMax",&eMax_2);
     jetpbpb1[3][k]->SetBranchAddress("muSum",&muSum_2);
     jetpbpb1[3][k]->SetBranchAddress("muMax",&muMax_2);
+    jetpbpb1[3][k]->SetBranchAddress("ecalSum",&ecalSum_2);
+    jetpbpb1[3][k]->SetBranchAddress("hcalSum",&hcalSum_2);
+    
     
     //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_1);
     //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_1);
@@ -408,7 +419,11 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   }
 
   cout<<"after histogram declaration"<<endl;
-  TNtuple * matchJets = new TNtuple("matchJets","Ntuple containing important information about matched jets","calopt:pfpt:deltaR:chMax:phMax:neMax:muMax:eMax:chSum:phSum:neSum:muSum:eSum");
+  TNtuple * matchJets = new TNtuple("matchedJets","Ntuple containing important information about matched jets","calopt:pfpt:deltaR:chMax:phMax:neMax:muMax:eMax:chSum:phSum:neSum:muSum:eSum:cent:jet80:jet80_prescl:jet65:jet65_prescl:jet55:jet55_prescl:hcalSum:ecalSum");
+  TNtuple * unmatch_PFJets = new TNtuple("unmatched_PFJets","Ntuple containing important information about unmatched jets","calopt:pfpt:deltaR:chMax:phMax:neMax:muMax:eMax:chSum:phSum:neSum:muSum:eSum:cent:jet80:jet80_prescl:jet65:jet65_prescl:jet55:jet55_prescl:hcalSum:ecalSum");
+
+  Float_t matchedJets[22];
+  Float_t unmatchedJets[22];
   
   //for the Jet 55 spectra: 
   Float_t effecPrescl = 2.047507;
@@ -424,10 +439,10 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   for(int k = 0;k<no_radius;k++){
 
     Long64_t nentries = jetpbpb1[2][k]->GetEntries();
-    //nentries = 10;
+    if(printDebug)nentries = 10;
     
     for(Long64_t nentry = 0; nentry<nentries;nentry++){
-      //cout<<"event no = "<<nentry<<endl;
+      if(printDebug)cout<<"event no = "<<nentry<<endl;
       for(int t = 0;t<N;t++)  jetpbpb1[t][k]->GetEntry(nentry);
       
       int centBin = findBin(hiBin_1);
@@ -469,14 +484,16 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
       vector<vector<vector<double> > > deltaR_calovsPF;
       int calosize = 0;
       Float_t deltapT = 0;
-
+      int calomatchcounter = 0;
+      
       for(int g = 0;g<nrefe_1;g++){
 	
 	calojet_eta = eta_1[g];
 	calojet_phi = phi_1[g];
 	calojet_pt = pt_1[g];
 	
-	if(calojet_pt < 10) continue;
+	if(calojet_pt < CALOPTCUT) continue;
+	if(TMath::Abs(calojet_eta) > 2.0) continue;
 	
 	int pfmatchcounter = 0;
 	deltaR_calovsPF.push_back(vector<vector<double> > ());
@@ -491,38 +508,46 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
 	  pfjet_phi = phi_2[j];
 	  pfjet_pt = pt_2[j];
 
-	  if(pfjet_pt < 10) continue;
+	  if(pfjet_pt < PFPTCUT) continue;
+	  if(TMath::Abs(pfjet_eta) > 2.0) continue;
 
 	  deltaRCaloPF = (Float_t)TMath::Sqrt((calojet_eta - pfjet_eta)*(calojet_eta - pfjet_eta) + (calojet_phi - pfjet_phi)*(calojet_phi - pfjet_phi));
 	  // if(deltaRCaloPF > (Float_t)deltaR/10) continue;
 	  deltapT = TMath::Abs(calojet_pt - pfjet_pt);
 
-	  deltaR_calovsPF[g].push_back(vector<double> ());
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(deltaRCaloPF); // 0 - delta R
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(deltapT); // 1 - delta pT	  
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(g); // 2 - calo counter 
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(calojet_pt); // 3 - calo jet pT 
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(j); // 4 - pf counter 
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(pfjet_pt); // 5 - pf jet pT
+	  deltaR_calovsPF[calomatchcounter].push_back(vector<double> ());
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(deltaRCaloPF); // 0 - delta R
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(deltapT); // 1 - delta pT	  
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(g); // 2 - calo counter 
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(calojet_pt); // 3 - calo jet pT 
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(j); // 4 - pf counter 
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(pfjet_pt); // 5 - pf jet pT
 	  // this will have the candidate variables for the matched jets. 
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(chMax_2[j]); // 6 - chMax 
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(phMax_2[j]); // 7 - phMax
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(neMax_2[j]); // 8 - neMax
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(muMax_2[j]); // 9 - muMax
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(eMax_2[j]); // 10 - eMax
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(chSum_2[j]); // 11 - chSum
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(phSum_2[j]); // 12 - phSum
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(neSum_2[j]); // 13 - neSum
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(muSum_2[j]); // 14 - muSum
-	  deltaR_calovsPF[g][pfmatchcounter].push_back(eSum_2[j]); // 15 - eSum
-
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(chMax_2[j]); // 6 - chMax 
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(phMax_2[j]); // 7 - phMax
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(neMax_2[j]); // 8 - neMax
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(muMax_2[j]); // 9 - muMax
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(eMax_2[j]); // 10 - eMax
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(chSum_2[j]); // 11 - chSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(phSum_2[j]); // 12 - phSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(neSum_2[j]); // 13 - neSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(muSum_2[j]); // 14 - muSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(eSum_2[j]); // 15 - eSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(0.0); // 16 - this is the variable which will tell me if a jet is matched.
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(hcalSum_2[j]); // 17 - hcalSum 
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(ecalSum_2[j]); // 18 - hcalSum
 
 	  ++pfmatchcounter;
 
 	}// pf jet loop
+	++calomatchcounter;
 	
       }// calo jet loop
 
+      if(printDebug)cout<<deltaR_calovsPF.size()<<endl;
+      if(printDebug)for(int a = 0;a<deltaR_calovsPF.size();++a) cout<<deltaR_calovsPF[a].size()<<" ";
+      if(printDebug)cout<<"going to small matching"<<endl;
+      
       // now that we have the 2D matrix, lets find the smallest delta R element from that and fill in the value of the 
 
       Float_t smallDeltaR = 10;
@@ -530,42 +555,59 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
       Int_t small_pf = 0;
 
       for(int c = 0;c<deltaR_calovsPF.size();++c){
-	//cout<<"going through all rows in the  matrix "<<c<<endl;
+	if(printDebug)cout<<"going through all rows in the  matrix "<<c<<endl;
 	for(int a = 0;a<deltaR_calovsPF.size();++a){
-	  //cout<<"calo jet iteration "<<a<<endl;
+	  if(printDebug)cout<<"calo jet iteration "<<a<<endl;
 	  for(int b = 0;b<deltaR_calovsPF[a].size();++b){
-	    //cout<<"pf jet iteration "<<b<<endl;
-
-	    //smallDeltaR = 10;
-	    if(deltaR_calovsPF[a][b][0] == 100) break;
+	    if(printDebug)cout<<"pf jet iteration "<<b<<endl;
+	    
+	    if(deltaR_calovsPF[a][b][16]==1){ 
+	      break;
+	    }
 	    if(smallDeltaR > deltaR_calovsPF[a][b][0]){
-	     
+	      
 	      smallDeltaR = deltaR_calovsPF[a][b][0];
 	      small_calo = a;
 	      small_pf = b;
 	      
 	    }
 	  }
-	  //cout<<endl;
 	}
 	
-	if(smallDeltaR > (Float_t)deltaR/10) continue;
+	if(smallDeltaR > (Float_t)deltaR/10 || deltaR_calovsPF[small_calo][small_pf][16] == 1) continue;
 	
 	calojet_pt = deltaR_calovsPF[small_calo][small_pf][3];
 	pfjet_pt = deltaR_calovsPF[small_calo][small_pf][5];
 	deltapT = deltaR_calovsPF[small_calo][small_pf][1];
 	deltaRCaloPF = deltaR_calovsPF[small_calo][small_pf][0];
-
-	matchJets->Fill(calojet_pt,pfjet_pt,deltaRCaloPF,deltaR_calovsPF[small_calo][small_pf][6],
-			deltaR_calovsPF[small_calo][small_pf][7],deltaR_calovsPF[small_calo][small_pf][8],
-			deltaR_calovsPF[small_calo][small_pf][9],deltaR_calovsPF[small_calo][small_pf][10],
-			deltaR_calovsPF[small_calo][small_pf][11],deltaR_calovsPF[small_calo][small_pf][12],
-			deltaR_calovsPF[small_calo][small_pf][13],deltaR_calovsPF[small_calo][small_pf][14],
-			deltaR_calovsPF[small_calo][small_pf][15]
-			);
-
+	
+	matchedJets[0] = calojet_pt;
+	matchedJets[1] = pfjet_pt;
+	matchedJets[2] = deltaRCaloPF;
+	matchedJets[3] = deltaR_calovsPF[small_calo][small_pf][6];
+	matchedJets[4] = deltaR_calovsPF[small_calo][small_pf][7];
+	matchedJets[5] = deltaR_calovsPF[small_calo][small_pf][8];
+	matchedJets[6] = deltaR_calovsPF[small_calo][small_pf][9];
+	matchedJets[7] = deltaR_calovsPF[small_calo][small_pf][10];
+	matchedJets[8] = deltaR_calovsPF[small_calo][small_pf][11];
+	matchedJets[9] = deltaR_calovsPF[small_calo][small_pf][12];
+	matchedJets[10] = deltaR_calovsPF[small_calo][small_pf][13];
+	matchedJets[11] = deltaR_calovsPF[small_calo][small_pf][14];
+	matchedJets[12] = deltaR_calovsPF[small_calo][small_pf][15];
+	matchedJets[13] = deltaR_calovsPF[small_calo][small_pf][17];
+	matchedJets[14] = deltaR_calovsPF[small_calo][small_pf][18];
+	matchedJets[15] = hiBin_1;
+	matchedJets[16] = jet80_1;
+	matchedJets[17] = jet80_p_1;
+	matchedJets[18] = jet65_1;
+	matchedJets[19] = jet65_p_1;
+	matchedJets[20] = jet55_1;
+	matchedJets[21] = jet55_p_1;
+	
+	matchJets->Fill(matchedJets);
+	
 	//now we have the smallest value, lets get the delta R of that particular matched jets 
-
+	
 	if(jet80_1){
 	  hCaloPFCorr[2][centBin]->Fill((Float_t) pfjet_pt/calojet_pt);
 	  hCaloPFpt[2][centBin]->Fill(calojet_pt,pfjet_pt);
@@ -590,19 +632,71 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
 	  hPF[0][centBin]->Fill(pfjet_pt);	    
 	  hDeltaR_deltapT[0][centBin]->Fill(deltaRCaloPF,deltapT);
 	}
+	
 	smallDeltaR = 10;
-	deltaR_calovsPF[small_calo][small_pf][0] = 100; // by setting this value you effectively remove that calo and pf jet for further matching 
+	for(int b = 0;b<deltaR_calovsPF[small_calo].size();++b){
+	  deltaR_calovsPF[small_calo][b][16] = 1; // by setting this value you effectively remove that calo and pf jet for further matching // removes the column for getting matched. 
+	}
+	for(int a = 0;a<deltaR_calovsPF.size();++a){
+	  deltaR_calovsPF[a][small_pf][16] = 1; // this removes the whole row from getting matched later. 
+	}
 
       }// running it for the number of calo jets: 
+
+      if(printDebug)cout<<"now going to find unmatched pf jets"<<endl;
+      // ok Now lets find the un-matched jets and fill the necessary unmatched ntuple:
+
+      if(deltaR_calovsPF.size() == 0) continue;
+      for(int b = 0;b<deltaR_calovsPF[0].size();++b){
+	if(printDebug)cout<<"pf jet iteration "<<b<<endl;
+
+	if(deltaR_calovsPF[0][b][16] == 1) continue;
+	
+	calojet_pt = deltaR_calovsPF[0][b][3];
+	pfjet_pt = deltaR_calovsPF[0][b][5];
+	deltapT = deltaR_calovsPF[0][b][1];
+	deltaRCaloPF = deltaR_calovsPF[0][b][0];
+	
+	unmatchedJets[0] = calojet_pt;
+	unmatchedJets[1] = pfjet_pt;
+	unmatchedJets[2] = deltaRCaloPF;
+	unmatchedJets[3] = deltaR_calovsPF[0][b][6];
+	unmatchedJets[4] = deltaR_calovsPF[0][b][7];
+	unmatchedJets[5] = deltaR_calovsPF[0][b][8];
+	unmatchedJets[6] = deltaR_calovsPF[0][b][9];
+	unmatchedJets[7] = deltaR_calovsPF[0][b][10];
+	unmatchedJets[8] = deltaR_calovsPF[0][b][11];
+	unmatchedJets[9] = deltaR_calovsPF[0][b][12];
+	unmatchedJets[10] = deltaR_calovsPF[0][b][13];
+	unmatchedJets[11] = deltaR_calovsPF[0][b][14];
+	unmatchedJets[12] = deltaR_calovsPF[0][b][15];
+	unmatchedJets[13] = deltaR_calovsPF[0][b][17];
+	unmatchedJets[14] = deltaR_calovsPF[0][b][18];
+	unmatchedJets[15] = hiBin_1;
+	unmatchedJets[16] = jet80_1;
+	unmatchedJets[17] = jet80_p_1;
+	unmatchedJets[18] = jet65_1;
+	unmatchedJets[19] = jet65_p_1;
+	unmatchedJets[20] = jet55_1;
+	unmatchedJets[21] = jet55_p_1;
+	
+	unmatch_PFJets->Fill(unmatchedJets);	  
+      }
 
     }// event loop 
 
   }// radius loop
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
+  //TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
   f.cd();
   matchJets->Write();
   matchJets->Print();
+  unmatch_PFJets->Write();
+  unmatch_PFJets->Print();
+  //unmatch_CaloJets->Write();
+  //unmatch_CaloJets->Print();
+  
   for(int i = 0;i<nbins_cent;++i){
 
     for(int a = 0;a<TrigValue-1;++a){

@@ -131,7 +131,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 15){
+void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 20){
 
   TStopwatch timer;
   timer.Start();
@@ -154,21 +154,21 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
 
   //Boolean Variables for the several plots: 
   bool doSpectra = false;
-  bool doPbPbIterSys = true;
-  bool doPPIterSys = true;
+  bool doPbPbIterSys = false;
+  bool doPPIterSys = false;
   bool doRAA = false;
-  bool doPbPbMCClosure = true;
-  bool doPPMCClosure = true;
+  bool doPbPbMCClosure = false;
+  bool doPPMCClosure = false;
   bool doPbPbDatavsMC = false;
   bool doPPDatavsMC = false;
   bool doPbPbNormRes = false;
   bool doPPNormRes = false;
-  bool doPbPbsigma = false;
-  bool doPPsigma = false;
-  bool doGenSpectra = false;
-  bool doPbPbTrgComb = false;
+  bool doPbPbsigma = true;
+  bool doPPsigma = true;
+  bool doGenSpectra = true;
+  bool doPbPbTrgComb = true;
   bool doPbPb12003TrgComb = false;
-  bool doPPTrgComb = false;
+  bool doPPTrgComb = true;
   bool doRandomCone = false;
   bool doSupernovaData = false;
   bool doSupernovaMC = false;
@@ -190,12 +190,12 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
   TFile *fin; 
   
   //if(location=="MIT") 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfold_marguerite_comb_MC_HLT_chMaxjtpt_norawptcut_test_%dGeVCut_ak%s%d%s_20150212.root",unfoldingCut,algo,radius,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_svd_test_unfold_0_absEta_20_%dGeVCut_ak%d%s_20150309.root",unfoldingCut,radius,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
   
-  TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1];
+  TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1], *dPbPb_MinBias[nbins_cent+1];
   
   TH1F *mPbPb_Gen[nbins_cent+1], *mPbPb_Reco[nbins_cent+1];
   TH2F *mPbPb_Matrix[nbins_cent+1], *mPbPb_Response[nbins_cent+1], *mPbPb_ResponseNorm[nbins_cent+1];
@@ -233,6 +233,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
     dPbPb_Trg80[i] = (TH1F*)fin->Get(Form("PbPb_measured_spectra_jet80_cent%d",i));
     dPbPb_Trg65[i] = (TH1F*)fin->Get(Form("PbPb_measured_spectra_jet65_cent%d",i));
     dPbPb_Trg55[i] = (TH1F*)fin->Get(Form("PbPb_measured_spectra_jet55_cent%d",i));    
+    dPbPb_MinBias[i] = (TH1F*)fin->Get(Form("PbPb_measured_spectra_MinBias_cent%d",i));    
     
     mPbPb_Reco[i] = (TH1F*)fin->Get(Form("hpbpb_reco_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Gen[i] = (TH1F*)fin->Get(Form("hpbpb_gen_R%d_n20_eta_p20_cent%d",radius,i));
@@ -995,7 +996,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
       //dPbPb_TrgComb[i]->Scale(1e-6)
       dPbPb_TrgComb[i]->SetMarkerStyle(24);
       dPbPb_TrgComb[i]->SetMarkerColor(kBlack);
-      dPbPb_TrgComb[i]->SetAxisRange(1e-6,10,"Y");
+      dPbPb_TrgComb[i]->SetAxisRange(1e-6,100,"Y");
       //dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("rebin_measured_cent%d",i),boundaries_pt);
       //divideBinWidth(dPbPb_TrgComb[i]);
       dPbPb_TrgComb[i]->SetAxisRange(50,500,"X");
@@ -1106,7 +1107,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
       mPbPb_Gen[i]->SetMarkerColor(i+1);
 
       if(i==0){
-	mPbPb_Gen[i]->SetAxisRange(1e-15,1e5,"Y");
+	mPbPb_Gen[i]->SetAxisRange(1e-15,1e2,"Y");
 	mPbPb_Gen[i]->SetAxisRange(15,600,"X");
 	makeHistTitle(mPbPb_Gen[i],"","MC: Jet p_{T} (GeV/c)","arbitrary for now");
 	mPbPb_Gen[i]->Draw();
@@ -1189,10 +1190,16 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
       //divideBinWidth(dPbPb_TrgComb[i]);
       dPbPb_TrgComb[i]->SetMarkerStyle(25);
       dPbPb_TrgComb[i]->SetMarkerColor(kBlack);
-      dPbPb_TrgComb[i]->SetAxisRange(1e-6,10,"Y");
+      dPbPb_TrgComb[i]->SetAxisRange(1e-6,100,"Y");
       dPbPb_TrgComb[i]->SetAxisRange(50,500,"X");
       dPbPb_TrgComb[i]->Draw();
 
+      dPbPb_MinBias[i]->SetMarkerStyle(20);
+      dPbPb_MinBias[i]->SetMarkerColor(kBlack);
+      //dPbPb_MinBias[i] = (TH1F*)dPbPb_MinBias[i]->Rebin(nbins_pt,Form("rebin_measured_80_cent%d",i),boundaries_pt);
+      //divideBinWidth(dPbPb_MinBias[i]);
+      dPbPb_MinBias[i]->Draw("same");
+      
       dPbPb_Trg80[i]->SetMarkerStyle(20);
       dPbPb_Trg80[i]->SetMarkerColor(kRed);
       //dPbPb_Trg80[i] = (TH1F*)dPbPb_Trg80[i]->Rebin(nbins_pt,Form("rebin_measured_80_cent%d",i),boundaries_pt);
@@ -1200,13 +1207,13 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
       dPbPb_Trg80[i]->Draw("same");
 
       dPbPb_Trg65[i]->SetMarkerStyle(20);
-      dPbPb_Trg65[i]->SetMarkerColor(kBlue);
+      dPbPb_Trg65[i]->SetMarkerColor(kGreen);
       //dPbPb_Trg65[i] = (TH1F*)dPbPb_Trg65[i]->Rebin(nbins_pt,Form("rebin_measured_65_cent%d",i),boundaries_pt);
       //divideBinWidth(dPbPb_Trg65[i]);
       dPbPb_Trg65[i]->Draw("same");
 
       dPbPb_Trg55[i]->SetMarkerStyle(20);
-      dPbPb_Trg55[i]->SetMarkerColor(kGreen);
+      dPbPb_Trg55[i]->SetMarkerColor(kBlue);
       //dPbPb_Trg55[i] = (TH1F*)dPbPb_Trg55[i]->Rebin(nbins_pt,Form("rebin_measured_55_cent%d",i),boundaries_pt);
       //divideBinWidth(dPbPb_Trg55[i]);
       dPbPb_Trg55[i]->Draw("same");
@@ -1218,6 +1225,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
     cDataMerge->cd(1);
     TLegend *PbPb_dataMerge = myLegend(0.75,0.65,0.90,0.85);
     PbPb_dataMerge->AddEntry(dPbPb_TrgComb[0],"Combined","pl");
+    PbPb_dataMerge->AddEntry(dPbPb_MinBias[0],"Jet80","pl");
     PbPb_dataMerge->AddEntry(dPbPb_Trg80[0],"Jet80","pl");
     PbPb_dataMerge->AddEntry(dPbPb_Trg65[0],"Jet65","pl");
     PbPb_dataMerge->AddEntry(dPbPb_Trg55[0],"Jet55","pl");
@@ -1233,7 +1241,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
     //drawText("L1_SingleJet36 added to jet55 and 65 triggers",0.22,0.83,15);
     //drawText("cut5: #frac{neMax}{neMax + chMax + phMax}",0.22,0.73,15);
     //drawText("cut4: #frac{#sum #left(ch+nu+ph+mu+e#right)}{0.5*raw p_{T}}",0.22,0.83,15);
-    drawText("chMax/jtpt>0.05",0.15,0.11,16);
+    drawText("chMax/jtpt>0.02 && eMax/jtpt<0.6",0.15,0.11,16);
     cDataMerge->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_chMaxjtpt_norawptcut_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   }
 

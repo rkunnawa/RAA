@@ -458,7 +458,37 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   //   //hJetMBSpectra[k][i]->Print("base");
   // }
     
-
+  TTree* trigger_info;
+  Int_t evt_value;
+  Int_t run_value;
+  Int_t lumi_value;
+  Int_t nref;
+  Float_t jetpt[1000];
+  Float_t jeteta[1000];
+  Int_t Jet80;
+  Int_t Jet80_prescl;
+  Int_t Jet65;
+  Int_t Jet65_prescl;
+  Int_t Jet55;
+  Int_t Jet55_prescl;
+  Int_t HIMinBias;
+  Int_t HIMinBias_prescl;
+  
+  trigger_info = new TTree("trigger_info","");
+  trigger_info->Branch("run_value",&run_value,"run_value/I");
+  trigger_info->Branch("evt_value",&evt_value,"evt_value/I");
+  trigger_info->Branch("lumi_value",&lumi_value,"lumi_value/I");
+  trigger_info->Branch("nref",&nref,"nref/I");
+  trigger_info->Branch("jetpt",&jetpt,"jetpt[nref]/F");
+  trigger_info->Branch("jeteta",&jeteta,"jeteta[nref]/F");
+  trigger_info->Branch("Jet80",&Jet80,"Jet80/I");
+  trigger_info->Branch("Jet80_prescl",&Jet80_prescl,"Jet80_prescl/I");
+  trigger_info->Branch("Jet65",&Jet65,"Jet65/I");
+  trigger_info->Branch("Jet65_prescl",&Jet65_prescl,"Jet65_prescl/I");
+  trigger_info->Branch("Jet55",&Jet55,"Jet55/I");
+  trigger_info->Branch("Jet55_prescl",&Jet55_prescl,"Jet55_prescl/I");
+  trigger_info->Branch("HIMinBias",&HIMinBias,"HIMinBias/I");
+  trigger_info->Branch("HIMinBias_prescl",&HIMinBias_prescl,"HIMinBias_prescl/I");  
   
   // prescl is calculated as the ratio of the 
   //minbias prescl = 38.695
@@ -467,6 +497,9 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   // jet55  prescl = 2.0475 (2.0292)
 
   // but these prescl values are derived from the triggered data sample, need to check if they are the same in the minbias sample 
+  // cout<<"total number of events with minbias trigger = "<<jetpbpb1[2][0]->GetEntries("HLT_HIMinBiasHfOrBSC_v1 && HLT_HIJet80_v1_Prescl==1")<<endl;
+  // cout<<" numerator   "<<jetpbpb1[2][0]->GetEntries("HLT_HIMinBiasHfOrBSC_v1 && HLT_HIJet80_v1_Prescl==1 && HLT_HIJet80_v1 && jtpt[0]>110 && TMath::Abs(jteta[0])<2")<<endl;
+  // cout<<" denominator "<<jetpbpb1[2][0]->GetEntries("HLT_HIMinBiasHfOrBSC_v1 && HLT_HIJet80_v1_Prescl==1 && jtpt[0]>110 && TMath::Abs(jteta[0])<2")<<endl;
 
   for(int k = 0;k<no_radius;k++){
 
@@ -497,29 +530,48 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
       Float_t largepT = pt_1[0];
       //cout<<"large pT = "<<largepT<<endl;
 
+      run_value = run_1;
+      evt_value = evt_1;
+      lumi_value = lumi_1;
+      
+      nref = nrefe_1;
+      Jet80 = jet80_1;
+      Jet80_prescl = jet80_p_1;
+      Jet65 = jet65_1;
+      Jet65_prescl = jet65_p_1;
+      Jet55 = jet55_1;
+      Jet55_prescl = jet55_p_1;
+      HIMinBias = jetMB_1;
+      HIMinBias_prescl = jetMB_p_1;
       for(int j = 0;j<nrefe_1;++j){
+
+	jetpt[j] = pt_1[j];
+	jeteta[j] = eta_1[j];
 	
 	if(TMath::Abs(eta_1[j])<2)
 	  if(largepT <= pt_1[j])
 	    largepT = pt_1[j];
 	
       }
+      trigger_info->Fill();
+      
+      
       //cout<<"after eta selection large pT = "<<largepT<<endl;
       
       //if(largepT!=test)cout<<"large pT is different in |eta|<2"<<endl;
 
-      hJet80_Prescl->Fill(jet80_p_1);
-      hJet65_Prescl->Fill(jet65_p_1);
-      hJet55_Prescl->Fill(jet55_p_1);
+      // hJet80_Prescl->Fill(jet80_p_1);
+      // hJet65_Prescl->Fill(jet65_p_1);
+      // hJet55_Prescl->Fill(jet55_p_1);
 
-      //if(l1MB_1 && jetMB_1) hJetMB->Fill(pt_1[0]);
-      if(jetMB_1==1 && jet80_p_1 == 1)hJetMB_80_1->Fill(largepT);
-      if(jetMB_1==1 && jet65_p_1 == 1)hJetMB_65_1->Fill(largepT);
-      if(jetMB_1==1 && jet55_p_1 == 1)hJetMB_55_1->Fill(largepT);
+      // //if(l1MB_1 && jetMB_1) hJetMB->Fill(pt_1[0]);
+      // if(jetMB_1==1)hJetMB_80_1->Fill(largepT);
+      // if(jetMB_1==1 && jet65_p_1 == 1)hJetMB_65_1->Fill(largepT);
+      // if(jetMB_1==1 && jet55_p_1 == 1)hJetMB_55_1->Fill(largepT);
 
-      if(jetMB_1==1 && jet80_1==1 && jet80_p_1 ==1 ) hJet80_JetMB->Fill(largepT);
-      if(jetMB_1==1 && jet65_1==1 && jet65_p_1 ==1 ) hJet65_JetMB->Fill(largepT);
-      if(jetMB_1==1 && jet55_1==1 && jet55_p_1 ==1 ) hJet55_JetMB->Fill(largepT);
+      // if(jetMB_1==1 && jet80_1==1) hJet80_JetMB->Fill(largepT);
+      // if(jetMB_1==1 && jet65_1==1 && jet65_p_1 ==1 ) hJet65_JetMB->Fill(largepT);
+      // if(jetMB_1==1 && jet55_1==1 && jet55_p_1 ==1 ) hJet55_JetMB->Fill(largepT);
       
       //if(printDebug && jentry%100==0) cout<<"MB prescl = "<<jetMB_p_1<<endl;
       //if(printDebug && jentry%100==0) cout<<"Jet 55 prescl = "<<jet55_p_1<<endl;
@@ -544,15 +596,18 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
   // TH1F * hL1SJ52_TrigTurnon = (TH1F*)hL1SJ52_JetMB->Clone("hL1SJ52_TrigTurnon");
   // hL1SJ52_TrigTurnon->Divide(hJetMB); 
- 
-if(Type=="Data"){
-    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  
+  if(Type=="Data"){
+    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_ntuple_SuperNovaRejected_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
     f.cd();
 
     //jets_ID->Write();
     //hJets->Write();
     //hEvents->Write();
-    
+
+    trigger_info->Write();
+
+#if 0
     hJetMB_55_1->Write();
     hJetMB_55_1->Print("base");
     hJetMB_65_1->Write();
@@ -599,7 +654,7 @@ if(Type=="Data"){
     // hJet80_TrigTurnon->Write();
     // hL1SJ36_TrigTurnon->Write();
     // hL1SJ52_TrigTurnon->Write();
-    
+#endif
   }
 
   if(Type=="MC"){

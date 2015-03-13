@@ -33,13 +33,15 @@ echo "Processing..."
 #root -b -q RAA_fragBiasCheck_pp_data.C\+\($startfile,$endfile\)
 
 #root -b -q RAA_read_MinBias.C\+\($startfile,$endfile\)
+#mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_ntuple_SuperNovaRejected_akPuCalo_20150311_1.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/.
 
-root -b -q RAA_read_mc_pp.C\+\($startfile,$endfile\)
+#root -b -q RAA_read_mc_pp.C\+\($startfile,$endfile\)
 
 #root -b -q RAA_read_data_pp.C\+\($startfile,$endfile\)
 #mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_akPF_20150127__$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/data/.
 
-#root -b -q RAA_calo_pf_JetCorrelation.C\+\($startfile,$endfile\)
+root -b -q RAA_calo_pf_JetCorrelation.C\+\($startfile,$endfile\)
+#mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150311_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/.
 
 #mv PbPb_data_ak3_Vs_20140820_$endfile.root ../../Output/.
 
