@@ -73,23 +73,25 @@ void RAA_plot_triggerTurnon(){
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
-  TFile * fin = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_akPuCalo_20150303.root");
+  TFile * fin = TFile::Open("/Users/raghavke/WORK/RAA/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_akPuCalo_20150309.root");
 
   TH1F * hJet80_MB = (TH1F*)fin->Get("hJet80_JetMB");
   TH1F * hJet65_MB = (TH1F*)fin->Get("hJet65_JetMB");
   TH1F * hJet55_MB = (TH1F*)fin->Get("hJet55_JetMB");
 
-  TH1F * hJetMB = (TH1F*)fin->Get("hJetMB");
+  TH1F * hJetMB_80_1 = (TH1F*)fin->Get("hJetMB_80_1");
+  TH1F * hJetMB_65_1 = (TH1F*)fin->Get("hJetMB_65_1_");
+  TH1F * hJetMB_55_1 = (TH1F*)fin->Get("hJetMB_55_1");
   //TH1F * hJet80 = (TH1F*)fin->Get("hJet80");
   //TH1F * hJet65 = (TH1F*)fin->Get("hJet65");
   //TH1F * hJet55 = (TH1F*)fin->Get("hJet55");
 
   TGraphAsymmErrors *hJet80_Turnon = new TGraphAsymmErrors;
-  hJet80_Turnon->BayesDivide(hJet80_MB,hJetMB);
+  hJet80_Turnon->BayesDivide(hJet80_MB,hJetMB_80_1);
   TGraphAsymmErrors *hJet65_Turnon = new TGraphAsymmErrors;
-  hJet65_Turnon->BayesDivide(hJet65_MB,hJetMB);
+  hJet65_Turnon->BayesDivide(hJet65_MB,hJetMB_65_1);
   TGraphAsymmErrors *hJet55_Turnon = new TGraphAsymmErrors;
-  hJet55_Turnon->BayesDivide(hJet55_MB,hJetMB);
+  hJet55_Turnon->BayesDivide(hJet55_MB,hJetMB_55_1);
 
   //TH1F * hTurnon_Jet55 = (TH1F*)hJet55_MB->Clone("hTurnon_Jet55");
   //hTurnon_Jet55->Divide(hJetMB);
