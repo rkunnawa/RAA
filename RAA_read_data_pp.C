@@ -108,8 +108,8 @@ static const char etaWidth [nbins_eta][256] = {
 };
 */
 
-static const int no_radius = 3;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {2,3,4};
+static const int no_radius = 2;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {3,5};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -363,6 +363,20 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
   //  jets_ID[k] = new TNtuple(Form("jets_R%d_ID",list_radius[k]),"","rawpt:jtpt:jet40:jet40_prescl:jet60:jet60_prescl:jet80:jet80_prescl:trgObjpt:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum:trkMax:trkSum");
   //}  
   //Float_t arrayValues[21];
+
+  TF1 * fResidual_0_eta_0p522 = new TF1("fResidual_0_eta_0p522","1 - [0]/pow(x,[1])");
+  fResidual_0_eta_0p522->SetParameter(0,0.0001950725);
+  fResidual_0_eta_0p522->SetParameter(0,-0.7253702207);
+  TF1 * fResidual_0p522_eta_1p044 = new TF1("fResidual_0p522_eta_1p044","1 - [0]/pow(x,[1])");
+  fResidual_0p522_eta_1p044->SetParameter(0, -0.0530616590);
+  fResidual_0p522_eta_1p044->SetParameter(0,0.6458308590);
+  TF1 * fResidual_1p044_eta_1p566 = new TF1("fResidual_1p044_eta_1p566","1 - [0]/pow(x,[1])");
+  fResidual_1p044_eta_1p566->SetParameter(0, -0.0361868092);
+  fResidual_1p044_eta_1p566->SetParameter(0, 0.3177377459);
+  TF1 * fResidual_1p566_eta_2p043 = new TF1("fResidual_1p566_eta_2p043","1 - [0]/pow(x,[1])");
+  fResidual_1p566_eta_2p043->SetParameter(0, -0.3569359074);
+  fResidual_1p566_eta_2p043->SetParameter(0, 0.4675646337);
+  
   
   for(int k = 0;k<no_radius;k++){
 
@@ -440,14 +454,19 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	  
 	  if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.6){
 	  //if(1>0){
-	  
+
+	    // if(eta_1[g] >= -0.522 && eta_1[g] < 0.522) pt_1[g] = pt_1[g] * fResidual_0_eta_0p522->Eval(pt_1[g]);
+	    // if((eta_1[g] >= -1.044 && eta_1[g] < -0.522) || (eta_1[g] <= 1.044 && eta_1[g] > 0.522)) pt_1[g] = pt_1[g] * fResidual_0p522_eta_1p044->Eval(pt_1[g]);
+	    // if((eta_1[g] >= -1.566 && eta_1[g] < -1.044) || (eta_1[g] <= 1.566 && eta_1[g] > 1.044)) pt_1[g] = pt_1[g] * fResidual_1p044_eta_1p566->Eval(pt_1[g]);
+	    // if((eta_1[g] >= -2.043 && eta_1[g] < -1.566) || (eta_1[g] <= 2.043 && eta_1[g] > 1.566)) pt_1[g] = pt_1[g] * fResidual_1p566_eta_2p043->Eval(pt_1[g]);
+	    
 	    if(jet80_1 && trgObj_pt_1>=80){
 	      hpp_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
 	    }
-	    if(jet60_1==1 && trgObj_pt_1>=65 && trgObj_pt_1<80){
+	    if(jet60_1==1 && trgObj_pt_1>=60 && trgObj_pt_1<80){
 	      hpp_Trg60[k][j]->Fill(pt_1[g],jet60_p_1);
 	    }
-	    if(jet40_1==1 && trgObj_pt_1>=55 && trgObj_pt_1<65){
+	    if(jet40_1==1 && trgObj_pt_1>=40 && trgObj_pt_1<60){
 	      hpp_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
 	    }
 	    
@@ -463,7 +482,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   TDatime date;
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_ak35%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   hEvents_HLT80->Write();

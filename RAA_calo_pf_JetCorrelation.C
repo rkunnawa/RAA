@@ -97,7 +97,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0){
+void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 9, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC"){
 
   TH1::SetDefaultSumw2();
 
@@ -113,9 +113,9 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
   // Since this has to run on the HiForest files, it is best to run them as condor jobs similar to the PbPb data read macro, along with the jet trees which get their branch address set. 
   
   std::string infile1;
-  infile1 = "jetRAA_PbPb_data_forest.txt";
-  //infile1 = "jetRAA_PbPb_mc_forest.txt";
-  //infile1 = "jetRAA_MinBiasUPC_forest.txt";
+  if(dataset == "Data")infile1 = "jetRAA_PbPb_data_forest.txt";
+  if(dataset == "MC")infile1 = "jetRAA_PbPb_mc_forest.txt";
+  if(dataset == "MinBiasUPC")infile1 = "jetRAA_MinBiasUPC_forest.txt";
   
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
@@ -201,6 +201,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
   int nrefe_1;
   float pt_1[1000];
   float raw_1[1000];
+  float refpt_1[1000];
   float eta_1[1000];
   float phi_1[1000];
   float chMax_1[1000];
@@ -218,11 +219,13 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
   float jtpu_1[1000];
   float hcalSum_1[1000];
   float ecalSum_1[1000];
+  float subid_1[1000];
   
   // jet tree 2 - PF
   int nrefe_2;
   float pt_2[1000];
   float raw_2[1000];
+  float refpt_2[1000];
   float eta_2[1000];
   float eta_2_CM[1000];
   float phi_2[1000];
@@ -241,6 +244,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
   float jtpu_2[1000];
   float hcalSum_2[1000];
   float ecalSum_2[1000];
+  float subid_2[1000];
   
   // event tree
   int evt_1;
@@ -277,8 +281,6 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
   int jet55_p_1;
   int jet65_p_1;
   int jet80_p_1;
-
-
 
   for(int k = 0;k<no_radius;k++){
     //set the branch addresses:  - one of the most boring parts of the code: 
@@ -343,6 +345,14 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
     jetpbpb1[3][k]->SetBranchAddress("ecalSum",&ecalSum_2);
     jetpbpb1[3][k]->SetBranchAddress("hcalSum",&hcalSum_2);
     
+    if(dataset=="MC"){
+
+      jetpbpb1[2][k]->SetBranchAddress("subid",&subid_1);
+      jetpbpb1[3][k]->SetBranchAddress("subid",&subid_2);
+      jetpbpb1[2][k]->SetBranchAddress("refpt",&refpt_1);
+      jetpbpb1[3][k]->SetBranchAddress("refpt",&refpt_2);
+
+    }
     
     //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_1);
     //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_1);
@@ -350,19 +360,22 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
     //jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
 
     // dont forget the include this for data and comment out the second set which is for MC. 
-    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v7",&jet55_1);
-    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v7_Prescl",&jet55_p_1);
-    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v7",&jet65_1);
-    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v7_Prescl",&jet65_p_1);
-    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v7",&jet80_1);
-    // jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v7_Prescl",&jet80_p_1);
-    
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1",&jet65_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1",&jet80_1);
-    jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_1);
+    if(dataset == "MC"){
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v7",&jet55_1);
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v7_Prescl",&jet55_p_1);
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v7",&jet65_1);
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v7_Prescl",&jet65_p_1);
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v7",&jet80_1);
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v7_Prescl",&jet80_p_1);
+    }
+    if(dataset=="Data" || dataset=="MinBiasUPC"){
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_1);
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1",&jet65_1);
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_1);
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1",&jet80_1);
+      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_1);
+    }
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND",&L1_sj36_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND_Prescl",&L1_sj36_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND",&L1_sj52_1);
@@ -434,6 +447,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
   Int_t evt_value;
   Int_t run_value;
   Int_t lumi_value;
+  Float_t subid, pfrawpt, calorawpt, pfrefpt, calorefpt, pfjtpu, calojtpu;
   
   TTree* matchJets = new TTree("matchedJets","Ntuple containing important information about matched jets");
   matchJets->Branch("calopt",&calopt,"calopt/F");   matchJets->Branch("phSum",&phSum,"phSum/F");
@@ -450,22 +464,49 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
   matchJets->Branch("run_value",&run_value,"run_value/I");
   matchJets->Branch("evt_value",&evt_value,"evt_value/I");
   matchJets->Branch("lumi_value",&lumi_value,"lumi_value/I");
+  if(dataset=="MC") matchJets->Branch("subid",&subid,"subid/F"); matchJets->Branch("pfrawpt",&pfrawpt,"pfrawpt/F");
+  if(dataset=="MC") matchJets->Branch("pfrefpt",&pfrefpt,"pfrefpt/F"); matchJets->Branch("pfjtpu",&pfjtpu,"pfjtpu/F");
+  if(dataset=="MC") matchJets->Branch("calorefpt",&calorefpt,"calorefpt/F");
+  matchJets->Branch("calorawpt",&calorawpt,"calorawpt/F");
+  matchJets->Branch("calojtpu",&calojtpu,"calojtpu/F");
   
-  TTree* unmatchJets = new TTree("unmatchedJets","Ntuple containing important information about unmatched PF jets");
-  unmatchJets->Branch("phSum",&phSum,"phSum/F");
-  unmatchJets->Branch("pfpt",&pfpt,"pfpt/F");         unmatchJets->Branch("neSum",&neSum,"neSum/F");
-  unmatchJets->Branch("deltar",&deltar,"deltar/F");   unmatchJets->Branch("muSum",&muSum,"muSum/F");
-  unmatchJets->Branch("chMax",&chMax,"chMax/F");      unmatchJets->Branch("eSum",&eSum,"eSum/F");
-  unmatchJets->Branch("phMax",&phMax,"phMax/F");      unmatchJets->Branch("hiBin",&hiBin,"hiBin/I");
-  unmatchJets->Branch("neMax",&neMax,"neMax/F");      unmatchJets->Branch("jet80",&jet80,"jet80/I");
-  unmatchJets->Branch("muMax",&muMax,"muMax/F");      unmatchJets->Branch("jet80_prescl",&jet80_prescl,"jet80_prescl/I");
-  unmatchJets->Branch("eMax",&eMax,"eMax/F");         unmatchJets->Branch("jet65",&jet65,"jet65/I");
-  unmatchJets->Branch("chSum",&chSum,"chSum/F");      unmatchJets->Branch("jet65_prescl",&jet65_prescl,"jet65_prescl/I");
-  unmatchJets->Branch("jet55",&jet55,"jet55/I");      unmatchJets->Branch("jet55_prescl",&jet55_prescl,"jet55_prescl/I");
-  unmatchJets->Branch("hcalSum",&hcalSum,"hcalSum/F");unmatchJets->Branch("ecalSum",&ecalSum,"ecalSum/F");
-  unmatchJets->Branch("run_value",&run_value,"run_value/I");
-  unmatchJets->Branch("evt_value",&evt_value,"evt_value/I");
-  unmatchJets->Branch("lumi_value",&lumi_value,"lumi_value/I");
+  TTree* unmatchPFJets = new TTree("unmatchedPFJets","Ntuple containing important information about unmatched PF jets");
+  unmatchPFJets->Branch("phSum",&phSum,"phSum/F");
+  unmatchPFJets->Branch("pfpt",&pfpt,"pfpt/F");         unmatchPFJets->Branch("neSum",&neSum,"neSum/F");
+  unmatchPFJets->Branch("deltar",&deltar,"deltar/F");   unmatchPFJets->Branch("muSum",&muSum,"muSum/F");
+  unmatchPFJets->Branch("chMax",&chMax,"chMax/F");      unmatchPFJets->Branch("eSum",&eSum,"eSum/F");
+  unmatchPFJets->Branch("phMax",&phMax,"phMax/F");      unmatchPFJets->Branch("hiBin",&hiBin,"hiBin/I");
+  unmatchPFJets->Branch("neMax",&neMax,"neMax/F");      unmatchPFJets->Branch("jet80",&jet80,"jet80/I");
+  unmatchPFJets->Branch("muMax",&muMax,"muMax/F");      unmatchPFJets->Branch("jet80_prescl",&jet80_prescl,"jet80_prescl/I");
+  unmatchPFJets->Branch("eMax",&eMax,"eMax/F");         unmatchPFJets->Branch("jet65",&jet65,"jet65/I");
+  unmatchPFJets->Branch("chSum",&chSum,"chSum/F");      unmatchPFJets->Branch("jet65_prescl",&jet65_prescl,"jet65_prescl/I");
+  unmatchPFJets->Branch("jet55",&jet55,"jet55/I");      unmatchPFJets->Branch("jet55_prescl",&jet55_prescl,"jet55_prescl/I");
+  unmatchPFJets->Branch("hcalSum",&hcalSum,"hcalSum/F");unmatchPFJets->Branch("ecalSum",&ecalSum,"ecalSum/F");
+  unmatchPFJets->Branch("run_value",&run_value,"run_value/I");
+  unmatchPFJets->Branch("evt_value",&evt_value,"evt_value/I");
+  unmatchPFJets->Branch("lumi_value",&lumi_value,"lumi_value/I");
+  if(dataset=="MC") unmatchPFJets->Branch("subid",&subid,"subid/F"); unmatchPFJets->Branch("pfrawpt",&pfrawpt,"pfrawpt/F");
+  if(dataset=="MC") unmatchPFJets->Branch("pfrefpt",&pfrefpt,"pfrefpt/F"); unmatchPFJets->Branch("pfjtpu",&pfjtpu,"pfjtpu/F");
+  
+  TTree* unmatchCaloJets = new TTree("unmatchedCaloJets","Ntuple containing important information about unmatched Calo jets");
+  unmatchCaloJets->Branch("phSum",&phSum,"phSum/F");
+  unmatchCaloJets->Branch("calopt",&pfpt,"pfpt/F");       unmatchCaloJets->Branch("neSum",&neSum,"neSum/F");
+  unmatchCaloJets->Branch("deltar",&deltar,"deltar/F");   unmatchCaloJets->Branch("muSum",&muSum,"muSum/F");
+  unmatchCaloJets->Branch("chMax",&chMax,"chMax/F");      unmatchCaloJets->Branch("eSum",&eSum,"eSum/F");
+  unmatchCaloJets->Branch("phMax",&phMax,"phMax/F");      unmatchCaloJets->Branch("hiBin",&hiBin,"hiBin/I");
+  unmatchCaloJets->Branch("neMax",&neMax,"neMax/F");      unmatchCaloJets->Branch("jet80",&jet80,"jet80/I");
+  unmatchCaloJets->Branch("muMax",&muMax,"muMax/F");      unmatchCaloJets->Branch("jet80_prescl",&jet80_prescl,"jet80_prescl/I");
+  unmatchCaloJets->Branch("eMax",&eMax,"eMax/F");         unmatchCaloJets->Branch("jet65",&jet65,"jet65/I");
+  unmatchCaloJets->Branch("chSum",&chSum,"chSum/F");      unmatchCaloJets->Branch("jet65_prescl",&jet65_prescl,"jet65_prescl/I");
+  unmatchCaloJets->Branch("jet55",&jet55,"jet55/I");      unmatchCaloJets->Branch("jet55_prescl",&jet55_prescl,"jet55_prescl/I");
+  unmatchCaloJets->Branch("hcalSum",&hcalSum,"hcalSum/F");unmatchCaloJets->Branch("ecalSum",&ecalSum,"ecalSum/F");
+  unmatchCaloJets->Branch("run_value",&run_value,"run_value/I");
+  unmatchCaloJets->Branch("evt_value",&evt_value,"evt_value/I");
+  unmatchCaloJets->Branch("lumi_value",&lumi_value,"lumi_value/I");
+  if(dataset=="MC") unmatchCaloJets->Branch("subid",&subid,"subid/F"); 
+  if(dataset=="MC") unmatchCaloJets->Branch("calorefpt",&calorefpt,"calorefpt/F");
+  unmatchCaloJets->Branch("calorawpt",&calorawpt,"calorawpt/F");
+  unmatchCaloJets->Branch("calojtpu",&calojtpu,"calojtpu/F");
 
   
   //for the Jet 55 spectra: 
@@ -490,7 +531,8 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
       
       int centBin = findBin(hiBin_1);
 
-      if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
+      //if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
+      if(pcollisionEventSelection_1==0) continue; 
 
       if(fabs(vz_1)>15) continue;
       //cout<<"passed the selection"<<endl;
@@ -584,7 +626,30 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
 	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(0.0); // 16 - this is the variable which will tell me if a jet is matched.
 	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(hcalSum_2[j]); // 17 - hcalSum 
 	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(ecalSum_2[j]); // 18 - hcalSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(raw_2[j]); // 19 - raw pt
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(jtpu_2[j]); // 20 - jtpu
+	  //all the following candidate information is for the calo jets 
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(chMax_1[j]); // 21 - chMax 
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(phMax_1[j]); // 22 - phMax
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(neMax_1[j]); // 23 - neMax
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(muMax_1[j]); // 24 - muMax
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(eMax_1[j]); // 25 - eMax
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(chSum_1[j]); // 26 - chSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(phSum_1[j]); // 27 - phSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(neSum_1[j]); // 28 - neSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(muSum_1[j]); // 29 - muSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(eSum_1[j]); // 30 - eSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(hcalSum_1[j]); // 31 - hcalSum 
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(ecalSum_1[j]); // 32 - hcalSum
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(raw_1[j]); // 33 - raw pt
+	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(jtpu_1[j]); // 34 - jtpu
 
+	  if(dataset=="MC") {
+	    deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(refpt_1[j]); // 34 calo ref pt 
+	    deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(refpt_2[j]); // 35 pf ref pt 
+	    deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(subid_2[j]); // 36 - subid only for MC
+	  }
+	  
 	  ++pfmatchcounter;
 
 	}// pf jet loop
@@ -592,9 +657,9 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
 	
       }// calo jet loop
 
-      // if(printDebug)cout<<deltaR_calovsPF.size()<<endl;
-      // if(printDebug)for(int a = 0;a<deltaR_calovsPF.size();++a) cout<<deltaR_calovsPF[a].size()<<" ";
-      // if(printDebug)cout<<"going to small matching"<<endl;
+      if(printDebug)cout<<deltaR_calovsPF.size()<<endl;
+      if(printDebug)for(int a = 0;a<deltaR_calovsPF.size();++a) cout<<deltaR_calovsPF[a].size()<<" ";
+      if(printDebug)cout<<endl<<"going to small matching"<<endl;
       
       // now that we have the 2D matrix, lets find the smallest delta R element from that and fill in the value of the 
 
@@ -626,6 +691,15 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
 	
 	calopt = deltaR_calovsPF[small_calo][small_pf][3];
 	pfpt = deltaR_calovsPF[small_calo][small_pf][5];
+	if(dataset=="MC"){
+	  pfrefpt = deltaR_calovsPF[small_calo][small_pf][35];
+	  calorefpt = deltaR_calovsPF[small_calo][small_pf][34];
+	  subid = deltaR_calovsPF[small_calo][small_pf][36]; 
+	}
+	pfrawpt = deltaR_calovsPF[small_calo][small_pf][19]; 
+	calorawpt = deltaR_calovsPF[small_calo][small_pf][33]; 
+	pfjtpu = deltaR_calovsPF[small_calo][small_pf][20]; 
+	calojtpu = deltaR_calovsPF[small_calo][small_pf][34];
 	deltar = deltaR_calovsPF[small_calo][small_pf][0];
 	chMax = deltaR_calovsPF[small_calo][small_pf][6];
 	phMax = deltaR_calovsPF[small_calo][small_pf][7];
@@ -689,17 +763,23 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
 
       }// running it for the number of calo jets: 
 
-      //if(printDebug)cout<<"now going to find unmatched pf jets"<<endl;
+      if(printDebug)cout<<"now going to find unmatched pf jets"<<endl;
       // ok Now lets find the un-matched jets and fill the necessary unmatched ntuple:
 
       if(deltaR_calovsPF.size() == 0) continue;
       for(int b = 0;b<deltaR_calovsPF[0].size();++b){
-	//if(printDebug)cout<<"pf jet iteration "<<b<<endl;
+	if(printDebug)cout<<"pf jet iteration "<<b<<endl;
 
 	if(deltaR_calovsPF[0][b][16] == 1) continue;
 
 	pfpt = deltaR_calovsPF[0][b][5];
 	deltar = deltaR_calovsPF[0][b][0];
+	if(dataset=="MC"){
+	  pfrefpt = deltaR_calovsPF[0][b][35];
+	  subid = deltaR_calovsPF[0][b][36]; 
+	}
+	pfrawpt = deltaR_calovsPF[0][b][19]; 
+	pfjtpu = deltaR_calovsPF[0][b][20]; 
 	chMax = deltaR_calovsPF[0][b][6];
 	phMax = deltaR_calovsPF[0][b][7];
 	neMax = deltaR_calovsPF[0][b][8];
@@ -723,21 +803,69 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 10, int radius=
 	hcalSum = deltaR_calovsPF[0][b][17];
 	ecalSum = deltaR_calovsPF[0][b][18];
 	
-	unmatchJets->Fill();
+	unmatchPFJets->Fill();
 	
+      }// unmatched PF jets
+      
+      if(printDebug)cout<<"now going to find unmatched calo jets"<<endl;
+
+      if(deltaR_calovsPF[0].size() == 0) continue;
+      
+      for(int a = 0;a<deltaR_calovsPF.size();++a){
+	if(printDebug)cout<<"calo jet iteration "<<a<<endl;
+
+	if(deltaR_calovsPF[a][0][16] == 1) continue;
+
+	calopt = deltaR_calovsPF[a][0][3];
+	deltar = deltaR_calovsPF[a][0][0];
+	if(dataset=="MC"){
+	  calorefpt = deltaR_calovsPF[a][0][34];
+	  subid = deltaR_calovsPF[a][0][36]; 
+	}
+	calorawpt = deltaR_calovsPF[a][0][33]; 
+	calojtpu = deltaR_calovsPF[a][0][34]; 
+	chMax = deltaR_calovsPF[a][0][21];
+	phMax = deltaR_calovsPF[a][0][22];
+	neMax = deltaR_calovsPF[a][0][23];
+	muMax = deltaR_calovsPF[a][0][24];
+	eMax = deltaR_calovsPF[a][0][25];
+	chSum = deltaR_calovsPF[a][0][26];
+	phSum = deltaR_calovsPF[a][0][27];
+	neSum = deltaR_calovsPF[a][0][28];
+	muSum = deltaR_calovsPF[a][0][29];
+	eSum = deltaR_calovsPF[a][0][30];
+	hiBin = hiBin_1;
+	jet80 = jet80_1;
+	jet80_prescl = jet80_p_1;
+	jet65 = jet65_1;
+	jet65_prescl = jet65_p_1;
+	jet55 = jet55_1;
+	jet55_prescl = jet55_p_1;
+	run_value = run_1;
+	evt_value = evt_1;
+	lumi_value = lumi_1;
+	hcalSum = deltaR_calovsPF[a][0][31];
+	ecalSum = deltaR_calovsPF[a][0][32];
+	
+	unmatchCaloJets->Fill();
+
       }
 
     }// event loop 
 
   }// radius loop
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
-  //TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d_test.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
+  //TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
+
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_%s_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d_test.root",dataset,deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
   f.cd();
+
   matchJets->Write();
   matchJets->Print();
-  unmatchJets->Write();
-  unmatchJets->Print();
+  unmatchPFJets->Write();
+  unmatchPFJets->Print();
+  unmatchCaloJets->Write();
+  unmatchCaloJets->Print();
   //unmatch_CaloJets->Write();
   //unmatch_CaloJets->Print();
   

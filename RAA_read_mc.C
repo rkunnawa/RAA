@@ -325,7 +325,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
+void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   
   TStopwatch timer;
   timer.Start();
@@ -423,7 +423,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   fVz->SetParameters(9.86748e-01, -8.91367e-03, 5.35416e-04, 2.67665e-06, -2.01867e-06);
 
   //get the centrality weight from the root file created in the plotting macro. 
-  TFile *fcentin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_DataMC_cent_ratio_20141117.root");
+  TFile *fcentin = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_DataMC_cent_ratio_20141117.root");
   TH1F *hCentWeight = (TH1F*)fcentin->Get("hCentRatio");
 
   // lets declare all the histograms here. 
@@ -508,7 +508,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   
   
   
-//declare the output file 
+  //declare the output file 
   //TNtuple *jets_ID = new TNtuple("jets_ID","","rawpt:refpt:jtpt:jtpu:jet55:jet55_prescl:jet65:jet65_prescl:jet80:jet80_prescl:scale:weight_vz:weight_cent:cent:subid:chMax:chSum:phMax:phSum:neMax:neSum:muMax:muSum:eMax:eSum");
   //Float_t arrayValues[25];
 
@@ -729,7 +729,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   for(int k = 0;k<no_radius;k++){
     if(printDebug)cout<<"Radius = "<<list_radius[k]<<endl;
     if(printDebug)cout<<"reading all the pbpb mc files"<<endl;
-    for (int h=0;h<nbins_pthat;h++) {
+    for (int h=0;h<endfile;h++) {
       //cout<<Form("ak%s%dJetAnalyzer/t",algo,list_radius[k])<<endl;
       data[k][h] = new JetData(fileName_pthat[h],Form("ak%s%d%sJetAnalyzer/t",algo,list_radius[k],jet_type),Form("ak%s%d%sJetAnalyzer/t",algo,list_radius[k],jet_type),0,1);
       //cout<<"A"<<endl;
@@ -748,7 +748,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   if(printDebug)hPtHatRaw[0]->Print("base");
   // if(printDebug)hPtHatRawPP[0]->Print("base");
 
-
+#if 0
 
   //plots for the jet ID (hopefully final check) // will be the same in Data and MC
   TH1F *hpbpb_Jet80 = new TH1F("hpbpb_Jet80","",100,0,300);
@@ -853,6 +853,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   TH1F* hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02","",100,0,300);
   TH1F* hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03","",100,0,300);
 
+#endif
   TH2F* hpbpb_chMaxJtpt_jtpt = new TH2F("hpbpb_chMaxJtpt_jtpt","",100,0,300,500,0,5);
   TH2F* hpbpb_eMaxJtpt_jtpt = new TH2F("hpbpb_eMaxJtpt_jtpt","",100,0,300,500,0,5);
   TH2F* hpbpb_eMaxSumcand_jtpt = new TH2F("hpbpb_eMaxSumcand_jtpt","",100,0,300,1000,0,10);
@@ -870,9 +871,12 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   TH2F* hpbpb_muMaxJtpt_jtpt_ptselection[trigValue][ptSelection];
   TH2F* hpbpb_eMaxSumcand_jtpt_ptselection[trigValue][ptSelection];
   TH2F* hpbpb_eMaxSumcand_jtpt_refptselection[trigValue][ptSelection];
+  TH2F* hpbpb_eMaxSumcand_jtpt_refANDjtptselection[trigValue][ptSelection];
   TH2F* hpbpb_eMaxSumcand_refpt_refptselection[trigValue][ptSelection];
   TH2F* hpbpb_eMaxSumcand_chMaxJtpt_ptselection[trigValue][ptSelection];
-  TH2F* hpbpb_eMaxSumcand_chMaxJtpt_refptselection[trigValue][ptSelection];
+  TH2F* hpbpb_eMaxSumcand_chMaxJtpt_refANDjtptselection[trigValue][ptSelection];
+  TH2F* hpbpb_eMaxSumcand_eMaxJtpt_ptselection[trigValue][ptSelection];
+  TH2F* hpbpb_eMaxSumcand_eMaxJtpt_refANDjtptselection[trigValue][ptSelection];
   TH2F* hpbpb_eMaxJtpt_chMaxJtpt_ptselection[trigValue][ptSelection];
   TH2F* hpbpb_neMaxJtpt_chMaxJtpt_ptselection[trigValue][ptSelection];
   TH2F* hpbpb_phMaxJtpt_chMaxJtpt_ptselection[trigValue][ptSelection];
@@ -890,9 +894,12 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
       hpbpb_neMaxJtpt_chMaxJtpt_ptselection[t][a] = new TH2F(Form("hpbpb_neMaxJtpt_chMaxJtpt_%d_jtpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",500,0,5,500,0,5);
       hpbpb_muMaxJtpt_chMaxJtpt_ptselection[t][a] = new TH2F(Form("hpbpb_muMaxJtpt_chMaxJtpt_%d_jtpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",500,0,5,500,0,5);
       hpbpb_eMaxSumcand_chMaxJtpt_ptselection[t][a] = new TH2F(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_jtpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",500,0,5,1000,0,10);
-      hpbpb_eMaxSumcand_chMaxJtpt_refptselection[t][a] = new TH2F(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_refpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",500,0,5,1000,0,10);
+      hpbpb_eMaxSumcand_chMaxJtpt_refANDjtptselection[t][a] = new TH2F(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_refANDjtpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",500,0,5,1000,0,10);
+      hpbpb_eMaxSumcand_eMaxJtpt_ptselection[t][a] = new TH2F(Form("hpbpb_eMaxSumcand_eMaxJtpt_%d_jtpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",500,0,5,1000,0,10);
+      hpbpb_eMaxSumcand_eMaxJtpt_refANDjtptselection[t][a] = new TH2F(Form("hpbpb_eMaxSumcand_eMaxJtpt_%d_refANDjtpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",500,0,5,1000,0,10);
       hpbpb_eMaxSumcand_jtpt_ptselection[t][a] = new TH2F(Form("hpbpb_eMaxSumcand_jtpt_%d_jtpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",100,0,300,1000,0,10);
       hpbpb_eMaxSumcand_jtpt_refptselection[t][a] = new TH2F(Form("hpbpb_eMaxSumcand_jtpt_%d_refpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",100,0,300,1000,0,10);
+      hpbpb_eMaxSumcand_jtpt_refANDjtptselection[t][a] = new TH2F(Form("hpbpb_eMaxSumcand_jtpt_%d_refANDjtpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",100,0,300,1000,0,10);
       hpbpb_eMaxSumcand_refpt_refptselection[t][a] = new TH2F(Form("hpbpb_eMaxSumcand_refpt_%d_refpt_%d_%s",ptBoundary[a],ptBoundary[a+1],trigName[t]),"",100,0,300,1000,0,10);
 
     }
@@ -904,7 +911,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
     // fill PbPb MC 
     if(printDebug)cout<<"Filling PbPb MC"<<endl;
 
-    for (int h=0;h<nbins_pthat;h++) {
+    for (int h=0;h<endfile;h++) {
       int goodCounter = 0;
 
       if (xsection[h]==0) continue;
@@ -924,7 +931,8 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
       int test_counter = 0; 
 
       Int_t nEntries = data[k][h]->tJet->GetEntries();
-      //if(printDebug) nEntries = 2;
+      //if(printDebug) nEntries = 10;
+
       for (Long64_t jentry=0; jentry<nEntries;jentry++) {
 	
         data[k][h]->tEvt->GetEntry(jentry);
@@ -1137,18 +1145,24 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 		    hpbpb_muMaxJtpt_chMaxJtpt_ptselection[2][a]->Fill(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g],data[k][h]->muMax[g]/data[k][h]->jtpt[g]);
 		    hpbpb_eMaxSumcand_chMaxJtpt_ptselection[2][a]->Fill(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
 		    hpbpb_eMaxSumcand_jtpt_ptselection[2][a]->Fill(data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
-		    hpbpb_eMaxSumcand_jtpt_ptselection[2][a]->Fill(data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
 		    hpbpb_eMaxJtpt_jtpt_ptselection[2][a]->Fill(data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->jtpt[g]));
 		    hpbpb_chMaxJtpt_jtpt_ptselection[2][a]->Fill(data[k][h]->jtpt[g],data[k][h]->chargedMax[g]/(data[k][h]->jtpt[g]));
 		    hpbpb_phMaxJtpt_jtpt_ptselection[2][a]->Fill(data[k][h]->jtpt[g],data[k][h]->photonMax[g]/(data[k][h]->jtpt[g]));
 		    hpbpb_neMaxJtpt_jtpt_ptselection[2][a]->Fill(data[k][h]->jtpt[g],data[k][h]->neutralMax[g]/(data[k][h]->jtpt[g]));
 		    hpbpb_muMaxJtpt_jtpt_ptselection[2][a]->Fill(data[k][h]->jtpt[g],data[k][h]->muMax[g]/(data[k][h]->jtpt[g]));
+		    
+		    hpbpb_eMaxSumcand_eMaxJtpt_ptselection[2][a]->Fill(data[k][h]->eMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		    if(data[k][h]->refpt[g] >= ptBoundary[a] && data[k][h]->refpt[g] < ptBoundary[a+1]){
+		      hpbpb_eMaxSumcand_chMaxJtpt_refANDjtptselection[2][a]->Fill(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		      hpbpb_eMaxSumcand_eMaxJtpt_refANDjtptselection[2][a]->Fill(data[k][h]->eMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		      hpbpb_eMaxSumcand_jtpt_refANDjtptselection[2][a]->Fill(data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		    }
+		   
 		  }
 		  if(data[k][h]->refpt[g] >= ptBoundary[a] && data[k][h]->refpt[g] < ptBoundary[a+1]){
-		    hpbpb_eMaxSumcand_chMaxJtpt_refptselection[2][a]->Fill(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
-		    hpbpb_eMaxSumcand_refpt_refptselection[2][a]->Fill(data[k][h]->refpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
 		    hpbpb_eMaxSumcand_jtpt_refptselection[2][a]->Fill(data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
 		  }
+		  
 		}
 
 		if(data[k][h]->jet65_1 && !data[k][h]->jet80_1){
@@ -1166,10 +1180,16 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 		    hpbpb_phMaxJtpt_jtpt_ptselection[1][a]->Fill(data[k][h]->jtpt[g],data[k][h]->photonMax[g]/(data[k][h]->jtpt[g]));
 		    hpbpb_neMaxJtpt_jtpt_ptselection[1][a]->Fill(data[k][h]->jtpt[g],data[k][h]->neutralMax[g]/(data[k][h]->jtpt[g]));
 		    hpbpb_muMaxJtpt_jtpt_ptselection[1][a]->Fill(data[k][h]->jtpt[g],data[k][h]->muMax[g]/(data[k][h]->jtpt[g]));
+
+		    hpbpb_eMaxSumcand_eMaxJtpt_ptselection[1][a]->Fill(data[k][h]->eMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		    if(data[k][h]->refpt[g] >= ptBoundary[a] && data[k][h]->refpt[g] < ptBoundary[a+1]){
+		      hpbpb_eMaxSumcand_chMaxJtpt_refANDjtptselection[1][a]->Fill(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		      hpbpb_eMaxSumcand_eMaxJtpt_refANDjtptselection[1][a]->Fill(data[k][h]->eMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		      hpbpb_eMaxSumcand_jtpt_refANDjtptselection[1][a]->Fill(data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		    }
+		    
 		  }
 		  if(data[k][h]->refpt[g] >= ptBoundary[a] && data[k][h]->refpt[g] < ptBoundary[a+1]){
-		    hpbpb_eMaxSumcand_chMaxJtpt_refptselection[1][a]->Fill(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
-		    hpbpb_eMaxSumcand_refpt_refptselection[1][a]->Fill(data[k][h]->refpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
 		    hpbpb_eMaxSumcand_jtpt_refptselection[1][a]->Fill(data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
 		  }
 		}
@@ -1190,16 +1210,22 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 		    hpbpb_phMaxJtpt_jtpt_ptselection[0][a]->Fill(data[k][h]->jtpt[g],data[k][h]->photonMax[g]/(data[k][h]->jtpt[g]));
 		    hpbpb_neMaxJtpt_jtpt_ptselection[0][a]->Fill(data[k][h]->jtpt[g],data[k][h]->neutralMax[g]/(data[k][h]->jtpt[g]));
 		    hpbpb_muMaxJtpt_jtpt_ptselection[0][a]->Fill(data[k][h]->jtpt[g],data[k][h]->muMax[g]/(data[k][h]->jtpt[g]));
+
+		    hpbpb_eMaxSumcand_eMaxJtpt_ptselection[0][a]->Fill(data[k][h]->eMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		    if(data[k][h]->refpt[g] >= ptBoundary[a] && data[k][h]->refpt[g] < ptBoundary[a+1]){
+		      hpbpb_eMaxSumcand_chMaxJtpt_refANDjtptselection[0][a]->Fill(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		      hpbpb_eMaxSumcand_eMaxJtpt_refANDjtptselection[0][a]->Fill(data[k][h]->eMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		      hpbpb_eMaxSumcand_jtpt_refANDjtptselection[0][a]->Fill(data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
+		    }
 		  }
 		  if(data[k][h]->refpt[g] >= ptBoundary[a] && data[k][h]->refpt[g] < ptBoundary[a+1]){
-		    hpbpb_eMaxSumcand_chMaxJtpt_refptselection[0][a]->Fill(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
-		    hpbpb_eMaxSumcand_refpt_refptselection[0][a]->Fill(data[k][h]->refpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
 		    hpbpb_eMaxSumcand_jtpt_refptselection[0][a]->Fill(data[k][h]->jtpt[g],data[k][h]->eMax[g]/(data[k][h]->chargedSum[g] + data[k][h]->photonSum[g] + data[k][h]->neutralSum[g] + data[k][h]->muSum[g]));
 		  }
 		}
 
 	      }
-	    
+
+#if 0
 	      if(data[k][h]->jet80_1){
 		hpbpb_Jet80->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.01)hpbpb_Jet80_chMaxJtpt0p01->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
@@ -1315,7 +1341,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
 		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.02 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 		if(data[k][h]->chargedMax[g]/data[k][h]->jtpt[g]>0.03 && data[k][h]->eMax[g]/data[k][h]->jtpt[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Fill(data[k][h]->jtpt[g],scale*weight_vz*weight_cent);
 	      }
-
+#endif
 	    }
 	  
 #if 0
@@ -1511,9 +1537,9 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   }
   
 
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_ak%s%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
-
+#if 0
   hpbpb_Jet80_chMaxJtpt0p01->Divide(hpbpb_Jet80);
   hpbpb_Jet80_chMaxJtpt0p01->Write();
   hpbpb_Jet80_chMaxJtpt0p02->Divide(hpbpb_Jet80);
@@ -1720,6 +1746,7 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
   hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Divide(hpbpb_Jet55);
   hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Write();
 
+  #endif
   hpbpb_chMaxJtpt_jtpt->Write();
   hpbpb_eMaxJtpt_jtpt->Write();
   hpbpb_eMaxJtpt_chMaxJtpt->Write();
@@ -1738,9 +1765,13 @@ void RAA_read_mc(char *algo = "Pu", char *jet_type = "PF", int sub_id = 0){
       hpbpb_neMaxJtpt_jtpt_ptselection[t][a]->Write();
       hpbpb_muMaxJtpt_jtpt_ptselection[t][a]->Write();
       hpbpb_eMaxJtpt_jtpt_ptselection[t][a]->Write();
-      hpbpb_eMaxSumcand_chMaxJtpt_refptselection[t][a]->Write();
+      //hpbpb_eMaxSumcand_chMaxJtpt_refptselection[t][a]->Write();
       hpbpb_eMaxSumcand_jtpt_refptselection[t][a]->Write();
       hpbpb_eMaxSumcand_refpt_refptselection[t][a]->Write();
+      hpbpb_eMaxSumcand_eMaxJtpt_refANDjtptselection[t][a]->Write();
+      hpbpb_eMaxSumcand_eMaxJtpt_ptselection[t][a]->Write();
+      hpbpb_eMaxSumcand_chMaxJtpt_refANDjtptselection[t][a]->Write();
+      hpbpb_eMaxSumcand_jtpt_refANDjtptselection[t][a]->Write();
     }
   }
 

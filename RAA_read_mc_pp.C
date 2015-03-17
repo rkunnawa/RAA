@@ -79,7 +79,7 @@ static const char etaWidth [nbins_eta][256] = {
 
 
 static const int no_radius = 1;//testing purposes 
-static const int list_radius[no_radius] = {4};
+static const int list_radius[no_radius] = {5};
 
 // divide by bin width
 void divideBinWidth(TH1 *h){
