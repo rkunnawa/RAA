@@ -74,15 +74,13 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
   
-  TFile *fData = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_data_akPuPF_20150308.root");
-  TFile *fMC = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_mc_akPuPF_20150308.root");
+  TFile *fData = TFile::Open("/Users/raghavke/WORK/RAA/Output/PbPb_data_akPuPF_20150313.root");
+  TFile *fMC = TFile::Open("/Users/raghavke/WORK/RAA/Output/PbPb_mc_akPuPF_20150313_9.root");
 
   //get the 2d histograms 
   static const int ptSelection = 19;
   static const int ptBoundary[ptSelection+1] = {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200};
 
-
-#if 0
   TH2F* hData_chMaxJtpt_jtpt_ptselection[ptSelection];
   TH2F* hData_eMaxJtpt_jtpt_ptselection[ptSelection];
   TH2F* hData_phMaxJtpt_jtpt_ptselection[ptSelection];
@@ -92,12 +90,12 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   //TH2F* hData_eMaxSumcand_jtpt_refptselection[ptSelection];
   //TH2F* hData_eMaxSumcand_refpt_refptselection[ptSelection];
   TH2F* hData_eMaxSumcand_chMaxJtpt_ptselection[ptSelection];
+  TH2F* hData_eMaxSumcand_eMaxJtpt_ptselection[ptSelection];
   //TH2F* hData_eMaxSumcand_chMaxJtpt_refptselection[ptSelection];
   TH2F* hData_eMaxJtpt_chMaxJtpt_ptselection[ptSelection];
   TH2F* hData_neMaxJtpt_chMaxJtpt_ptselection[ptSelection];
   TH2F* hData_phMaxJtpt_chMaxJtpt_ptselection[ptSelection];
   TH2F* hData_muMaxJtpt_chMaxJtpt_ptselection[ptSelection];
-
   
   TH2F* hMC_chMaxJtpt_jtpt_ptselection[ptSelection];
   TH2F* hMC_eMaxJtpt_jtpt_ptselection[ptSelection];
@@ -105,48 +103,54 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   TH2F* hMC_neMaxJtpt_jtpt_ptselection[ptSelection];
   TH2F* hMC_muMaxJtpt_jtpt_ptselection[ptSelection];
   TH2F* hMC_eMaxSumcand_jtpt_ptselection[ptSelection];
-  TH2F* hMC_eMaxSumcand_jtpt_refptselection[ptSelection];
+  TH2F* hMC_eMaxSumcand_jtpt_refANDjtptselection[ptSelection];
   TH2F* hMC_eMaxSumcand_refpt_refptselection[ptSelection];
   TH2F* hMC_eMaxSumcand_chMaxJtpt_ptselection[ptSelection];
-  TH2F* hMC_eMaxSumcand_chMaxJtpt_refptselection[ptSelection];
+  TH2F* hMC_eMaxSumcand_chMaxJtpt_refANDjtptselection[ptSelection];
+  TH2F* hMC_eMaxSumcand_eMaxJtpt_ptselection[ptSelection];
+  TH2F* hMC_eMaxSumcand_eMaxJtpt_refANDjtptselection[ptSelection];
   TH2F* hMC_eMaxJtpt_chMaxJtpt_ptselection[ptSelection];
+  TH2F* hMC_eMaxJtpt_chMaxJtpt_refANDjtptselection[ptSelection];
   TH2F* hMC_neMaxJtpt_chMaxJtpt_ptselection[ptSelection];
   TH2F* hMC_phMaxJtpt_chMaxJtpt_ptselection[ptSelection];
   TH2F* hMC_muMaxJtpt_chMaxJtpt_ptselection[ptSelection];
   
   //TCanvas *cchMaxJtpt_jtpt[ptSelection], *cphMaxJtpt_jtpt[ptSelection], *cneMaxJtpt_jtpt[ptSelection], *cmuMaxJtpt_jtpt[ptSelection], *ceMaxJtpt_jtpt[ptSelection], *ceMaxSumcand_jtpt[ptSelection];
-  TCanvas *ceMaxSumcand_chMaxJtpt[ptSelection], *ceMaxJtpt_chMaxJtpt[ptSelection], *cphMaxJtpt_chMaxJtpt[ptSelection], *cneMaxJtpt_chMaxJtpt[ptSelection], *cmuMaxJtpt_chMaxJtpt[ptSelection];
+  TCanvas *ceMaxSumcand_eMaxJtpt[ptSelection], *ceMaxSumcand_chMaxJtpt[ptSelection], *ceMaxJtpt_chMaxJtpt[ptSelection], *cphMaxJtpt_chMaxJtpt[ptSelection], *cneMaxJtpt_chMaxJtpt[ptSelection], *cmuMaxJtpt_chMaxJtpt[ptSelection];
   TH2F *hData_chMaxJtpt_jtpt, *hData_phMaxJtpt_jtpt, *hData_neMaxJtpt_jtpt, *hData_muMaxJtpt_jtpt, *hData_eMaxJtpt_jtpt, *hData_eMaxSumcand_jtpt;
-  TH2F *hMC_chMaxJtpt_jtpt, *hMC_phMaxJtpt_jtpt, *hMC_neMaxJtpt_jtpt, *hMC_muMaxJtpt_jtpt, *hMC_eMaxJtpt_jtpt, *hMC_eMaxSumcand_jtpt_jtpt, *hMC_eMaxSumcand_jtpt_refpt, *hMC_eMaxSumcand_refpt_refpt;
+  TH2F *hMC_chMaxJtpt_jtpt, *hMC_phMaxJtpt_jtpt, *hMC_neMaxJtpt_jtpt, *hMC_muMaxJtpt_jtpt, *hMC_eMaxJtpt_jtpt, *hMC_eMaxSumcand_jtpt_jtpt, *hMC_eMaxSumcand_jtpt_refANDjtpt, *hMC_eMaxSumcand_refpt_refpt;
   
   for(int a = 0;a<ptSelection;a++){
 
-    hData_chMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_chMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hData_phMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_phMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hData_neMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_neMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hData_muMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_muMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hData_eMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_eMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hData_eMaxSumcand_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_eMaxSumcand_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hData_eMaxSumcand_chMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hData_eMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_eMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hData_neMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_neMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hData_phMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_phMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hData_muMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_muMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
+    hData_chMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_chMaxJtpt_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_phMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_phMaxJtpt_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_neMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_neMaxJtpt_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_muMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_muMaxJtpt_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_eMaxJtpt_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_eMaxJtpt_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_eMaxSumcand_jtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_eMaxSumcand_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_eMaxSumcand_chMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_eMaxSumcand_eMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_eMaxSumcand_eMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_eMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_eMaxJtpt_chMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_neMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_neMaxJtpt_chMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_phMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_phMaxJtpt_chMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hData_muMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fData->Get(Form("hpbpb_muMaxJtpt_chMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
 
-    hMC_chMaxJtpt_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_chMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_phMaxJtpt_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_phMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_neMaxJtpt_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_neMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_muMaxJtpt_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_muMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_eMaxJtpt_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_eMaxSumcand_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_eMaxSumcand_jtpt_refptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_jtpt_%d_refpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_eMaxSumcand_refpt_refptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_refpt_%d_refpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_eMaxSumcand_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_eMaxSumcand_chMaxJtpt_refptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_refpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_eMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_neMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_neMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_phMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_phMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-    hMC_muMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_muMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
+    hMC_chMaxJtpt_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_chMaxJtpt_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_phMaxJtpt_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_phMaxJtpt_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_neMaxJtpt_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_neMaxJtpt_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_muMaxJtpt_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_muMaxJtpt_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_eMaxJtpt_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxJtpt_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_eMaxSumcand_jtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_jtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_eMaxSumcand_jtpt_refANDjtptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_jtpt_%d_refANDjtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_eMaxSumcand_refpt_refptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_refpt_%d_refpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_eMaxSumcand_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_eMaxSumcand_chMaxJtpt_refANDjtptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_chMaxJtpt_%d_refANDjtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_eMaxSumcand_eMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_eMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_eMaxSumcand_eMaxJtpt_refANDjtptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxSumcand_eMaxJtpt_%d_refANDjtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_eMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_eMaxJtpt_chMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_neMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_neMaxJtpt_chMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_phMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_phMaxJtpt_chMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
+    hMC_muMaxJtpt_chMaxJtpt_ptselection[a] = (TH2F*)fMC->Get(Form("hpbpb_muMaxJtpt_chMaxJtpt_%d_jtpt_%d_HLT80",ptBoundary[a],ptBoundary[a+1]));
 
     if(a == 0) {
       hData_chMaxJtpt_jtpt = (TH2F*)hData_chMaxJtpt_jtpt_ptselection[a]->Clone(Form("hpbpb_chMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
@@ -161,7 +165,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
       hMC_muMaxJtpt_jtpt = (TH2F*)hMC_muMaxJtpt_jtpt_ptselection[a]->Clone(Form("hpbpb_muMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
       hMC_eMaxJtpt_jtpt = (TH2F*)hMC_eMaxJtpt_jtpt_ptselection[a]->Clone(Form("hpbpb_eMaxJtpt_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
       hMC_eMaxSumcand_jtpt_jtpt = (TH2F*)hMC_eMaxSumcand_jtpt_ptselection[a]->Clone(Form("hpbpb_eMaxSumcand_jtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]));
-      hMC_eMaxSumcand_jtpt_refpt = (TH2F*)hMC_eMaxSumcand_jtpt_refptselection[a]->Clone(Form("hpbpb_eMaxSumcand_jtpt_%d_refpt_%d",ptBoundary[a],ptBoundary[a+1]));
+      hMC_eMaxSumcand_jtpt_refANDjtpt = (TH2F*)hMC_eMaxSumcand_jtpt_refANDjtptselection[a]->Clone(Form("hpbpb_eMaxSumcand_jtpt_%d_refANDjtpt_%d",ptBoundary[a],ptBoundary[a+1]));
       hMC_eMaxSumcand_refpt_refpt = (TH2F*)hMC_eMaxSumcand_refpt_refptselection[a]->Clone(Form("hpbpb_eMaxSumcand_refpt_%d_refpt_%d",ptBoundary[a],ptBoundary[a+1]));
 
     } else {
@@ -177,13 +181,13 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
       hMC_muMaxJtpt_jtpt->Add(hMC_muMaxJtpt_jtpt_ptselection[a]);
       hMC_eMaxJtpt_jtpt->Add(hMC_eMaxJtpt_jtpt_ptselection[a]);
       hMC_eMaxSumcand_jtpt_jtpt->Add(hMC_eMaxSumcand_jtpt_ptselection[a]);
-      hMC_eMaxSumcand_jtpt_refpt->Add(hMC_eMaxSumcand_jtpt_refptselection[a]);
+      hMC_eMaxSumcand_jtpt_refANDjtpt->Add(hMC_eMaxSumcand_jtpt_refANDjtptselection[a]);
       hMC_eMaxSumcand_refpt_refpt->Add(hMC_eMaxSumcand_refpt_refptselection[a]);
     }
 
   }
 
-
+#if 0
   TCanvas * ceMaxSumcand_jtpt = new TCanvas("ceMaxSumcand_jtpt","",1200,800);
   makeMultiPanelCanvas(ceMaxSumcand_jtpt,4,1,0.0,0.0,0.2,0.15,0.07);
   ceMaxSumcand_jtpt->cd(1)->SetLogz();
@@ -210,7 +214,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_eMaxSumcand_refpt_refpt->SetYTitle("eMax/Sumcand");
   hMC_eMaxSumcand_refpt_refpt->Draw("colz");
   drawText("MC 0-30%, 10 < refpt < 200",0.3,0.8,14);
-  ceMaxSumcand_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_jtpt_10_pt_200.pdf","RECREATE");
+  ceMaxSumcand_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_jtpt_10_pt_200.pdf","RECREATE");
 
   TCanvas * ceMaxJtpt_jtpt = new TCanvas("ceMaxJtpt_jtpt","",1200,800);
   makeMultiPanelCanvas(ceMaxJtpt_jtpt,2,1,0.0,0.0,0.2,0.15,0.07);
@@ -226,7 +230,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_eMaxJtpt_jtpt->SetYTitle("eMax/Sumcand");
   hMC_eMaxJtpt_jtpt->Draw("colz");
   drawText("MC 0-30%, 10 < jtpt < 200",0.3,0.8,14);
-  ceMaxJtpt_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_eMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
+  ceMaxJtpt_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_eMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
 
   TCanvas * cchMaxJtpt_jtpt = new TCanvas("cchMaxJtpt_jtpt","",1200,800);
   makeMultiPanelCanvas(cchMaxJtpt_jtpt,2,1,0.0,0.0,0.2,0.15,0.07);
@@ -242,7 +246,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_chMaxJtpt_jtpt->SetYTitle("eMax/Sumcand");
   hMC_chMaxJtpt_jtpt->Draw("colz");
   drawText("MC 0-30%, 10 < jtpt < 200",0.3,0.8,14);
-  cchMaxJtpt_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_chMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
+  cchMaxJtpt_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_chMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
 
   TCanvas * cneMaxJtpt_jtpt = new TCanvas("cneMaxJtpt_jtpt","",1200,800);
   makeMultiPanelCanvas(cneMaxJtpt_jtpt,2,1,0.0,0.0,0.2,0.15,0.07);
@@ -258,7 +262,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_neMaxJtpt_jtpt->SetYTitle("eMax/Sumcand");
   hMC_neMaxJtpt_jtpt->Draw("colz");
   drawText("MC 0-30%, 10 < jtpt < 200",0.3,0.8,14);
-  cneMaxJtpt_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_neMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
+  cneMaxJtpt_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_neMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
 
   TCanvas * cphMaxJtpt_jtpt = new TCanvas("cphMaxJtpt_jtpt","",1200,800);
   makeMultiPanelCanvas(cphMaxJtpt_jtpt,2,1,0.0,0.0,0.2,0.15,0.07);
@@ -274,7 +278,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_phMaxJtpt_jtpt->SetYTitle("eMax/Sumcand");
   hMC_phMaxJtpt_jtpt->Draw("colz");
   drawText("MC 0-30%, 10 < jtpt < 200",0.3,0.8,14);
-  cphMaxJtpt_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_phMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
+  cphMaxJtpt_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_phMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
   
   TCanvas * cmuMaxJtpt_jtpt = new TCanvas("cmuMaxJtpt_jtpt","",1200,800);
   makeMultiPanelCanvas(cmuMaxJtpt_jtpt,2,1,0.0,0.0,0.2,0.15,0.07);
@@ -290,10 +294,43 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_muMaxJtpt_jtpt->SetYTitle("eMax/Sumcand");
   hMC_muMaxJtpt_jtpt->Draw("colz");
   drawText("MC 0-30%, 10 < jtpt < 200",0.3,0.8,14);
-  cmuMaxJtpt_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_muMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
-
+  cmuMaxJtpt_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_muMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
+#endif
   
   for(int a = 3;a<ptSelection;a++){
+
+    ceMaxSumcand_eMaxJtpt[a] = new TCanvas(Form("ceMaxSumcand_eMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
+    makeMultiPanelCanvas(ceMaxSumcand_eMaxJtpt[a],3,1,0.0,0.0,0.2,0.15,0.07);
+    ceMaxSumcand_eMaxJtpt[a]->cd(1)->SetLogz();
+    hData_eMaxSumcand_eMaxJtpt_ptselection[a]->SetTitle(" ");
+    hData_eMaxSumcand_eMaxJtpt_ptselection[a]->SetXTitle("eMax/jtpt");
+    hData_eMaxSumcand_eMaxJtpt_ptselection[a]->SetYTitle("eMax/Sumcand");
+    hData_eMaxSumcand_eMaxJtpt_ptselection[a]->RebinX(5);
+    hData_eMaxSumcand_eMaxJtpt_ptselection[a]->RebinY(10);
+    hData_eMaxSumcand_eMaxJtpt_ptselection[a]->SetAxisRange(0,1.5,"X");
+    hData_eMaxSumcand_eMaxJtpt_ptselection[a]->Draw("colz");
+    drawText("Data",0.45,0.7,15);
+    drawText(Form("%d < reco pt < %d",ptBoundary[a],ptBoundary[a+1]),0.3,0.8,15);
+    ceMaxSumcand_eMaxJtpt[a]->cd(2)->SetLogz();
+    hMC_eMaxSumcand_eMaxJtpt_ptselection[a]->SetXTitle("eMax/jtpt");
+    hMC_eMaxSumcand_eMaxJtpt_ptselection[a]->SetYTitle("eMax/Sumcand");
+    hMC_eMaxSumcand_eMaxJtpt_ptselection[a]->RebinX(5);
+    hMC_eMaxSumcand_eMaxJtpt_ptselection[a]->RebinY(10);
+    hMC_eMaxSumcand_eMaxJtpt_ptselection[a]->SetAxisRange(0,1.5,"X");
+    hMC_eMaxSumcand_eMaxJtpt_ptselection[a]->Draw("colz");
+    drawText(Form("%d < reco pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
+    drawText("MC",0.45,0.7,15);
+    ceMaxSumcand_eMaxJtpt[a]->cd(3)->SetLogz();
+    hMC_eMaxSumcand_eMaxJtpt_refANDjtptselection[a]->SetXTitle("eMax/jtpt");
+    hMC_eMaxSumcand_eMaxJtpt_refANDjtptselection[a]->SetYTitle("eMax/Sumcand");
+    hMC_eMaxSumcand_eMaxJtpt_refANDjtptselection[a]->RebinX(5);
+    hMC_eMaxSumcand_eMaxJtpt_refANDjtptselection[a]->RebinY(10);
+    hMC_eMaxSumcand_eMaxJtpt_refANDjtptselection[a]->SetAxisRange(0,1.5,"X");
+    hMC_eMaxSumcand_eMaxJtpt_refANDjtptselection[a]->Draw("colz");
+    drawText(Form("%d < ref, jet pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
+    drawText("MC",0.45,0.7,15);
+    ceMaxSumcand_eMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_eMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+
     ceMaxSumcand_chMaxJtpt[a] = new TCanvas(Form("ceMaxSumcand_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
     makeMultiPanelCanvas(ceMaxSumcand_chMaxJtpt[a],3,1,0.0,0.0,0.2,0.15,0.07);
     ceMaxSumcand_chMaxJtpt[a]->cd(1)->SetLogz();
@@ -316,15 +353,15 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     drawText(Form("%d < reco pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
     ceMaxSumcand_chMaxJtpt[a]->cd(3)->SetLogz();
-    hMC_eMaxSumcand_chMaxJtpt_refptselection[a]->SetXTitle("chMax/jtpt");
-    hMC_eMaxSumcand_chMaxJtpt_refptselection[a]->SetYTitle("eMax/Sumcand");
-    hMC_eMaxSumcand_chMaxJtpt_refptselection[a]->RebinX(5);
-    hMC_eMaxSumcand_chMaxJtpt_refptselection[a]->RebinY(10);
-    hMC_eMaxSumcand_chMaxJtpt_refptselection[a]->SetAxisRange(0,1.5,"X");
-    hMC_eMaxSumcand_chMaxJtpt_refptselection[a]->Draw("colz");
-    drawText(Form("%d < ref pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
+    hMC_eMaxSumcand_chMaxJtpt_refANDjtptselection[a]->SetXTitle("chMax/jtpt");
+    hMC_eMaxSumcand_chMaxJtpt_refANDjtptselection[a]->SetYTitle("eMax/Sumcand");
+    hMC_eMaxSumcand_chMaxJtpt_refANDjtptselection[a]->RebinX(5);
+    hMC_eMaxSumcand_chMaxJtpt_refANDjtptselection[a]->RebinY(10);
+    hMC_eMaxSumcand_chMaxJtpt_refANDjtptselection[a]->SetAxisRange(0,1.5,"X");
+    hMC_eMaxSumcand_chMaxJtpt_refANDjtptselection[a]->Draw("colz");
+    drawText(Form("%d < ref, jet pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    ceMaxSumcand_chMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_chMaxJtpt_%d_jtpt_%d.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+    ceMaxSumcand_chMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
 
     ceMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("ceMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
     makeMultiPanelCanvas(ceMaxJtpt_chMaxJtpt[a],2,1,0.0,0.0,0.2,0.15,0.07);
@@ -347,13 +384,13 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_eMaxJtpt_chMaxJtpt_ptselection[a]->Draw("colz");
     drawText(Form("%d < reco pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    // ceMaxJtpt_chMaxJtpt[a]->cd(3)->SetLogz();
-    // hMC_eMaxJtpt_chMaxJtpt_refptselection[a]->SetXTitle("chMax/jtpt");
-    // hMC_eMaxJtpt_chMaxJtpt_refptselection[a]->SetYTitle("eMax/Sumcand");
-    // hMC_eMaxJtpt_chMaxJtpt_refptselection[a]->Draw("colz");
-    // drawText(Form("%d < ref pt < %d",ptSelection[a],ptSelection[a+1]),0.2,0.8,15);
-    // drawText("MC",0.45,0.7,15);
-    ceMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_eMaxJtpt_chMaxJtpt_%d_jtpt_%d.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+    ceMaxJtpt_chMaxJtpt[a]->cd(3)->SetLogz();
+    hMC_eMaxJtpt_chMaxJtpt_refANDjtptselection[a]->SetXTitle("chMax/jtpt");
+    hMC_eMaxJtpt_chMaxJtpt_refANDjtptselection[a]->SetYTitle("eMax/Sumcand");
+    hMC_eMaxJtpt_chMaxJtpt_refANDjtptselection[a]->Draw("colz");
+    drawText(Form("%d < ref, reco pt < %d",ptSelection[a],ptSelection[a+1]),0.2,0.8,15);
+    drawText("MC",0.45,0.7,15);
+    ceMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_eMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
 
     cneMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cneMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
     makeMultiPanelCanvas(cneMaxJtpt_chMaxJtpt[a],2,1,0.0,0.0,0.2,0.15,0.07);
@@ -376,8 +413,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_neMaxJtpt_chMaxJtpt_ptselection[a]->Draw("colz");
     drawText(Form("%d < reco pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    cneMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_neMaxJtpt_chMaxJtpt_%d_jtpt_%d.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
-
+    cneMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_neMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
 
     cphMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cphMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
     makeMultiPanelCanvas(cphMaxJtpt_chMaxJtpt[a],2,1,0.0,0.0,0.2,0.15,0.07);
@@ -400,7 +436,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_phMaxJtpt_chMaxJtpt_ptselection[a]->Draw("colz");
     drawText(Form("%d < reco pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    cphMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_phMaxJtpt_chMaxJtpt_%d_jtpt_%d.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+    cphMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_phMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
 
     //cmuMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cmuMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
     cmuMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cmuMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
@@ -424,13 +460,13 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_muMaxJtpt_chMaxJtpt_ptselection[a]->Draw("colz");
     drawText(Form("%d < reco pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    cmuMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_muMaxJtpt_chMaxJtpt_%d_jtpt_%d.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+    cmuMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_muMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
     
   }
 
   //TCanvas *cchMaxJtpt_jtpt
 
-
+#if 0
   
   //get the histograms:
   TH1F* hData_Jet80 = (TH1F*)fData->Get("hpbpb_Jet80");
@@ -978,7 +1014,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet55_SumcandData->AddEntry(hData_Jet55_eMaxSumcand0p9," 0.9 ","pl");
   Jet55_SumcandData->Draw();
 
-  cSumcandData->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_data_eMaxSumcand_ratio_plot.pdf","RECREATE");
+  cSumcandData->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_data_eMaxSumcand_ratio_plot.pdf","RECREATE");
 
   //make the plot from the sumcand - 2x2 plot
   TCanvas *cSumcandMC = new TCanvas("cSumcandMC","",1200,1000);
@@ -1187,7 +1223,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet55_SumcandMC->AddEntry(hMC_Jet55_eMaxSumcand0p9," 0.9 ","pl");
   Jet55_SumcandMC->Draw();
 
-  cSumcandMC->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_MC_eMaxSumcand_ratio_plot.pdf","RECREATE");
+  cSumcandMC->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_MC_eMaxSumcand_ratio_plot.pdf","RECREATE");
 
 
   // lets start making the plots 3 plots, data on top MC at the bottom: 
@@ -1542,7 +1578,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet55_eMax_chMax->AddEntry(hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet55_eMax_chMax->Draw();
 
-  cJet55->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet55_spectra_ratio_jetid.pdf","RECREATE");
+  cJet55->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jet55_spectra_ratio_jetid.pdf","RECREATE");
 
 
 
@@ -1894,7 +1930,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet65_eMax_chMax->AddEntry(hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet65_eMax_chMax->Draw();
 
-  cJet65->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet65_spectra_ratio_jetid.pdf","RECREATE");
+  cJet65->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jet65_spectra_ratio_jetid.pdf","RECREATE");
 
   
   TCanvas * cJet80 = new TCanvas("cJet80","",1200,1000);
@@ -2245,10 +2281,12 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet80_eMax_chMax->AddEntry(hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet80_eMax_chMax->Draw();
 
-  cJet80->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet80_spectra_ratio_jetid.pdf","RECREATE");
+  cJet80->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jet80_spectra_ratio_jetid.pdf","RECREATE");
 
-#endif 
+#endif
   
+#if 0
+  cout<<" plotting the jet ID variables now"<<endl;
   // get the pfcand variables before and after the cut and take ratio:
 
   TH1F* hMC_chMax[nbins_cent], * hMC_phMax[nbins_cent], * hMC_neMax[nbins_cent], * hMC_muMax[nbins_cent], * hMC_eMax[nbins_cent];
@@ -2269,6 +2307,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   TH1F * hRatio_Data_chSum[nbins_cent], * hRatio_Data_phSum[nbins_cent], * hRatio_Data_neSum[nbins_cent], * hRatio_Data_muSum[nbins_cent], * hRatio_Data_eSum[nbins_cent];
   
   for(int i = 0;i<nbins_cent;++i){
+
+    cout<<"centrality bin = "<<i<<endl;
 
     hMC_chMax[i] = (TH1F*)fMC->Get(Form("hpbpb_chMax_R3_n20_eta_p20_cent%d",i));
     hMC_phMax[i] = (TH1F*)fMC->Get(Form("hpbpb_phMax_R3_n20_eta_p20_cent%d",i));
@@ -2293,7 +2333,6 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_neSum_withCut[i] = (TH1F*)fMC->Get(Form("hpbpb_neSum_withCut_R3_n20_eta_p20_cent%d",i));
     hMC_muSum_withCut[i] = (TH1F*)fMC->Get(Form("hpbpb_muSum_withCut_R3_n20_eta_p20_cent%d",i));
     hMC_eSum_withCut[i] = (TH1F*)fMC->Get(Form("hpbpb_eSum_withCut_R3_n20_eta_p20_cent%d",i));
-
     
     hData_chMax[i] = (TH1F*)fData->Get(Form("hpbpb_chMax_R3_n20_eta_p20_cent%d",i));
     hData_phMax[i] = (TH1F*)fData->Get(Form("hpbpb_phMax_R3_n20_eta_p20_cent%d",i));
@@ -2718,6 +2757,8 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   cData_neSum_ratio->SaveAs("","RECREATE");
   cData_muSum_ratio->SaveAs("","RECREATE");
   cData_eSum_ratio->SaveAs("","RECREATE");
+
+#endif
   
   //
   timer.Stop();
