@@ -49,6 +49,7 @@
 //static const double boundaries_fileno_job[job_no+1] = {0, 413, 826, 1239, 1652, 2065, 2478, 2891, 3304, 3717, 4130, 4542};
 
 #define NOBJECT_MAX 16384
+#define pi 3.14159265
 
 static const int nbins_pt = 39;
 static const double boundaries_pt[nbins_pt+1] = {
@@ -107,10 +108,10 @@ static const char etaWidth [nbins_eta][256] = {
 
 static const int nbins_cent = 6;
 static Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 5 to get your actual centrality
-static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8 ,362.24}; //last one is for 0-200 bin. 
+static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8, 362.24}; //last one is for 0-200 bin. 
 
-static const int no_radius = 4;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {2,3,4,5};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -137,7 +138,7 @@ void divideBinWidth(TH1 *h)
 }
 
 int findBin(int hiBin){
-  int binNo = 0;
+  int binNo = -1;
 
   for(int i = 0;i<nbins_cent;i++){
     if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
@@ -149,10 +150,18 @@ int findBin(int hiBin){
   return binNo;
 }
 
+double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
+{
+  float deta = eta1 - eta2;
+  float dphi = fabs(phi1 - phi2);
+  if(dphi > pi)dphi -= 2*pi;
+  double dr = sqrt(pow(deta,2) + pow(dphi,2));
+  return dr;
+}
 
 using namespace std;
 
-void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Vs", char *jet_type = "Calo", char *Type = "Data"){
+void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "PF", char *Type = "Data"){
 
   TH1::SetDefaultSumw2();
   
@@ -169,8 +178,8 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Vs", cha
   std::string infile1;
   if(Type=="MC")infile1 = "PbPb_HydjetMinBias_forest.txt";
   //if(Type=="Data")infile1 = "PbPb_MinBiasUPC_forest.txt";
-  //if(Type=="Data")infile1 = "jetRAA_MinBiasUPC_forest.txt";
-  if(Type=="Data")infile1 = "14010_MinBiasUPC_forest.txt";
+  if(Type=="Data")infile1 = "jetRAA_MinBiasUPC_forest.txt";
+  //if(Type=="Data")infile1 = "14010_MinBiasUPC_forest.txt";
   
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
@@ -381,6 +390,10 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Vs", cha
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND_Prescl",&L1_sj36_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND",&L1_sj52_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND_Prescl",&L1_sj52_p_1);
+
+    jetpbpb1[4][k]->SetBranchAddress("pt",&trgObj_pt_1);
+    jetpbpb1[4][k]->SetBranchAddress("eta",&trgObj_eta_1);
+    jetpbpb1[4][k]->SetBranchAddress("phi",&trgObj_phi_1);
     
     /*
     jetpbpb1[2][k]->SetBranchAddress("nPFpart", &nPFpart);
@@ -546,46 +559,73 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Vs", cha
 
       if(fabs(vz_1)>15) continue;
       
+      if(jetMB_1==0 || jet80_p_1==0 || jet65_p_1 || jet55_p_1)  continue;
+
       hEvents->Fill(1);
-      
-      Float_t largepT = pt_1[0];
-      //cout<<"large pT = "<<largepT<<endl;
 
+      if(nrefe_1 > 40) continue;
       
+      // Float_t largepT = pt_1[0];
+      // //cout<<"large pT = "<<largepT<<endl;
+      // Float_t deltaR = 0;
+      // Float_t small_deltaR = 100.;
+      // Int_t small_position = 0;
+      // // find the jet thats matched with the trigger object in delta R. 
+      // for(int j = 0;j<nrefe_1;++j){
+
+      // 	deltaR = Calc_deltaR(eta_1[j],phi_1[j], trgObj_eta_1, trgObj_phi_1);
+	
+      // 	if(deltaR < small_deltaR){
+	  
+      // 	  small_deltaR = deltaR;
+      // 	  small_position = j;
+	  
+      // 	}
+
+      // }
+
+      // Float_t deltaR_leading = Calc_deltaR(eta_1[0],phi_1[0], trgObj_eta_1, trgObj_phi_1);
+
+      //if(trgObj_pt_1 != -99)cout<<" JetMB = "<<jetMB_1<<" Jet80 = "<<jet80_1<<" Jet65 = "<<jet65_1<<" Jet55 = "<<jet55_1<<endl;
+      //if(trgObj_pt_1 != -99)cout<<" Trigger object pt =  "<<trgObj_pt_1<<", matched jet pt = "<<pt_1[small_position]<<", deltaR = "<<small_deltaR<<", leading jet pt = "<<pt_1[0]<<", delta R with leading jet = "<<deltaR_leading<<endl;
+
+      // hDenominator[k]->Fill(pt_1[small_position]);
+      
+      // if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[small_position], jet80_p_1); 
+      // if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[small_position], jet65_p_1); 
+      // if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[small_position], jet55_p_1);
+
+      // now the jet which is matched with the trigger object is the jet at position 
       for(int j = 0;j<nrefe_1;++j){
-	
-	// if(jetMB_1==1 && jet80_p_1==1 && jet65_p_1==1 && jet55_p_1==1) {
 
-	//   //if(chMax_1[j]/pt_1[j] < 0.02 || eMax_1[j]/pt_1[j]>0.6) continue; 
-	  
+	//if(chMax_1[j]/pt_1[j] < 0.02 || eMax_1[j]/pt_1[j]>0.6) continue; 
+	
+	hDenominator[k]->Fill(pt_1[j]);
+	
+	if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[j]); 
+	if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[j]); 
+	if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[j]);
+	
+	//if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[j]);
+	//if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[j]);
+	
+
+	// if(jetMB_1==1 && jet80_p_1==1) {
+	
 	//   hDenominator[k]->Fill(pt_1[j]);
-  
+	  
 	//   if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[j]); 
-	//   if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[j]); 
-	//   if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[j]);
-
-	//   if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[j]);
-	//   if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[j]);
-	
+	//   // if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[0]); 
+	//   // if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[0]);
+	  
+	//   // if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[0]);
+	//   // if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[0]);
+	  
 	// }
-
-	if(jetMB_1==1 && jet80_p_1==1) {
-	
-	  hDenominator[k]->Fill(pt_1[j]);
-	  
-	  if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[j]); 
-	  // if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[0]); 
-	  // if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[0]);
-	  
-	  // if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[0]);
-	  // if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[0]);
-	  
-	}
 	
 	
       }
 	
-      
       //trigger_info->Fill();
 
 
@@ -632,7 +672,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Vs", cha
   // hL1SJ52_TrigTurnon->Divide(hJetMB); 
   
   if(Type=="Data"){
-    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_14010_MinBiasUPC_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
     f.cd();
 
     //jets_ID->Write();

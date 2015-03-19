@@ -53,7 +53,7 @@ void RAA_plot_triggerTurnon_v3() {
     638, 686, 1000
   };
 
-  TFile * fin = TFile::Open("../../Output/PbPb_14010_MinBiasUPC_akVsCalo_20150318.root");
+  TFile * fin = TFile::Open("../../Output/PbPb_14010_MinBiasUPC_akPuPF_20150319.root");
   
   TH1F * hDenominator_R3  = (TH1F*)fin->Get("hDenominator_R3");
   TH1F * hDenominator_R4  = (TH1F*)fin->Get("hDenominator_R4");
@@ -110,7 +110,7 @@ void RAA_plot_triggerTurnon_v3() {
   gr_turnon_jet80_R5->Draw("psame");
   leg->Draw();
 
-  c3->SaveAs("../../Plots/trigger_turnon_hlt80_pbpb_14010_akVsCalo.pdf","RECREATE");
+  c3->SaveAs("../../Plots/trigger_turnon_hlt80_pbpb_14010_akPuPF.pdf","RECREATE");
 
 
 

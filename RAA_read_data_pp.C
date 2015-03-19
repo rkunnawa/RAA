@@ -80,36 +80,25 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 
-static const int nbins_eta = 1;
+static const int nbins_eta = 5;
 static const double boundaries_eta[nbins_eta][2] = {
-  {0.0,2.0}
+  {0.0,0.5},
+  {0.5,1.0},
+  {1.0,1.5},
+  {1.5,2.0},
+  {2.0,2.5},
 };
 
 static const double delta_eta[nbins_eta] = {
-  4.0
+  1.0,1.0,1.0,1.0,1.0
 };
 
 static const char etaWidth [nbins_eta][256] = {
-  "0_absEta_20"
+  "0_absEta_05", "05_absEta_10", "10_absEta_15", "15_absEta_20", "20_absEta_25" 
 };
 
-/*
-static const int nbins_eta = 1;
-static const double boundaries_eta[nbins_eta][2] = {
-  {-2.0,+2.0}
-};
-
-static const double delta_eta[nbins_eta] = {
-  4.0
-};
-
-static const char etaWidth [nbins_eta][256] = {
-  "n20_eta_p20"
-};
-*/
-
-static const int no_radius = 2;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3,5};
+static const int no_radius = 4;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4,5};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -197,6 +186,21 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
   TH1F *hpp_Trg40[no_radius][nbins_eta];
   TH1F *hpp_TrgComb[no_radius][nbins_eta];
 
+  TH1F *hpp_chMaxcut_Trg80[no_radius][nbins_eta];
+  TH1F *hpp_chMaxcut_Trg60[no_radius][nbins_eta];
+  TH1F *hpp_chMaxcut_Trg40[no_radius][nbins_eta];
+  TH1F *hpp_chMaxcut_TrgComb[no_radius][nbins_eta];
+
+  TH1F *hpp_eMaxcut_Trg80[no_radius][nbins_eta];
+  TH1F *hpp_eMaxcut_Trg60[no_radius][nbins_eta];
+  TH1F *hpp_eMaxcut_Trg40[no_radius][nbins_eta];
+  TH1F *hpp_eMaxcut_TrgComb[no_radius][nbins_eta];
+  
+  TH1F *hpp_residual_Trg80[no_radius][nbins_eta];
+  TH1F *hpp_residual_Trg60[no_radius][nbins_eta];
+  TH1F *hpp_residual_Trg40[no_radius][nbins_eta];
+  TH1F *hpp_residual_TrgComb[no_radius][nbins_eta];
+
   TH1F * hchMax[no_radius][nbins_eta];
   TH1F * hphMax[no_radius][nbins_eta];
   TH1F * hneMax[no_radius][nbins_eta];
@@ -218,6 +222,22 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
       hpp_Trg40[k][j] = new TH1F(Form("hpp_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
       hpp_TrgComb[k][j] = new TH1F(Form("hpp_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
 
+      hpp_chMaxcut_Trg80[k][j] = new TH1F(Form("hpp_chMaxcut_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_chMaxcut_Trg60[k][j] = new TH1F(Form("hpp_chMaxcut_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_chMaxcut_Trg40[k][j] = new TH1F(Form("hpp_chMaxcut_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_chMaxcut_TrgComb[k][j] = new TH1F(Form("hpp_chMaxcut_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+
+      hpp_eMaxcut_Trg80[k][j] = new TH1F(Form("hpp_eMaxcut_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_eMaxcut_Trg60[k][j] = new TH1F(Form("hpp_eMaxcut_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_eMaxcut_Trg40[k][j] = new TH1F(Form("hpp_eMaxcut_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_eMaxcut_TrgComb[k][j] = new TH1F(Form("hpp_eMaxcut_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+
+      
+      hpp_residual_Trg80[k][j] = new TH1F(Form("hpp_residual_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_residual_Trg60[k][j] = new TH1F(Form("hpp_residual_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_residual_Trg40[k][j] = new TH1F(Form("hpp_residual_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_residual_TrgComb[k][j] = new TH1F(Form("hpp_residual_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      
       hchMax[k][j] = new TH1F(Form("chMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
       hphMax[k][j] = new TH1F(Form("phMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
       hneMax[k][j] = new TH1F(Form("neMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
@@ -366,16 +386,16 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
   TF1 * fResidual_0_eta_0p522 = new TF1("fResidual_0_eta_0p522","1 - [0]/pow(x,[1])");
   fResidual_0_eta_0p522->SetParameter(0,0.0001950725);
-  fResidual_0_eta_0p522->SetParameter(0,-0.7253702207);
+  fResidual_0_eta_0p522->SetParameter(1,-0.7253702207);
   TF1 * fResidual_0p522_eta_1p044 = new TF1("fResidual_0p522_eta_1p044","1 - [0]/pow(x,[1])");
   fResidual_0p522_eta_1p044->SetParameter(0, -0.0530616590);
-  fResidual_0p522_eta_1p044->SetParameter(0,0.6458308590);
+  fResidual_0p522_eta_1p044->SetParameter(1,0.6458308590);
   TF1 * fResidual_1p044_eta_1p566 = new TF1("fResidual_1p044_eta_1p566","1 - [0]/pow(x,[1])");
   fResidual_1p044_eta_1p566->SetParameter(0, -0.0361868092);
-  fResidual_1p044_eta_1p566->SetParameter(0, 0.3177377459);
+  fResidual_1p044_eta_1p566->SetParameter(1, 0.3177377459);
   TF1 * fResidual_1p566_eta_2p043 = new TF1("fResidual_1p566_eta_2p043","1 - [0]/pow(x,[1])");
   fResidual_1p566_eta_2p043->SetParameter(0, -0.3569359074);
-  fResidual_1p566_eta_2p043->SetParameter(0, 0.4675646337);
+  fResidual_1p566_eta_2p043->SetParameter(1, 0.4675646337);
   
   
   for(int k = 0;k<no_radius;k++){
@@ -408,7 +428,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 
 	for(int g = 0;g<nrefe_1;g++){
 
-	  if(TMath::Abs(eta_1[g])<boundaries_eta[j][0] || TMath::Abs(eta_1[g])>boundaries_eta[j][1]) continue;
+	  if(fabs(eta_1[g]) < boundaries_eta[j][0] || fabs(eta_1[g])>boundaries_eta[j][1]) continue;
 
 #if 0
 	  arrayValues[0] = raw_1[g];
@@ -440,6 +460,7 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	  //if((neMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (phMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/pt_1[g]>0.05) && (muMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9)){
 	  //if(eSum_1[g]/(chSum_1[g]+neSum_1[g]+phSum_1[g]+muSum_1[g])<0.7){
 
+#if 0
 	  hchMax[k][j]->Fill(chMax_1[g]);
 	  hphMax[k][j]->Fill(phMax_1[g]);
 	  hneMax[k][j]->Fill(neMax_1[g]);
@@ -451,27 +472,66 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
 	  hneSum[k][j]->Fill(neSum_1[g]);
 	  heSum[k][j]->Fill(eSum_1[g]);
 	  hmuSum[k][j]->Fill(muSum_1[g]);
+
+	  if(jet80_1 && trgObj_pt_1>=80){
+	    hpp_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
+	  }
+	  if(jet60_1==1 && trgObj_pt_1>=60 && trgObj_pt_1<80){
+	    hpp_Trg60[k][j]->Fill(pt_1[g],jet60_p_1);
+	  }
+	  if(jet40_1==1 && trgObj_pt_1>=40 && trgObj_pt_1<60){
+	    hpp_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
+	  }
 	  
-	  if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.6){
+	  
+	  if(chMax_1[g]/pt_1[g]>0.02){
 	  //if(1>0){
 
-	    // if(eta_1[g] >= -0.522 && eta_1[g] < 0.522) pt_1[g] = pt_1[g] * fResidual_0_eta_0p522->Eval(pt_1[g]);
-	    // if((eta_1[g] >= -1.044 && eta_1[g] < -0.522) || (eta_1[g] <= 1.044 && eta_1[g] > 0.522)) pt_1[g] = pt_1[g] * fResidual_0p522_eta_1p044->Eval(pt_1[g]);
-	    // if((eta_1[g] >= -1.566 && eta_1[g] < -1.044) || (eta_1[g] <= 1.566 && eta_1[g] > 1.044)) pt_1[g] = pt_1[g] * fResidual_1p044_eta_1p566->Eval(pt_1[g]);
-	    // if((eta_1[g] >= -2.043 && eta_1[g] < -1.566) || (eta_1[g] <= 2.043 && eta_1[g] > 1.566)) pt_1[g] = pt_1[g] * fResidual_1p566_eta_2p043->Eval(pt_1[g]);
-	    
 	    if(jet80_1 && trgObj_pt_1>=80){
-	      hpp_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
+	      hpp_chMaxcut_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
 	    }
 	    if(jet60_1==1 && trgObj_pt_1>=60 && trgObj_pt_1<80){
-	      hpp_Trg60[k][j]->Fill(pt_1[g],jet60_p_1);
+	      hpp_chMaxcut_Trg60[k][j]->Fill(pt_1[g],jet60_p_1);
 	    }
 	    if(jet40_1==1 && trgObj_pt_1>=40 && trgObj_pt_1<60){
-	      hpp_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
+	      hpp_chMaxcut_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
 	    }
 	    
 	  }// qa condition
 
+	  if(eMax_1[g]/pt_1[g]<0.6){
+	  //if(1>0){
+
+	    if(jet80_1 && trgObj_pt_1>=80){
+	      hpp_eMaxcut_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
+	    }
+	    if(jet60_1==1 && trgObj_pt_1>=60 && trgObj_pt_1<80){
+	      hpp_eMaxcut_Trg60[k][j]->Fill(pt_1[g],jet60_p_1);
+	    }
+	    if(jet40_1==1 && trgObj_pt_1>=40 && trgObj_pt_1<60){
+	      hpp_eMaxcut_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
+	    }
+	    
+	  }// qa condition
+
+#endif
+	  if(eta_1[g] >= -0.522 && eta_1[g] < 0.522) pt_1[g] = pt_1[g] * fResidual_0_eta_0p522->Eval(pt_1[g]);
+	  if((eta_1[g] >= -1.044 && eta_1[g] < -0.522) || (eta_1[g] <= 1.044 && eta_1[g] > 0.522)) pt_1[g] = pt_1[g] * fResidual_0p522_eta_1p044->Eval(pt_1[g]);
+	  if((eta_1[g] >= -1.566 && eta_1[g] < -1.044) || (eta_1[g] <= 1.566 && eta_1[g] > 1.044)) pt_1[g] = pt_1[g] * fResidual_1p044_eta_1p566->Eval(pt_1[g]);
+	  if((eta_1[g] >= -2.043 && eta_1[g] < -1.566) || (eta_1[g] <= 2.043 && eta_1[g] > 1.566)) pt_1[g] = pt_1[g] * fResidual_1p566_eta_2p043->Eval(pt_1[g]);
+
+	  if(eMax_1[g]/pt_1[g]> 0.6 || chMax_1[g]/pt_1[g]<0.02) continue;
+	  
+	  if(jet80_1 && trgObj_pt_1>=80){
+	    hpp_residual_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
+	  }
+	  if(jet60_1==1 && trgObj_pt_1>=60 && trgObj_pt_1<80){
+	    hpp_residual_Trg60[k][j]->Fill(pt_1[g],jet60_p_1);
+	  }
+	  if(jet40_1==1 && trgObj_pt_1>=40 && trgObj_pt_1<60){
+	    hpp_residual_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
+	  }
+	  
 	}// jet loop
 	
       }// eta bins
@@ -529,6 +589,45 @@ void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
       if(printDebug)hpp_Trg40[k][j]->Print();
       hpp_TrgComb[k][j]->Write();
       if(printDebug)hpp_TrgComb[k][j]->Print();
+
+      hpp_chMaxcut_TrgComb[k][j]->Add(hpp_chMaxcut_Trg80[k][j]);
+      hpp_chMaxcut_TrgComb[k][j]->Add(hpp_chMaxcut_Trg60[k][j]);
+      hpp_chMaxcut_TrgComb[k][j]->Add(hpp_chMaxcut_Trg40[k][j]);
+
+      hpp_chMaxcut_Trg80[k][j]->Write();
+      if(printDebug)hpp_chMaxcut_Trg80[k][j]->Print();
+      hpp_chMaxcut_Trg60[k][j]->Write();
+      if(printDebug)hpp_chMaxcut_Trg60[k][j]->Print();
+      hpp_chMaxcut_Trg40[k][j]->Write();
+      if(printDebug)hpp_chMaxcut_Trg40[k][j]->Print();
+      hpp_chMaxcut_TrgComb[k][j]->Write();
+      if(printDebug)hpp_chMaxcut_TrgComb[k][j]->Print();
+
+      hpp_eMaxcut_TrgComb[k][j]->Add(hpp_eMaxcut_Trg80[k][j]);
+      hpp_eMaxcut_TrgComb[k][j]->Add(hpp_eMaxcut_Trg60[k][j]);
+      hpp_eMaxcut_TrgComb[k][j]->Add(hpp_eMaxcut_Trg40[k][j]);
+
+      hpp_eMaxcut_Trg80[k][j]->Write();
+      if(printDebug)hpp_eMaxcut_Trg80[k][j]->Print();
+      hpp_eMaxcut_Trg60[k][j]->Write();
+      if(printDebug)hpp_eMaxcut_Trg60[k][j]->Print();
+      hpp_eMaxcut_Trg40[k][j]->Write();
+      if(printDebug)hpp_eMaxcut_Trg40[k][j]->Print();
+      hpp_eMaxcut_TrgComb[k][j]->Write();
+      if(printDebug)hpp_eMaxcut_TrgComb[k][j]->Print();
+
+      hpp_residual_TrgComb[k][j]->Add(hpp_residual_Trg80[k][j]);
+      hpp_residual_TrgComb[k][j]->Add(hpp_residual_Trg60[k][j]);
+      hpp_residual_TrgComb[k][j]->Add(hpp_residual_Trg40[k][j]);
+
+      hpp_residual_Trg80[k][j]->Write();
+      if(printDebug)hpp_residual_Trg80[k][j]->Print();
+      hpp_residual_Trg60[k][j]->Write();
+      if(printDebug)hpp_residual_Trg60[k][j]->Print();
+      hpp_residual_Trg40[k][j]->Write();
+      if(printDebug)hpp_residual_Trg40[k][j]->Print();
+      hpp_residual_TrgComb[k][j]->Write();
+      if(printDebug)hpp_residual_TrgComb[k][j]->Print();
 
     }// eta bin loop
 

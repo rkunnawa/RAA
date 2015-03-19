@@ -53,12 +53,12 @@ void RAA_plot_triggerTurnon_v2() {
     638, 686, 1000
   };
 
-  TFile * fin = TFile::Open("../../Output/PbPb_MinBiasUPC_akPuCalo_20150318.root");
+  TFile * fin = TFile::Open("../../Output/PbPb_MinBiasUPC_akPuPF_20150319.root");
   
-  TH1F * hDenominator  = (TH1F*)fin->Get("hDenominator_R2");
-  TH1F * hNumerator_80  = (TH1F*)fin->Get("hNumerator_80_R2");
-  TH1F * hNumerator_65  = (TH1F*)fin->Get("hNumerator_65_R2");
-  TH1F * hNumerator_55  = (TH1F*)fin->Get("hNumerator_55_R2");
+  TH1F * hDenominator  = (TH1F*)fin->Get("hDenominator_R3");
+  TH1F * hNumerator_80  = (TH1F*)fin->Get("hNumerator_80_R3");
+  TH1F * hNumerator_65  = (TH1F*)fin->Get("hNumerator_65_R3");
+  TH1F * hNumerator_55  = (TH1F*)fin->Get("hNumerator_55_R3");
 
   CorrectBinWidth(hDenominator);
   CorrectBinWidth(hNumerator_55);
@@ -105,7 +105,7 @@ void RAA_plot_triggerTurnon_v2() {
   gr_turnon_jet80->Draw("psame");
   leg->Draw();
 
-  c3->SaveAs("../../Plots/trigger_turnon_hlt_pbpb_akPu3Calo.pdf","RECREATE");
+  c3->SaveAs("../../Plots/trigger_turnon_hlt_pbpb_akPu2PF.pdf","RECREATE");
 
 
 
