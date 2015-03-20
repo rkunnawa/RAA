@@ -169,7 +169,7 @@ void divideBinWidth(TH1 *h)
 }
 
 int findBin(int hiBin){
-  int binNo = 0;
+  int binNo = -1;
 
   for(int i = 0;i<nbins_cent;i++){
     if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
@@ -786,6 +786,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       // get the stuff required for the trigger turn on curve later. in a separate loop till i understand how to put this in here. 
       
       int centBin = findBin(hiBin_1);//tells us the centrality of the event. 
+      if(centBin==-1) continue;
+
       //if(printDebug)cout<<"cent bin = "<<centBin<<endl;
       //if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
       // if(k==1)hEvents->Fill(1);

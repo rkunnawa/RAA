@@ -142,7 +142,7 @@ static const char trigName [trigValue][256] = {"HLT55","HLT65","HLT80","Combined
 static const Float_t effecPrescl = 2.047507;
 
 int findBin(int hiBin){
-  int binNo = 0;
+  int binNo = -1;
 
   for(int i = 0;i<nbins_cent;i++){
     if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
@@ -950,6 +950,8 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
 
 	if(!data[k][h]->pcollisionEventSelection) continue;
         int cBin = findBin(data[k][h]->bin);
+	if(cBin==-1) continue;
+
         //int cBin = nbins_cent-1;
         double weight_cent=1;
         double wegiht_pt=1;

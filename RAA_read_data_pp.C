@@ -106,7 +106,7 @@ static const int list_radius[no_radius] = {2,3,4,5};
 
 using namespace std;
 
-void RAA_read_data_pp(int startfile = 0,int endfile = 1,char *jet_type = "PF"){
+void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
 
   TH1::SetDefaultSumw2();
   gStyle->SetOptStat(0);

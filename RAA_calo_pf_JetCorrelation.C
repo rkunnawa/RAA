@@ -503,7 +503,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   
   TTree* unmatchCaloJets = new TTree("unmatchedCaloJets","Ntuple containing important information about unmatched Calo jets");
   unmatchCaloJets->Branch("phSum",&phSum,"phSum/F");
-  unmatchCaloJets->Branch("calopt",&pfpt,"pfpt/F");       unmatchCaloJets->Branch("neSum",&neSum,"neSum/F");
+  unmatchCaloJets->Branch("calopt",&calopt,"calopt/F");   unmatchCaloJets->Branch("neSum",&neSum,"neSum/F");
   unmatchCaloJets->Branch("deltar",&deltar,"deltar/F");   unmatchCaloJets->Branch("muSum",&muSum,"muSum/F");
   unmatchCaloJets->Branch("chMax",&chMax,"chMax/F");      unmatchCaloJets->Branch("eSum",&eSum,"eSum/F");
   unmatchCaloJets->Branch("phMax",&phMax,"phMax/F");      unmatchCaloJets->Branch("hiBin",&hiBin,"hiBin/I");

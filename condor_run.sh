@@ -17,6 +17,8 @@ cd /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Macros/RAA/
 
 echo "root directory: $ROOTSYS"
 
+df -h
+
 gcc --version
 
 startfile=$1
@@ -35,15 +37,15 @@ echo "Processing..."
 #root -b -q RAA_read_MinBias.C\+\($startfile,$endfile\)
 #mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_ntuple_SuperNovaRejected_akPuCalo_20150311_1.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/.
 
-root -b -q RAA_read_mc_pp.C\+\($startfile,$endfile\)
+#root -b -q RAA_read_mc_pp.C\+\($startfile,$endfile\)
 
 #root -b -q RAA_read_mc.C\+\($startfile,$endfile\)
 
 #root -b -q RAA_read_data_pp.C\+\($startfile,$endfile\)
 #mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_ak35PF_20150319_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/data/.
 
-#root -b -q RAA_calo_pf_JetCorrelation.C\+\($startfile,$endfile\)
-#mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150319_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/.
+root -b -q RAA_calo_pf_JetCorrelation.C\+\($startfile,$endfile\)
+mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150320_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/.
 
 #mv PbPb_data_ak3_Vs_20140820_$endfile.root ../../Output/.
 

@@ -559,11 +559,18 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
       if(fabs(vz_1)>15) continue;
       
-      if(jetMB_1==0 || jet80_p_1==0 || jet65_p_1 || jet55_p_1)  continue;
+      if(jetMB_1==0 || jet80_p_1==0 || jet65_p_1==0 || jet55_p_1==0)  continue;
 
       hEvents->Fill(1);
 
-      if(nrefe_1 > 40) continue;
+      //if(nrefe_1 > 30) continue;
+      //apply the supernova rejection cut:
+      int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
+      for(int g = 0;g<nrefe_1;g++)
+       	if(eta_1[g]>=-2 && eta_1[g]<2) if(pt_1[g]>=50) jetCounter++;	  
+      
+      if(jetCounter>10) continue;
+      
       
       // Float_t largepT = pt_1[0];
       // //cout<<"large pT = "<<largepT<<endl;
@@ -597,6 +604,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
       // now the jet which is matched with the trigger object is the jet at position 
       for(int j = 0;j<nrefe_1;++j){
+      //for(int j = 0;j<1;++j){ // plotting the leading jet. 
 
 	//if(chMax_1[j]/pt_1[j] < 0.02 || eMax_1[j]/pt_1[j]>0.6) continue; 
 	
@@ -606,8 +614,8 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 	if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[j]); 
 	if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[j]);
 	
-	//if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[j]);
-	//if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[j]);
+	if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[j]);
+	if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[j]);
 	
 
 	// if(jetMB_1==1 && jet80_p_1==1) {
@@ -672,7 +680,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   // hL1SJ52_TrigTurnon->Divide(hJetMB); 
   
   if(Type=="Data"){
-    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_ak%s%s_%d_%d_supernova50.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
     f.cd();
 
     //jets_ID->Write();
@@ -687,7 +695,15 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
       hNumerator_55[k]->Write();
       hNumerator_55_n65_n80[k]->Write();
       hNumerator_65_n80[k]->Write();
+      hDenominator[k]->Print();
+      hNumerator_80[k]->Print();
+      hNumerator_65[k]->Print();
+      hNumerator_55[k]->Print();
+      hNumerator_55_n65_n80[k]->Print();
+      hNumerator_65_n80[k]->Print();
+
     }
+
     
     
 #if 0

@@ -53,7 +53,7 @@ void RAA_plot_triggerTurnon_v2() {
     638, 686, 1000
   };
 
-  TFile * fin = TFile::Open("../../Output/PbPb_MinBiasUPC_akPuPF_20150319.root");
+  TFile * fin = TFile::Open("../../Output/PbPb_MinBiasUPC_akPuPF_supernova50_20150319.root");
   
   TH1F * hDenominator  = (TH1F*)fin->Get("hDenominator_R3");
   TH1F * hNumerator_80  = (TH1F*)fin->Get("hNumerator_80_R3");
