@@ -1,18 +1,6 @@
-// Raghav Kunnawalkam Elayavalli
-// Feb 26th 2015
-// Rutgers
-// questions or comments: raghav.k.e at CERN dot CH
-
-//
-// Macro to plot the trigger turn on curve  
-//
-//
-
-
 
 #include <iostream>
 #include <stdio.h>
-#include <fstream>
 #include <fstream>
 #include <TH1F.h>
 #include <TH1F.h>
@@ -24,6 +12,7 @@
 #include <TLegend.h>
 #include <TGraphErrors.h>
 #include <TGraphAsymmErrors.h>
+#include <TMultiGraph.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <TH3.h>
@@ -32,6 +21,7 @@
 #include <TStopwatch.h>
 #include <TRandom3.h>
 #include <TChain.h>
+#include <TNtuple.h>
 #include <TProfile.h>
 #include <TStopwatch.h>
 #include <TCut.h>
@@ -42,119 +32,124 @@
 #include "TMath.h"
 #include "TLine.h"
 
-
-#include "Headers/plot.h"
- 
-static const int nbins_pt = 39;
-static const double boundaries_pt[nbins_pt+1] = {
-  3, 4, 5, 7, 9, 12, 
-  15, 18, 21, 24, 28,
-  32, 37, 43, 49, 56,
-  64, 74, 84, 97, 114,
-  133, 153, 174, 196,
-  220, 245, 272, 300, 
-  330, 362, 395, 430,
-  468, 507, 548, 592,
-  638, 686, 1000 
-};
-
-
 using namespace std;
+
 
 void RAA_plot_triggerTurnon(){
 
-  TStopwatch timer;
-  timer.Start();
-
-  TDatime date;
-
-  gStyle->SetOptStat(0);
-
   TH1::SetDefaultSumw2();
-  TH2::SetDefaultSumw2();
 
-<<<<<<< HEAD
-  TFile * fin = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_akPuCalo_20150310.root");
-=======
-  TFile * fin = TFile::Open("/Users/raghavke/WORK/RAA/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_akPuCalo_20150309.root");
->>>>>>> a6a963cbe66c5895e1da1b749a0b9ce4fe0d2c32
+  TFile * fin = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_MinBiasUPC_ntuple_SuperNovaRejected_akPuCalo_20150311.root");
 
-  TH1F * hJet80_MB = (TH1F*)fin->Get("hJet80_JetMB");
-  TH1F * hJet65_MB = (TH1F*)fin->Get("hJet65_JetMB");
-  TH1F * hJet55_MB = (TH1F*)fin->Get("hJet55_JetMB");
+  TTree * trig = (TTree*)fin->Get("trigger_info");
 
-<<<<<<< HEAD
-  TH1F * hJetMB = (TH1F*)fin->Get("hJetMB_55_1");
-=======
-  TH1F * hJetMB_80_1 = (TH1F*)fin->Get("hJetMB_80_1");
-  TH1F * hJetMB_65_1 = (TH1F*)fin->Get("hJetMB_65_1_");
-  TH1F * hJetMB_55_1 = (TH1F*)fin->Get("hJetMB_55_1");
->>>>>>> a6a963cbe66c5895e1da1b749a0b9ce4fe0d2c32
-  //TH1F * hJet80 = (TH1F*)fin->Get("hJet80");
-  //TH1F * hJet65 = (TH1F*)fin->Get("hJet65");
-  //TH1F * hJet55 = (TH1F*)fin->Get("hJet55");
+  int run, evt, lumi, nref, jet80, jet80_prescl, jet65, jet65_prescl, jet55, jet55_prescl, hiMB, hiMB_prescl;
+  float jetpt[1000], jeteta[1000];
 
-<<<<<<< HEAD
-  //TGraphAsymmErrors *hJet80_Turnon = new TGraphAsymmErrors;
-  //hJet80_Turnon->BayesDivide(hJet80_MB,hJetMB);
-  //TGraphAsymmErrors *hJet65_Turnon = new TGraphAsymmErrors;
-  //hJet65_Turnon->BayesDivide(hJet65_MB,hJetMB);
-=======
-  TGraphAsymmErrors *hJet80_Turnon = new TGraphAsymmErrors;
-  hJet80_Turnon->BayesDivide(hJet80_MB,hJetMB_80_1);
-  TGraphAsymmErrors *hJet65_Turnon = new TGraphAsymmErrors;
-  hJet65_Turnon->BayesDivide(hJet65_MB,hJetMB_65_1);
->>>>>>> a6a963cbe66c5895e1da1b749a0b9ce4fe0d2c32
-  TGraphAsymmErrors *hJet55_Turnon = new TGraphAsymmErrors;
-  hJet55_Turnon->BayesDivide(hJet55_MB,hJetMB_55_1);
+  trig->SetBranchAddress("evt_value",&evt);
+  trig->SetBranchAddress("run_value",&run);
+  trig->SetBranchAddress("lumi_value",&lumi);
+  trig->SetBranchAddress("nref",&nref);
+  trig->SetBranchAddress("jetpt",&jetpt);
+  trig->SetBranchAddress("jeteta",&jeteta);
+  trig->SetBranchAddress("Jet80",&jet80);
+  trig->SetBranchAddress("Jet80_prescl",&jet80_prescl);
+  trig->SetBranchAddress("Jet65",&jet65);
+  trig->SetBranchAddress("Jet65_prescl",&jet65_prescl);
+  trig->SetBranchAddress("Jet55",&jet55);
+  trig->SetBranchAddress("Jet55_prescl",&jet55_prescl);
+  trig->SetBranchAddress("HIMinBias",&hiMB);
+  trig->SetBranchAddress("HIMinBias_prescl",&hiMB_prescl);
 
-  //TH1F * hTurnon_Jet55 = (TH1F*)hJet55_MB->Clone("hTurnon_Jet55");
-  //hTurnon_Jet55->Divide(hJetMB);
- 
+  TH1F* hDenominator_80 = new TH1F("hDenominator_80","",14,0,140);
+  TH1F* hDenominator_65 = new TH1F("hDenominator_65","",14,0,140);
+  TH1F* hDenominator_55 = new TH1F("hDenominator_55","",14,0,140);
+  TH1F* hNumerator_80 = new TH1F("hNumerator_80","",14,0,140);
+  TH1F* hNumerator_65 = new TH1F("hNumerator_65","",14,0,140);
+  TH1F* hNumerator_55 = new TH1F("hNumerator_55","",14,0,140);
+
   
-  //plot the turn on curves:
+  Long_t  nentries = trig->GetEntries();
+  cout<<nentries<<endl;
+  // nentries = 10000000;
+  for(Long_t i = 0;i<nentries;i++){
+    trig->GetEntry(i);
+    if(i%100000 == 0) cout<<i<<"/"<<nentries<<endl;
+   
+    if(jet80_prescl==1 && jet65_prescl==1 && jet55_prescl==1){
 
-  TCanvas * cturnon = new TCanvas ("cTurnon","",800,600);
-  //cturnon->SetLogy();
-  //hJet80_Turnon->SetTitle(" ");
-  //hJet80_Turnon->SetXTitle("Jet p_{T} (GeV/c)");
-  //hJet80_Turnon->SetYTitle("Trigger Efficiency");
-  //hJet80_Turnon->SetMarkerStyle(20);
-  //hJet80_Turnon->SetMarkerColor(kBlack);
-  //hJet80_Turnon->Rebin(5);
-  //hJet80_Turnon->Scale(1./5);
-  //hJet80_Turnon->SetAxisRange(20,170,"X");
-  //hJet80_Turnon->SetAxisRange(0,1.2,"Y");
-  //hJet80_Turnon->Draw("Ap");
+      hDenominator_80->Fill(jetpt[0]);
+      hDenominator_65->Fill(jetpt[0]);
+      hDenominator_55->Fill(jetpt[0]);
+      
+      if(jet80)
+	hNumerator_80->Fill(jetpt[0]);
+      if(jet65)
+	hNumerator_65->Fill(jetpt[0]);
+      if(jet55)
+	hNumerator_55->Fill(jetpt[0]);
+      
+    }
 
-  //hJet65_Turnon->SetMarkerStyle(20);
-  //hJet65_Turnon->SetMarkerColor(kGreen);
-  // //hJet65_Turnon->Rebin(5);
-  // //hJet65_Turnon->Scale(1./5);
-  //hJet65_Turnon->Draw("Ap");
-
-  hJet55_Turnon->SetMarkerStyle(20);
-  hJet55_Turnon->SetMarkerColor(kBlue);
-  // hJet55_Turnon->Rebin(5);
-  // hJet55_Turnon->Scale(1./5);
-  hJet55_Turnon->Draw("Ap");
-
-
-  TLine * line = new TLine(20,1,200,1);
-  line->SetLineWidth(2);
-  //line->Draw();
-
-  TLegend * turnon = myLegend(0.5,0.2,0.7,0.4);
-  turnon->AddEntry(hJet55_Turnon,"HLT_HIJet55_v1","pl");
-  //turnon->AddEntry(hJet65_Turnon,"HLT_HIJet65_v1","pl");
-  //turnon->AddEntry(hJet80_Turnon,"HLT_HIJet80_v1","pl");
-  //turnon->SetTextSize(0.04);
-  turnon->Draw();
+  }
   
-  putCMSPrel();
-  drawText("HLT turnon curves",0.2,0.8,16);
+  hDenominator_80->Print("base");
+  hDenominator_65->Print("base");
+  hDenominator_55->Print("base");
+  hNumerator_80->Print("base");
+  hNumerator_65->Print("base");
+  hNumerator_55->Print("base");
+  
+  TGraphAsymmErrors * Jet80 = new TGraphAsymmErrors();
+  Jet80->BayesDivide(hNumerator_80, hDenominator_80);
+  Jet80->SetMarkerColor(kRed);
+  Jet80->SetMarkerSize(2.0);
+  TGraphAsymmErrors * Jet65 = new TGraphAsymmErrors();
+  Jet65->BayesDivide(hNumerator_65, hDenominator_65);
+  Jet65->SetMarkerColor(kGreen);
+  Jet65->SetMarkerSize(2.0);
+  TGraphAsymmErrors * Jet55 = new TGraphAsymmErrors();
+  Jet55->BayesDivide(hNumerator_55, hDenominator_55);
+  Jet55->SetMarkerColor(kBlue);
+  Jet55->SetMarkerSize(2.0);
+  
+  TCanvas * cSpectra = new TCanvas ("cSpectra","",1000,600);
+  cSpectra->Divide(2,1);
+  cSpectra->cd(1)->SetLogy();
 
-  cturnon->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_triggerturnon_55_%d.pdf",date.GetDate()),"RECREATE");
+  hDenominator_80->SetMarkerColor(kRed);
+  hDenominator_80->SetMarkerStyle(25);
+  hDenominator_80->Draw();
+  
+  hDenominator_65->SetMarkerColor(kGreen);
+  hDenominator_65->SetMarkerStyle(24);
+  hDenominator_65->Draw("same");
+  
+  hDenominator_55->SetMarkerColor(kBlue);
+  hDenominator_55->SetMarkerStyle(27);
+  hDenominator_55->Draw("same");
+
+  hNumerator_80->SetMarkerColor(kRed);
+  hNumerator_80->SetMarkerStyle(21);
+  hNumerator_80->Draw("same");
+  hNumerator_65->SetMarkerColor(kGreen);
+  hNumerator_65->SetMarkerStyle(20);
+  hNumerator_65->Draw("same");
+  hNumerator_55->SetMarkerColor(kBlue);
+  hNumerator_55->SetMarkerStyle(33);
+  hNumerator_55->Draw("same");
+
+  cSpectra->cd(2);
+    
+  TMultiGraph * mg = new TMultiGraph();
+  mg->SetTitle(";lead jet p_{T}^{reco};Efficiency");
+  mg->Add(Jet80,"");
+  mg->Add(Jet65,"");
+  mg->Add(Jet55,"");
+
+  mg->Draw("AP");
+
+  cSpectra->SaveAs("Trigger_spectra_MinBias.pdf","RECREATE");
   
 
 }

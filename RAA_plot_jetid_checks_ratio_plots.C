@@ -74,9 +74,12 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
   
-  TFile *fData = TFile::Open("/Users/raghavke/WORK/RAA/Output/PbPb_data_akPuPF_20150313.root");
-  TFile *fMC = TFile::Open("/Users/raghavke/WORK/RAA/Output/PbPb_mc_akPuPF_20150313_9.root");
+  TFile *fData = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_data_akPuPF_20150308.root");
+  //TFile *fData = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_data_akPuPF_20150313.root");
+  TFile *fMC = TFile::Open("/Users/keraghav/WORK/RAA/Output/PbPb_mc_akPuPF_20150313_9.root");
 
+
+#if 0
   //get the 2d histograms 
   static const int ptSelection = 19;
   static const int ptBoundary[ptSelection+1] = {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200};
@@ -214,7 +217,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_eMaxSumcand_refpt_refpt->SetYTitle("eMax/Sumcand");
   hMC_eMaxSumcand_refpt_refpt->Draw("colz");
   drawText("MC 0-30%, 10 < refpt < 200",0.3,0.8,14);
-  ceMaxSumcand_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_jtpt_10_pt_200.pdf","RECREATE");
+  ceMaxSumcand_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_jtpt_10_pt_200.pdf","RECREATE");
 
   TCanvas * ceMaxJtpt_jtpt = new TCanvas("ceMaxJtpt_jtpt","",1200,800);
   makeMultiPanelCanvas(ceMaxJtpt_jtpt,2,1,0.0,0.0,0.2,0.15,0.07);
@@ -230,7 +233,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_eMaxJtpt_jtpt->SetYTitle("eMax/Sumcand");
   hMC_eMaxJtpt_jtpt->Draw("colz");
   drawText("MC 0-30%, 10 < jtpt < 200",0.3,0.8,14);
-  ceMaxJtpt_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_eMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
+  ceMaxJtpt_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_eMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
 
   TCanvas * cchMaxJtpt_jtpt = new TCanvas("cchMaxJtpt_jtpt","",1200,800);
   makeMultiPanelCanvas(cchMaxJtpt_jtpt,2,1,0.0,0.0,0.2,0.15,0.07);
@@ -246,7 +249,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_chMaxJtpt_jtpt->SetYTitle("eMax/Sumcand");
   hMC_chMaxJtpt_jtpt->Draw("colz");
   drawText("MC 0-30%, 10 < jtpt < 200",0.3,0.8,14);
-  cchMaxJtpt_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_chMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
+  cchMaxJtpt_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_chMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
 
   TCanvas * cneMaxJtpt_jtpt = new TCanvas("cneMaxJtpt_jtpt","",1200,800);
   makeMultiPanelCanvas(cneMaxJtpt_jtpt,2,1,0.0,0.0,0.2,0.15,0.07);
@@ -262,7 +265,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_neMaxJtpt_jtpt->SetYTitle("eMax/Sumcand");
   hMC_neMaxJtpt_jtpt->Draw("colz");
   drawText("MC 0-30%, 10 < jtpt < 200",0.3,0.8,14);
-  cneMaxJtpt_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_neMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
+  cneMaxJtpt_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_neMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
 
   TCanvas * cphMaxJtpt_jtpt = new TCanvas("cphMaxJtpt_jtpt","",1200,800);
   makeMultiPanelCanvas(cphMaxJtpt_jtpt,2,1,0.0,0.0,0.2,0.15,0.07);
@@ -278,7 +281,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_phMaxJtpt_jtpt->SetYTitle("eMax/Sumcand");
   hMC_phMaxJtpt_jtpt->Draw("colz");
   drawText("MC 0-30%, 10 < jtpt < 200",0.3,0.8,14);
-  cphMaxJtpt_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_phMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
+  cphMaxJtpt_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_phMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
   
   TCanvas * cmuMaxJtpt_jtpt = new TCanvas("cmuMaxJtpt_jtpt","",1200,800);
   makeMultiPanelCanvas(cmuMaxJtpt_jtpt,2,1,0.0,0.0,0.2,0.15,0.07);
@@ -294,7 +297,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   hMC_muMaxJtpt_jtpt->SetYTitle("eMax/Sumcand");
   hMC_muMaxJtpt_jtpt->Draw("colz");
   drawText("MC 0-30%, 10 < jtpt < 200",0.3,0.8,14);
-  cmuMaxJtpt_jtpt->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_muMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
+  cmuMaxJtpt_jtpt->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_muMaxJtpt_jtpt_10_pt_200.pdf","RECREATE");
 #endif
   
   for(int a = 3;a<ptSelection;a++){
@@ -329,7 +332,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_eMaxSumcand_eMaxJtpt_refANDjtptselection[a]->Draw("colz");
     drawText(Form("%d < ref, jet pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    ceMaxSumcand_eMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_eMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+    ceMaxSumcand_eMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_eMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
 
     ceMaxSumcand_chMaxJtpt[a] = new TCanvas(Form("ceMaxSumcand_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
     makeMultiPanelCanvas(ceMaxSumcand_chMaxJtpt[a],3,1,0.0,0.0,0.2,0.15,0.07);
@@ -361,7 +364,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_eMaxSumcand_chMaxJtpt_refANDjtptselection[a]->Draw("colz");
     drawText(Form("%d < ref, jet pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    ceMaxSumcand_chMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+    ceMaxSumcand_chMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_eMaxSumcand_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
 
     ceMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("ceMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
     makeMultiPanelCanvas(ceMaxJtpt_chMaxJtpt[a],2,1,0.0,0.0,0.2,0.15,0.07);
@@ -390,7 +393,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_eMaxJtpt_chMaxJtpt_refANDjtptselection[a]->Draw("colz");
     drawText(Form("%d < ref, reco pt < %d",ptSelection[a],ptSelection[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    ceMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_eMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+    ceMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_eMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
 
     cneMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cneMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
     makeMultiPanelCanvas(cneMaxJtpt_chMaxJtpt[a],2,1,0.0,0.0,0.2,0.15,0.07);
@@ -413,7 +416,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_neMaxJtpt_chMaxJtpt_ptselection[a]->Draw("colz");
     drawText(Form("%d < reco pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    cneMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_neMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+    cneMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_neMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
 
     cphMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cphMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
     makeMultiPanelCanvas(cphMaxJtpt_chMaxJtpt[a],2,1,0.0,0.0,0.2,0.15,0.07);
@@ -436,7 +439,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_phMaxJtpt_chMaxJtpt_ptselection[a]->Draw("colz");
     drawText(Form("%d < reco pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    cphMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_phMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+    cphMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_phMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
 
     //cmuMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cmuMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
     cmuMaxJtpt_chMaxJtpt[a] = new TCanvas(Form("cmuMaxJtpt_chMaxJtpt_%d_jtpt_%d",ptBoundary[a],ptBoundary[a+1]),"",1200,800);
@@ -460,7 +463,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_muMaxJtpt_chMaxJtpt_ptselection[a]->Draw("colz");
     drawText(Form("%d < reco pt < %d",ptBoundary[a],ptBoundary[a+1]),0.2,0.8,15);
     drawText("MC",0.45,0.7,15);
-    cmuMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/raghavke/WORK/RAA/Plots/PbPb_jetid_muMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
+    cmuMaxJtpt_chMaxJtpt[a]->SaveAs(Form("/Users/keraghav/WORK/RAA/Plots/PbPb_jetid_muMaxJtpt_chMaxJtpt_%d_jtpt_%d_jet80.pdf",ptBoundary[a],ptBoundary[a+1]),"RECREATE");
     
   }
 
@@ -1014,7 +1017,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet55_SumcandData->AddEntry(hData_Jet55_eMaxSumcand0p9," 0.9 ","pl");
   Jet55_SumcandData->Draw();
 
-  cSumcandData->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_data_eMaxSumcand_ratio_plot.pdf","RECREATE");
+  cSumcandData->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_data_eMaxSumcand_ratio_plot.pdf","RECREATE");
 
   //make the plot from the sumcand - 2x2 plot
   TCanvas *cSumcandMC = new TCanvas("cSumcandMC","",1200,1000);
@@ -1223,7 +1226,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet55_SumcandMC->AddEntry(hMC_Jet55_eMaxSumcand0p9," 0.9 ","pl");
   Jet55_SumcandMC->Draw();
 
-  cSumcandMC->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_MC_eMaxSumcand_ratio_plot.pdf","RECREATE");
+  cSumcandMC->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_MC_eMaxSumcand_ratio_plot.pdf","RECREATE");
 
 
   // lets start making the plots 3 plots, data on top MC at the bottom: 
@@ -1578,7 +1581,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet55_eMax_chMax->AddEntry(hMC_Jet55_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet55_eMax_chMax->Draw();
 
-  cJet55->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jet55_spectra_ratio_jetid.pdf","RECREATE");
+  cJet55->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet55_spectra_ratio_jetid.pdf","RECREATE");
 
 
 
@@ -1930,7 +1933,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet65_eMax_chMax->AddEntry(hMC_Jet65_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet65_eMax_chMax->Draw();
 
-  cJet65->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jet65_spectra_ratio_jetid.pdf","RECREATE");
+  cJet65->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet65_spectra_ratio_jetid.pdf","RECREATE");
 
   
   TCanvas * cJet80 = new TCanvas("cJet80","",1200,1000);
@@ -2281,11 +2284,12 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   Jet80_eMax_chMax->AddEntry(hMC_Jet80_eMaxJtpt0p5_chMaxJtpt0p03,"X = 5, Y = 3","pl");
   Jet80_eMax_chMax->Draw();
 
-  cJet80->SaveAs("/Users/raghavke/WORK/RAA/Plots/PbPb_jet80_spectra_ratio_jetid.pdf","RECREATE");
+  cJet80->SaveAs("/Users/keraghav/WORK/RAA/Plots/PbPb_jet80_spectra_ratio_jetid.pdf","RECREATE");
 
 #endif
   
-#if 0
+#endif
+  
   cout<<" plotting the jet ID variables now"<<endl;
   // get the pfcand variables before and after the cut and take ratio:
 
@@ -2311,6 +2315,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     cout<<"centrality bin = "<<i<<endl;
 
     hMC_chMax[i] = (TH1F*)fMC->Get(Form("hpbpb_chMax_R3_n20_eta_p20_cent%d",i));
+    hMC_chMax[i] = (TH1F*)hMC_chMax[i]->Rebin(4);
     hMC_phMax[i] = (TH1F*)fMC->Get(Form("hpbpb_phMax_R3_n20_eta_p20_cent%d",i));
     hMC_neMax[i] = (TH1F*)fMC->Get(Form("hpbpb_neMax_R3_n20_eta_p20_cent%d",i));
     hMC_muMax[i] = (TH1F*)fMC->Get(Form("hpbpb_muMax_R3_n20_eta_p20_cent%d",i));
@@ -2323,6 +2328,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_eSum[i] = (TH1F*)fMC->Get(Form("hpbpb_eSum_R3_n20_eta_p20_cent%d",i));
 
     hMC_chMax_withCut[i] = (TH1F*)fMC->Get(Form("hpbpb_chMax_withCut_R3_n20_eta_p20_cent%d",i));
+    hMC_chMax_withCut[i] = (TH1F*)hMC_chMax_withCut[i]->Rebin(4);
     hMC_phMax_withCut[i] = (TH1F*)fMC->Get(Form("hpbpb_phMax_withCut_R3_n20_eta_p20_cent%d",i));
     hMC_neMax_withCut[i] = (TH1F*)fMC->Get(Form("hpbpb_neMax_withCut_R3_n20_eta_p20_cent%d",i));
     hMC_muMax_withCut[i] = (TH1F*)fMC->Get(Form("hpbpb_muMax_withCut_R3_n20_eta_p20_cent%d",i));
@@ -2335,6 +2341,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_eSum_withCut[i] = (TH1F*)fMC->Get(Form("hpbpb_eSum_withCut_R3_n20_eta_p20_cent%d",i));
     
     hData_chMax[i] = (TH1F*)fData->Get(Form("hpbpb_chMax_R3_n20_eta_p20_cent%d",i));
+    hData_chMax[i] = (TH1F*)hData_chMax[i]->Rebin(4);
     hData_phMax[i] = (TH1F*)fData->Get(Form("hpbpb_phMax_R3_n20_eta_p20_cent%d",i));
     hData_neMax[i] = (TH1F*)fData->Get(Form("hpbpb_neMax_R3_n20_eta_p20_cent%d",i));
     hData_muMax[i] = (TH1F*)fData->Get(Form("hpbpb_muMax_R3_n20_eta_p20_cent%d",i));
@@ -2347,6 +2354,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hData_eSum[i] = (TH1F*)fData->Get(Form("hpbpb_eSum_R3_n20_eta_p20_cent%d",i));
 
     hData_chMax_withCut[i] = (TH1F*)fData->Get(Form("hpbpb_chMax_withCut_R3_n20_eta_p20_cent%d",i));
+    hData_chMax_withCut[i] = (TH1F*)hData_chMax_withCut[i]->Rebin(4);
     hData_phMax_withCut[i] = (TH1F*)fData->Get(Form("hpbpb_phMax_withCut_R3_n20_eta_p20_cent%d",i));
     hData_neMax_withCut[i] = (TH1F*)fData->Get(Form("hpbpb_neMax_withCut_R3_n20_eta_p20_cent%d",i));
     hData_muMax_withCut[i] = (TH1F*)fData->Get(Form("hpbpb_muMax_withCut_R3_n20_eta_p20_cent%d",i));
@@ -2405,99 +2413,317 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   }
 
   TCanvas * cMC_chMax = new TCanvas("cMC_chMax","",800,600);
-  makeMultiPanelCanvas(cMC_chMax,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_chMax,3,2,0.0,0.0,0.2,0.15,0.07);
+  #if 0
   TCanvas * cMC_phMax = new TCanvas("cMC_phMax","",800,600);
-  makeMultiPanelCanvas(cMC_phMax,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_phMax,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_neMax = new TCanvas("cMC_neMax","",800,600);
-  makeMultiPanelCanvas(cMC_neMax,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_neMax,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_muMax = new TCanvas("cMC_muMax","",800,600);
-  makeMultiPanelCanvas(cMC_muMax,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_muMax,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_eMax = new TCanvas("cMC_eMax","",800,600);
-  makeMultiPanelCanvas(cMC_eMax,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_eMax,3,2,0.0,0.0,0.2,0.15,0.07);
 
   TCanvas * cMC_chMax_ratio = new TCanvas("cMC_chMax_ratio","",800,600);
-  makeMultiPanelCanvas(cMC_chMax_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_chMax_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_phMax_ratio = new TCanvas("cMC_phMax_ratio","",800,600);
-  makeMultiPanelCanvas(cMC_phMax_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_phMax_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_neMax_ratio = new TCanvas("cMC_neMax_ratio","",800,600);
-  makeMultiPanelCanvas(cMC_neMax_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_neMax_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_muMax_ratio = new TCanvas("cMC_muMax_ratio","",800,600);
-  makeMultiPanelCanvas(cMC_muMax_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_muMax_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_eMax_ratio = new TCanvas("cMC_eMax_ratio","",800,600);
-  makeMultiPanelCanvas(cMC_eMax_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_eMax_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
 
 
   TCanvas * cMC_chSum = new TCanvas("cMC_chSum","",800,600);
-  makeMultiPanelCanvas(cMC_chSum,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_chSum,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_phSum = new TCanvas("cMC_phSum","",800,600);
-  makeMultiPanelCanvas(cMC_phSum,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_phSum,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_neSum = new TCanvas("cMC_neSum","",800,600);
-  makeMultiPanelCanvas(cMC_neSum,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_neSum,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_muSum = new TCanvas("cMC_muSum","",800,600);
-  makeMultiPanelCanvas(cMC_muSum,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_muSum,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_eSum = new TCanvas("cMC_eSum","",800,600);
-  makeMultiPanelCanvas(cMC_eSum,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_eSum,3,2,0.0,0.0,0.2,0.15,0.07);
 
   TCanvas * cMC_chSum_ratio = new TCanvas("cMC_chSum_ratio","",800,600);
-  makeMultiPanelCanvas(cMC_chSum_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_chSum_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_phSum_ratio = new TCanvas("cMC_phSum_ratio","",800,600);
-  makeMultiPanelCanvas(cMC_phSum_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_phSum_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_neSum_ratio = new TCanvas("cMC_neSum_ratio","",800,600);
-  makeMultiPanelCanvas(cMC_neSum_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_neSum_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_muSum_ratio = new TCanvas("cMC_muSum_ratio","",800,600);
-  makeMultiPanelCanvas(cMC_muSum_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cMC_muSum_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cMC_eSum_ratio = new TCanvas("cMC_eSum_ratio","",800,600);
-  makeMultiPanelCanvas(cMC_eSum_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
-
+  makeMultiPanelCanvas(cMC_eSum_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
+#endif
   
   TCanvas * cData_chMax = new TCanvas("cData_chMax","",800,600);
-  makeMultiPanelCanvas(cData_chMax,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_chMax,3,2,0.0,0.0,0.2,0.15,0.07);
+#if 0
   TCanvas * cData_phMax = new TCanvas("cData_phMax","",800,600);
-  makeMultiPanelCanvas(cData_phMax,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_phMax,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_neMax = new TCanvas("cData_neMax","",800,600);
-  makeMultiPanelCanvas(cData_neMax,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_neMax,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_muMax = new TCanvas("cData_muMax","",800,600);
-  makeMultiPanelCanvas(cData_muMax,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_muMax,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_eMax = new TCanvas("cData_eMax","",800,600);
-  makeMultiPanelCanvas(cData_eMax,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_eMax,3,2,0.0,0.0,0.2,0.15,0.07);
 
   TCanvas * cData_chMax_ratio = new TCanvas("cData_chMax_ratio","",800,600);
-  makeMultiPanelCanvas(cData_chMax_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_chMax_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_phMax_ratio = new TCanvas("cData_phMax_ratio","",800,600);
-  makeMultiPanelCanvas(cData_phMax_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_phMax_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_neMax_ratio = new TCanvas("cData_neMax_ratio","",800,600);
-  makeMultiPanelCanvas(cData_neMax_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_neMax_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_muMax_ratio = new TCanvas("cData_muMax_ratio","",800,600);
-  makeMultiPanelCanvas(cData_muMax_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_muMax_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_eMax_ratio = new TCanvas("cData_eMax_ratio","",800,600);
-  makeMultiPanelCanvas(cData_eMax_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_eMax_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
 
 
   TCanvas * cData_chSum = new TCanvas("cData_chSum","",800,600);
-  makeMultiPanelCanvas(cData_chSum,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_chSum,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_phSum = new TCanvas("cData_phSum","",800,600);
-  makeMultiPanelCanvas(cData_phSum,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_phSum,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_neSum = new TCanvas("cData_neSum","",800,600);
-  makeMultiPanelCanvas(cData_neSum,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_neSum,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_muSum = new TCanvas("cData_muSum","",800,600);
-  makeMultiPanelCanvas(cData_muSum,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_muSum,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_eSum = new TCanvas("cData_eSum","",800,600);
-  makeMultiPanelCanvas(cData_eSum,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_eSum,3,2,0.0,0.0,0.2,0.15,0.07);
 
   TCanvas * cData_chSum_ratio = new TCanvas("cData_chSum_ratio","",800,600);
-  makeMultiPanelCanvas(cData_chSum_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_chSum_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_phSum_ratio = new TCanvas("cData_phSum_ratio","",800,600);
-  makeMultiPanelCanvas(cData_phSum_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_phSum_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_neSum_ratio = new TCanvas("cData_neSum_ratio","",800,600);
-  makeMultiPanelCanvas(cData_neSum_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_neSum_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_muSum_ratio = new TCanvas("cData_muSum_ratio","",800,600);
-  makeMultiPanelCanvas(cData_muSum_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_muSum_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
   TCanvas * cData_eSum_ratio = new TCanvas("cData_eSum_ratio","",800,600);
-  makeMultiPanelCanvas(cData_eSum_ratio,3,3,0.0,0.0,0.2,0.15,0.07);
+  makeMultiPanelCanvas(cData_eSum_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
+#endif
 
+  TCanvas * cchMax = new TCanvas("cchMax","",800,600);
+  makeMultiPanelCanvas(cchMax,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0;i<nbins_cent;++i){
+    
+    cData_chMax->cd(nbins_cent-i);
+    cData_chMax->cd(nbins_cent-i)->SetLogy();
 
+    hData_chMax[i]->SetYTitle("counts");
+    hData_chMax[i]->SetXTitle("chMax");
+    hData_chMax[i]->SetMarkerColor(kBlack);
+    hData_chMax[i]->SetMarkerStyle(24);
+    hData_chMax[i]->Draw();
+
+    hData_chMax_withCut[i]->SetMarkerColor(kRed);
+    hData_chMax_withCut[i]->SetMarkerStyle(33);
+    hData_chMax_withCut[i]->Draw("same");
+    
+    if(i==nbins_cent-1){
+      TLegend * l_chMax = myLegend(0.4,0.4,0.6,0.6);
+      l_chMax->AddEntry(hData_chMax[i],"noCut","pl");
+      l_chMax->AddEntry(hData_chMax_withCut[i],"chMax/jtpt >0.02 && eMax/jtpt<0.6","pl");
+      l_chMax->SetTextSize(0.04);
+      l_chMax->Draw();
+    }
+
+    #if 0
+    cData_phMax->cd(nbins_cent-i);
+    cData_phMax->cd(nbins_cent-i)->SetLogy();
+
+    hData_phMax[i]->SetYTitle("counts");
+    hData_phMax[i]->SetXTitle("chMax");
+    hData_phMax[i]->SetMarkerColor(kBlack);
+    hData_phMax[i]->SetMarkerStyle(24);
+    hData_phMax[i]->Draw();
+
+    hData_phMax_withCut[i]->SetMarkerColor(kRed);
+    hData_phMax_withCut[i]->SetMarkerStyle(24);
+    hData_phMax_withCut[i]->Draw("same");
+    
+    if(i==nbins_cent-1){
+      TLegend * l_phMax = myLegend(0.4,0.4,0.6,0.6);
+      l_phMax->AddEntry(hData_phMax[i],"noCut","pl");
+      l_phMax->AddEntry(hData_phMax_withCut[i],"chMax/jtpt >0.02 && eMax/jtpt<0.6","pl");
+      l_phMax->SetTextSize(0.04);
+      l_phMax->Draw();
+    }
+
+    cData_neMax->cd(nbins_cent-i);
+    cData_neMax->cd(nbins_cent-i)->SetLogy();
+
+    hData_neMax[i]->SetYTitle("counts");
+    hData_neMax[i]->SetXTitle("chMax");
+    hData_neMax[i]->SetMarkerColor(kBlack);
+    hData_neMax[i]->SetMarkerStyle(24);
+    hData_neMax[i]->Draw();
+
+    hData_neMax_withCut[i]->SetMarkerColor(kRed);
+    hData_neMax_withCut[i]->SetMarkerStyle(24);
+    hData_neMax_withCut[i]->Draw("same");
+    
+    if(i==nbins_cent-1){
+      TLegend * l_neMax = myLegend(0.4,0.4,0.6,0.6);
+      l_neMax->AddEntry(hData_neMax[i],"noCut","pl");
+      l_neMax->AddEntry(hData_neMax_withCut[i],"chMax/jtpt >0.02 && eMax/jtpt<0.6","pl");
+      l_neMax->SetTextSize(0.04);
+      l_neMax->Draw();
+    }
+
+    cData_muMax->cd(nbins_cent-i);
+    cData_muMax->cd(nbins_cent-i)->SetLogy();
+
+    hData_muMax[i]->SetYTitle("counts");
+    hData_muMax[i]->SetXTitle("chMax");
+    hData_muMax[i]->SetMarkerColor(kBlack);
+    hData_muMax[i]->SetMarkerStyle(24);
+    hData_muMax[i]->Draw();
+
+    hData_muMax_withCut[i]->SetMarkerColor(kRed);
+    hData_muMax_withCut[i]->SetMarkerStyle(24);
+    hData_muMax_withCut[i]->Draw("same");
+    
+    if(i==nbins_cent-1){
+      TLegend * l_muMax = myLegend(0.4,0.4,0.6,0.6);
+      l_muMax->AddEntry(hData_muMax[i],"noCut","pl");
+      l_muMax->AddEntry(hData_muMax_withCut[i],"chMax/jtpt >0.02 && eMax/jtpt<0.6","pl");
+      l_muMax->SetTextSize(0.04);
+      l_muMax->Draw();
+    }
+
+    cData_eMax->cd(nbins_cent-i);
+    cData_eMax->cd(nbins_cent-i)->SetLogy();
+
+    hData_eMax[i]->SetYTitle("counts");
+    hData_eMax[i]->SetXTitle("chMax");
+    hData_eMax[i]->SetMarkerColor(kBlack);
+    hData_eMax[i]->SetMarkerStyle(24);
+    hData_eMax[i]->Draw();
+
+    hData_eMax_withCut[i]->SetMarkerColor(kRed);
+    hData_eMax_withCut[i]->SetMarkerStyle(24);
+    hData_eMax_withCut[i]->Draw("same");
+    
+    if(i==nbins_cent-1){
+      TLegend * l_eMax = myLegend(0.4,0.4,0.6,0.6);
+      l_eMax->AddEntry(hData_eMax[i],"noCut","pl");
+      l_eMax->AddEntry(hData_eMax_withCut[i],"chMax/jtpt >0.02 && eMax/jtpt<0.6","pl");
+      l_eMax->SetTextSize(0.04);
+      l_eMax->Draw();
+    }
+
+    cData_chSum->cd(nbins_cent-i);
+    cData_chSum->cd(nbins_cent-i)->SetLogy();
+
+    hData_chSum[i]->SetYTitle("counts");
+    hData_chSum[i]->SetXTitle("chSum");
+    hData_chSum[i]->SetMarkerColor(kBlack);
+    hData_chSum[i]->SetMarkerStyle(24);
+    hData_chSum[i]->Draw();
+
+    hData_chSum_withCut[i]->SetMarkerColor(kRed);
+    hData_chSum_withCut[i]->SetMarkerStyle(24);
+    hData_chSum_withCut[i]->Draw("same");
+    
+    if(i==nbins_cent-1){
+      TLegend * l_chSum = myLegend(0.4,0.4,0.6,0.6);
+      l_chSum->AddEntry(hData_chSum[i],"noCut","pl");
+      l_chSum->AddEntry(hData_chSum_withCut[i],"chSum/jtpt >0.02 && eSum/jtpt<0.6","pl");
+      l_chSum->SetTextSize(0.04);
+      l_chSum->Draw();
+    }
+
+    cData_phSum->cd(nbins_cent-i);
+    cData_phSum->cd(nbins_cent-i)->SetLogy();
+
+    hData_phSum[i]->SetYTitle("counts");
+    hData_phSum[i]->SetXTitle("chSum");
+    hData_phSum[i]->SetMarkerColor(kBlack);
+    hData_phSum[i]->SetMarkerStyle(24);
+    hData_phSum[i]->Draw();
+
+    hData_phSum_withCut[i]->SetMarkerColor(kRed);
+    hData_phSum_withCut[i]->SetMarkerStyle(24);
+    hData_phSum_withCut[i]->Draw("same");
+    
+    if(i==nbins_cent-1){
+      TLegend * l_phSum = myLegend(0.4,0.4,0.6,0.6);
+      l_phSum->AddEntry(hData_phSum[i],"noCut","pl");
+      l_phSum->AddEntry(hData_phSum_withCut[i],"chMax/jtpt >0.02 && eMax/jtpt<0.6","pl");
+      l_phSum->SetTextSize(0.04);
+      l_phSum->Draw();
+    }
+
+    cData_neSum->cd(nbins_cent-i);
+    cData_neSum->cd(nbins_cent-i)->SetLogy();
+
+    hData_neSum[i]->SetYTitle("counts");
+    hData_neSum[i]->SetXTitle("chSum");
+    hData_neSum[i]->SetMarkerColor(kBlack);
+    hData_neSum[i]->SetMarkerStyle(24);
+    hData_neSum[i]->Draw();
+
+    hData_neSum_withCut[i]->SetMarkerColor(kRed);
+    hData_neSum_withCut[i]->SetMarkerStyle(24);
+    hData_neSum_withCut[i]->Draw("same");
+    
+    if(i==nbins_cent-1){
+      TLegend * l_neSum = myLegend(0.4,0.4,0.6,0.6);
+      l_neSum->AddEntry(hData_neSum[i],"noCut","pl");
+      l_neSum->AddEntry(hData_neSum_withCut[i],"chMax/jtpt >0.02 && eMax/jtpt<0.6","pl");
+      l_neSum->SetTextSize(0.04);
+      l_neSum->Draw();
+    }
+
+    cData_muSum->cd(nbins_cent-i);
+    cData_muSum->cd(nbins_cent-i)->SetLogy();
+
+    hData_muSum[i]->SetYTitle("counts");
+    hData_muSum[i]->SetXTitle("chSum");
+    hData_muSum[i]->SetMarkerColor(kBlack);
+    hData_muSum[i]->SetMarkerStyle(24);
+    hData_muSum[i]->Draw();
+
+    hData_muSum_withCut[i]->SetMarkerColor(kRed);
+    hData_muSum_withCut[i]->SetMarkerStyle(24);
+    hData_muSum_withCut[i]->Draw("same");
+    
+    if(i==nbins_cent-1){
+      TLegend * l_muSum = myLegend(0.4,0.4,0.6,0.6);
+      l_muSum->AddEntry(hData_muSum[i],"noCut","pl");
+      l_muSum->AddEntry(hData_muSum_withCut[i],"chMax/jtpt >0.02 && eMax/jtpt<0.6","pl");
+      l_muSum->SetTextSize(0.04);
+      l_muSum->Draw();
+    }
+
+    cData_eSum->cd(nbins_cent-i);
+    cData_eSum->cd(nbins_cent-i)->SetLogy();
+
+    hData_eSum[i]->SetYTitle("counts");
+    hData_eSum[i]->SetXTitle("chSum");
+    hData_eSum[i]->SetMarkerColor(kBlack);
+    hData_eSum[i]->SetMarkerStyle(24);
+    hData_eSum[i]->Draw();
+
+    hData_eSum_withCut[i]->SetMarkerColor(kRed);
+    hData_eSum_withCut[i]->SetMarkerStyle(24);
+    hData_eSum_withCut[i]->Draw("same");
+    
+    if(i==nbins_cent-1){
+      TLegend * l_eSum = myLegend(0.4,0.4,0.6,0.6);
+      l_eSum->AddEntry(hData_eSum[i],"noCut","pl");
+      l_eSum->AddEntry(hData_eSum_withCut[i],"chMax/jtpt >0.02 && eMax/jtpt<0.6","pl");
+      l_eSum->SetTextSize(0.04);
+      l_eSum->Draw();
+    }
+#endif
+
+  
     cMC_chMax->cd(nbins_cent-i);
     cMC_chMax->cd(nbins_cent-i)->SetLogy();
 
@@ -2508,7 +2734,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_chMax[i]->Draw();
 
     hMC_chMax_withCut[i]->SetMarkerColor(kRed);
-    hMC_chMax_withCut[i]->SetMarkerStyle(24);
+    hMC_chMax_withCut[i]->SetMarkerStyle(33);
     hMC_chMax_withCut[i]->Draw("same");
     
     if(i==nbins_cent-1){
@@ -2519,6 +2745,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
       l_chMax->Draw();
     }
 
+#if 0
     cMC_phMax->cd(nbins_cent-i);
     cMC_phMax->cd(nbins_cent-i)->SetLogy();
 
@@ -2529,7 +2756,7 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
     hMC_phMax[i]->Draw();
 
     hMC_phMax_withCut[i]->SetMarkerColor(kRed);
-    hMC_phMax_withCut[i]->SetMarkerStyle(24);
+    hMC_phMax_withCut[i]->SetMarkerStyle(33);
     hMC_phMax_withCut[i]->Draw("same");
     
     if(i==nbins_cent-1){
@@ -2707,10 +2934,25 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
       l_eSum->SetTextSize(0.04);
       l_eSum->Draw();
     }
+#endif
+
+    // cchMax->cd(nbins_cent-i);
+    // cchMax->cd(nbins_cent-i)->SetLogy();
+
+    // divideBinWidth(hMC_chMax[i]);
+    // hMC_chMax[i]->Scale(1./hMC_chMax[i]->Integral());
+    // divideBinWidth(hData_chMax[i]);
+    // hData_chMax[i]->Scale(1./hData_chMax[i]->Integral());
+
+    // hData_chMax[i]->Draw();
+    // hMC_chMax[i]->Draw("same");
+    
 
   }
-  
+
+  cchMax->SaveAs("","RECREATE");
   cMC_chMax->SaveAs("","RECREATE");
+#if 0
   cMC_phMax->SaveAs("","RECREATE");
   cMC_neMax->SaveAs("","RECREATE");
   cMC_muMax->SaveAs("","RECREATE");
@@ -2733,10 +2975,11 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   cMC_neSum_ratio->SaveAs("","RECREATE");
   cMC_muSum_ratio->SaveAs("","RECREATE");
   cMC_eSum_ratio->SaveAs("","RECREATE");
-
+#endif
   cData_chMax->SaveAs("","RECREATE");
-  cData_phMax->SaveAs("","RECREATE");
-  cData_neMax->SaveAs("","RECREATE");
+#if 0
+cData_phMax->SaveAs("","RECREATE");
+cData_neMax->SaveAs("","RECREATE");
   cData_muMax->SaveAs("","RECREATE");
   cData_eMax->SaveAs("","RECREATE");
 
@@ -2757,7 +3000,6 @@ void RAA_plot_jetid_checks_ratio_plots(int radius = 3, char *algo = "Pu", char *
   cData_neSum_ratio->SaveAs("","RECREATE");
   cData_muSum_ratio->SaveAs("","RECREATE");
   cData_eSum_ratio->SaveAs("","RECREATE");
-
 #endif
   
   //
