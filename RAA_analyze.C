@@ -90,13 +90,15 @@ static const double delta_eta[nbins_eta] = {
 static const char etaWidth [nbins_eta][256] = {
   "0_absEta_05","05_absEta_10","10_absEta_15","15_absEta_20"
 };
-*/
+
 static const int nbins_eta = 1;
 
 static const char etaWidth [nbins_eta][256] = {
-"0_absEta_05"
+"0_absEta_20"
 };
 
+static const double deltaEta[nbins_eta] = {4.0};
+*/
 
 // Remove bins with error > central value
 void cleanup(TH1F *h){
@@ -164,7 +166,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 5, char* algo = "Pu", char *jet_type = "PF", int unfoldingCut = 40){
+void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "0_absEta_05", double deltaEta = 1.0){
 
 TStopwatch timer; 
 timer.Start();
@@ -178,37 +180,26 @@ timer.Start();
   
   TDatime date;//this is just here to get them to run optimized. 
 
-  cout<<"before input file declaration 1"<<endl;
   //TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_final_chMaxjtpt_ak%s%s_20150202.root",algo,jet_type));
   //TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_allcutswithouteSum_ak%s%s_20150203.root",algo,jet_type));
   //TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_nocut_spectra_ak%s%s_20150203.root",algo,jet_type));
-  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_chMaxjtpt_norawptcut_spectra_ak%s%s_20150211.root",algo,jet_type));
+  TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_ak%s%s_20150304.root",algo,jet_type));
   TFile *fMC_pp_in;
-  
-  //if(radius == 2) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_final_jetID_ak2PF_20150128.root");
-  if(radius == 2) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_chMaxjtpt_norawpt_ak2PF_20150204.root");
-  //if(radius == 3) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_final_jetID_ak3PF_20150123.root");
-  //if(radius == 3) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_final_chMaxjtpt_ak3PF_20150202.root");
-  //if(radius == 3) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_allcutswithouteSum_ak3PF_20150203.root");
-  //if(radius == 3) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_chMaxjtpt_norawpt_ak3PF_20150209.root");
-  if(radius == 3) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_chMaxjtpt_norawpt_absEta_ak3PF_20150218.root");
-//if(radius == 4) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_final_jetID_ak4PF_20150128.root");
-if(radius == 4) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_chMaxjtpt_norawpt_ak4PF_20150204.root");
-
-if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_chMaxjtpt_norawpt_absEta_ak5PF_20150218.root");
-  
-  cout<<"before input file declaration 2"<<endl;
+  fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_akPF_20150320.root");
   
   //TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_spectra_histograms_akPuPF_20150128.root");
   //TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_doga_file_spectra_histograms_akPuPF_20150202.root");
   //TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_marguerite_file_spectra_histograms_akPuPF_20150203.root");
   //TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_marguerite_allcutswithouteSum_file_spectra_histograms_akPuPF_20150203.root");
-  TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_marguerite_chMaxjtpt_norawptcut_file_spectra_histograms_akPuPF_20150204.root");
+  TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_akPuPF_20150304.root");
+  TFile * fData_MinBias_PbPb = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_akPuPF_20150304.root");
+  
   //TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_marguerite_nocut_file_spectra_histograms_akPuPF_20150203.root");
   //TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_chMaxjtpt_akPF_20150203.root");
   //TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_allcutwithouteSum_akPF_20150203.root");
-  TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_chMaxjtpt_norawptcut_absEta_35_akPF_20150218.root");
-     
+  //TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_akPF_20150226.root");
+  TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_akPF_20150319.root");
+  
   cout<<"after input file declaration"<<endl;
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
   // for the above condition, i might have to play with the date stamp. 
@@ -231,22 +222,23 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
   TH1F *mPbPb_mcclosure_gen[nbins_cent+1];
   const int Iterations = 20; //for unfolding systematics. 
   const int BayesIter = 4;
-  TH1F *uPbPb_Bayes[nbins_cent+1], *uPbPb_BinByBin[nbins_cent+1]; 
+  TH1F *uPbPb_Bayes[nbins_cent+1], *uPbPb_BinByBin[nbins_cent+1], *uPbPb_SVD[nbins_cent+1]; 
   TH1F *uPbPb_BayesianIter[nbins_cent+1][Iterations];
-
+  TH1F *dPbPb_MinBias[nbins_cent];
+  
   TH1F *dPP_1, *dPP_2, *dPP_3, *dPP_Comb;
   TH1F *mPP_Gen, *mPP_Reco;
   TH2F *mPP_Matrix, *mPP_Response,*mPP_ResponseNorm;
   TH1F *mPP_mcclosure_data;
   TH2F *mPP_mcclosure_Matrix, *mPP_mcclosure_Response,*mPP_mcclosure_ResponseNorm;
   TH1F *mPP_mcclosure_Gen;
-  TH1F *uPP_Bayes, *uPP_BinByBin;
+  TH1F *uPP_Bayes, *uPP_BinByBin, *uPP_SVD;
   TH1F *uPP_BayesianIter[Iterations];
 
   // would be better to read in the histograms and rebin them. come to think of it, it would be better to have them already rebinned (and properly scaled - to the level of differential cross section in what ever barns (inverse micro barns) but keep it consistent) from the read macro. 
-#if 0
+
   // get PbPb data
-  for(int i = 0;i<=nbins_cent;i++){
+  for(int i = 0;i<nbins_cent;i++){
     if(printDebug) cout<<"cent_"<<i<<endl;
     dPbPb_TrgComb[i] = (TH1F*)fData_PbPb_in->Get(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
     //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
@@ -262,6 +254,9 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     dPbPb_Trg55[i]->Print("base");
 //dPbPb_TrgComb[i] = (TH1F*)dPbPb_Trg80[i]->Clone(Form("Jet_80_triggered_spectra_data_PbPb_cent%d",i));
 
+    dPbPb_MinBias[i] = (TH1F*)fData_MinBias_PbPb->Get(Form("hJetMBSpectra_R%d_cent%d",radius,i));
+    dPbPb_TrgComb[i]->Add(dPbPb_MinBias[i]);
+    
     for(int k = 1;k<=unfoldingCut;k++) {
       dPbPb_TrgComb[i]->SetBinContent(k,0);
       dPbPb_Trg80[i]->SetBinContent(k,0);
@@ -271,23 +266,36 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     
   }
 
+  Int_t nSVDIter = 4;
+    
   if(printDebug)cout<<"loaded the data histograms PbPb"<<endl;
   // get PbPb MC
   for(int i = 0;i<nbins_cent;i++){
     
     mPbPb_Gen[i] = (TH1F*)fMC_in->Get(Form("hpbpb_JetComb_gen_R%d_n20_eta_p20_cent%d",radius,i));
+    //mPbPb_Gen[i] = (TH1F*)fMC_in->Get(Form("hpbpb_gen_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Gen[i]->Print("base");
     mPbPb_Reco[i] = (TH1F*)fMC_in->Get(Form("hpbpb_JetComb_reco_R%d_n20_eta_p20_cent%d",radius,i));
+    //mPbPb_Reco[i] = (TH1F*)fMC_in->Get(Form("hpbpb_reco_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Reco[i]->Print("base");
-    mPbPb_Matrix[i] = (TH2F*)fMC_in->Get(Form("hpbpb_matrix_HLT_R%d_n20_eta_p20_cent%d",radius,i));
+    //mPbPb_Matrix[i] = (TH2F*)fMC_in->Get(Form("hpbpb_matrix_HLT_R%d_n20_eta_p20_cent%d",radius,i));
+    mPbPb_Matrix[i] = (TH2F*)fMC_in->Get(Form("hpbpb_matrix_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Matrix[i]->Print("base");
     mPbPb_mcclosure_data[i] = (TH1F*)fMC_in->Get(Form("hpbpb_mcclosure_JetComb_data_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_mcclosure_data[i]->Print("base");
     mPbPb_mcclosure_gen[i] = (TH1F*)fMC_in->Get(Form("hpbpb_mcclosure_gen_JetComb_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_mcclosure_gen[i]->Print("base");
-    mPbPb_mcclosure_Matrix[i] = (TH2F*)fMC_in->Get(Form("hpbpb_mcclosure_matrix_HLT_R%d_n20_eta_p20_cent%d",radius,i));
+    mPbPb_mcclosure_Matrix[i] = (TH2F*)fMC_in->Get(Form("hpbpb_mcclosure_matrix_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_mcclosure_Matrix[i]->Print("base");
 
+    //since SVD is very straight forward, lets do it rignt here:
+    //get the SVD response matrix:
+    //RooUnfoldResponse ruResponse(mPbPb_Matrix[i]->ProjectionY(),mPbPb_Matrix[i]->ProjectionX(), mPbPb_Matrix[i],"","");
+    //regularization parameter definition: 
+    //RooUnfoldSvd unfoldSvd(&ruResponse, dPbPb_TrgComb[i], nSVDIter);
+    //uPbPb_SVD[i] = (TH1F*)unfoldSvd.Hreco();
+  
+    
     for(int k = 1;k<=unfoldingCut;k++){
 
       mPbPb_Gen[i]->SetBinContent(k,0);
@@ -307,17 +315,17 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
   }
   
   if(printDebug) cout<<"loaded the data and mc PbPb histograms from the files"<<endl;
-#endif
+  
   // get PP data
   if(printDebug) cout<<"Getting PP data and MC"<<endl;
-  dPP_1 = (TH1F*)fData_pp_in->Get(Form("hpp_Trg80_R%d_%s",radius,etaWidth[0])); 
+  dPP_1 = (TH1F*)fData_pp_in->Get(Form("hpp_residual_Trg80_R%d_%s",radiusPP,etaWidth)); 
   dPP_1->Print("base");
-  dPP_2 = (TH1F*)fData_pp_in->Get(Form("hpp_Trg60_R%d_%s",radius,etaWidth[0]));
+  dPP_2 = (TH1F*)fData_pp_in->Get(Form("hpp_residual_Trg60_R%d_%s",radiusPP,etaWidth));
   dPP_2->Print("base");
-  dPP_3 = (TH1F*)fData_pp_in->Get(Form("hpp_Trg40_R%d_%s",radius,etaWidth[0]));
+  dPP_3 = (TH1F*)fData_pp_in->Get(Form("hpp_residual_Trg40_R%d_%s",radiusPP,etaWidth));
   dPP_3->Print("base");
-  dPP_Comb = (TH1F*)fData_pp_in->Get(Form("hpp_TrgComb_R%d_%s",radius,etaWidth[0]));   
-//dPP_Comb = (TH1F*)dPP_1->Clone(Form("hpp_TrgComb_R%d_n20_eta_p20",radius,etaWidth[0]));   
+  dPP_Comb = (TH1F*)fData_pp_in->Get(Form("hpp_residual_TrgComb_R%d_%s",radiusPP,etaWidth));   
+//dPP_Comb = (TH1F*)dPP_1->Clone(Form("hpp_TrgComb_R%d_n20_eta_p20",radiusPP,etaWidth));   
   dPP_Comb->Print("base");
   for(int k = 1;k<=unfoldingCut;k++) {
     dPP_Comb->SetBinContent(k,0);
@@ -327,17 +335,23 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
   }
   
   // get PP MC
-  mPP_Gen = (TH1F*)fMC_pp_in->Get(Form("hpp_JetComb_gen_R%d_%s",radius,etaWidth[0]));
+  mPP_Gen = (TH1F*)fMC_pp_in->Get(Form("hpp_JetComb_gen_R%d_%s",radiusPP,etaWidth));
   mPP_Gen->Print("base");
-  mPP_Reco = (TH1F*)fMC_pp_in->Get(Form("hpp_JetComb_reco_R%d_%s",radius,etaWidth[0]));
+  mPP_Reco = (TH1F*)fMC_pp_in->Get(Form("hpp_JetComb_reco_R%d_%s",radiusPP,etaWidth));
   mPP_Reco->Print("base");
-  mPP_Matrix = (TH2F*)fMC_pp_in->Get(Form("hpp_matrix_HLT_R%d_%s",radius,etaWidth[0]));
+  mPP_Matrix = (TH2F*)fMC_pp_in->Get(Form("hpp_matrix_HLT_R%d_%s",radiusPP,etaWidth));
   mPP_Matrix->Print("base");
-  mPP_mcclosure_data = (TH1F*)fMC_pp_in->Get(Form("hpp_mcclosure_data_R%d_%s",radius,etaWidth[0]));
+  mPP_mcclosure_data = (TH1F*)fMC_pp_in->Get(Form("hpp_mcclosure_data_R%d_%s",radiusPP,etaWidth));
   mPP_mcclosure_data->Print("base");
-  mPP_mcclosure_Matrix = (TH2F*)fMC_pp_in->Get(Form("hpp_mcclosure_matrix_R%d_%s",radius,etaWidth[0]));
+  mPP_mcclosure_Matrix = (TH2F*)fMC_pp_in->Get(Form("hpp_mcclosure_matrix_R%d_%s",radiusPP,etaWidth));
   mPP_mcclosure_Matrix->Print("base");
 
+  //RooUnfoldResponse ruResponsePP(mPP_Matrix->ProjectionY(),mPP_Matrix->ProjectionX(), mPP_Matrix,"","");
+  //regularization parameter definition: 
+  //RooUnfoldSvd unfoldSvdPP(&ruResponsePP, dPP_Comb, nSVDIter);
+  //uPP_SVD = (TH1F*)unfoldSvdPP.Hreco();
+
+  
   for(int k = 1;k<=unfoldingCut;k++){
     mPP_Gen->SetBinContent(k,0);
     mPP_Reco->SetBinContent(k,0);
@@ -349,13 +363,16 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
       mPP_mcclosure_Matrix->SetBinContent(l,k,0);
     }
   }
-  
+
+  //do the pp svd unfolding here:
+
   //mPP_Matrix->Print("base");
   //mPP_Response = (TH2F*)fMc_in->Get("hpp_gen");
   // make the response matrix.
   // here since we dont have the simple nature of the uhist histograms which makes debugging hard, we have to run the response matrix and unfolding separately for PbPb and pp which makes code ugly and not efficient but easy to debug at the same time.
 
 #if 0
+
   if(printDebug) cout<<"Filling the PbPb response Matrix"<<endl;
 
   // response matrix and unfolding for PbPb 
@@ -438,6 +455,8 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
       }
       
     }
+    
+    
   }
 
   
@@ -524,7 +543,10 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
       }
       
     }
+
+
   }
+
 #endif
 
   if(printDebug) cout<<"Filling PP response Matrix"<<endl;
@@ -615,6 +637,7 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     
   }
   
+#if 0
   if(printDebug) cout<<"Filling PP mcclosure response Matrix"<<endl;
 
   // response matrix for pp.  
@@ -702,10 +725,12 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     
     
   }
-#if 0
+#endif
   if(printDebug) cout<<"finished with all the response matrix. now going for unfolding"<<endl;
   
-  // do the unfolding - including the iteration systematics (ofcourse). Similar to the above version, we have to create 2 separate unfolding for PbPb and pp. 
+#if 0
+
+  // do the unfolding - including the iteration systematics (ofcourse). Similar to the above version, we have to create 2 separate unfolding for PbPb and pp.
 
   // first for PbPb
   for (int i=0;i<nbins_cent;i++) {
@@ -776,7 +801,8 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     delete hPrior;
      
   }
-#endif
+
+#endif 
 
   // do the pp unfolding. 
   // Do Bin-by-bin
@@ -813,7 +839,7 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
   
   delete hBinByBinCorRawPP;
   delete hMCGenPP;
-  
+#if 0
   // Iteration Systematics
   for (int j=2;j<Iterations;j++){
     bayesianUnfold myUnfoldingSys(mPP_Matrix,hPriorPP,0);
@@ -822,8 +848,10 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     uPP_BayesianIter[j]->Print("base");
     uPP_BayesianIter[j]->SetTitle(Form("Unfolded pp Bayesian iteration %d",j));
   }
-  
-  uPP_Bayes        = (TH1F*) uPP_BayesianIter[BayesIter]->Clone("uPP_Bayes");
+#endif
+
+  //uPP_Bayes        = (TH1F*) uPP_BayesianIter[BayesIter]->Clone("uPP_Bayes");
+  uPP_Bayes        = (TH1F*) myUnfolding.hPrior->Clone("uPP_Bayes");
   //uhist[i]->hRecoJECSys   = (TH1F*) myUnfoldingJECSys.hPrior->Clone("UnfoldedJECSys_cent%i",i));
   //uhist[i]->hRecoSmearSys   = (TH1F*) myUnfoldingSmearSys.hPrior->Clone("UnfoldedSmearSys_cent%i",i));
   //uPP_BinByBin[i] = (TH1F*) unfold2.Hreco();
@@ -835,6 +863,7 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
   delete hPriorPP;
 
 #if 0
+
   // calculate the RAA 
   // Scale pp by 1./64 - sigma pp 
   // scale PbPb by 1./ncoll[i]
@@ -858,7 +887,8 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     //RAA_bayesian[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
     //RAA_bayesian[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     RAA_bayesian[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    RAA_bayesian[i]->Scale(1./145.156);
+    //RAA_bayesian[i]->Scale(1./145.156); // triggered value
+    RAA_bayesian[i]->Scale(1./161.939); //minbias value
     RAA_bayesian[i]->Scale(1./(7.65*1e6));
     RAA_bayesian[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     RAA_bayesian[i]->Scale(5.3*1e3);
@@ -867,7 +897,8 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     //RAA_measured[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
     //RAA_measured[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     RAA_measured[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    RAA_measured[i]->Scale(1./145.156);
+    //RAA_measured[i]->Scale(1./145.156);
+    RAA_measured[i]->Scale(1./161.939); // mninbias value
     RAA_measured[i]->Scale(1./(7.65*1e6));
     RAA_measured[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     RAA_measured[i]->Scale(5.3*1e3);
@@ -876,7 +907,8 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     //RAA_binbybin[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
     //RAA_binbybin[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     RAA_binbybin[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    RAA_binbybin[i]->Scale(1./145.156);
+    //RAA_binbybin[i]->Scale(1./145.156);
+    RAA_binbybin[i]->Scale(1./161.939);
     RAA_binbybin[i]->Scale(1./(7.65*1e6));
     RAA_binbybin[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     RAA_binbybin[i]->Scale(5.3*1e3);
@@ -984,7 +1016,7 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     
   }
 #endif
-
+#if 0
   // do pp mc unfolding closure test 
   // Do Bin-by-bin
   if(printDebug) cout<<"doing bin by bin unfolding for MC closure test - PP"<<endl;
@@ -1047,11 +1079,14 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
 
   delete hPriorPPMC;
   // write it to the output file
-  
+  #endif
+
   cout<<"writing to output file"<<endl;
+
     
-  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_unfold_%s_%dGeVCut_ak%d%s_%d.root",etaWidth[0],unfoldingCut,radius,jet_type,date.GetDate()),"RECREATE");
+  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_%d_unfold_%s_%dGeVCut_ak%s_%d.root", radiusPP, etaWidth,unfoldingCut,jet_type,date.GetDate()),"RECREATE");
   fout.cd();
+
 #if 0
   for(int i = 0;i<nbins_cent;i++){
 
@@ -1059,18 +1094,31 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     //uPbPb_Bayes[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
     //uPbPb_Bayes[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     uPbPb_Bayes[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    uPbPb_Bayes[i]->Scale(1./145.156);
+    //uPbPb_Bayes[i]->Scale(1./145.156);
+    uPbPb_Bayes[i]->Scale(1./161.939);
     uPbPb_Bayes[i]->Scale(1./(7.65*1e6));
     uPbPb_Bayes[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     uPbPb_Bayes[i] = (TH1F*)uPbPb_Bayes[i]->Rebin(nbins_pt,Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i),boundaries_pt);
     divideBinWidth(uPbPb_Bayes[i]);
     uPbPb_Bayes[i]->Write();
 
+    // uPbPb_SVD[i]->Scale(1./4);// delta eta
+    // //uPbPb_SVD[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
+    // //uPbPb_SVD[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
+    // uPbPb_SVD[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
+    // uPbPb_SVD[i]->Scale(1./145.156);
+    // uPbPb_SVD[i]->Scale(1./(7.65*1e6));
+    // uPbPb_SVD[i]->Scale(64.*1e9/(ncoll[i]*1e3));
+    // uPbPb_SVD[i] = (TH1F*)uPbPb_SVD[i]->Rebin(nbins_pt,Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i),boundaries_pt);
+    // divideBinWidth(uPbPb_SVD[i]);
+    // uPbPb_SVD[i]->Write();
+
     uPbPb_BinByBin[i]->Scale(1./4);// delta eta
     //uPbPb_BinByBin[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
     //uPbPb_BinByBin[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     uPbPb_BinByBin[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    uPbPb_BinByBin[i]->Scale(1./145.156);
+    //uPbPb_BinByBin[i]->Scale(1./145.156);
+    uPbPb_BinByBin[i]->Scale(1./161.939);
     uPbPb_BinByBin[i]->Scale(1./(7.65*1e6));
     uPbPb_BinByBin[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     uPbPb_BinByBin[i] = (TH1F*)uPbPb_BinByBin[i]->Rebin(nbins_pt,Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i),boundaries_pt);
@@ -1085,7 +1133,8 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     //dPbPb_TrgComb[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
     //dPbPb_TrgComb[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     dPbPb_TrgComb[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    dPbPb_TrgComb[i]->Scale(1./145.156);
+    //dPbPb_TrgComb[i]->Scale(1./145.156);
+    dPbPb_TrgComb[i]->Scale(1./161.939);
     dPbPb_TrgComb[i]->Scale(1./(7.65*1e6));
     dPbPb_TrgComb[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_combined_cent%d",i),boundaries_pt);
@@ -1096,7 +1145,8 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     //dPbPb_Trg80[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
     //dPbPb_Trg80[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     dPbPb_Trg80[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    dPbPb_Trg80[i]->Scale(1./145.156);
+    //dPbPb_Trg80[i]->Scale(1./145.156);
+    dPbPb_Trg80[i]->Scale(1./161.939);
     dPbPb_Trg80[i]->Scale(1./(7.65*1e6));
     dPbPb_Trg80[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     dPbPb_Trg80[i] = (TH1F*)dPbPb_Trg80[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_jet80_cent%d",i),boundaries_pt);
@@ -1108,7 +1158,8 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     //dPbPb_Trg65[i]->Scale(1./145.156/1e6);// Jet 65 luminosity
     //dPbPb_Trg65[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     dPbPb_Trg65[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    dPbPb_Trg65[i]->Scale(1./145.156);
+    //dPbPb_Trg65[i]->Scale(1./145.156);
+    dPbPb_Trg65[i]->Scale(1./161.939);
     dPbPb_Trg65[i]->Scale(1./(7.65*1e6));
     dPbPb_Trg65[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     dPbPb_Trg65[i] = (TH1F*)dPbPb_Trg65[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_jet65_cent%d",i),boundaries_pt);
@@ -1120,12 +1171,25 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     //dPbPb_Trg55[i]->Scale(1./145.156/1e6);// Jet 55 luminosity
     //dPbPb_Trg55[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     dPbPb_Trg55[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    dPbPb_Trg55[i]->Scale(1./145.156);
+    //dPbPb_Trg55[i]->Scale(1./145.156);
+    dPbPb_Trg55[i]->Scale(1./161.939);
     dPbPb_Trg55[i]->Scale(1./(7.65*1e6));
     dPbPb_Trg55[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     dPbPb_Trg55[i] = (TH1F*)dPbPb_Trg55[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_jet55_cent%d",i),boundaries_pt);
     divideBinWidth(dPbPb_Trg55[i]);
     dPbPb_Trg55[i]->Write();
+
+    dPbPb_MinBias[i]->Scale(1./4);// delta eta
+    //dPbPb_MinBias[i]->Scale(1./145.156/1e6);// Jet 55 luminosity
+    //dPbPb_MinBias[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
+    dPbPb_MinBias[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
+    //dPbPb_MinBias[i]->Scale(1./145.156);
+    dPbPb_MinBias[i]->Scale(1./161.939);
+    dPbPb_MinBias[i]->Scale(1./(7.65*1e6));
+    dPbPb_MinBias[i]->Scale(64.*1e9/(ncoll[i]*1e3));
+    dPbPb_MinBias[i] = (TH1F*)dPbPb_MinBias[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_MinBias_cent%d",i),boundaries_pt);
+    divideBinWidth(dPbPb_MinBias[i]);
+    dPbPb_MinBias[i]->Write();
 
     
     //mPbPb_ResponseNorm[i] = (TH2F*)mPbPb_ResponseNorm[i]->Rebin2D(nbins_pt,Form("PbPb_normalized_response_matrix_cent%d",i),boundaries_pt);    
@@ -1176,28 +1240,30 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
   }//cent bin loop
 
 #endif
-      //dPP_Comb->Scale(1./4);// delta eta
+
+#if 0
+  //dPP_Comb->Scale(1./deltaEta);// delta eta
   dPP_Comb->Scale(1./5.3/1e3);// Jet 80 luminosity
   //dPP_Comb->Scale(1./1.0466/1e6);// Jet 80 luminosity
   dPP_Comb = (TH1F*)dPP_Comb->Rebin(nbins_pt,"pp_measured_spectra_combined",boundaries_pt);
   divideBinWidth(dPP_Comb);
   dPP_Comb->Write();
   
-  //dPP_1->Scale(1./4);// delta eta
+  //dPP_1->Scale(1./deltaEta);// delta eta
   dPP_1->Scale(1./5.3/1e3);// Jet 80 luminosity
   //dPP_1->Scale(1./1.0466/1e6);// Jet 80 luminosity
   dPP_1 = (TH1F*)dPP_1->Rebin(nbins_pt,"pp_measured_spectra_jet80",boundaries_pt);
   divideBinWidth(dPP_1);
   dPP_1->Write();
 
-  //dPP_2->Scale(1./4);// delta eta
+  //dPP_2->Scale(1./deltaEta);// delta eta
   dPP_2->Scale(1./5.3/1e3);// Jet 80 luminosity
   //dPP_2->Scale(1./1.0466/1e6);// Jet 80 luminosity
   dPP_2 = (TH1F*)dPP_2->Rebin(nbins_pt,"pp_measured_spectra_jet60",boundaries_pt);
   divideBinWidth(dPP_2);
   dPP_2->Write();
   
-  //dPP_3->Scale(1./4);// delta eta
+  //dPP_3->Scale(1./deltaEta);// delta eta
   dPP_3->Scale(1./5.3/1e3);// Jet 80 luminosity
   //dPP_3->Scale(1./1.0466/1e6);// Jet 80 luminosity
   dPP_3 = (TH1F*)dPP_3->Rebin(nbins_pt,"pp_measured_spectra_jet40",boundaries_pt);
@@ -1211,12 +1277,12 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
   mPP_mcclosure_ResponseNorm->Write();
   mPP_mcclosure_Response->Write();
 
-  //mPP_Gen->Scale(1./4);// delta eta
+  //mPP_Gen->Scale(1./deltaEta);// delta eta
   mPP_Gen = (TH1F*)mPP_Gen->Rebin(nbins_pt,"PP_Gen_spectra_refpt",boundaries_pt);
   divideBinWidth(mPP_Gen);
   mPP_Gen->Write();
   
-  //mPP_Reco->Scale(1./4);// delta eta
+  //mPP_Reco->Scale(1./deltaEta);// delta eta
   mPP_Reco = (TH1F*)mPP_Reco->Rebin(nbins_pt,"PP_Reco_spectra_refpt",boundaries_pt);
   divideBinWidth(mPP_Reco);
   mPP_Reco->Write();
@@ -1234,27 +1300,36 @@ if(radius == 5) fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/C
     uPP_MC_BayesianIter[i]->Write();
   }
   
-  //uPP_Bayes->Scale(1./4);// delta eta
-  uPP_Bayes->Scale(1./5.3/1e3); //pp lumi
+#endif
+
+  uPP_Bayes->Scale(1./deltaEta);// delta eta
+  uPP_Bayes->Scale(1./5.3); //pp lumi to get it to pico barns 
   //uPP_Bayes->Scale(1./1.0466/1e6);
   uPP_Bayes = (TH1F*)uPP_Bayes->Rebin(nbins_pt,"PP_bayesian_unfolded_spectra",boundaries_pt);
   divideBinWidth(uPP_Bayes);
   uPP_Bayes->Write();
+
+  // //uPP_SVD->Scale(1./deltaEta);// delta eta
+  // uPP_SVD->Scale(1./5.3/1e3); //pp lumi
+  // //uPP_SVD->Scale(1./1.0466/1e6);
+  // uPP_SVD = (TH1F*)uPP_SVD->Rebin(nbins_pt,"PP_bayesian_unfolded_spectra",boundaries_pt);
+  // divideBinWidth(uPP_SVD);
+  // uPP_SVD->Write();
   
-  //uPP_BinByBin->Scale(1./4);// delta eta
-  uPP_BinByBin->Scale(1./5.3/1e3); // pp lumi
+  uPP_BinByBin->Scale(1./deltaEta);// delta eta
+  uPP_BinByBin->Scale(1./5.3); // pp lumi
   //uPP_BinByBin->Scale(1./1.0466/1e6);
   uPP_BinByBin = (TH1F*)uPP_BinByBin->Rebin(nbins_pt,"PP_BinByBin_unfolded_spectra",boundaries_pt);
   divideBinWidth(uPP_BinByBin);
   uPP_BinByBin->Write();
-
+#if 0
   uPP_MC_Bayes = (TH1F*)uPP_MC_Bayes->Rebin(nbins_pt,"PP_MC_Bayes_unfolded_spectra",boundaries_pt);
   divideBinWidth(uPP_MC_Bayes);
   uPP_MC_Bayes->Write();
   uPP_MC_BinByBin = (TH1F*)uPP_MC_BinByBin->Rebin(nbins_pt,"PP_MC_BinByBin_unfolded_spectra",boundaries_pt);
   divideBinWidth(uPP_MC_BinByBin);
   uPP_MC_BinByBin->Write();
-
+#endif
   //fout.Write();
   fout.Close();
   
