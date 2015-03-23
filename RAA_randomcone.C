@@ -30,13 +30,13 @@
 
 using namespace std;
 
-void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",const char *type="data"){
+void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",const char *type="MC"){
   
   TDatime date;
 
   TFile *FileA; 
   if(type=="data")
-    FileA = TFile::Open("/mnt/hadoop/cms/store/user/velicanu/HIMinBias2011_GR_R_53_LV6_CMSSW_5_3_16_lumi2_FOREST_TRY2merged/0.root");
+    FileA = TFile::Open("/mnt/hadoop/cms/store/user/belt/HiForest_MinBias_JetRAA_v1_final/HiForest_HIMinBiasUPC_14Mar2014_v2_JetRAA_lumi4_Part28.root");
   else if(type=="MC")
     FileA = TFile::Open("/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root");
   
@@ -77,8 +77,7 @@ void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",
   // test histogram for ranPFsumEt
   //TH1F *test_ranpfsumet = new TH1F("test_ranpfsumet","",200,0,100);
   TTree* ak;
-  if(rad!=2)ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,rad,jet_type));
-  if(rad==2)ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,3,jet_type));
+  ak      = (TTree*)FileA->Get(Form("ak%s%d%sJetAnalyzer/t",algo,3,jet_type));
   // - TTree* ic      = (TTree*)FileA->Get("icPu5JetAnalyzer/t"); // - not there in the new forest 
   TTree* hlt     = (TTree*)FileA->Get("hltanalysis/HltTree");
   TTree* skim    = (TTree*)FileA->Get("skimanalysis/HltTree");
@@ -579,7 +578,7 @@ void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",
   cout<<"Right before the loop"<<endl;
   //int Nevents = ak->GetEntries();
 
-  for(int iev = 0; iev < Nevents; ++iev)//loop over all the entries (events)
+  for(int iev = 0; iev < Nevents; ++iev)
     {
  
       if (iev%nMarks==0) 

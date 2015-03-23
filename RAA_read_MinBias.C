@@ -49,6 +49,7 @@
 //static const double boundaries_fileno_job[job_no+1] = {0, 413, 826, 1239, 1652, 2065, 2478, 2891, 3304, 3717, 4130, 4542};
 
 #define NOBJECT_MAX 16384
+#define pi 3.14159265
 
 static const int nbins_pt = 39;
 static const double boundaries_pt[nbins_pt+1] = {
@@ -107,10 +108,10 @@ static const char etaWidth [nbins_eta][256] = {
 
 static const int nbins_cent = 6;
 static Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 5 to get your actual centrality
-static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8 ,362.24}; //last one is for 0-200 bin. 
+static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8, 362.24}; //last one is for 0-200 bin. 
 
-static const int no_radius = 1;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -137,7 +138,7 @@ void divideBinWidth(TH1 *h)
 }
 
 int findBin(int hiBin){
-  int binNo = 0;
+  int binNo = -1;
 
   for(int i = 0;i<nbins_cent;i++){
     if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
@@ -149,10 +150,18 @@ int findBin(int hiBin){
   return binNo;
 }
 
+double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
+{
+  float deta = eta1 - eta2;
+  float dphi = fabs(phi1 - phi2);
+  if(dphi > pi)dphi -= 2*pi;
+  double dr = sqrt(pow(deta,2) + pow(dphi,2));
+  return dr;
+}
 
 using namespace std;
 
-void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "Calo", char *Type = "Data"){
+void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "PF", char *Type = "Data"){
 
   TH1::SetDefaultSumw2();
   
@@ -170,6 +179,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   if(Type=="MC")infile1 = "PbPb_HydjetMinBias_forest.txt";
   //if(Type=="Data")infile1 = "PbPb_MinBiasUPC_forest.txt";
   if(Type=="Data")infile1 = "jetRAA_MinBiasUPC_forest.txt";
+  //if(Type=="Data")infile1 = "14010_MinBiasUPC_forest.txt";
   
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
@@ -380,6 +390,10 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND_Prescl",&L1_sj36_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND",&L1_sj52_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND_Prescl",&L1_sj52_p_1);
+
+    jetpbpb1[4][k]->SetBranchAddress("pt",&trgObj_pt_1);
+    jetpbpb1[4][k]->SetBranchAddress("eta",&trgObj_eta_1);
+    jetpbpb1[4][k]->SetBranchAddress("phi",&trgObj_phi_1);
     
     /*
     jetpbpb1[2][k]->SetBranchAddress("nPFpart", &nPFpart);
@@ -458,37 +472,37 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   //   //hJetMBSpectra[k][i]->Print("base");
   // }
     
-  TTree* trigger_info;
-  Int_t evt_value;
-  Int_t run_value;
-  Int_t lumi_value;
-  Int_t nref;
-  Float_t jetpt[1000];
-  Float_t jeteta[1000];
-  Int_t Jet80;
-  Int_t Jet80_prescl;
-  Int_t Jet65;
-  Int_t Jet65_prescl;
-  Int_t Jet55;
-  Int_t Jet55_prescl;
-  Int_t HIMinBias;
-  Int_t HIMinBias_prescl;
+  // TTree* trigger_info;
+  // Int_t evt_value;
+  // Int_t run_value;
+  // Int_t lumi_value;
+  // Int_t nref;
+  // Float_t jetpt[1000];
+  // Float_t jeteta[1000];
+  // Int_t Jet80;
+  // Int_t Jet80_prescl;
+  // Int_t Jet65;
+  // Int_t Jet65_prescl;
+  // Int_t Jet55;
+  // Int_t Jet55_prescl;
+  // Int_t HIMinBias;
+  // Int_t HIMinBias_prescl;
   
-  trigger_info = new TTree("trigger_info","");
-  trigger_info->Branch("run_value",&run_value,"run_value/I");
-  trigger_info->Branch("evt_value",&evt_value,"evt_value/I");
-  trigger_info->Branch("lumi_value",&lumi_value,"lumi_value/I");
-  trigger_info->Branch("nref",&nref,"nref/I");
-  trigger_info->Branch("jetpt",&jetpt,"jetpt[nref]/F");
-  trigger_info->Branch("jeteta",&jeteta,"jeteta[nref]/F");
-  trigger_info->Branch("Jet80",&Jet80,"Jet80/I");
-  trigger_info->Branch("Jet80_prescl",&Jet80_prescl,"Jet80_prescl/I");
-  trigger_info->Branch("Jet65",&Jet65,"Jet65/I");
-  trigger_info->Branch("Jet65_prescl",&Jet65_prescl,"Jet65_prescl/I");
-  trigger_info->Branch("Jet55",&Jet55,"Jet55/I");
-  trigger_info->Branch("Jet55_prescl",&Jet55_prescl,"Jet55_prescl/I");
-  trigger_info->Branch("HIMinBias",&HIMinBias,"HIMinBias/I");
-  trigger_info->Branch("HIMinBias_prescl",&HIMinBias_prescl,"HIMinBias_prescl/I");  
+  // trigger_info = new TTree("trigger_info","");
+  // trigger_info->Branch("run_value",&run_value,"run_value/I");
+  // trigger_info->Branch("evt_value",&evt_value,"evt_value/I");
+  // trigger_info->Branch("lumi_value",&lumi_value,"lumi_value/I");
+  // trigger_info->Branch("nref",&nref,"nref/I");
+  // trigger_info->Branch("jetpt",&jetpt,"jetpt[nref]/F");
+  // trigger_info->Branch("jeteta",&jeteta,"jeteta[nref]/F");
+  // trigger_info->Branch("Jet80",&Jet80,"Jet80/I");
+  // trigger_info->Branch("Jet80_prescl",&Jet80_prescl,"Jet80_prescl/I");
+  // trigger_info->Branch("Jet65",&Jet65,"Jet65/I");
+  // trigger_info->Branch("Jet65_prescl",&Jet65_prescl,"Jet65_prescl/I");
+  // trigger_info->Branch("Jet55",&Jet55,"Jet55/I");
+  // trigger_info->Branch("Jet55_prescl",&Jet55_prescl,"Jet55_prescl/I");
+  // trigger_info->Branch("HIMinBias",&HIMinBias,"HIMinBias/I");
+  // trigger_info->Branch("HIMinBias_prescl",&HIMinBias_prescl,"HIMinBias_prescl/I");  
   
   // prescl is calculated as the ratio of the 
   //minbias prescl = 38.695
@@ -496,6 +510,26 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   // jet65  prescl = 1.11398 (1.11287)
   // jet55  prescl = 2.0475 (2.0292)
 
+  
+  TH1F* hDenominator[no_radius]; 
+  TH1F* hNumerator_80[no_radius];
+  TH1F* hNumerator_65[no_radius];
+  TH1F* hNumerator_55[no_radius];
+
+  TH1F * hNumerator_55_n65_n80[no_radius];
+  TH1F * hNumerator_65_n80[no_radius];
+
+  for(int k = 0;k<no_radius;k++){
+
+    hDenominator[k] =new TH1F(Form("hDenominator_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    hNumerator_80[k] =new TH1F(Form("hNumerator_80_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    hNumerator_65[k] =new TH1F(Form("hNumerator_65_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    hNumerator_55[k] =new TH1F(Form("hNumerator_55_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    hNumerator_55_n65_n80[k] =new TH1F(Form("hNumerator_55_n65_n80_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    hNumerator_65_n80[k] =new TH1F(Form("hNumerator_65_n80_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+
+  }
+  
   // but these prescl values are derived from the triggered data sample, need to check if they are the same in the minbias sample 
   // cout<<"total number of events with minbias trigger = "<<jetpbpb1[2][0]->GetEntries("HLT_HIMinBiasHfOrBSC_v1 && HLT_HIJet80_v1_Prescl==1")<<endl;
   // cout<<" numerator   "<<jetpbpb1[2][0]->GetEntries("HLT_HIMinBiasHfOrBSC_v1 && HLT_HIJet80_v1_Prescl==1 && HLT_HIJet80_v1 && jtpt[0]>110 && TMath::Abs(jteta[0])<2")<<endl;
@@ -525,36 +559,85 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
       if(fabs(vz_1)>15) continue;
       
+      //if(jetMB_1==0 || jet80_p_1==0 || jet65_p_1==0 || jet55_p_1==0)  continue;
+      if(jetMB_1==0)  continue;
+
       hEvents->Fill(1);
-      
-      Float_t largepT = pt_1[0];
-      //cout<<"large pT = "<<largepT<<endl;
 
-      run_value = run_1;
-      evt_value = evt_1;
-      lumi_value = lumi_1;
+      if(nrefe_1 > 30) continue;
+      //apply the supernova rejection cut:
+      //int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
+      //for(int g = 0;g<nrefe_1;g++)
+      //  if(eta_1[g]>=-2 && eta_1[g]<2) if(pt_1[g]>=50) jetCounter++;	  
       
-      nref = nrefe_1;
-      Jet80 = jet80_1;
-      Jet80_prescl = jet80_p_1;
-      Jet65 = jet65_1;
-      Jet65_prescl = jet65_p_1;
-      Jet55 = jet55_1;
-      Jet55_prescl = jet55_p_1;
-      HIMinBias = jetMB_1;
-      HIMinBias_prescl = jetMB_p_1;
-      for(int j = 0;j<nrefe_1;++j){
+      //if(jetCounter>10) continue;
+      
+      
+      // Float_t largepT = pt_1[0];
+      // //cout<<"large pT = "<<largepT<<endl;
+      // Float_t deltaR = 0;
+      // Float_t small_deltaR = 100.;
+      // Int_t small_position = 0;
+      // // find the jet thats matched with the trigger object in delta R. 
+      // for(int j = 0;j<nrefe_1;++j){
 
-	jetpt[j] = pt_1[j];
-	jeteta[j] = eta_1[j];
+      // 	deltaR = Calc_deltaR(eta_1[j],phi_1[j], trgObj_eta_1, trgObj_phi_1);
 	
-	if(TMath::Abs(eta_1[j])<2)
-	  if(largepT <= pt_1[j])
-	    largepT = pt_1[j];
+      // 	if(deltaR < small_deltaR){
+	  
+      // 	  small_deltaR = deltaR;
+      // 	  small_position = j;
+	  
+      // 	}
+
+      // }
+
+      // Float_t deltaR_leading = Calc_deltaR(eta_1[0],phi_1[0], trgObj_eta_1, trgObj_phi_1);
+      
+      //if(trgObj_pt_1 != -99)cout<<" JetMB = "<<jetMB_1<<" Jet80 = "<<jet80_1<<" Jet65 = "<<jet65_1<<" Jet55 = "<<jet55_1<<endl;
+      //if(trgObj_pt_1 != -99)cout<<" Trigger object pt =  "<<trgObj_pt_1<<", matched jet pt = "<<pt_1[small_position]<<", deltaR = "<<small_deltaR<<", leading jet pt = "<<pt_1[0]<<", delta R with leading jet = "<<deltaR_leading<<endl;
+      
+      // hDenominator[k]->Fill(pt_1[small_position]);
+      
+      // if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[small_position], jet80_p_1); 
+      // if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[small_position], jet65_p_1); 
+      // if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[small_position], jet55_p_1);
+      
+      // now the jet which is matched with the trigger object is the jet at position 
+      for(int j = 0;j<nrefe_1;++j){
+      //for(int j = 0;j<1;++j){ // plotting the leading jet. 
+	
+	if(chMax_1[j]/pt_1[j] < 0.02 || eMax_1[j]/pt_1[j]>0.6) continue; 
+	
+	hDenominator[k]->Fill(pt_1[j]);
+	
+	if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[j], jet80_p_1); 
+	if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[j], jet65_p_1); 
+	if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[j], jet55_p_1);
+	
+	if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[j]);
+	if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[j]);
+	
+	
+	// if(jetMB_1==1 && jet80_p_1==1) {
+	
+	//   hDenominator[k]->Fill(pt_1[j]);
+	  
+	//   if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[j]); 
+	//   // if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[0]); 
+	//   // if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[0]);
+	  
+	//   // if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[0]);
+	//   // if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[0]);
+	  
+	// }
+	
 	
       }
-      trigger_info->Fill();
-      
+	
+      //trigger_info->Fill();
+
+
       
       //cout<<"after eta selection large pT = "<<largepT<<endl;
       
@@ -598,15 +681,32 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   // hL1SJ52_TrigTurnon->Divide(hJetMB); 
   
   if(Type=="Data"){
-    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_ntuple_SuperNovaRejected_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_supernova30_jetid_prescl_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
     f.cd();
 
     //jets_ID->Write();
     //hJets->Write();
     //hEvents->Write();
 
-    trigger_info->Write();
+    //trigger_info->Write();
+    for(int k = 0;k<no_radius;k++){
+      hDenominator[k]->Write();
+      hNumerator_80[k]->Write();
+      hNumerator_65[k]->Write();
+      hNumerator_55[k]->Write();
+      hNumerator_55_n65_n80[k]->Write();
+      hNumerator_65_n80[k]->Write();
+      hDenominator[k]->Print();
+      hNumerator_80[k]->Print();
+      hNumerator_65[k]->Print();
+      hNumerator_55[k]->Print();
+      hNumerator_55_n65_n80[k]->Print();
+      hNumerator_65_n80[k]->Print();
 
+    }
+
+    
+    
 #if 0
     hJetMB_55_1->Write();
     hJetMB_55_1->Print("base");

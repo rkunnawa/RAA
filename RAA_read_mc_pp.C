@@ -57,29 +57,27 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 
-static const int nbins_eta = 1;
-//static const double boundaries_eta[nbins_eta][2] = {
-//  {0.0,0.5}, {0.5,1.0}, {1.0,1.5}, {1.5,2.0}
-//};
+
+static const int nbins_eta = 5;
 static const double boundaries_eta[nbins_eta][2] = {
-  {0.0,2.0}
+  {0.0,0.5},
+  {0.5,1.0},
+  {1.0,1.5},
+  {1.5,2.0},
+  {2.0,2.5},
 };
 
 static const double delta_eta[nbins_eta] = {
-  4.0
+  1.0,1.0,1.0,1.0,1.0
 };
-
-// static const char etaWidth [nbins_eta][256] = {
-//   "0_absEta_05","05_absEta_10","10_absEta_15","15_absEta_20"
-// };
 
 static const char etaWidth [nbins_eta][256] = {
-  "0_absEta_20"
+  "0_absEta_05", "05_absEta_10", "10_absEta_15", "15_absEta_20", "20_absEta_25" 
 };
 
 
-static const int no_radius = 1;//testing purposes 
-static const int list_radius[no_radius] = {4};
+static const int no_radius = 4;//testing purposes 
+static const int list_radius[no_radius] = {2,3,4,5};
 
 // divide by bin width
 void divideBinWidth(TH1 *h){
@@ -240,7 +238,7 @@ public:
 
 using namespace std;
 
-void RAA_read_mc_pp(int startfile = 0, int endfile = 1, char *jet_type="PF"){
+void RAA_read_mc_pp(int startfile = 9, int endfile = 10, char *jet_type="PF"){
 
   TStopwatch timer;
   timer.Start();
@@ -639,7 +637,7 @@ void RAA_read_mc_pp(int startfile = 0, int endfile = 1, char *jet_type="PF"){
     
   }//radius loop
   
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_mc_ak%d%s_%d_%d.root",list_radius[0],jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_mc_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   for(int k = 0;k<no_radius;k++){
