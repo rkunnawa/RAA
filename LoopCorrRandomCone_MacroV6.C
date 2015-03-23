@@ -319,9 +319,9 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_HYDJET.root"));
     // TFile *ak5MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_HYDJET.root"));
 
-    TFile *ak2MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu2PF_20150217.root"));
-    TFile *ak3MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu3PF_20150206.root"));
-    TFile *ak4MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu4PF_20150206.root"));
+    TFile *ak2MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu2PF_20150320.root"));
+    TFile *ak3MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu3PF_20150320.root"));
+    TFile *ak4MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu4PF_20150320.root"));
     //TFile *ak5MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu5PF_20150206.root"));
     
     akTreeMC[0]   = (TTree*)ak2MCFile->Get("nt");
@@ -334,9 +334,9 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_DATA.root"));
     // TFile *ak5dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_DATA.root"));
 
-    TFile *ak2dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu2PF_20150217.root"));
-    TFile *ak3dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu3PF_20150206.root"));
-    TFile *ak4dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu4PF_20150206.root"));
+    TFile *ak2dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu2PF_20150320.root"));
+    TFile *ak3dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu3PF_20150320.root"));
+    TFile *ak4dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu4PF_20150320.root"));
     //TFile *ak5dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu5PF_20150206.root"));
 
     akTreeData[0]   = (TTree*)ak2dataFile->Get("nt");
@@ -355,26 +355,26 @@ void LoopCorrRandomCone_MacroV6(){
   //const char* cent[] =      {  "0-5%"   ,     "5-10%"      ,    "10-30%"       ,   "30-50%"        ,    "50-70%"       ,     "70-90%"     };
   //const char* centCuts[] =  {  "bin<=5" , "bin>5 && bin<=15" , "bin>15 && bin<=55" , "bin>55 && bin<=95", "bin>95 && bin<=135","bin>135 && bin<=175" };
 
-  //const char* centLabel[] = {"7090","5070","3050","1030","0510","0005"};
-  //const char* cent[] =      {"70-90%","50-70%","30-50%","10-30%","5-10%","0-5%"};
-  //const char* centCuts[] =  {  "bin>140 && bin<=180" , "bin>100 && bin<=140" , "bin>60 && bin<=100" , "bin>20 && bin<=60", "bin>10 && bin<=20","bin<=10" };
+  const char* centLabel[] = {"7090","5070","3050","1030","0510","0005"};
+  const char* cent[] =      {"70-90%","50-70%","30-50%","10-30%","5-10%","0-5%"};
+  const char* centCuts[] =  {  "bin>140 && bin<=180" , "bin>100 && bin<=140" , "bin>60 && bin<=100" , "bin>20 && bin<=60", "bin>10 && bin<=20","bin<=10" };
 
-  const char *centLabel[] = {
-    "7090","5070","4050","3040",
-    "2030","1520","1015","0610",
-    "0406","0204","0102","0001"
-  };
+  // const char *centLabel[] = {
+  //   "7090","5070","4050","3040",
+  //   "2030","1520","1015","0610",
+  //   "0406","0204","0102","0001"
+  // };
   
-  const char *cent[] = {
-    "70-90%","50-70%","40-50%","30-40%",
-    "20-30%","15-20%","10-15%","6-10%",
-    "4-6%","2-4%","1-2%","0-1%"};
+  // const char *cent[] = {
+  //   "70-90%","50-70%","40-50%","30-40%",
+  //   "20-30%","15-20%","10-15%","6-10%",
+  //   "4-6%","2-4%","1-2%","0-1%"};
   
-  const char *centCuts[] = {
-    "bin>140 && bin<=180","bin>100 && bin<=140","bin>80 && bin<=100","bin>60 && bin<=80",
-    "bin>40 && bin<=60", "bin>30 && bin<=40","bin>20 && bin<=30", "bin>12 && bin<=20",
-    "bin>8 && bin<=12","bin>4 && bin<=8","bin>2 && bin<=4","bin>0 && bin<=2"
-  };
+  // const char *centCuts[] = {
+  //   "bin>140 && bin<=180","bin>100 && bin<=140","bin>80 && bin<=100","bin>60 && bin<=80",
+  //   "bin>40 && bin<=60", "bin>30 && bin<=40","bin>20 && bin<=30", "bin>12 && bin<=20",
+  //   "bin>8 && bin<=12","bin>4 && bin<=8","bin>2 && bin<=4","bin>0 && bin<=2"
+  // };
  
   //we might want to look at smaller centrality bins as well 
 
@@ -388,7 +388,7 @@ void LoopCorrRandomCone_MacroV6(){
   //const char* centCuts[] =  {  "bin>28&&bin<=30" , "bin>30 &&bin<=32" , "bin>32 &&bin<=34" , "bin>34 &&bin<=36", "bin>36 &&bin<=38","bin>38&&bin<=40" };
 
 
-  const int nCent = 12;
+  const int nCent = 6;
  
   cout<<"going to draw specific histograms"<<endl;
   /*
@@ -478,6 +478,8 @@ void LoopCorrRandomCone_MacroV6(){
     cout<<"drawing C1"<<endl;
 
     const int nAlgos = 3;
+    const char* varLabel[nAlgos] = { "R=0.2","R=0.3","R=0.4"};
+
     TLegend* leg1[nCent];
     TH1D * ranConeMC[nCent][nAlgos];
     TH1D * ranConeData[nCent][nAlgos];
@@ -490,11 +492,10 @@ void LoopCorrRandomCone_MacroV6(){
    
     const char* var2 = "jpu";
 
-    const char* varLabel[nAlgos] = { "R=0.2","R=0.3","R=0.4" };
     const char* hType[2] = {"MC    ","DataMB"};
    
     double marker [2] = {20,25};//,21,25};//22,26};
-    double color  [nAlgos] = {2,3,4};//,2,4};
+    double color  [nAlgos] = {1,2,4};//,2,4};
     double fill   [nAlgos] = {0,0,0};//,0,0};
     double meanMC[nCent][nAlgos];
     double meanErrMC[nCent][nAlgos]; 
@@ -527,7 +528,8 @@ void LoopCorrRandomCone_MacroV6(){
   
     //double xAxisBins[21] = {0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1.0,1.4,1.8,2.2,2.6, 3.0,3.4,3.8,4.2,4.6,5.0};
     TCanvas *c1MC = new TCanvas("c1MC","c1MC",1400,1200);
-    makeMultiPanelCanvas(c1MC,4,3,0.0,0.0,0.2,0.15,0.07);
+    if(nCent==6)makeMultiPanelCanvas(c1MC,3,2,0.0,0.0,0.2,0.15,0.07);
+    if(nCent==12)makeMultiPanelCanvas(c1MC,4,3,0.0,0.0,0.2,0.15,0.07);
     //Loop over the 6 centrality sections
     for (int i=0; i<nCent; i++){
       cout<<"centrality = "<<i<<endl;
@@ -538,7 +540,7 @@ void LoopCorrRandomCone_MacroV6(){
       c1MC->cd(i+1);
       c1MC->cd(i+1)->SetLogy();
 
-      for (int ir = 0; ir<=nAlgos-1; ir++){
+      for (int ir = 1; ir < nAlgos-1; ir++){
 	
 	cout<<"algo "<<ir<<endl; //this is basically which radius you want to look at. 3,4,5
 
@@ -616,7 +618,7 @@ void LoopCorrRandomCone_MacroV6(){
 
 	ranConeMC[i][ir]->Rebin(5);
 	ranConeMC[i][ir]->Scale(1./5);
-	if (ir==0) ranConeMC[i][ir]->Draw("");
+	if (ir==1) ranConeMC[i][ir]->Draw("");
 	if (ir!=0) ranConeMC[i][ir]->Draw("same");	
 	//if (ir==0)
 	  //leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");	  
@@ -668,8 +670,8 @@ void LoopCorrRandomCone_MacroV6(){
     putCMSSim(0.1,0.95);
     drawText("-2<#eta<2",0.5,0.5,20);
 
-    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_12cent_n2_eta_p2_234_%d.pdf",date.GetDate()));
-    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_12cent_n2_eta_p2_234_%d.root",date.GetDate())); 
+    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_6cent_n2_eta_p2_3_%d.pdf",date.GetDate()));
+    if (doPrint) c1MC->Print(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/JetRaa_PFSumEt_6cent_n2_eta_p2_3_%d.root",date.GetDate())); 
 
 
     /*

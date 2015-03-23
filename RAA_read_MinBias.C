@@ -49,6 +49,7 @@
 //static const double boundaries_fileno_job[job_no+1] = {0, 413, 826, 1239, 1652, 2065, 2478, 2891, 3304, 3717, 4130, 4542};
 
 #define NOBJECT_MAX 16384
+#define pi 3.14159265
 
 static const int nbins_pt = 39;
 static const double boundaries_pt[nbins_pt+1] = {
@@ -107,17 +108,15 @@ static const char etaWidth [nbins_eta][256] = {
 
 static const int nbins_cent = 6;
 static Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 5 to get your actual centrality
-static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8 ,362.24}; //last one is for 0-200 bin. 
+static Double_t ncoll[nbins_cent+1] = { 1660, 1310, 745, 251, 62.8, 10.8, 362.24}; //last one is for 0-200 bin. 
 
-//static const int no_radius = 3;//necessary for the RAA analysis  
-//static const int list_radius[no_radius] = {2,3,4};
-
-static const int no_radius = 1;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3};
+static const int no_radius = 3;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
 //static const int list_radius[no_radius] = {1,2,3,4,5,6,7};
+
 
 
 // divide by bin width
@@ -139,7 +138,7 @@ void divideBinWidth(TH1 *h)
 }
 
 int findBin(int hiBin){
-  int binNo = 0;
+  int binNo = -1;
 
   for(int i = 0;i<nbins_cent;i++){
     if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
@@ -151,6 +150,14 @@ int findBin(int hiBin){
   return binNo;
 }
 
+double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
+{
+  float deta = eta1 - eta2;
+  float dphi = fabs(phi1 - phi2);
+  if(dphi > pi)dphi -= 2*pi;
+  double dr = sqrt(pow(deta,2) + pow(dphi,2));
+  return dr;
+}
 
 using namespace std;
 
@@ -172,6 +179,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   if(Type=="MC")infile1 = "PbPb_HydjetMinBias_forest.txt";
   //if(Type=="Data")infile1 = "PbPb_MinBiasUPC_forest.txt";
   if(Type=="Data")infile1 = "jetRAA_MinBiasUPC_forest.txt";
+  //if(Type=="Data")infile1 = "14010_MinBiasUPC_forest.txt";
   
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
@@ -182,7 +190,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     instr1>>filename1;
   }
   
-  const int N = 4;
+  const int N = 5;
   
   TChain *jetpbpb1[N][no_radius];
 
@@ -194,7 +202,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     dir[2][k] = Form("ak%s%d%sJetAnalyzer",algo,list_radius[k],jet_type);
     //dir[3][k] = Form("akPu%d%sJetAnalyzer",list_radius[k],jet_type);
     dir[3][k] = "hiEvtAnalyzer";
-    //dir[4][k] = "hltobject"; //- not there in MinBias files 
+    dir[4][k] = "hltobject"; //- not there in MinBias files 
     //dir[6][k] = "pfcandAnalyzer";
   }
 
@@ -204,7 +212,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     "t",
     //"t",
     "HiTree",
-    // "jetObjTree",
+    "jetObjTree"
     //"pfTree"
   };
   
@@ -238,11 +246,11 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     jetpbpb1[2][k]->AddFriend(jetpbpb1[0][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[1][k]);
     jetpbpb1[2][k]->AddFriend(jetpbpb1[3][k]);
-    //jetpbpb1[2][k]->AddFriend(jetpbpb1[4][k]);
+    jetpbpb1[2][k]->AddFriend(jetpbpb1[4][k]);
   }// radius loop ends
 
   cout<<"total no of entries in the combined forest files = "<<jetpbpb1[2][0]->GetEntries()<<endl;
-  
+
   //file 1: 
   // jet tree 1
   int nrefe_1;
@@ -289,7 +297,9 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
   // trigger tree
   int L1_MB_1;
+  int l1MB_1;
   int L1_MB_p_1;
+  int l1MB_p_1;
   int L1_sj36_1;
   int L1_sj52_1;
   int jetMB_1;
@@ -380,6 +390,10 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND_Prescl",&L1_sj36_p_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND",&L1_sj52_1);
     jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND_Prescl",&L1_sj52_p_1);
+
+    jetpbpb1[4][k]->SetBranchAddress("pt",&trgObj_pt_1);
+    jetpbpb1[4][k]->SetBranchAddress("eta",&trgObj_eta_1);
+    jetpbpb1[4][k]->SetBranchAddress("phi",&trgObj_phi_1);
     
     /*
     jetpbpb1[2][k]->SetBranchAddress("nPFpart", &nPFpart);
@@ -409,9 +423,18 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   TH1F *hEvents  = new TH1F("hEvents","",2,0,1);
   TH1F *hJets = new TH1F("hJets","",2,0,1);
 
-  TH1F *hJetMB = new TH1F("hJetMB","",200,0,200);
+  TH1F *hJetMB_80_1 = new TH1F("hJetMB_80_1","",200,0,200);
+  TH1F *hJetMB_65_1 = new TH1F("hJetMB_65_1_","",200,0,200);
+  TH1F *hJetMB_55_1 = new TH1F("hJetMB_55_1","",200,0,200);
+  TH1F *hJetMBSpectra[no_radius][nbins_cent];
+  for(int k = 0;k<no_radius;++k){
+    for(int i = 0;i<nbins_cent;++i)
+      hJetMBSpectra[k][i] = new TH1F(Form("hJetMBSpectra_R%d_cent%d",list_radius[k],i),"Data from MB trigger alone to add to the Jet triggered data",1000,0,1000);
+  }
+  
   TH1F *hL1MB = new TH1F("hL1MB","",200,0,200);
   TH1F *hJet80 = new TH1F("hJet80","",200,0,200);
+  TH1F *hJet80_Trig = new TH1F("hJet80_Trig","",200,0,200);
   TH1F *hJet65 = new TH1F("hJet65","",200,0,200);
   TH1F *hJet55 = new TH1F("hJet55","",200,0,200);
   TH1F *hL1SJ36 = new TH1F("hL1SJ36","",200,0,200);
@@ -420,26 +443,105 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   TH1F *hJet80_JetMB = new TH1F("hJet80_JetMB","",200,0,200);
   TH1F *hJet65_JetMB = new TH1F("hJet65_JetMB","",200,0,200);
   TH1F *hJet55_JetMB = new TH1F("hJet55_JetMB","",200,0,200);
+  TH1F *hJet65_Jet80 = new TH1F("hJet65_Jet80","",200,0,200);
+  TH1F *hJet55_Jet80 = new TH1F("hJet55_Jet80","",200,0,200);
   TH1F *hL1SJ36_JetMB = new TH1F("hL1SJ36_JetMB","",200,0,200);
   TH1F *hL1SJ52_JetMB = new TH1F("hL1SJ52_JetMB","",200,0,200);
- 
+
+  TH1F * hJet80_Prescl = new TH1F("hJet80_Prescl","",200,0,10);
+  TH1F * hJet65_Prescl = new TH1F("hJet65_Prescl","",200,0,10);
+  TH1F * hJet55_Prescl = new TH1F("hJet55_Prescl","",200,0,10);
+  
+    
+  // jetpbpb1[2][0]->Draw("jtpt[0]>>hJet80_JetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet80_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&HLT_HIJet80_v1_Prescl==1)","goff");
+  // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet80_Trig","(pcollisionEventSelection&&HLT_HIJet80_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&jetObjTree.pt>80)","goff");
+  // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet65_JetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet65_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&HLT_HIJet65_v1_Prescl==1)","goff");
+  // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet55_JetMB","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&HLT_HIJet55_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&HLT_HIJet55_v1_Prescl==1)","goff");
+  // // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet65_Jet80","(pcollisionEventSelection&&HLT_HIJet65_v1&&HLT_HIJet80_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&pt>80)","goff");
+  // // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJet55_Jet80","(pcollisionEventSelection&&HLT_HIJet80_v1&&HLT_HIJet55_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&pt>80)","goff");
+  // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJetMB_80_1","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&HLT_HIJet80_v1_Prescl==1)","goff");
+  // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJetMB_65_1","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&HLT_HIJet65_v1_Prescl==1)","goff");
+  // jetpbpb1[2][0]->Draw("Max$(jtpt)>>hJetMB_55_1","(pcollisionEventSelection&&HLT_HIMinBiasHfOrBSC_v1&&abs(jteta)<2&&abs(vz)<15&&pHBHENoiseFilter&&HLT_HIJet55_v1_Prescl==1)","goff");
+
+  // for(int k = 0;k<no_radius;++k){
+
+  // for(int i = 0;i<nbins_cent;i++){
+  //   //cout<<Form("%f %f",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
+  //   //cout<<Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f)",5*boundaries_cent[i],5*boundaries_cent[i+1])<<endl;
+  //   jetpbpb1[2][k]->Draw(Form("jtpt>>hJetMBSpectra_R%d_cent%d",list_radius[k],i),Form("38.695*(pcollisionEventSelection && HLT_HIMinBiasHfOrBSC_v1 && abs(jteta)<2 && abs(vz)<15 && pHBHENoiseFilter && !HLT_HIJet80_v1 && !HLT_HIJet65_v1 && !HLT_HIJet55_v1 && hiBin>=%f && hiBin<%f && chargedMax/jtpt>0.02 && eMax/jtpt<0.6)",5*boundaries_cent[i],5*boundaries_cent[i+1]),"goff");
+  //   //hJetMBSpectra[k][i]->Print("base");
+  // }
+    
+  // TTree* trigger_info;
+  // Int_t evt_value;
+  // Int_t run_value;
+  // Int_t lumi_value;
+  // Int_t nref;
+  // Float_t jetpt[1000];
+  // Float_t jeteta[1000];
+  // Int_t Jet80;
+  // Int_t Jet80_prescl;
+  // Int_t Jet65;
+  // Int_t Jet65_prescl;
+  // Int_t Jet55;
+  // Int_t Jet55_prescl;
+  // Int_t HIMinBias;
+  // Int_t HIMinBias_prescl;
+  
+  // trigger_info = new TTree("trigger_info","");
+  // trigger_info->Branch("run_value",&run_value,"run_value/I");
+  // trigger_info->Branch("evt_value",&evt_value,"evt_value/I");
+  // trigger_info->Branch("lumi_value",&lumi_value,"lumi_value/I");
+  // trigger_info->Branch("nref",&nref,"nref/I");
+  // trigger_info->Branch("jetpt",&jetpt,"jetpt[nref]/F");
+  // trigger_info->Branch("jeteta",&jeteta,"jeteta[nref]/F");
+  // trigger_info->Branch("Jet80",&Jet80,"Jet80/I");
+  // trigger_info->Branch("Jet80_prescl",&Jet80_prescl,"Jet80_prescl/I");
+  // trigger_info->Branch("Jet65",&Jet65,"Jet65/I");
+  // trigger_info->Branch("Jet65_prescl",&Jet65_prescl,"Jet65_prescl/I");
+  // trigger_info->Branch("Jet55",&Jet55,"Jet55/I");
+  // trigger_info->Branch("Jet55_prescl",&Jet55_prescl,"Jet55_prescl/I");
+  // trigger_info->Branch("HIMinBias",&HIMinBias,"HIMinBias/I");
+  // trigger_info->Branch("HIMinBias_prescl",&HIMinBias_prescl,"HIMinBias_prescl/I");  
+  
+  // prescl is calculated as the ratio of the 
+  //minbias prescl = 38.695
+  // jet80  prescl = 1 (same in minbias sample as well)
+  // jet65  prescl = 1.11398 (1.11287)
+  // jet55  prescl = 2.0475 (2.0292)
+
+  
+  TH1F* hDenominator[no_radius]; 
+  TH1F* hNumerator_80[no_radius];
+  TH1F* hNumerator_65[no_radius];
+  TH1F* hNumerator_55[no_radius];
+
+  TH1F * hNumerator_55_n65_n80[no_radius];
+  TH1F * hNumerator_65_n80[no_radius];
+
+  for(int k = 0;k<no_radius;k++){
+
+    hDenominator[k] =new TH1F(Form("hDenominator_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    hNumerator_80[k] =new TH1F(Form("hNumerator_80_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    hNumerator_65[k] =new TH1F(Form("hNumerator_65_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    hNumerator_55[k] =new TH1F(Form("hNumerator_55_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    hNumerator_55_n65_n80[k] =new TH1F(Form("hNumerator_55_n65_n80_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    hNumerator_65_n80[k] =new TH1F(Form("hNumerator_65_n80_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+
+  }
+  
+  // but these prescl values are derived from the triggered data sample, need to check if they are the same in the minbias sample 
+  // cout<<"total number of events with minbias trigger = "<<jetpbpb1[2][0]->GetEntries("HLT_HIMinBiasHfOrBSC_v1 && HLT_HIJet80_v1_Prescl==1")<<endl;
+  // cout<<" numerator   "<<jetpbpb1[2][0]->GetEntries("HLT_HIMinBiasHfOrBSC_v1 && HLT_HIJet80_v1_Prescl==1 && HLT_HIJet80_v1 && jtpt[0]>110 && TMath::Abs(jteta[0])<2")<<endl;
+  // cout<<" denominator "<<jetpbpb1[2][0]->GetEntries("HLT_HIMinBiasHfOrBSC_v1 && HLT_HIJet80_v1_Prescl==1 && jtpt[0]>110 && TMath::Abs(jteta[0])<2")<<endl;
+
   for(int k = 0;k<no_radius;k++){
 
     if(printDebug)cout<<"Running data reading for R = "<<list_radius[k]<<endl;
     // loop for the jetpbpb1[2] tree 
     Long64_t nentries_MB = jetpbpb1[2][k]->GetEntries();
     if(printDebug)cout<<"nentries_MB = "<<nentries_MB<<endl;
-
-    cout<<"No of events with HLT_HIMinBiasHfOrBSC_v1 = "<<jetpbpb1[2][k]->GetEntries("HLT_HIMinBiasHfOrBSC_v1")<<endl;
-    cout<<"No of events with HLT_HIMinBiasHfOrBSC_v1 = "<<jetpbpb1[2][k]->GetEntries("HLT_HIMinBiasHfOrBSC_v1")<<endl;
-    cout<<"No of events with L1_ZeroBias = "<<jetpbpb1[2][k]->GetEntries("L1_ZeroBias")<<endl;
-    cout<<"No of events with HLT_HIJet55_v1 = "<<jetpbpb1[2][k]->GetEntries("HLT_HIJet55_v1")<<endl;
-    cout<<"No of events with HLT_HIJet65_v1 = "<<jetpbpb1[2][k]->GetEntries("HLT_HIJet65_v1")<<endl;
-    cout<<"No of events with HLT_HIJet80_v1 = "<<jetpbpb1[2][k]->GetEntries("HLT_HIJet80_v1")<<endl;
-    cout<<"No of events with L1_SingleJet36_BptxAND = "<<jetpbpb1[2][k]->GetEntries("L1_SingleJet36_BptxAND")<<endl;
-    cout<<"No of events with L1_SingleJet52_BptxAND = "<<jetpbpb1[2][k]->GetEntries("L1_SingleJet52_BptxAND")<<endl;
     
-   
     for(int jentry = 0;jentry<nentries_MB;jentry++){
 
       jetpbpb1[0][k]->GetEntry(jentry);
@@ -457,228 +559,111 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
       if(fabs(vz_1)>15) continue;
       
-      int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
-      
-      //if(algo=="Vs"){
-      
-      for(int j = 0;j<nbins_eta;j++){
-	  
-	for(int g = 0;g<nrefe_1;g++){
-	    
-	  if(eta_1[g]>=boundaries_eta[j][0] && eta_1[g]<boundaries_eta[j][1]){
-	      
-	    if(pt_1[g]>=50) jetCounter++;
-	    
-	  }//eta selection cut
-	  
-	}// jet loop
-	
-      }//eta bins loop
-      
-      // if(printDebug)cout<<"pixel hit = "<<hiNpix_1<<", jet counter = "<<jetCounter<<endl;
-      
-      // hpbpb_Npix_before_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
-      // hpbpb_Npix_before_cut[k][nbins_cent]->Fill(jetCounter,hiNpix_1);	
-      
-      //if(hiBin_1 >= 0 && hiBin_1 < 1) hpbpb_Npix_before_cut[k][nbins_cent+1]->Fill(jetCounter,hiNpix_1);	
-
-      // apply the correct supernova selection cut rejection here: 
-      if(hiNpix_1 > 38000 - 500*jetCounter){
-       	if(printDebug) cout<<"removed this supernova event"<<endl;
-      	continue;
-      }
+      //if(jetMB_1==0 || jet80_p_1==0 || jet65_p_1==0 || jet55_p_1==0)  continue;
+      if(jetMB_1==0)  continue;
 
       hEvents->Fill(1);
+
+      if(nrefe_1 > 30) continue;
+      //apply the supernova rejection cut:
+      //int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
+      //for(int g = 0;g<nrefe_1;g++)
+      //  if(eta_1[g]>=-2 && eta_1[g]<2) if(pt_1[g]>=50) jetCounter++;	  
       
-#if 0
-      Float_t Vs_0_x_minus = sumpT[0]*v_n[0][0]*TMath::Cos(0*psi_n[0][0]);
-      Float_t Vs_0_x_plus = sumpT[14]*v_n[0][14]*TMath::Cos(0*psi_n[0][14]);
-      Float_t Vs_0_y_minus = sumpT[0]*v_n[0][0]*TMath::Sin(0*psi_n[0][0]);
-      Float_t Vs_0_y_plus = sumpT[14]*v_n[0][14]*TMath::Sin(0*psi_n[0][14]);
-      Float_t Vs_0_x = Vs_0_x_minus + Vs_0_x_plus;
-      Float_t Vs_0_y = Vs_0_y_minus + Vs_0_y_plus;
-      //if(printDebug)std::cout<<"Vs_0_x = "<<Vs_0_x<<"; Vs_0_y =  "<<Vs_0_y<<std::endl;
-      //if(TMath::Abs(Vs_0_x)> v0_tight && printDebug) std::cout<<"event "<<jentry<<" has sumpT* cos v0 > 5200"<<std::endl;
-      //if(TMath::Abs(Vs_0_y)> v0_tight && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v0 > 5200"<<std::endl;
-      if(TMath::Abs(Vs_0_x)> v0_tight || TMath::Abs(Vs_0_y)> v0_tight) hEvents_Diverge_v0_tight->Fill(1);
-      if(TMath::Abs(Vs_0_x)> v0_loose || TMath::Abs(Vs_0_y)> v0_loose) hEvents_Diverge_v0_loose->Fill(1);
+      //if(jetCounter>10) continue;
       
-      Float_t Vs_1_x_minus = sumpT[0]*v_n[1][0]*TMath::Cos(1*psi_n[1][0]);
-      Float_t Vs_1_x_plus = sumpT[14]*v_n[1][14]*TMath::Cos(1*psi_n[1][14]);
-      Float_t Vs_1_y_minus = sumpT[0]*v_n[1][0]*TMath::Sin(1*psi_n[1][0]);
-      Float_t Vs_1_y_plus = sumpT[14]*v_n[1][14]*TMath::Sin(1*psi_n[1][14]);
-      Float_t Vs_1_x = Vs_1_x_minus + Vs_1_x_plus;
-      Float_t Vs_1_y = Vs_1_y_minus + Vs_1_y_plus;
-      //if(printDebug)std::cout<<"Vs_1_x = "<<Vs_1_x<<"; Vs_1_y =  "<<Vs_1_y<<std::endl;
-      //if(TMath::Abs(Vs_1_x)> v1_tight && printDebug) std::cout<<"event "<<jentry<<" has sumpT* cos v1 > 100"<<std::endl;
-      //if(TMath::Abs(Vs_1_y)> v1_tight && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v1 > 100"<<std::endl;
-      if(TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight) hEvents_Diverge_v1_tight->Fill(1);
-      if(TMath::Abs(Vs_1_x)>v1_loose || TMath::Abs(Vs_1_y)>v1_loose) hEvents_Diverge_v1_loose->Fill(1);
+      
+      // Float_t largepT = pt_1[0];
+      // //cout<<"large pT = "<<largepT<<endl;
+      // Float_t deltaR = 0;
+      // Float_t small_deltaR = 100.;
+      // Int_t small_position = 0;
+      // // find the jet thats matched with the trigger object in delta R. 
+      // for(int j = 0;j<nrefe_1;++j){
 
-      Float_t Vs_2_x_minus = sumpT[0]*v_n[2][0]*TMath::Cos(2*psi_n[2][0]);
-      Float_t Vs_2_x_plus = sumpT[14]*v_n[2][14]*TMath::Cos(2*psi_n[2][14]);
-      Float_t Vs_2_y_minus = sumpT[0]*v_n[2][0]*TMath::Sin(2*psi_n[2][0]);
-      Float_t Vs_2_y_plus = sumpT[14]*v_n[2][14]*TMath::Sin(2*psi_n[2][14]);
-      Float_t Vs_2_x = Vs_2_x_minus + Vs_2_x_plus;
-      Float_t Vs_2_y = Vs_2_y_minus + Vs_2_y_plus;
-      //if(printDebug)std::cout<<"Vs_2_x = "<<Vs_2_x<<"; Vs_2_y =  "<<Vs_2_y<<std::endl;
-      //if(TMath::Abs(Vs_2_x)>140 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* cos v2 > 140"<<std::endl;
-      //if(TMath::Abs(Vs_2_y)>140 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v2 > 140"<<std::endl;
-      if(TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight) hEvents_Diverge_v2_tight->Fill(1);
-      if(TMath::Abs(Vs_2_x)>v2_loose || TMath::Abs(Vs_2_y)>v2_loose) hEvents_Diverge_v2_loose->Fill(1);
+      // 	deltaR = Calc_deltaR(eta_1[j],phi_1[j], trgObj_eta_1, trgObj_phi_1);
+	
+      // 	if(deltaR < small_deltaR){
+	  
+      // 	  small_deltaR = deltaR;
+      // 	  small_position = j;
+	  
+      // 	}
 
-      Float_t Vs_3_x_minus = sumpT[0]*v_n[3][0]*TMath::Cos(3*psi_n[3][0]);
-      Float_t Vs_3_x_plus = sumpT[14]*v_n[3][14]*TMath::Cos(3*psi_n[3][14]);
-      Float_t Vs_3_y_minus = sumpT[0]*v_n[3][0]*TMath::Sin(3*psi_n[3][0]);
-      Float_t Vs_3_y_plus = sumpT[14]*v_n[3][14]*TMath::Sin(3*psi_n[3][14]);
-      Float_t Vs_3_x = Vs_3_x_minus + Vs_3_x_plus;
-      Float_t Vs_3_y = Vs_3_y_minus + Vs_3_y_plus;
-      //if(printDebug)std::cout<<"Vs_3_x = "<<Vs_3_x<<"; Vs_3_y =  "<<Vs_3_y<<std::endl;
-      //if(TMath::Abs(Vs_3_x)>120 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* cos v3 > 120"<<std::endl;
-      //if(TMath::Abs(Vs_3_y)>120 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v3 > 120"<<std::endl;
-      if(TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight) hEvents_Diverge_v3_tight->Fill(1);
-      if(TMath::Abs(Vs_3_x)>v3_loose || TMath::Abs(Vs_3_y)>v3_loose) hEvents_Diverge_v3_loose->Fill(1);
+      // }
 
-      Float_t Vs_4_x_minus = sumpT[0]*v_n[4][0]*TMath::Cos(4*psi_n[4][0]);
-      Float_t Vs_4_x_plus = sumpT[14]*v_n[4][14]*TMath::Cos(4*psi_n[4][14]);
-      Float_t Vs_4_y_minus = sumpT[0]*v_n[4][0]*TMath::Sin(4*psi_n[4][0]);
-      Float_t Vs_4_y_plus = sumpT[14]*v_n[4][14]*TMath::Sin(4*psi_n[4][14]);
-      Float_t Vs_4_x = Vs_4_x_minus + Vs_4_x_plus;
-      Float_t Vs_4_y = Vs_4_y_minus + Vs_4_y_plus;
-
-      //if(printDebug)std::cout<<"Vs_4_x = "<<Vs_4_x<<"; Vs_4_y =  "<<Vs_4_y<<std::endl;
-      //if(TMath::Abs(Vs_4_x)>140 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* cos v4 > 140"<<std::endl;
-      //if(TMath::Abs(Vs_4_y)>140 && printDebug) std::cout<<"event "<<jentry<<" has sumpT* sin v4 > 140"<<std::endl;
-      if(TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) hEvents_Diverge_v4_tight->Fill(1);
-      if(TMath::Abs(Vs_4_x)>v4_loose || TMath::Abs(Vs_4_y)>v4_loose) hEvents_Diverge_v4_loose->Fill(1);
-
-      if(TMath::Abs(Vs_0_x)>v0_tight || TMath::Abs(Vs_0_y)>v0_tight || TMath::Abs(Vs_1_x)>v1_tight || TMath::Abs(Vs_1_y)>v1_tight || TMath::Abs(Vs_2_x)>v2_tight || TMath::Abs(Vs_2_y)>v2_tight || TMath::Abs(Vs_3_x)>v3_tight || TMath::Abs(Vs_3_y)>v3_tight || TMath::Abs(Vs_4_x)>v4_tight || TMath::Abs(Vs_4_y)>v4_tight) {
-	hEvents_Diverge_tight->Fill(1);
-	isDivergeTight = true;
+      // Float_t deltaR_leading = Calc_deltaR(eta_1[0],phi_1[0], trgObj_eta_1, trgObj_phi_1);
+      
+      //if(trgObj_pt_1 != -99)cout<<" JetMB = "<<jetMB_1<<" Jet80 = "<<jet80_1<<" Jet65 = "<<jet65_1<<" Jet55 = "<<jet55_1<<endl;
+      //if(trgObj_pt_1 != -99)cout<<" Trigger object pt =  "<<trgObj_pt_1<<", matched jet pt = "<<pt_1[small_position]<<", deltaR = "<<small_deltaR<<", leading jet pt = "<<pt_1[0]<<", delta R with leading jet = "<<deltaR_leading<<endl;
+      
+      // hDenominator[k]->Fill(pt_1[small_position]);
+      
+      // if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[small_position], jet80_p_1); 
+      // if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[small_position], jet65_p_1); 
+      // if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[small_position], jet55_p_1);
+      
+      // now the jet which is matched with the trigger object is the jet at position 
+      for(int j = 0;j<nrefe_1;++j){
+      //for(int j = 0;j<1;++j){ // plotting the leading jet. 
+	
+	if(chMax_1[j]/pt_1[j] < 0.02 || eMax_1[j]/pt_1[j]>0.6) continue; 
+	
+	hDenominator[k]->Fill(pt_1[j]);
+	
+	if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[j], jet80_p_1); 
+	if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[j], jet65_p_1); 
+	if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[j], jet55_p_1);
+	
+	if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[j]);
+	if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[j]);
+	
+	
+	// if(jetMB_1==1 && jet80_p_1==1) {
+	
+	//   hDenominator[k]->Fill(pt_1[j]);
+	  
+	//   if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[j]); 
+	//   // if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[0]); 
+	//   // if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[0]);
+	  
+	//   // if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[0]);
+	//   // if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[0]);
+	  
+	// }
+	
+	
       }
-      if(TMath::Abs(Vs_0_x)>v0_loose || TMath::Abs(Vs_0_y)>v0_loose || TMath::Abs(Vs_1_x)>v1_loose || TMath::Abs(Vs_1_y)>v1_loose || TMath::Abs(Vs_2_x)>v2_loose || TMath::Abs(Vs_2_y)>v2_loose || TMath::Abs(Vs_3_x)>v3_loose || TMath::Abs(Vs_3_y)>v3_loose || TMath::Abs(Vs_4_x)>v4_loose || TMath::Abs(Vs_4_y)>v4_loose) {
-	hEvents_Diverge_loose->Fill(1);
-	isDivergeLoose = true;
-      }
+	
+      //trigger_info->Fill();
+
+
       
-#endif
+      //cout<<"after eta selection large pT = "<<largepT<<endl;
+      
+      //if(largepT!=test)cout<<"large pT is different in |eta|<2"<<endl;
 
+      // hJet80_Prescl->Fill(jet80_p_1);
+      // hJet65_Prescl->Fill(jet65_p_1);
+      // hJet55_Prescl->Fill(jet55_p_1);
 
-      for(int j = 0;j<nbins_eta;j++){
+      // //if(l1MB_1 && jetMB_1) hJetMB->Fill(pt_1[0]);
+      // if(jetMB_1==1)hJetMB_80_1->Fill(largepT);
+      // if(jetMB_1==1 && jet65_p_1 == 1)hJetMB_65_1->Fill(largepT);
+      // if(jetMB_1==1 && jet55_p_1 == 1)hJetMB_55_1->Fill(largepT);
 
-	for(int g = 0;g<nrefe_1;g++){ // this is the loop for the  Jets we are interested in.  
-	  	  
-	  if(eta_1[g]<boundaries_eta[j][0] || eta_1[g]>=boundaries_eta[j][1]) continue;
+      // if(jetMB_1==1 && jet80_1==1) hJet80_JetMB->Fill(largepT);
+      // if(jetMB_1==1 && jet65_1==1 && jet65_p_1 ==1 ) hJet65_JetMB->Fill(largepT);
+      // if(jetMB_1==1 && jet55_1==1 && jet55_p_1 ==1 ) hJet55_JetMB->Fill(largepT);
+      
+      //if(printDebug && jentry%100==0) cout<<"MB prescl = "<<jetMB_p_1<<endl;
+      //if(printDebug && jentry%100==0) cout<<"Jet 55 prescl = "<<jet55_p_1<<endl;
+      //if(printDebug && jentry%100==0) cout<<"Jet 65 prescl = "<<jet65_p_1<<endl;
+      //if(printDebug && jentry%100==0) cout<<"Jet 80 prescl = "<<jet80_p_1<<endl;
 
-	  if(L1_MB_1) cout<<"hi"<<endl;
-
-	  /*
-	  if(jetMB_1) hJetMB->Fill(pt_1[g],jetMB_p_1);
-	  if(L1_MB_1) hL1MB->Fill(pt_1[g],L1_MB_p_1);
-	  if(L1_sj36_1) hL1SJ36->Fill(pt_1[g],L1_sj36_1);
-	  if(L1_sj52_1) hL1SJ52->Fill(pt_1[g],L1_sj52_1);
-	  if(jet80_1) hJet80->Fill(pt_1[g],jet80_p_1);
-	  if(jet65_1) hJet65->Fill(pt_1[g],jet65_p_1);
-	  if(jet55_1) hJet55->Fill(pt_1[g],jet55_p_1);
-	  if(jetMB_1 && L1_MB_1) hL1MB_JetMB->Fill(pt_1[g],L1_MB_p_1*jetMB_p_1);
-	  if(jetMB_1 && L1_sj36_1) hL1SJ36_JetMB->Fill(pt_1[g],L1_sj36_1*jetMB_p_1);
-	  if(jetMB_1 && L1_sj52_1) hL1SJ52_JetMB->Fill(pt_1[g],L1_sj52_1*jetMB_p_1);
-	  if(jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[g],jet80_p_1*jetMB_p_1);
-	  if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[g],jet65_p_1*jetMB_p_1);
-	  if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[g],jet55_p_1*jetMB_p_1);	  
-	  */
-
-	  
-	  if(jetMB_1) hJetMB->Fill(pt_1[g]);
-	  
-	  if(L1_MB_1) hL1MB->Fill(pt_1[g]);
-
-	  if(L1_sj36_1) hL1SJ36->Fill(pt_1[g]);
-
-	  if(L1_sj52_1) hL1SJ52->Fill(pt_1[g]);
-
-	  if(jet80_1) hJet80->Fill(pt_1[g]);
-
-	  if(jet65_1) hJet65->Fill(pt_1[g]);
-
-	  if(jet55_1) hJet55->Fill(pt_1[g]);
-
-	  if(jetMB_1 && L1_MB_1) hL1MB_JetMB->Fill(pt_1[g]);
-
-	  if(jetMB_1 && L1_sj36_1) hL1SJ36_JetMB->Fill(pt_1[g]);
-
-	  if(jetMB_1 && L1_sj52_1) hL1SJ52_JetMB->Fill(pt_1[g]);
-
-	  if(jetMB_1 && jet80_1) hJet80_JetMB->Fill(pt_1[g]);
-
-	  if(jetMB_1 && jet65_1) hJet65_JetMB->Fill(pt_1[g]);
-
-	  if(jetMB_1 && jet55_1) hJet55_JetMB->Fill(pt_1[g]);
-
-	  
-	  /*
-	  if(Type=="Data"){
-	    arrayValues_Data[0] = raw_1[g];
-	    arrayValues_Data[1] = pt_1[g];
-	    arrayValues_Data[2] = jtpu_1[g];
-	    arrayValues_Data[3] = L1_MB_1; 
-	    arrayValues_Data[4] = L1_MB_p_1; 
-	    arrayValues_Data[5] = jetMB_1; 
-	    arrayValues_Data[6] = jetMB_p_1; 
-	    arrayValues_Data[7] = centBin;
-	    arrayValues_Data[8] = chMax_1[g];
-	    arrayValues_Data[9] = chSum_1[g];
-	    arrayValues_Data[10] = phMax_1[g];
-	    arrayValues_Data[11] = phSum_1[g];
-	    arrayValues_Data[12] = neMax_1[g];
-	    arrayValues_Data[13] = neSum_1[g];
-	    arrayValues_Data[14] = muMax_1[g];
-	    arrayValues_Data[15] = muSum_1[g];
-	    arrayValues_Data[16] = eMax_1[g];
-	    arrayValues_Data[17] = eSum_1[g];
-
-	    jets_ID->Fill(arrayValues_Data);
-	  }
-
-	  if(Type=="MC"){
-	    arrayValues_MC[0] = raw_1[g];
-	    arrayValues_MC[1] = pt_1[g];
-	    arrayValues_MC[2] = jtpu_1[g];
-	    arrayValues_MC[3] = L1_MB_1; 
-	    arrayValues_MC[4] = L1_MB_p_1; 
-	    arrayValues_MC[5] = jetMB_1; 
-	    arrayValues_MC[6] = jetMB_p_1; 
-	    arrayValues_MC[7] = centBin;
-	    arrayValues_MC[8] = chMax_1[g];
-	    arrayValues_MC[9] = chSum_1[g];
-	    arrayValues_MC[10] = phMax_1[g];
-	    arrayValues_MC[11] = phSum_1[g];
-	    arrayValues_MC[12] = neMax_1[g];
-	    arrayValues_MC[13] = neSum_1[g];
-	    arrayValues_MC[14] = muMax_1[g];
-	    arrayValues_MC[15] = muSum_1[g];
-	    arrayValues_MC[16] = eMax_1[g];
-	    arrayValues_MC[17] = eSum_1[g];
-	    arrayValues_MC[18] = refpt_1[g];
-	    arrayValues_MC[19] = subid_1[g];
-	   
-	    jets_ID->Fill(arrayValues_MC);
-
-	  }
-	  */
-
-	  hJets->Fill(1);
-	  
-	    
-	}//jet loop
-	  
-      }//eta bin loop
-
-    
     }//nentries_jet55or65 loop
     
   }//radius loop.
-
   
   // TH1F * hJet55_TrigTurnon = (TH1F*)hJet55_JetMB->Clone("hJet55_TrigTurnon");
   // hJet55_TrigTurnon->Divide(hJetMB);
@@ -694,38 +679,86 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 
   // TH1F * hL1SJ52_TrigTurnon = (TH1F*)hL1SJ52_JetMB->Clone("hL1SJ52_TrigTurnon");
   // hL1SJ52_TrigTurnon->Divide(hJetMB); 
- 
+  
   if(Type=="Data"){
-    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_supernova30_jetid_prescl_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
     f.cd();
 
     //jets_ID->Write();
     //hJets->Write();
     //hEvents->Write();
+
+    //trigger_info->Write();
+    for(int k = 0;k<no_radius;k++){
+      hDenominator[k]->Write();
+      hNumerator_80[k]->Write();
+      hNumerator_65[k]->Write();
+      hNumerator_55[k]->Write();
+      hNumerator_55_n65_n80[k]->Write();
+      hNumerator_65_n80[k]->Write();
+      hDenominator[k]->Print();
+      hNumerator_80[k]->Print();
+      hNumerator_65[k]->Print();
+      hNumerator_55[k]->Print();
+      hNumerator_55_n65_n80[k]->Print();
+      hNumerator_65_n80[k]->Print();
+
+    }
+
     
-    hJetMB->Write();
-    hJet80->Write();
-    hJet65->Write();
-    hJet55->Write();
-    hL1MB->Write();
-    hL1SJ36->Write();
-    hL1SJ52->Write();
+    
+#if 0
+    hJetMB_55_1->Write();
+    hJetMB_55_1->Print("base");
+    hJetMB_65_1->Write();
+    hJetMB_65_1->Print("base");
+    hJetMB_80_1->Write();
+    hJetMB_80_1->Print("base");
+
+    // for(int k = 0;k<no_radius;++k){
+    //   for(int i = 0;i<nbins_cent;++i){
+    // 	hJetMBSpectra[k][i]->Write();
+    // 	hJetMBSpectra[k][i]->Print("base");
+    //   }
+    // }
+    
+    //hJet80->Write();
+    //hJet65->Write();
+    //hJet55->Write();
+    //hL1MB->Write();
+    //hL1SJ36->Write();
+    //hL1SJ52->Write();
     hJet80_JetMB->Write();
+    hJet80_JetMB->Print("base");
     hJet65_JetMB->Write();
+    hJet65_JetMB->Print("base");
     hJet55_JetMB->Write();
-    hL1MB_JetMB->Write();
-    hL1SJ36_JetMB->Write();
-    hL1SJ52_JetMB->Write();
+    hJet55_JetMB->Print("base");
+    hJet80_Prescl->Write();
+    hJet80_Prescl->Print("base");
+    hJet65_Prescl->Write();
+    hJet65_Prescl->Print("base");
+    hJet55_Prescl->Write();
+    hJet55_Prescl->Print("base");
+    // hJet65_Jet80->Write();
+    // hJet65_Jet80->Print("base");
+    // hJet55_Jet80->Write();
+    // hJet55_Jet80->Print("base");
+    // hJet80_Trig->Write();
+    // hJet80_Trig->Print("base");
+    //hL1MB_JetMB->Write();
+    //hL1SJ36_JetMB->Write();
+    //hL1SJ52_JetMB->Write();
     // hJet55_TrigTurnon->Write();
     // hJet65_TrigTurnon->Write();
     // hJet80_TrigTurnon->Write();
     // hL1SJ36_TrigTurnon->Write();
     // hL1SJ52_TrigTurnon->Write();
-    
+#endif
   }
 
   if(Type=="MC"){
-    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_HydjetMinBias_jetntuple_withEvtCuts_SuperNovaRejected_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+    TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_HydjetMinBias_jetntuple_withEvtCuts_ak%s3%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
     f.cd();
 
     //jets_ID->Write();

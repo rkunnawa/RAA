@@ -21,16 +21,48 @@
 #include <TMath.h>
 #include <TH1.h>
 #include <TH2.h>
-
+#include <iostream>
+#include <stdio.h>
+#include <fstream>
+#include <fstream>
+#include <TH1F.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TFile.h>
+#include <TTree.h>
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TLegend.h>
+#include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TH3.h>
+#include <TFile.h>
+#include <TStyle.h>
+#include <TStopwatch.h>
+#include <TRandom3.h>
+#include <TChain.h>
+#include <TProfile.h>
+#include <TStopwatch.h>
+#include <TCut.h>
+#include <TNtuple.h>
+#include <cstdlib>
+#include <cmath>
+#include "TLegend.h"
+#include "TLatex.h"
+#include "TMath.h"
+#include "TLine.h"
+#include <vector>
 
 class DuplicateEvents {
+  
 public:
-  DuplicateEvents(std::string infname){
-    inf = TFile::Open(infname.c_str());
-    t = (TTree*)inf->Get("hiEvtAnalyzer/HiTree");
+  DuplicateEvents(TTree * t){
+    event = (TTree*)t;
   };
   ~DuplicateEvents(){
-    delete inf;
+    delete event;
   }
   
   void MakeList(){
@@ -39,12 +71,12 @@ public:
     occurence.clear();
     int run,evt;
     //float vz;
-    t->SetBranchAddress("run",&run);
-    t->SetBranchAddress("evt",&evt);
+    event->SetBranchAddress("run",&run);
+    event->SetBranchAddress("evt",&evt);
     //t->SetBranchAddress("vz",&vz);
-    for(int i = 0;i<t->GetEntries();i++){
-      t->GetEntry(i);
-      if(i%100000==0) cout<<i<<" / "<<t->GetEntries()<<" run: "<<run<<" evt: "<<evt<<endl;
+    for(int i = 0;i<event->GetEntries();i++){
+      event->GetEntry(i);
+      if(i%100000==0) cout<<i<<" / "<<event->GetEntries()<<" run: "<<run<<" evt: "<<evt<<endl;
       int occur = (int)FindOccurences(run,evt);
       if(occur==0) occurence.push_back(1);
       else occurence.push_back(2);
@@ -55,16 +87,17 @@ public:
     int noccur = count(evts.begin(),evts.end(),std::make_pair(run,evt));
     return noccur;
   }
-  TFile* inf;
-  TTree* t;
+  TTree * event;
   vector <pair<int,int> > evts;
   vector <int> occurence;
 };
 
+static const int no_radius = 1;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {3};
 
 using namespace std;
 
-void RAA_duplicateEventsCheck( int startfile = 0, int endfile = 1, int radius = 3, char *algo = "Vs"){
+void RAA_duplicateEventsCheck( int startfile = 0, int endfile = 902, int radius = 3, char *algo = "Vs"){
   
   //TH1::SetDefaultSumw2();
   TStopwatch timer;
@@ -72,13 +105,15 @@ void RAA_duplicateEventsCheck( int startfile = 0, int endfile = 1, int radius = 
   
   // Change to macro to run on condor since its taking a freaking long time. 
   // done! 
+
+  bool printDebug = false;
   
   std::string infile;
-  infile = "jetRAA_PbPb_filelist.txt";
+  //infile = "jetRAA_PbPb_filelist.txt";
+  infile = "jetRAA_MinBiasUPC_forest.txt";
   
   std::ifstream instr(infile.c_str(),std::ifstream::in);
   std::string filename;
-  //int nFiles = 11;
   
   //just to read the files till the start number
   cout<<"reading from "<<startfile<<" to "<<endfile<<endl;
@@ -86,144 +121,46 @@ void RAA_duplicateEventsCheck( int startfile = 0, int endfile = 1, int radius = 
   for(int ifile = 0;ifile<startfile;ifile++){
     instr>>filename;
   }
-  
-  for(int ifile = startfile;ifile<endfile;ifile++){
-    instr>>filename;
-    cout<<"File: "<<filename<<endl;  
-  }  
-  
+
   //filename = "/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root";
   
-  DuplicateEvents dupEvt(filename.c_str());
+ 
+
+  TChain *jetpbpb1;
+  string dir = "hiEvtAnalyzer";
+  string trees = "HiTree";
+  
+  //this loop is to assign the tree values before we go into the file loop. 
+  jetpbpb1 = new TChain(string(dir+"/"+trees).data());
+  
+  for(int ifile = startfile;ifile<endfile;ifile++){
+    
+    instr>>filename;
+    if(printDebug)cout<<"File: "<<filename<<endl;
+    
+    jetpbpb1->Add(filename.c_str());
+    if(printDebug)cout << "Tree loaded  " << string(dir+"/"+trees).data() << endl;
+    if(printDebug)cout << "Entries : " << jetpbpb1->GetEntries() << endl;
+    
+  }// file loop ends
+
+  DuplicateEvents dupEvt(jetpbpb1);
   dupEvt.MakeList();
   
-  //i dont need any of the following stuff since the DuplicateEvents class will do all that for me.  
-  // on second thought looks like i need that. :) 
-  
-  TFile *fin = TFile::Open(filename.c_str());
-  
-  TTree *jetpbpb1 = (TTree*)fin->Get(Form("ak%s%dPFJetAnalyzer/t",algo,radius));
-  TTree *evtpbpb1 = (TTree*)fin->Get("hiEvtAnalyzer/HiTree");
-  TTree *hltpbpb1 = (TTree*)fin->Get("hltanalysis/HltTree");
-  TTree *skmpbpb1 = (TTree*)fin->Get("skimanalysis/HltTree");
-  TTree *trgpbpb1 = (TTree*)fin->Get("hltobject/jetObjTree");
-  
-  jetpbpb1->AddFriend(evtpbpb1);
-  jetpbpb1->AddFriend(hltpbpb1);
-  jetpbpb1->AddFriend(skmpbpb1);
-  jetpbpb1->AddFriend(trgpbpb1);
-  
-  //file 1: 
-  // jet tree
-  int nrefe_1;
-  float pt_1[1000];
-  //float old_pt3[1000];
-  float raw_1[1000];
-  float eta_1[1000];
-  float eta_1_CM[1000];
-  float phi_1[1000];
-  float chMax_1[1000];
-  float trkMax_1[1000];
-  float chSum_1[1000];
-  float phSum_1[1000];
-  float neSum_1[1000];
-  float trkSum_1[1000];
-  float phMax_1[1000];
-  float neMax_1[1000];
-
   // event tree
   int evt_1;
   int run_1;
   int lumi_1;
-  int hiBin_1;
-  float vx_1;
-  float vy_1;
-  float vz_1;
-  int hiNtracks_1;
-  float hiHFminus_1;
-  float hiHFplus_1;
-  float hiHFplusEta4_1;
-  float hiHFminusEta4_1;
-  int pcollisionEventSelection_1;
-  int pHBHENoiseFilter_1;
-  int pprimaryvertexFilter_1;
-  int pVertexFilterCutGplus_1;
-
-  // trigger tree
-  int L1_MB_1;
-  int L1_MB_p_1;
-  int jetMB_1;
-  int jet55_1;
-  int jet65_1;
-  int jet80_1;
-  int jetMB_p_1;
-  int jet55_p_1;
-  int jet65_p_1;
-  int jet80_p_1;
-
-
-  // trigger object tree - this contains the maximum value of the particular trigger object. 
-  float trgObj_id_1;
-  float trgObj_pt_1;
-  float trgObj_eta_1;
-  float trgObj_phi_1;
-  float trgObj_mass_1;
-
 
   //set the branch addresses:  - one of the most boring parts of the code: 
   jetpbpb1->SetBranchAddress("evt",&evt_1);
   jetpbpb1->SetBranchAddress("run",&run_1);
   jetpbpb1->SetBranchAddress("lumi",&lumi_1);
-  jetpbpb1->SetBranchAddress("hiBin",&hiBin_1);
-  jetpbpb1->SetBranchAddress("vz",&vz_1);
-  jetpbpb1->SetBranchAddress("vx",&vx_1);
-  jetpbpb1->SetBranchAddress("vy",&vy_1);
-  jetpbpb1->SetBranchAddress("hiNtracks",&hiNtracks_1);
-  jetpbpb1->SetBranchAddress("hiHFminus",&hiHFminus_1);
-  jetpbpb1->SetBranchAddress("hiHFplus",&hiHFplus_1);
-  jetpbpb1->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4_1);
-  jetpbpb1->SetBranchAddress("hiHFminusEta4",&hiHFminusEta4_1);
-  jetpbpb1->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection_1);
-  jetpbpb1->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter_1);
-  //jetpbpb1->SetBranchAddress("pprimaryvertexFilter",&pprimaryvertexFilter_1);
-  //jetpbpb1->SetBranchAddress("pVertexFilterCutGplus",&pVertexFilterCutGplus_1);
-  
-  jetpbpb1->SetBranchAddress("nref",&nrefe_1);
-  jetpbpb1->SetBranchAddress("jtpt",&pt_1);
-  jetpbpb1->SetBranchAddress("jteta",&eta_1);
-  jetpbpb1->SetBranchAddress("jtphi",&phi_1);
-  jetpbpb1->SetBranchAddress("rawpt",&raw_1);
-  jetpbpb1->SetBranchAddress("chargedMax",&chMax_1);
-  jetpbpb1->SetBranchAddress("chargedSum",&chSum_1);
-  jetpbpb1->SetBranchAddress("trackMax",&trkMax_1);
-  jetpbpb1->SetBranchAddress("trackSum",&trkSum_1);
-  jetpbpb1->SetBranchAddress("photonMax",&phMax_1);
-  jetpbpb1->SetBranchAddress("photonSum",&phSum_1);
-  jetpbpb1->SetBranchAddress("neutralMax",&neMax_1);
-  jetpbpb1->SetBranchAddress("neutralSum",&neSum_1);
-
-  //jetpbpb1->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_1);
-  //jetpbpb1->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_1);
-  //jetpbpb1->SetBranchAddress("L1_ZeroBias",&L1_MB_1);
-  //jetpbpb1->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
-  jetpbpb1->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
-  jetpbpb1->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_1);
-  jetpbpb1->SetBranchAddress("HLT_HIJet65_v1",&jet65_1);
-  jetpbpb1->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_1);
-  jetpbpb1->SetBranchAddress("HLT_HIJet80_v1",&jet80_1);
-  jetpbpb1->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_1);
-
-  jetpbpb1->SetBranchAddress("id",&trgObj_id_1);
-  jetpbpb1->SetBranchAddress("pt",&trgObj_pt_1);
-  jetpbpb1->SetBranchAddress("eta",&trgObj_eta_1);
-  jetpbpb1->SetBranchAddress("phi",&trgObj_phi_1);
-  jetpbpb1->SetBranchAddress("mass",&trgObj_mass_1);
-
 
   // write the duplicate events to file. 
   
   ofstream outfile;
-  outfile.open(Form("pbpb_new_jetRAA_forest_duplicate_events_run_lumi_event_%d.txt",endfile));
+  outfile.open(Form("/export/d00/scratch/rkunnawa/pbpb_new_minbiasUPF_duplicate_events_run_lumi_event_%d.txt",endfile));
   
   Long64_t nentries = jetpbpb1->GetEntries();
 
