@@ -8,6 +8,7 @@
 #include <TCanvas.h>
 #include <TLegend.h>
 #include <TGraphAsymmErrors.h>
+#include <TLine.h>
 //#include "Headers/plot.h"
 
 void CorrectBinWidth(TH1 *h1)
@@ -40,6 +41,8 @@ TLegend *getLegend(double x1, double y1, double x2, double y2)
 void RAA_plot_triggerTurnon_v2() {
 
   TH1::SetDefaultSumw2();
+  //gStyle->SetOptStat(0);
+
   static const int nbins_pt = 39;
   static const double boundaries_pt[nbins_pt+1] = {
     3, 4, 5, 7, 9, 12,
@@ -53,7 +56,7 @@ void RAA_plot_triggerTurnon_v2() {
     638, 686, 1000
   };
 
-  TFile * fin = TFile::Open("../../Output/PbPb_MinBiasUPC_akPuPF_supernova50_20150319.root");
+  TFile * fin = TFile::Open("../../Output/PbPb_MinBiasUPC_supernova30_nojetid_prescl_akPuPF_20150322.root");
   
   TH1F * hDenominator  = (TH1F*)fin->Get("hDenominator_R3");
   TH1F * hNumerator_80  = (TH1F*)fin->Get("hNumerator_80_R3");
@@ -76,7 +79,7 @@ void RAA_plot_triggerTurnon_v2() {
   TGraphAsymmErrors *gr_turnon_jet55 = new TGraphAsymmErrors(hNumerator_55, hDenominator,"cl=0.683 b(1,1) mode");
   gr_turnon_jet55->SetTitle("");
   gr_turnon_jet55->GetYaxis()->SetTitle("Trigger turnon");
-  gr_turnon_jet55->GetXaxis()->SetTitle("Jet p_{T} (GeV/c)");
+  gr_turnon_jet55->GetXaxis()->SetTitle("akPu3PF Reco Jet p_{T} (GeV/c)");
   gr_turnon_jet55->SetMarkerStyle(20);
   gr_turnon_jet55->SetMarkerColor(8);
   gr_turnon_jet55->SetLineColor(8);
@@ -91,10 +94,11 @@ void RAA_plot_triggerTurnon_v2() {
   gr_turnon_jet80->SetMarkerColor(6);
   gr_turnon_jet80->SetLineColor(6);
 
-  TLegend *leg = getLegend(0.40,0.30,0.75,0.55);
-  leg->AddEntry(gr_turnon_jet55,"HIHLT_Jet55","p");
-  leg->AddEntry(gr_turnon_jet65,"HIHLT_Jet65","p");
-  leg->AddEntry(gr_turnon_jet80,"HIHLT_Jet80","p");
+  TLegend *leg = getLegend(0.60,0.15,0.85,0.35);
+  leg->AddEntry(gr_turnon_jet55,"HLT_HIJet55","p");
+  leg->AddEntry(gr_turnon_jet65,"HLT_HIJet65","p");
+  leg->AddEntry(gr_turnon_jet80,"HLT_HIJet80","p");
+  leg->SetTextSize(0.04);
 
   TCanvas *c3 = new TCanvas("c3","Turn on",808,635);
   c3->cd();
@@ -105,12 +109,43 @@ void RAA_plot_triggerTurnon_v2() {
   gr_turnon_jet80->Draw("psame");
   leg->Draw();
 
-  c3->SaveAs("../../Plots/trigger_turnon_hlt_pbpb_akPu2PF.pdf","RECREATE");
+  c3->SaveAs("../../Plots/trigger_turnon_hlt_pbpb_supernova30_nojetid_prescl_akPu3PF.pdf","RECREATE");
 
+  TH1F * hRatio_Jet80 = (TH1F*)hNumerator_80->Clone("hRatio_Jet80");
+  hRatio_Jet80->Divide(hDenominator);
+  TH1F * hRatio_Jet65 = (TH1F*)hNumerator_65->Clone("hRatio_Jet65");
+  hRatio_Jet65->Divide(hDenominator);
+  TH1F * hRatio_Jet55 = (TH1F*)hNumerator_55->Clone("hRatio_Jet55");
+  hRatio_Jet55->Divide(hDenominator);
 
+  TLine *line = new TLine(20,1,145,1);
+  line->SetLineStyle(2);
+  line->SetLineWidth(2);
 
+  TCanvas * c4 = new TCanvas("c4","",800,600);
+  c4->cd();
+  hRatio_Jet80->SetMarkerStyle(20);
+  hRatio_Jet80->SetMarkerColor(6);
+  hRatio_Jet80->SetYTitle("Trigger Contribution");
+  hRatio_Jet80->SetXTitle("akPu3PF Reco Jet p_{T} (GeV/c)");
+  hRatio_Jet80->SetAxisRange(0,1.2,"Y");
+  hRatio_Jet80->SetAxisRange(20,140,"X");
+  hRatio_Jet80->Draw();
 
+  hRatio_Jet65->SetMarkerStyle(20);
+  hRatio_Jet65->SetMarkerColor(4);
+  hRatio_Jet65->SetAxisRange(20,100,"X");
+  hRatio_Jet65->Draw("same");
 
+  hRatio_Jet55->SetMarkerStyle(20);
+  hRatio_Jet55->SetMarkerColor(8);
+  hRatio_Jet55->SetAxisRange(20,90,"X");
+  hRatio_Jet55->Draw("same");
+  hRatio_Jet80->Draw("same");
 
+  line->Draw();
+  leg->Draw();
+  
+  c4->SaveAs("../../Plots/trigger_spectra_ratio_supernov30_nojetid_prescl_akPu3PF.pdf","RECREATE");
 
 }

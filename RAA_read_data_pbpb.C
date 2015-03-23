@@ -516,7 +516,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   f.cd();
   // need to keep all the input histograms in scope of the output file. 
 
-#if 0
   TH1F *hEvents_HLT80 = new TH1F("hEvents_HLT80","",4,0,2);
   TH1F *hEvents_HLT65 = new TH1F("hEvents_HLT65","",4,0,2);
   TH1F *hEvents_HLT55 = new TH1F("hEvents_HLT55","",4,0,2);
@@ -616,111 +615,35 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     }
    }
 
+
+
+  TH1F * hpbpb_Jet[trigValue-1][nbins_cent];
+  TH1F * hpbpb_Jet_chMaxJtpt[trigValue-1][5][nbins_cent];
+  TH1F * hpbpb_Jet_eMaxJtpt[trigValue-1][9][nbins_cent];
+  //TH1F * hpbpb_Jet_eMaxSumcand[trigValue-1][9][nbins_cent];
+  TH1F * hpbpb_Jet_eMaxJtpt_chMaxJtpt[trigValue-1][3][3][nbins_cent];
+
+  for(int i = 0;i<nbins_cent;++i){
+    
+    for(int t = 0;t<trigValue-1;t++){
+
+      hpbpb_Jet[t][i] = new TH1F(Form("hpbpb_%s_cent%d",trigName[t], i),"",100,0,300);
+
+      for(int a = 0;a<5;++a)
+	hpbpb_Jet_chMaxJtpt[t][a][i] = new TH1F(Form("hpbpb_%s_chMaxJtpt0p0%d_cent%d",trigName[t], a+1, i),"",100,0,300);
+
+      for(int a = 0;a<9;++a)
+	hpbpb_Jet_eMaxJtpt[t][a][i] = new TH1F(Form("hpbpb_%s_eMaxJtpt0p%d_cent%d", trigName[t], a+1, i),"",100,0,300);
+      
+      for(int a = 0;a<3;++a)
+	for(int b = 0;b<3;++b)  
+	  hpbpb_Jet_eMaxJtpt_chMaxJtpt[t][a][b][i] = new TH1F(Form("hpbpb_%s_eMaxJtpt0p0%d_chMaxJtpt0p%d_cent%d",trigName[t], a+5, b+1, i),"",100,0,300);
+
+    }
+
+  }
+
   
-  //plots for the jet ID (hopefully final check) // will be the same in Data and MC
-  TH1F *hpbpb_Jet80 = new TH1F("hpbpb_Jet80","",100,0,300);
-  TH1F* hpbpb_Jet80_chMaxJtpt0p01 = new TH1F("hpbpb_Jet80_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet80_chMaxJtpt0p02 = new TH1F("hpbpb_Jet80_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet80_chMaxJtpt0p03 = new TH1F("hpbpb_Jet80_chMaxJtpt0p03","",100,0,300);
-  TH1F* hpbpb_Jet80_chMaxJtpt0p04 = new TH1F("hpbpb_Jet80_chMaxJtpt0p04","",100,0,300);
-  TH1F* hpbpb_Jet80_chMaxJtpt0p05 = new TH1F("hpbpb_Jet80_chMaxJtpt0p05","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p1 = new TH1F("hpbpb_Jet80_eMaxJtpt0p1","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p2 = new TH1F("hpbpb_Jet80_eMaxJtpt0p2","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p3 = new TH1F("hpbpb_Jet80_eMaxJtpt0p3","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p4 = new TH1F("hpbpb_Jet80_eMaxJtpt0p4","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p5 = new TH1F("hpbpb_Jet80_eMaxJtpt0p5","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p6 = new TH1F("hpbpb_Jet80_eMaxJtpt0p6","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p7 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p8 = new TH1F("hpbpb_Jet80_eMaxJtpt0p8","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p9 = new TH1F("hpbpb_Jet80_eMaxJtpt0p9","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxSumcand0p1 = new TH1F("hpbpb_Jet80_eMaxSumcand0p1","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxSumcand0p2 = new TH1F("hpbpb_Jet80_eMaxSumcand0p2","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxSumcand0p3 = new TH1F("hpbpb_Jet80_eMaxSumcand0p3","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxSumcand0p4 = new TH1F("hpbpb_Jet80_eMaxSumcand0p4","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxSumcand0p5 = new TH1F("hpbpb_Jet80_eMaxSumcand0p5","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxSumcand0p6 = new TH1F("hpbpb_Jet80_eMaxSumcand0p6","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxSumcand0p7 = new TH1F("hpbpb_Jet80_eMaxSumcand0p7","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxSumcand0p8 = new TH1F("hpbpb_Jet80_eMaxSumcand0p8","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxSumcand0p9 = new TH1F("hpbpb_Jet80_eMaxSumcand0p9","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03 = new TH1F("hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01 = new TH1F("hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02 = new TH1F("hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03 = new TH1F("hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01 = new TH1F("hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02 = new TH1F("hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03 = new TH1F("hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03","",100,0,300);
-
-  TH1F *hpbpb_Jet65 = new TH1F("hpbpb_Jet65","",100,0,300);
-  TH1F* hpbpb_Jet65_chMaxJtpt0p01 = new TH1F("hpbpb_Jet65_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet65_chMaxJtpt0p02 = new TH1F("hpbpb_Jet65_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet65_chMaxJtpt0p03 = new TH1F("hpbpb_Jet65_chMaxJtpt0p03","",100,0,300);
-  TH1F* hpbpb_Jet65_chMaxJtpt0p04 = new TH1F("hpbpb_Jet65_chMaxJtpt0p04","",100,0,300);
-  TH1F* hpbpb_Jet65_chMaxJtpt0p05 = new TH1F("hpbpb_Jet65_chMaxJtpt0p05","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p1 = new TH1F("hpbpb_Jet65_eMaxJtpt0p1","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p2 = new TH1F("hpbpb_Jet65_eMaxJtpt0p2","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p3 = new TH1F("hpbpb_Jet65_eMaxJtpt0p3","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p4 = new TH1F("hpbpb_Jet65_eMaxJtpt0p4","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p5 = new TH1F("hpbpb_Jet65_eMaxJtpt0p5","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p6 = new TH1F("hpbpb_Jet65_eMaxJtpt0p6","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p7 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p8 = new TH1F("hpbpb_Jet65_eMaxJtpt0p8","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p9 = new TH1F("hpbpb_Jet65_eMaxJtpt0p9","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxSumcand0p1 = new TH1F("hpbpb_Jet65_eMaxSumcand0p1","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxSumcand0p2 = new TH1F("hpbpb_Jet65_eMaxSumcand0p2","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxSumcand0p3 = new TH1F("hpbpb_Jet65_eMaxSumcand0p3","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxSumcand0p4 = new TH1F("hpbpb_Jet65_eMaxSumcand0p4","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxSumcand0p5 = new TH1F("hpbpb_Jet65_eMaxSumcand0p5","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxSumcand0p6 = new TH1F("hpbpb_Jet65_eMaxSumcand0p6","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxSumcand0p7 = new TH1F("hpbpb_Jet65_eMaxSumcand0p7","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxSumcand0p8 = new TH1F("hpbpb_Jet65_eMaxSumcand0p8","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxSumcand0p9 = new TH1F("hpbpb_Jet65_eMaxSumcand0p9","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03 = new TH1F("hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01 = new TH1F("hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02 = new TH1F("hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03 = new TH1F("hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01 = new TH1F("hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02 = new TH1F("hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03 = new TH1F("hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03","",100,0,300);
-
-  TH1F *hpbpb_Jet55 = new TH1F("hpbpb_Jet55","",100,0,300);
-  TH1F* hpbpb_Jet55_chMaxJtpt0p01 = new TH1F("hpbpb_Jet55_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet55_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet55_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_chMaxJtpt0p03","",100,0,300);
-  TH1F* hpbpb_Jet55_chMaxJtpt0p04 = new TH1F("hpbpb_Jet55_chMaxJtpt0p04","",100,0,300);
-  TH1F* hpbpb_Jet55_chMaxJtpt0p05 = new TH1F("hpbpb_Jet55_chMaxJtpt0p05","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p1 = new TH1F("hpbpb_Jet55_eMaxJtpt0p1","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p2 = new TH1F("hpbpb_Jet55_eMaxJtpt0p2","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p3 = new TH1F("hpbpb_Jet55_eMaxJtpt0p3","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p4 = new TH1F("hpbpb_Jet55_eMaxJtpt0p4","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p5 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p6 = new TH1F("hpbpb_Jet55_eMaxJtpt0p6","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p7 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p8 = new TH1F("hpbpb_Jet55_eMaxJtpt0p8","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p9 = new TH1F("hpbpb_Jet55_eMaxJtpt0p9","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxSumcand0p1 = new TH1F("hpbpb_Jet55_eMaxSumcand0p1","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxSumcand0p2 = new TH1F("hpbpb_Jet55_eMaxSumcand0p2","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxSumcand0p3 = new TH1F("hpbpb_Jet55_eMaxSumcand0p3","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxSumcand0p4 = new TH1F("hpbpb_Jet55_eMaxSumcand0p4","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxSumcand0p5 = new TH1F("hpbpb_Jet55_eMaxSumcand0p5","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxSumcand0p6 = new TH1F("hpbpb_Jet55_eMaxSumcand0p6","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxSumcand0p7 = new TH1F("hpbpb_Jet55_eMaxSumcand0p7","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxSumcand0p8 = new TH1F("hpbpb_Jet55_eMaxSumcand0p8","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxSumcand0p9 = new TH1F("hpbpb_Jet55_eMaxSumcand0p9","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01 = new TH1F("hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02","",100,0,300);
-  TH1F* hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03 = new TH1F("hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03","",100,0,300);
-
-#endif
   static const int ptSelection = 19;
   static const int ptBoundary[ptSelection+1] = {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200};
 
@@ -1027,9 +950,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
 	  jets_ID[k]->Fill(arrayValues);
 #endif
-	  
-	  // going to use the effective prescl for the Jet55 trigger: 2.0475075465
-	  Float_t effecPrescl = 2.047507;
 
 	  //if(cut5<0.95 && cut6<0.95 && cut7<0.95 && cut1>0.05 && cut2<0.95 && cut2b<0.95){
 	  //if(eSum_1[g]/(chSum_1[g]+neSum_1[g]+phSum_1[g]+muSum_1[g])<0.7){
@@ -1106,114 +1026,41 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
 	    }
 
-#if 0
 	    if(jet80_1){
-	      hpbpb_Jet80->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.01)hpbpb_Jet80_chMaxJtpt0p01->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.02)hpbpb_Jet80_chMaxJtpt0p02->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.03)hpbpb_Jet80_chMaxJtpt0p03->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.04)hpbpb_Jet80_chMaxJtpt0p04->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.05)hpbpb_Jet80_chMaxJtpt0p05->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.1)hpbpb_Jet80_eMaxSumcand0p1->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.2)hpbpb_Jet80_eMaxSumcand0p2->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.3)hpbpb_Jet80_eMaxSumcand0p3->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.4)hpbpb_Jet80_eMaxSumcand0p4->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.5)hpbpb_Jet80_eMaxSumcand0p5->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.6)hpbpb_Jet80_eMaxSumcand0p6->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.7)hpbpb_Jet80_eMaxSumcand0p7->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.8)hpbpb_Jet80_eMaxSumcand0p8->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.9)hpbpb_Jet80_eMaxSumcand0p9->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.1)hpbpb_Jet80_eMaxJtpt0p1->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.2)hpbpb_Jet80_eMaxJtpt0p2->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.3)hpbpb_Jet80_eMaxJtpt0p3->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.4)hpbpb_Jet80_eMaxJtpt0p4->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.8)hpbpb_Jet80_eMaxJtpt0p8->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.9)hpbpb_Jet80_eMaxJtpt0p9->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Fill(pt_1[g]);
+	      
+		hpbpb_Jet[2][centBin]->Fill(pt_1[g]);
+		for(int a = 0;a<5;++a)
+		  if(chMax_1[g]/pt_1[g] > (Float_t)(a+1)/100) hpbpb_Jet_chMaxJtpt[2][a][centBin]->Fill(pt_1[g]);
+		for(int a = 0;a<9;++a)
+		  if(eMax_1[g]/pt_1[g] < (Float_t) (a+1)/10) hpbpb_Jet_eMaxJtpt[2][a][centBin]->Fill(pt_1[g]);
+		for(int a = 0;a<3;++a)
+		  for(int b = 0;b<3;++b)
+		    if(chMax_1[g]/pt_1[g]> (Float_t) (b+1)/100 && eMax_1[g]/pt_1[g] < (Float_t) (a+5)/10 ) hpbpb_Jet_eMaxJtpt_chMaxJtpt[2][a][b][centBin]->Fill(pt_1[g]);
 	    }
 	    if(jet65_1 && !jet80_1){
-	      hpbpb_Jet65->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.01)hpbpb_Jet65_chMaxJtpt0p01->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.02)hpbpb_Jet65_chMaxJtpt0p02->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.03)hpbpb_Jet65_chMaxJtpt0p03->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.04)hpbpb_Jet65_chMaxJtpt0p04->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.05)hpbpb_Jet65_chMaxJtpt0p05->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.1)hpbpb_Jet65_eMaxSumcand0p1->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.2)hpbpb_Jet65_eMaxSumcand0p2->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.3)hpbpb_Jet65_eMaxSumcand0p3->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.4)hpbpb_Jet65_eMaxSumcand0p4->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.5)hpbpb_Jet65_eMaxSumcand0p5->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.6)hpbpb_Jet65_eMaxSumcand0p6->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.7)hpbpb_Jet65_eMaxSumcand0p7->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.8)hpbpb_Jet65_eMaxSumcand0p8->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.9)hpbpb_Jet65_eMaxSumcand0p9->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.1)hpbpb_Jet65_eMaxJtpt0p1->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.2)hpbpb_Jet65_eMaxJtpt0p2->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.3)hpbpb_Jet65_eMaxJtpt0p3->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.4)hpbpb_Jet65_eMaxJtpt0p4->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.8)hpbpb_Jet65_eMaxJtpt0p8->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.9)hpbpb_Jet65_eMaxJtpt0p9->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Fill(pt_1[g]);
-	      if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Fill(pt_1[g]);
+
+		hpbpb_Jet[1][centBin]->Fill(pt_1[g]);
+		for(int a = 0;a<5;++a)
+		  if(chMax_1[g]/pt_1[g] > (Float_t)(a+1)/100) hpbpb_Jet_chMaxJtpt[1][a][centBin]->Fill(pt_1[g]);
+		for(int a = 0;a<9;++a)
+		  if(eMax_1[g]/pt_1[g] < (Float_t) (a+1)/10) hpbpb_Jet_eMaxJtpt[1][a][centBin]->Fill(pt_1[g]);
+		for(int a = 0;a<3;++a)
+		  for(int b = 0;b<3;++b)
+		    if(chMax_1[g]/pt_1[g]> (Float_t) (b+1)/100 && eMax_1[g]/pt_1[g] < (Float_t) (a+5)/10 ) hpbpb_Jet_eMaxJtpt_chMaxJtpt[1][a][b][centBin]->Fill(pt_1[g]);
 	    }
 	    if(jet55_1 && !jet65_1 && !jet80_1){
-	      hpbpb_Jet55->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.01)hpbpb_Jet55_chMaxJtpt0p01->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.02)hpbpb_Jet55_chMaxJtpt0p02->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.03)hpbpb_Jet55_chMaxJtpt0p03->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.04)hpbpb_Jet55_chMaxJtpt0p04->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.05)hpbpb_Jet55_chMaxJtpt0p05->Fill(pt_1[g],effecPrescl);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.1)hpbpb_Jet55_eMaxSumcand0p1->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.2)hpbpb_Jet55_eMaxSumcand0p2->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.3)hpbpb_Jet55_eMaxSumcand0p3->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.4)hpbpb_Jet55_eMaxSumcand0p4->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.5)hpbpb_Jet55_eMaxSumcand0p5->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.6)hpbpb_Jet55_eMaxSumcand0p6->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.7)hpbpb_Jet55_eMaxSumcand0p7->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.8)hpbpb_Jet55_eMaxSumcand0p8->Fill(pt_1[g]);
-	      if(eMax_1[g]/(chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g])<0.9)hpbpb_Jet55_eMaxSumcand0p9->Fill(pt_1[g]);
-	      if(eMax_1[g]/pt_1[g]<0.1)hpbpb_Jet55_eMaxJtpt0p1->Fill(pt_1[g],effecPrescl);
-	      if(eMax_1[g]/pt_1[g]<0.2)hpbpb_Jet55_eMaxJtpt0p2->Fill(pt_1[g],effecPrescl);
-	      if(eMax_1[g]/pt_1[g]<0.3)hpbpb_Jet55_eMaxJtpt0p3->Fill(pt_1[g],effecPrescl);
-	      if(eMax_1[g]/pt_1[g]<0.4)hpbpb_Jet55_eMaxJtpt0p4->Fill(pt_1[g],effecPrescl);
-	      if(eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5->Fill(pt_1[g],effecPrescl);
-	      if(eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6->Fill(pt_1[g],effecPrescl);
-	      if(eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7->Fill(pt_1[g],effecPrescl);
-	      if(eMax_1[g]/pt_1[g]<0.8)hpbpb_Jet55_eMaxJtpt0p8->Fill(pt_1[g],effecPrescl);
-	      if(eMax_1[g]/pt_1[g]<0.9)hpbpb_Jet55_eMaxJtpt0p9->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.7)hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.6)hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.01 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.02 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Fill(pt_1[g],effecPrescl);
-	      if(chMax_1[g]/pt_1[g]>0.03 && eMax_1[g]/pt_1[g]<0.5)hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Fill(pt_1[g],effecPrescl);
+	
+	      hpbpb_Jet[0][centBin]->Fill(pt_1[g],effecPrescl);
+		for(int a = 0;a<5;++a)
+		  if(chMax_1[g]/pt_1[g] > (Float_t)(a+1)/100) hpbpb_Jet_chMaxJtpt[0][a][centBin]->Fill(pt_1[g],effecPrescl);
+		for(int a = 0;a<9;++a)
+		  if(eMax_1[g]/pt_1[g] < (Float_t) (a+1)/10) hpbpb_Jet_eMaxJtpt[0][a][centBin]->Fill(pt_1[g],effecPrescl);
+		for(int a = 0;a<3;++a)
+		  for(int b = 0;b<3;++b)
+		    if(chMax_1[g]/pt_1[g]> (Float_t) (b+1)/100 && eMax_1[g]/pt_1[g] < (Float_t) (a+5)/10 ) hpbpb_Jet_eMaxJtpt_chMaxJtpt[0][a][b][centBin]->Fill(pt_1[g],effecPrescl);		
+	  
 	    }
 
-#endif
 	    
 	  }// check if its r = 0.3
 	
@@ -1406,219 +1253,32 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     }//nentries_jet55or65 loop
     
   }//radius loop. 
- 
+  
   //hEvents_HLT80->Write();
   //hEvents_HLT65->Write();
   //hEvents_HLT55->Write();
 
-#if 0
-  hpbpb_Jet80->Write();
-  //hpbpb_Jet80_chMaxJtpt0p01->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_chMaxJtpt0p01->Write();
-  //hpbpb_Jet80_chMaxJtpt0p02->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_chMaxJtpt0p02->Write();
-  //hpbpb_Jet80_chMaxJtpt0p03->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_chMaxJtpt0p03->Write();
-  //hpbpb_Jet80_chMaxJtpt0p04->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_chMaxJtpt0p04->Write();
-  //hpbpb_Jet80_chMaxJtpt0p05->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_chMaxJtpt0p05->Write();
+  for(int i = 0;i<nbins_cent;++i){
+    
+    for(int t = 0;t<trigValue-1;t++){
 
-  //hpbpb_Jet80_eMaxJtpt0p1->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p1->Write();
-  //hpbpb_Jet80_eMaxJtpt0p2->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p2->Write();
-  //hpbpb_Jet80_eMaxJtpt0p3->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p3->Write();
-  //hpbpb_Jet80_eMaxJtpt0p4->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p4->Write();
-  //hpbpb_Jet80_eMaxJtpt0p5->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p5->Write();
-  //hpbpb_Jet80_eMaxJtpt0p6->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p6->Write();
-  //hpbpb_Jet80_eMaxJtpt0p7->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p7->Write();
-  //hpbpb_Jet80_eMaxJtpt0p8->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p8->Write();
-  //hpbpb_Jet80_eMaxJtpt0p9->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p9->Write();
+      hpbpb_Jet[t][i]->Write();
 
-  //hpbpb_Jet80_eMaxSumcand0p1->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxSumcand0p1->Write();
-  //hpbpb_Jet80_eMaxSumcand0p2->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxSumcand0p2->Write();
-  //hpbpb_Jet80_eMaxSumcand0p3->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxSumcand0p3->Write();
-  //hpbpb_Jet80_eMaxSumcand0p4->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxSumcand0p4->Write();
-  //hpbpb_Jet80_eMaxSumcand0p5->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxSumcand0p5->Write();
-  //hpbpb_Jet80_eMaxSumcand0p6->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxSumcand0p6->Write();
-  //hpbpb_Jet80_eMaxSumcand0p7->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxSumcand0p7->Write();
-  //hpbpb_Jet80_eMaxSumcand0p8->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxSumcand0p8->Write();
-  //hpbpb_Jet80_eMaxSumcand0p9->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxSumcand0p9->Write();
+      for(int a = 0;a<5;++a){
+	hpbpb_Jet_chMaxJtpt[t][a][i]->Write();
+      }
 
-  //hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p01->Write();
-  //hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p02->Write();
-  //hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p7_chMaxJtpt0p03->Write();
-  //hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p01->Write();
-  //hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p02->Write();
-  //hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p6_chMaxJtpt0p03->Write();
-  //hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p01->Write();
-  //hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p02->Write();
-  //hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Divide(hpbpb_Jet80);
-  hpbpb_Jet80_eMaxJtpt0p5_chMaxJtpt0p03->Write();
+      for(int a = 0;a<9;++a){
+	hpbpb_Jet_eMaxJtpt[t][a][i]->Write();
+      }
+      for(int a = 0;a<3;++a)
+	for(int b = 0;b<3;++b) { 
+	  hpbpb_Jet_eMaxJtpt_chMaxJtpt[t][a][b][i]->Write();
+	}
 
-  hpbpb_Jet65->Write();
-  //hpbpb_Jet65_chMaxJtpt0p01->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_chMaxJtpt0p01->Write();
-  //hpbpb_Jet65_chMaxJtpt0p02->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_chMaxJtpt0p02->Write();
-  //hpbpb_Jet65_chMaxJtpt0p03->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_chMaxJtpt0p03->Write();
-  //hpbpb_Jet65_chMaxJtpt0p04->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_chMaxJtpt0p04->Write();
-  //hpbpb_Jet65_chMaxJtpt0p05->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_chMaxJtpt0p05->Write();
+    }
 
-  //hpbpb_Jet65_eMaxJtpt0p1->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p1->Write();
-  //hpbpb_Jet65_eMaxJtpt0p2->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p2->Write();
-  //hpbpb_Jet65_eMaxJtpt0p3->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p3->Write();
-  //hpbpb_Jet65_eMaxJtpt0p4->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p4->Write();
-  //hpbpb_Jet65_eMaxJtpt0p5->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p5->Write();
-  //hpbpb_Jet65_eMaxJtpt0p6->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p6->Write();
-  //hpbpb_Jet65_eMaxJtpt0p7->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p7->Write();
-  //hpbpb_Jet65_eMaxJtpt0p8->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p8->Write();
-  //hpbpb_Jet65_eMaxJtpt0p9->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p9->Write();
-
-
-  //hpbpb_Jet65_eMaxSumcand0p1->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxSumcand0p1->Write();
-  //hpbpb_Jet65_eMaxSumcand0p2->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxSumcand0p2->Write();
-  //hpbpb_Jet65_eMaxSumcand0p3->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxSumcand0p3->Write();
-  //hpbpb_Jet65_eMaxSumcand0p4->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxSumcand0p4->Write();
-  //hpbpb_Jet65_eMaxSumcand0p5->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxSumcand0p5->Write();
-  //hpbpb_Jet65_eMaxSumcand0p6->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxSumcand0p6->Write();
-  //hpbpb_Jet65_eMaxSumcand0p7->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxSumcand0p7->Write();
-  //hpbpb_Jet65_eMaxSumcand0p8->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxSumcand0p8->Write();
-  //hpbpb_Jet65_eMaxSumcand0p9->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxSumcand0p9->Write();
-
-  //hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p01->Write();
-  //hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p02->Write();
-  //hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p7_chMaxJtpt0p03->Write();
-  //hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p01->Write();
-  //hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p02->Write();
-  //hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p6_chMaxJtpt0p03->Write();
-  //hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p01->Write();
-  //hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p02->Write();
-  //hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Divide(hpbpb_Jet65);
-  hpbpb_Jet65_eMaxJtpt0p5_chMaxJtpt0p03->Write();
-
-  hpbpb_Jet55->Write();
-  //hpbpb_Jet55_chMaxJtpt0p01->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_chMaxJtpt0p01->Write();
-  //hpbpb_Jet55_chMaxJtpt0p02->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_chMaxJtpt0p02->Write();
-  //hpbpb_Jet55_chMaxJtpt0p03->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_chMaxJtpt0p03->Write();
-  //hpbpb_Jet55_chMaxJtpt0p04->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_chMaxJtpt0p04->Write();
-  //hpbpb_Jet55_chMaxJtpt0p05->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_chMaxJtpt0p05->Write();
-
-  //hpbpb_Jet55_eMaxJtpt0p1->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p1->Write();
-  //hpbpb_Jet55_eMaxJtpt0p2->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p2->Write();
-  //hpbpb_Jet55_eMaxJtpt0p3->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p3->Write();
-  //hpbpb_Jet55_eMaxJtpt0p4->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p4->Write();
-  //hpbpb_Jet55_eMaxJtpt0p5->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p5->Write();
-  //hpbpb_Jet55_eMaxJtpt0p6->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p6->Write();
-  //hpbpb_Jet55_eMaxJtpt0p7->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p7->Write();
-  //hpbpb_Jet55_eMaxJtpt0p8->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p8->Write();
-  //hpbpb_Jet55_eMaxJtpt0p9->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p9->Write();
-
-  //hpbpb_Jet55_eMaxSumcand0p1->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxSumcand0p1->Write();
-  //hpbpb_Jet55_eMaxSumcand0p2->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxSumcand0p2->Write();
-  //hpbpb_Jet55_eMaxSumcand0p3->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxSumcand0p3->Write();
-  //hpbpb_Jet55_eMaxSumcand0p4->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxSumcand0p4->Write();
-  //hpbpb_Jet55_eMaxSumcand0p5->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxSumcand0p5->Write();
-  //hpbpb_Jet55_eMaxSumcand0p6->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxSumcand0p6->Write();
-  //hpbpb_Jet55_eMaxSumcand0p7->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxSumcand0p7->Write();
-  //hpbpb_Jet55_eMaxSumcand0p8->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxSumcand0p8->Write();
-  //hpbpb_Jet55_eMaxSumcand0p9->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxSumcand0p9->Write();
-
-  //hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p01->Write();
-  //hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p02->Write();
-  //hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p7_chMaxJtpt0p03->Write();
-  //hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p01->Write();
-  //hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p02->Write();
-  //hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p6_chMaxJtpt0p03->Write();
-  //hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p01->Write();
-  //hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p02->Write();
-  //hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Divide(hpbpb_Jet55);
-  hpbpb_Jet55_eMaxJtpt0p5_chMaxJtpt0p03->Write();
+  }
 
   hpbpb_chMaxJtpt_jtpt->Write();
   hpbpb_eMaxJtpt_jtpt->Write();
@@ -1697,8 +1357,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     //evt_electron_good[k]->Write();
   }
 
-
-#endif
 
   /*
   hEvents->Write();

@@ -515,7 +515,7 @@ void RAA_read_mc_pp(int startfile = 9, int endfile = 10, char *jet_type="PF"){
 
             int subEvt=-1;
 	    
-            if ( fabs(dataPP[k][h]->jteta[g])  > boundaries_eta[j][1] || fabs(dataPP[k][h]->jteta[g]) < boundaries_eta[j][0] ) continue;
+            if ( TMath::Abs(dataPP[k][h]->jteta[g])  > boundaries_eta[j][1] || TMath::Abs(dataPP[k][h]->jteta[g]) < boundaries_eta[j][0] ) continue;
 
 #if 0
 

@@ -97,8 +97,8 @@ static const char etaWidth [nbins_eta][256] = {
   "0_absEta_05", "05_absEta_10", "10_absEta_15", "15_absEta_20", "20_absEta_25" 
 };
 
-static const int no_radius = 4;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {2,3,4,5};
+static const int no_radius = 2;//necessary for the RAA analysis  
+static const int list_radius[no_radius] = {3,5};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -402,7 +402,7 @@ void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
 
     if(printDebug) cout<<"Reading data for R = "<<list_radius[k]<<endl;
     Long64_t nentries_jetPP = jetPP[2][k]->GetEntries();
-    if(printDebug) nentries_jetPP = 2;
+    if(printDebug) nentries_jetPP = 1000;
     
     for(int jentry = 0;jentry<nentries_jetPP;jentry++){
 
@@ -514,11 +514,13 @@ void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
 	    
 	  }// qa condition
 
-#endif
+
 	  if(eta_1[g] >= -0.522 && eta_1[g] < 0.522) pt_1[g] = pt_1[g] * fResidual_0_eta_0p522->Eval(pt_1[g]);
 	  if((eta_1[g] >= -1.044 && eta_1[g] < -0.522) || (eta_1[g] <= 1.044 && eta_1[g] > 0.522)) pt_1[g] = pt_1[g] * fResidual_0p522_eta_1p044->Eval(pt_1[g]);
 	  if((eta_1[g] >= -1.566 && eta_1[g] < -1.044) || (eta_1[g] <= 1.566 && eta_1[g] > 1.044)) pt_1[g] = pt_1[g] * fResidual_1p044_eta_1p566->Eval(pt_1[g]);
 	  if((eta_1[g] >= -2.043 && eta_1[g] < -1.566) || (eta_1[g] <= 2.043 && eta_1[g] > 1.566)) pt_1[g] = pt_1[g] * fResidual_1p566_eta_2p043->Eval(pt_1[g]);
+
+#endif
 
 	  if(eMax_1[g]/pt_1[g]> 0.6 || chMax_1[g]/pt_1[g]<0.02) continue;
 	  
@@ -564,7 +566,7 @@ void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
       // divideBinWidth(hpp_Trg80[k][j]);// divide by delta pt. 
       // divideBinWidth(hpp_Trg60[k][j]);
       // divideBinWidth(hpp_Trg40[k][j]);
-      
+#if 0
       hchMax[k][j]->Write();
       hphMax[k][j]->Write();
       hneMax[k][j]->Write();
@@ -615,6 +617,7 @@ void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
       if(printDebug)hpp_eMaxcut_Trg40[k][j]->Print();
       hpp_eMaxcut_TrgComb[k][j]->Write();
       if(printDebug)hpp_eMaxcut_TrgComb[k][j]->Print();
+#endif
 
       hpp_residual_TrgComb[k][j]->Add(hpp_residual_Trg80[k][j]);
       hpp_residual_TrgComb[k][j]->Add(hpp_residual_Trg60[k][j]);
