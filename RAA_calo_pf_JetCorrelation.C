@@ -11,7 +11,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
-#include <fstream>
+#include <sstream>
 #include <TH1F.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -22,6 +22,7 @@
 #include <TLegend.h>
 #include <TGraphErrors.h>
 #include <TGraphAsymmErrors.h>
+#include <TEventList.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <TH3.h>
@@ -106,7 +107,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "Data"){
+void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC"){
 
   TH1::SetDefaultSumw2();
 
@@ -204,6 +205,25 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
 
   cout<<"total no of entries in the combined forest files = "<<jetpbpb1[2][0]->GetEntries()<<endl;
   //  if(printDebug)cout<<"total no of entries in the Jet80 Tree     = "<<jetpbpb2[2][0]->GetEntries()<<endl;
+
+  // get the centrality weight, vz weight and the scale from the cross section, pt weighting. 
+  static const Int_t nbins_pthat = 9;
+  Double_t xsection[nbins_pthat+1] = {2.034e-01, 1.075e-02, 1.025e-03,  9.865e-05, 1.129e-05, 1.465e-06, 2.837e-07, 5.323e-08, 5.934e-09, 0};
+  Int_t boundaries_pthat[nbins_pthat+1] = {15, 30, 50, 80, 120, 180, 220, 280, 370, 2000};
+  
+  // Vertex & centrality reweighting for PbPb
+  TF1 *fVz;
+  fVz = new TF1("fVz","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
+  fVz->SetParameters(9.86748e-01, -8.91367e-03, 5.35416e-04, 2.67665e-06, -2.01867e-06);
+
+  //get the centrality weight from the root file created in the plotting macro. 
+  TFile *fcentin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Macros/RAA/PbPb_DataMC_cent_ratio_20141117.root");
+  TH1F *hCentWeight = (TH1F*)fcentin->Get("hCentRatio");
+
+  
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_%s_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",dataset,deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
+  f.cd();
+
 
   //set the branch addresses:
   // jet tree 1 - Calo 
@@ -458,6 +478,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   Int_t evt_value;
   Int_t run_value;
   Int_t lumi_value;
+  Float_t weight;
   Float_t subid, pfrawpt, calorawpt, pfrefpt, calorefpt, pfjtpu, calojtpu, vz, pthat;
   
   TTree* matchJets = new TTree("matchedJets","Ntuple containing important information about matched jets");
@@ -479,6 +500,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   if(dataset=="MC") matchJets->Branch("pfrefpt",&pfrefpt,"pfrefpt/F"); matchJets->Branch("pfjtpu",&pfjtpu,"pfjtpu/F");
   if(dataset=="MC") matchJets->Branch("calorefpt",&calorefpt,"calorefpt/F");
   if(dataset=="MC") matchJets->Branch("pthat",&pthat,"pthat/F"); if(dataset=="MC") matchJets->Branch("vz",&vz,"vz/F");
+  if(dataset=="MC") matchJets->Branch("weight",&weight,"weight/F");
   matchJets->Branch("calorawpt",&calorawpt,"calorawpt/F");
   matchJets->Branch("calojtpu",&calojtpu,"calojtpu/F");
   
@@ -499,6 +521,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   unmatchPFJets->Branch("lumi_value",&lumi_value,"lumi_value/I");
   if(dataset=="MC") unmatchPFJets->Branch("subid",&subid,"subid/I"); unmatchPFJets->Branch("pfrawpt",&pfrawpt,"pfrawpt/F");
   if(dataset=="MC") unmatchPFJets->Branch("pfrefpt",&pfrefpt,"pfrefpt/F"); unmatchPFJets->Branch("pfjtpu",&pfjtpu,"pfjtpu/F");
+  if(dataset=="MC") unmatchPFJets->Branch("weight",&weight,"weight/F");
   if(dataset=="MC") unmatchPFJets->Branch("pthat",&pthat,"pthat/F"); if(dataset=="MC") unmatchPFJets->Branch("vz",&vz,"vz/F");
   
   TTree* unmatchCaloJets = new TTree("unmatchedCaloJets","Ntuple containing important information about unmatched Calo jets");
@@ -519,6 +542,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   if(dataset=="MC") unmatchCaloJets->Branch("subid",&subid,"subid/I"); 
   if(dataset=="MC") unmatchCaloJets->Branch("calorefpt",&calorefpt,"calorefpt/F");
   if(dataset=="MC") unmatchCaloJets->Branch("pthat",&pthat,"pthat/F"); if(dataset=="MC") unmatchCaloJets->Branch("vz",&vz,"vz/F");
+  if(dataset=="MC") unmatchCaloJets->Branch("weight",&weight,"weight/F");
   unmatchCaloJets->Branch("calorawpt",&calorawpt,"calorawpt/F");
   unmatchCaloJets->Branch("calojtpu",&calojtpu,"calojtpu/F");
 
@@ -537,20 +561,39 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   for(int k = 0;k<no_radius;k++){
 
     Long64_t nentries = jetpbpb1[2][k]->GetEntries();
-    //nentries = 20;
+    //Long64_t nentries = 100;
+    
+    TEventList *el = new TEventList("el","el");
+    double pthat_upper = boundaries_pthat[endfile + 1];
+    stringstream selection; selection<<"pthat<"<<pthat_upper;
+    
+    jetpbpb1[2][k]->Draw(">>el",selection.str().c_str());
+    double fentries = el->GetN();
+    delete el;
     
     for(Long64_t nentry = 0; nentry<nentries;nentry++){
       if(printDebug)cout<<"event no = "<<nentry<<endl;
       for(int t = 0;t<N;t++)  jetpbpb1[t][k]->GetEntry(nentry);
       
-      int centBin = findBin(hiBin_1);
-      if(centBin==-1) continue;
+      //int centBin = findBin(hiBin_1);
+      //if(centBin==-1) continue;
       //if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
       if(pcollisionEventSelection_1==0) continue; 
       if(dataset=="Data" || dataset=="MinBiasUPC") if(pcollisionEventSelection_1==0) continue;
 
       if(fabs(vz_1)>15) continue;
       //cout<<"passed the selection"<<endl;
+
+      weight = 1;
+      if(dataset=="MC"){
+	
+	double scale = (double)(xsection[endfile]-xsection[endfile+1])/fentries;
+	
+	Float_t weight_cent = hCentWeight->GetBinContent(hCentWeight->FindBin(hiBin_1));
+	Float_t weight_vz = fVz->Eval(vz_1);
+
+	weight = scale*weight_cent*weight_vz;
+      }
 
       int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
 
@@ -857,9 +900,6 @@ void RAA_calo_pf_JetCorrelation(int startfile = 0, int endfile = 1, int radius=3
   }// radius loop
 
   //TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
-
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_%s_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",dataset,deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
-  f.cd();
 
   matchJets->Write();
   matchJets->Print();
