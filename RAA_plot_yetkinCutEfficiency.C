@@ -4,14 +4,29 @@
   
   gSystem->Load("Headers/plot.h");
 
-  TFile * fData = TFile::Open("../../Output/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150320.root");
+  // the cut is a 3 step cut based on the different value of the calopt/pfpt - copy the following lines into your loop (with the corresponding branch address set)
+  // if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) hGood->Fill();
+  // if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < (18/7 *(Float_t)calopt_1/pfpt_1 - 9/7)) ) hGood->Fill();
+  // if(calopt/pfpt > 0.85 & eMax/Sumcand > 0.9) hGood->Fill();
+  
+  
+  
+  Int_t radius = 3;
+
+  if(radius == 2) TFile * fData = TFile::Open("../../Output/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150327.root");
+  if(radius == 3) TFile * fData = TFile::Open("../../Output/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150320.root");
+  if(radius == 4) TFile * fData = TFile::Open("../../Output/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150327.root");
+
+  if(radius == 2) TFile * fMC = TFile::Open("../../Output/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150326.root");
+  if(radius == 3) TFile * fMC = TFile::Open("../../Output/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150326.root");
+  if(radius == 4)TFile * fMC = TFile::Open("../../Output/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150326.root");
+
   TTree * Data_matched = (TTree*)fData->Get("matchedJets");
   TTree * Data_unmatched = (TTree*)fData->Get("unmatchedPFJets");
 
-  TFile * fMC = TFile::Open("../../Output/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150319_9.root");
   TTree * MC_matched = (TTree*)fMC->Get("matchedJets");
   TTree * MC_unmatched = (TTree*)fMC->Get("unmatchedPFJets");
-
+  
   TH1F * hMC_Jet55_noCut = new TH1F("hMC_Jet55_noCut","data from matched jets without any jet ID cut",1000,0,1000);
   TH1F * hMC_Jet55_CutA = new TH1F("hMC_Jet55_CutA","data from matched jets with Jet ID cut: slant line from 0.4 calopt/pfpt from eMax/Sumcand 0 till 0.9  and then calopt/pfpt > 0.85",1000,0,1000);
   TH1F * hMC_Jet55_CutB = new TH1F("hMC_Jet55_CutB","data from matched jets with Jet ID cut: slant line calopt/pfpt = 0.5, eMax/pfpt = 0 to calopt/pfpt = 1.25, eMax/pfpt = 1.1",1000,0,1000);
@@ -165,6 +180,9 @@
 	hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
       if(eMax_1/Sumcand >=0.9 && calopt_1/pfpt_1 > 0.85 && chMax_1/pfpt_1 > 0.02) 
 	hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
+      if(calopt_1/pfpt_1 < 0.5 && eMax_1/Sumcand < 0.05)
+	hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
+	
       
       // if(eMax_1/pfpt_1 < (22/15 * (Float_t)calopt_1/pfpt_1 - 11/15)) 
       // 	hData_Jet55_CutB->Fill(pfpt_1);
