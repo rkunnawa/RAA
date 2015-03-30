@@ -4,13 +4,13 @@
 
   Int_t radius = 4;
 
-  if(radius == 2) TFile * fData = TFile::Open("../../Output/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150327.root");
-  if(radius == 3) TFile * fData = TFile::Open("../../Output/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150320.root");
-  if(radius == 4) TFile * fData = TFile::Open("../../Output/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150327.root");
+  if(radius == 2) TFile * fData = TFile::Open("../../Output/JetRAA_ntuples/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150328.root");
+  if(radius == 3) TFile * fData = TFile::Open("../../Output/JetRAA_ntuples/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150328.root");
+  if(radius == 4) TFile * fData = TFile::Open("../../Output/JetRAA_ntuples/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150328.root");
 
-  if(radius == 2) TFile * fMC = TFile::Open("../../Output/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150326.root");
-  if(radius == 3) TFile * fMC = TFile::Open("../../Output/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150326.root");
-  if(radius == 4)TFile * fMC = TFile::Open("../../Output/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150326.root");
+  if(radius == 2) TFile * fMC = TFile::Open("../../Output/JetRAA_ntuples/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150328.root");
+  if(radius == 3) TFile * fMC = TFile::Open("../../Output/JetRAA_ntuples/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150328.root");
+  if(radius == 4)TFile * fMC = TFile::Open("../../Output/JetRAA_ntuples/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150328.root");
 
 
   TTree * Data_matched = (TTree*)fData->Get("matchedJets");
