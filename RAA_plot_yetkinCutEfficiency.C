@@ -12,15 +12,13 @@
   
   Int_t radius = 3;
 
-  if(radius == 2) TFile * fData = TFile::Open("../../Output/JetRAA_ntuples/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150328.root");
-  if(radius == 3) TFile * fData = TFile::Open("../../Output/JetRAA_ntuples/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150328.root");
-  if(radius == 4) TFile * fData = TFile::Open("../../Output/JetRAA_ntuples/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150328.root");
+  if(radius == 2) TFile * fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150331.root");
+  if(radius == 3) TFile * fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150331.root");
+  if(radius == 4) TFile * fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150331.root");
 
-  if(radius == 2) TFile * fMC = TFile::Open("../../Output/JetRAA_ntuples/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150328.root");
-  if(radius == 3) TFile * fMC = TFile::Open("../../Output/JetRAA_ntuples/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150328.root");
-  if(radius == 4)TFile * fMC = TFile::Open("../../Output/JetRAA_ntuples/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150328.root");
-
-
+  if(radius == 2) TFile * fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150331.root");
+  if(radius == 3) TFile * fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150331.root");
+  if(radius == 4)TFile * fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150331.root");
 
   TTree * Data_matched = (TTree*)fData->Get("matchedJets");
   TTree * Data_unmatched = (TTree*)fData->Get("unmatchedPFJets");
@@ -92,8 +90,7 @@
   TH1F * hMC_unmatched_Jet55_noCut = new TH1F("hMC_unmatched_Jet55_noCut","",1000,0,1000);
   TH1F * hMC_unmatched_Jet55_CutA = new TH1F("hMC_unmatched_Jet55_CutA","",1000,0,1000);
   TH1F * hMC_unmatched_Jet55_CutA_rej = new TH1F("hMC_unmatched_Jet55_CutA_rej","",1000,0,1000);
-  
-  
+
   // 1 - Data, 2 - MC
   Float_t pfpt_1, pfpt_2;
   Float_t pfrefpt_2;

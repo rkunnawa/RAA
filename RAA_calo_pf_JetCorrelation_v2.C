@@ -107,7 +107,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "Data"){
+void RAA_calo_pf_JetCorrelation_v2(int startfile = 7, int endfile = 8, int radius=4, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC"){
 
   TH1::SetDefaultSumw2();
 
@@ -209,7 +209,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
   // get the centrality weight, vz weight and the scale from the cross section, pt weighting. 
   static const Int_t nbins_pthat = 9;
   Double_t xsection[nbins_pthat+1] = {2.034e-01, 1.075e-02, 1.025e-03,  9.865e-05, 1.129e-05, 1.465e-06, 2.837e-07, 5.323e-08, 5.934e-09, 0};
-  Double_t boundaries_pthat[nbins_pthat+1] = {15, 30, 50, 80, 120, 180, 220, 280, 370, 2000};
+  Double_t boundaries_pthat[nbins_pthat+1] = {15, 30, 50, 80, 120, 170, 220, 280, 370, 2000};
 
   TH1F * hpthatBin = new TH1F("hpthatBin","",nbins_pthat, boundaries_pthat);
 
@@ -574,24 +574,24 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
 
     Long64_t nentries = jetpbpb1[2][k]->GetEntries();
     //Long64_t nentries = 100;
-    
-    TEventList *el = new TEventList("el","el");
-    double pthat_upper = boundaries_pthat[startfile + 1];
-    stringstream selection; selection<<"pthat<"<<pthat_upper;
-    
-    jetpbpb1[2][k]->Draw(">>el",selection.str().c_str());
-    double fentries = el->GetN();
-    delete el;
+
+    Long64_t fentries = 1;
+    if(dataset == "MC"){
+      TEventList *el = new TEventList("el","el");
+      double pthat_upper = boundaries_pthat[startfile + 1];
+      stringstream selection; selection<<"pthat<"<<pthat_upper;
+      
+      jetpbpb1[2][k]->Draw(">>el",selection.str().c_str());
+      fentries = el->GetN();
+      delete el;
+    }
     
     for(Long64_t nentry = 0; nentry<nentries;nentry++){
       if(printDebug)cout<<"event no = "<<nentry<<endl;
       for(int t = 0;t<N;t++)  jetpbpb1[t][k]->GetEntry(nentry);
       
-      //int centBin = findBin(hiBin_1);
-      //if(centBin==-1) continue;
-      //if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
       if(pcollisionEventSelection_1==0) continue; 
-      if(dataset=="Data" || dataset=="MinBiasUPC") if(pcollisionEventSelection_1==0) continue;
+      if(dataset=="Data" || dataset=="MinBiasUPC") if(pHBHENoiseFilter_1==0) continue;
 
       if(fabs(vz_1)>15) continue;
       //cout<<"passed the selection"<<endl;
@@ -601,7 +601,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
 
 	int pthatBin = hpthatBin->FindBin(pthat_1);
 	
-	double scale = (double)(xsection[pthatBin]-xsection[pthatBin-1])/fentries;
+	double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/fentries;
 	
 	Float_t weight_cent = hCentWeight->GetBinContent(hCentWeight->FindBin(hiBin_1));
 	Float_t weight_vz = fVz->Eval(vz_1);
