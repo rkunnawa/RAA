@@ -1,16 +1,53 @@
-{
+#include <iostream>
+#include <stdio.h>
+#include <fstream>
+#include <fstream>
+#include <TH1F.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TFile.h>
+#include <TTree.h>
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TLegend.h>
+#include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TH3.h>
+#include <TFile.h>
+#include <TStyle.h>
+#include <TStopwatch.h>
+#include <TRandom3.h>
+#include <TChain.h>
+#include <TProfile.h>
+#include <TStopwatch.h>
+#include <TCut.h>
+#include <cstdlib>
+#include <cmath>
+#include "TLegend.h"
+#include "TLatex.h"
+#include "TMath.h"
+#include "TLine.h"
 
-  gSystem->Load("Headers/plot.h");
 
-  Int_t radius = 4;
+#include "Headers/plot.h"
 
-  if(radius == 2) TFile * fData = TFile::Open("../../Output/JetRAA_ntuples/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150328.root");
-  if(radius == 3) TFile * fData = TFile::Open("../../Output/JetRAA_ntuples/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150328.root");
-  if(radius == 4) TFile * fData = TFile::Open("../../Output/JetRAA_ntuples/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150328.root");
+using namespace std;
 
-  if(radius == 2) TFile * fMC = TFile::Open("../../Output/JetRAA_ntuples/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150328.root");
-  if(radius == 3) TFile * fMC = TFile::Open("../../Output/JetRAA_ntuples/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150328.root");
-  if(radius == 4)TFile * fMC = TFile::Open("../../Output/JetRAA_ntuples/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150328.root");
+void RAA_plot_matched_unmatched_eMaxSumcand(){
+
+  Int_t radius = 3;
+  TFile * fData, * fMC; 
+
+  if(radius == 2) fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150331.root");
+  if(radius == 3) fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150331.root");
+  //if(radius == 3) fData = TFile::Open("/export/d00/scratch/pawan/condorfiles/pbpb/ntuples/Merged_JetRAA_akPu3_PbPb_Data.root");
+  if(radius == 4) fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150331.root");
+
+  if(radius == 2) fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150331.root");
+  if(radius == 3) fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150331.root");
+  if(radius == 4) fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150331.root");
 
 
   TTree * Data_matched = (TTree*)fData->Get("matchedJets");
@@ -54,13 +91,13 @@
     hMC_unmatch_eMaxSumcand_calopfpt_ptselection[a] = new TH2F(Form("hMC_unmatch_eMaxSumcand_calopfpt_ptselection_%d",a),"",100, 0, 2.5, 100, 0, 5);
     hMC_unmatch_eMaxSumcand_calopfpt_refptselection[a] = new TH2F(Form("hMC_unmatch_eMaxSumcand_calopfpt_refptselection_%d",a),"",100, 0, 2.5, 100, 0, 5);
     
-    Data_matched->Draw(Form("eMax/(chSum+neSum+muSum+phSum):calopt/pfpt>>hData_eMaxSumcand_calopfpt_ptselection_%d",a),Form("pfpt > %d && pfpt < %d && jet55", ptBoundary[a], ptBoundary[a+1]),"goff");
-    MC_matched->Draw(Form("eMax/(chSum+neSum+muSum+phSum):calopt/pfpt>>hMC_eMaxSumcand_calopfpt_ptselection_%d",a),Form("pfpt > %d && pfpt < %d && jet55", ptBoundary[a], ptBoundary[a+1]),"goff");
-    MC_matched->Draw(Form("eMax/(chSum+neSum+muSum+phSum):calopt/pfpt>>hMC_eMaxSumcand_calopfpt_refptselection_%d",a),Form("pfpt > %d && pfpt < %d && pfrefpt > %d && pfrefpt < %d && jet55",  ptBoundary[a], ptBoundary[a+1],  ptBoundary[a], ptBoundary[a+1]),"goff");
+    Data_matched->Draw(Form("eMax/(pfpt-eMax):calopt/pfpt>>hData_eMaxSumcand_calopfpt_ptselection_%d",a),Form("pfpt > %d && pfpt < %d && jet55", ptBoundary[a], ptBoundary[a+1]),"goff");
+    MC_matched->Draw(Form("eMax/(pfpt-eMax):calopt/pfpt>>hMC_eMaxSumcand_calopfpt_ptselection_%d",a),Form("pfpt > %d && pfpt < %d && jet55", ptBoundary[a], ptBoundary[a+1]),"goff");
+    MC_matched->Draw(Form("eMax/(pfpt-eMax):calopt/pfpt>>hMC_eMaxSumcand_calopfpt_refptselection_%d",a),Form("pfpt > %d && pfpt < %d && pfrefpt > %d && pfrefpt < %d && jet55",  ptBoundary[a], ptBoundary[a+1],  ptBoundary[a], ptBoundary[a+1]),"goff");
 
-    Data_unmatched->Draw(Form("eMax/(chSum+neSum+muSum+phSum):(pfpt-pfpt)>>hData_unmatch_eMaxSumcand_calopfpt_ptselection_%d",a),Form("pfpt > %d && pfpt < %d && jet55", ptBoundary[a], ptBoundary[a+1]),"goff");
-    MC_unmatched->Draw(Form("eMax/(chSum+neSum+muSum+phSum):(pfpt-pfpt)>>hMC_unmatch_eMaxSumcand_calopfpt_ptselection_%d",a),Form("pfpt > %d && pfpt < %d && jet55", ptBoundary[a], ptBoundary[a+1]),"goff");
-    MC_unmatched->Draw(Form("eMax/(chSum+neSum+muSum+phSum):(pfpt-pfpt)>>hMC_unmatch_eMaxSumcand_calopfpt_refptselection_%d",a),Form("pfpt > %d && pfpt < %d && pfrefpt > %d && pfrefpt < %d && jet55",  ptBoundary[a], ptBoundary[a+1],  ptBoundary[a], ptBoundary[a+1]),"goff");
+    Data_unmatched->Draw(Form("eMax/(pfpt-eMax):(pfpt-pfpt)>>hData_unmatch_eMaxSumcand_calopfpt_ptselection_%d",a),Form("pfpt > %d && pfpt < %d && jet55", ptBoundary[a], ptBoundary[a+1]),"goff");
+    MC_unmatched->Draw(Form("eMax/(pfpt-eMax):(pfpt-pfpt)>>hMC_unmatch_eMaxSumcand_calopfpt_ptselection_%d",a),Form("pfpt > %d && pfpt < %d && jet55", ptBoundary[a], ptBoundary[a+1]),"goff");
+    MC_unmatched->Draw(Form("eMax/(pfpt-eMax):(pfpt-pfpt)>>hMC_unmatch_eMaxSumcand_calopfpt_refptselection_%d",a),Form("pfpt > %d && pfpt < %d && pfrefpt > %d && pfrefpt < %d && jet55",  ptBoundary[a], ptBoundary[a+1],  ptBoundary[a], ptBoundary[a+1]),"goff");
 
     hData_eMaxSumcand_calopfpt_ptselection[a]->Add(hData_unmatch_eMaxSumcand_calopfpt_ptselection[a]);
     hMC_eMaxSumcand_calopfpt_ptselection[a]->Add(hMC_unmatch_eMaxSumcand_calopfpt_ptselection[a]);
@@ -71,7 +108,7 @@
     ceMaxSumcand[a]->cd(1);
     ceMaxSumcand[a]->cd(1)->SetLogz();
     hData_eMaxSumcand_calopfpt_ptselection[a]->SetXTitle("calopt/pfpt");
-    hData_eMaxSumcand_calopfpt_ptselection[a]->SetYTitle("eMax/(chSum+neSum+muSum+phSum)");
+    hData_eMaxSumcand_calopfpt_ptselection[a]->SetYTitle("eMax/(pfpt-eMax)");
     hData_eMaxSumcand_calopfpt_ptselection[a]->Draw("colz");
     drawText(Form("%d < pfpt < %d", ptBoundary[a], ptBoundary[a+1]),0.2,0.7,14);
     drawText("Data - Jet55",0.25,0.8,14);
@@ -82,7 +119,7 @@
     ceMaxSumcand[a]->cd(2);
     ceMaxSumcand[a]->cd(2)->SetLogz();
     hMC_eMaxSumcand_calopfpt_ptselection[a]->SetXTitle("calopt/pfpt");
-    hMC_eMaxSumcand_calopfpt_ptselection[a]->SetYTitle("eMax/(chSum+neSum+muSum+phSum)");
+    hMC_eMaxSumcand_calopfpt_ptselection[a]->SetYTitle("eMax/(pfpt-eMax)");
     hMC_eMaxSumcand_calopfpt_ptselection[a]->Draw("colz");
     drawText(Form("%d < pfpt < %d", ptBoundary[a], ptBoundary[a+1]),0.2,0.7,14);
     drawText("MC - Jet55",0.25,0.8,14);
@@ -93,7 +130,7 @@
     ceMaxSumcand[a]->cd(3);
     ceMaxSumcand[a]->cd(3)->SetLogz();
     hMC_eMaxSumcand_calopfpt_refptselection[a]->SetXTitle("calopt/pfpt");
-    hMC_eMaxSumcand_calopfpt_refptselection[a]->SetYTitle("eMax/(chSum+neSum+muSum+phSum)");
+    hMC_eMaxSumcand_calopfpt_refptselection[a]->SetYTitle("eMax/(pfpt-eMax)");
     hMC_eMaxSumcand_calopfpt_refptselection[a]->Draw("colz");
     drawText(Form("%d < pfpt, pfrefpt < %d", ptBoundary[a], ptBoundary[a+1]),0.2,0.7,14);
     drawText("MC - Jet55",0.25,0.8,14);
@@ -101,7 +138,7 @@
     CutA_2->Draw();
     CutA_3->Draw();
 
-    ceMaxSumcand[a]->SaveAs(Form("eMaxSumcand_calpfpt_jet55_showingCut_fullstat_R0p%d_%d_ptrange_%d.pdf",radius, ptBoundary[a], ptBoundary[a+1]),"RECREATE");
+    ceMaxSumcand[a]->SaveAs(Form("eMaxOverpfptMinuseMax_calpfpt_jet55_showingCut_fullstat_R0p%d_%d_ptrange_%d.pdf",radius, ptBoundary[a], ptBoundary[a+1]),"RECREATE");
     
   }
 

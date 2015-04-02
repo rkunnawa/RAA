@@ -94,7 +94,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation_pp(int startfile = 7, int endfile = 8, int radius=3, int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "Data"){
+void RAA_calo_pf_JetCorrelation_pp(int startfile = 2, int endfile = 3, int radius=3, int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "Data"){
 
   TH1::SetDefaultSumw2();
 

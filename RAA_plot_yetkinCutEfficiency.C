@@ -1,75 +1,123 @@
-{
+#include <iostream>
+#include <stdio.h>
+#include <fstream>
+#include <fstream>
+#include <TH1F.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TFile.h>
+#include <TTree.h>
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TLegend.h>
+#include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TH3.h>
+#include <TFile.h>
+#include <TStyle.h>
+#include <TStopwatch.h>
+#include <TRandom3.h>
+#include <TChain.h>
+#include <TProfile.h>
+#include <TStopwatch.h>
+#include <TCut.h>
+#include <cstdlib>
+#include <cmath>
+#include "TLegend.h"
+#include "TLatex.h"
+#include "TMath.h"
+#include "TLine.h"
+
+
+#include "Headers/plot.h"
+
+
+
+static const int nbins_cent = 7;
+static const Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36,40};// multiply by 2.5 to get your actual centrality % (old 2011 data) 
+//now we have to multiply by 5, since centrality goes from 0-200. 
+
+int findBin(int hiBin){
+  int binNo = -1;
+
+  for(int i = 0;i<nbins_cent;i++){
+    if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
+      binNo = i;
+      break;
+    }
+  }
+
+  return binNo;
+}
+
+using namespace std;
+
+void RAA_plot_yetkinCutEfficiency(){
 
   TH1::SetDefaultSumw2();
   
-  gSystem->Load("Headers/plot.h");
-
   // the cut is a 3 step cut based on the different value of the calopt/pfpt - copy the following lines into your loop (with the corresponding branch address set)
   // if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) hGood->Fill();
   // if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < (18/7 *(Float_t)calopt_1/pfpt_1 - 9/7)) ) hGood->Fill();
   // if(calopt/pfpt > 0.85 & eMax/Sumcand > 0.9) hGood->Fill();
   
-  
-  Int_t radius = 3;
+  Int_t radius = 4;
+  char * etaWidth = (char*)"n20_eta_p20";
+  TFile * fData, * fMC; 
 
-  if(radius == 2) TFile * fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150331.root");
-  if(radius == 3) TFile * fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150331.root");
-  if(radius == 4) TFile * fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150331.root");
+  if(radius == 2) fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150331.root");
+  if(radius == 3) fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150331.root");
+  //if(radius == 3) fData = TFile::Open("/export/d00/scratch/pawan/condorfiles/pbpb/ntuples/Merged_JetRAA_akPu3_PbPb_Data.root");
+  if(radius == 4) fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_Data_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150331.root");
 
-  if(radius == 2) TFile * fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150331.root");
-  if(radius == 3) TFile * fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150331.root");
-  if(radius == 4)TFile * fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150331.root");
+  if(radius == 2) fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150331.root");
+  if(radius == 3) fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150331.root");
+  if(radius == 4) fMC = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MC_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150331.root");
 
   TTree * Data_matched = (TTree*)fData->Get("matchedJets");
   TTree * Data_unmatched = (TTree*)fData->Get("unmatchedPFJets");
 
   TTree * MC_matched = (TTree*)fMC->Get("matchedJets");
   TTree * MC_unmatched = (TTree*)fMC->Get("unmatchedPFJets");
-  
+
+
   TH1F * hMC_Jet55_noCut = new TH1F("hMC_Jet55_noCut","data from matched jets without any jet ID cut",1000,0,1000);
   TH1F * hMC_Jet55_CutA = new TH1F("hMC_Jet55_CutA","data from matched jets with Jet ID cut: slant line from 0.4 calopt/pfpt from eMax/Sumcand 0 till 0.9  and then calopt/pfpt > 0.85",1000,0,1000);
   TH1F * hMC_Jet55_CutA_rej = new TH1F("hMC_Jet55_CutA_rej","data from matched jets rejected by Jet ID cut: slant line from 0.4 calopt/pfpt from eMax/Sumcand 0 till 0.9  and then calopt/pfpt > 0.85",1000,0,1000);
-  TH1F * hMC_Jet55_CutB = new TH1F("hMC_Jet55_CutB","data from matched jets with Jet ID cut: slant line calopt/pfpt = 0.5, eMax/pfpt = 0 to calopt/pfpt = 1.25, eMax/pfpt = 1.1",1000,0,1000);
 
   TH1F * hMC_Jet65_noCut = new TH1F("hMC_Jet65_noCut","data from matched jets without any jet ID cut",1000,0,1000);
   TH1F * hMC_Jet65_CutA = new TH1F("hMC_Jet65_CutA","data from matched jets with Jet ID cut: slant line from 0.4 calopt/pfpt from eMax/Sumcand 0 till 0.9  and then calopt/pfpt > 0.85",1000,0,1000);
   TH1F * hMC_Jet65_CutA_rej = new TH1F("hMC_Jet65_CutA_rej","data from matched jets rejected with Jet ID cut: slant line from 0.4 calopt/pfpt from eMax/Sumcand 0 till 0.9  and then calopt/pfpt > 0.85",1000,0,1000);
-  TH1F * hMC_Jet65_CutB = new TH1F("hMC_Jet65_CutB","data from matched jets with Jet ID cut: slant line calopt/pfpt = 0.5, eMax/pfpt = 0 to calopt/pfpt = 1.25, eMax/pfpt = 1.1",1000,0,1000);
 
   TH1F * hMC_Jet80_noCut = new TH1F("hMC_Jet80_noCut","data from matched jets without any jet ID cut",1000,0,1000);
   TH1F * hMC_Jet80_CutA = new TH1F("hMC_Jet80_CutA","data from matched jets with Jet ID cut: slant line from 0.4 calopt/pfpt from eMax/Sumcand 0 till 0.9  and then calopt/pfpt > 0.85",1000,0,1000);
   TH1F * hMC_Jet80_CutA_rej = new TH1F("hMC_Jet80_CutA_rej","data from matched jets rejected with Jet ID cut: slant line from 0.4 calopt/pfpt from eMax/Sumcand 0 till 0.9  and then calopt/pfpt > 0.85",1000,0,1000);
-  TH1F * hMC_Jet80_CutB = new TH1F("hMC_Jet80_CutB","data from matched jets with Jet ID cut: slant line calopt/pfpt = 0.5, eMax/pfpt = 0 to calopt/pfpt = 1.25, eMax/pfpt = 1.1",1000,0,1000);
 
   TH1F * hData_Jet55_noCut = new TH1F("hData_Jet55_noCut","data from matched jets without any jet ID cut",1000,0,1000);
   TH1F * hData_Jet55_CutA = new TH1F("hData_Jet55_CutA","data from matched jets with Jet ID cut: slant line from 0.5 calopt/pfpt from eMax/Sumcand 0 till 1 and then calopt/pfpt > 0.85",1000,0,1000);
   // this cut is a combination of two: 
   // if(eMax/SumCand < 0.9 && ( eMax/Sumcand < (18/7 calopt/pfpt - 9/7) ) ) { hData_Jet55_CutA->Fill()}
   // if { eMax/Sumcand >0.9 && calopt/pfpt > 0.85} { hData_Jet55_CutA->Fill()}  
-  TH1F * hData_Jet55_CutB = new TH1F("hData_Jet55_CutB","data from matched jets with Jet ID cut: slant line calopt/pfpt = 0.5, eMax/pfpt = 0 to calopt/pfpt = 1.25, eMax/pfpt = 1.1",1000,0,1000);
   // this cut is if( eMax/pfpt < (22/15 * calopt/pfpt - 11/15) ) {hData_Jet55_CutB->Fill()} 
   TH1F * hData_Jet55_CutA_rej = new TH1F("hData_Jet55_CutA_rej","",1000,0,1000);
-  TH1F * hData_Jet55_CutB_rej = new TH1F("hData_Jet55_CutB_rej","",1000,0,1000);
 
   TH1F * hData_Jet65_noCut = new TH1F("hData_Jet65_noCut","data from matched jets without any jet ID cut",1000,0,1000);
   TH1F * hData_Jet65_CutA = new TH1F("hData_Jet65_CutA","data from matched jets with Jet ID cut: slant line from 0.5 calopt/pfpt from eMax/Sumcand 0 till 1 and then calopt/pfpt > 0.85",1000,0,1000);
   // this cut is a combination of two: 
   // if(eMax/SumCand < 0.9 && ( eMax/Sumcand < (18/7 calopt/pfpt - 9/7) ) ) { hData_Jet65_CutA->Fill()}
   // if { eMax/Sumcand >0.9 && calopt/pfpt > 0.85} { hData_Jet65_CutA->Fill()}  
-  TH1F * hData_Jet65_CutB = new TH1F("hData_Jet65_CutB","data from matched jets with Jet ID cut: slant line calopt/pfpt = 0.5, eMax/pfpt = 0 to calopt/pfpt = 1.25, eMax/pfpt = 1.1",1000,0,1000);
   // this cut is if( eMax/pfpt < (22/15 * calopt/pfpt - 11/15) ) {hData_Jet65_CutB->Fill()} 
   TH1F * hData_Jet65_CutA_rej = new TH1F("hData_Jet65_CutA_rej","",1000,0,1000);
-  TH1F * hData_Jet65_CutB_rej = new TH1F("hData_Jet65_CutB_rej","",1000,0,1000);
   
   TH1F * hData_Jet80_noCut = new TH1F("hData_Jet80_noCut","data from matched jets without any jet ID cut",1000,0,1000);
   TH1F * hData_Jet80_CutA = new TH1F("hData_Jet80_CutA","data from matched jets with Jet ID cut: slant line from 0.5 calopt/pfpt from eMax/Sumcand 0 till 1 and then calopt/pfpt > 0.85",1000,0,1000);
   // this cut is a combination of two: 
   // if(eMax/SumCand < 0.9 && ( eMax/Sumcand < (18/7 calopt/pfpt - 9/7) ) ) { hData_Jet80_CutA->Fill()}
   // if { eMax/Sumcand >0.9 && calopt/pfpt > 0.85} { hData_Jet80_CutA->Fill()}  
-  TH1F * hData_Jet80_CutB = new TH1F("hData_Jet80_CutB","data from matched jets with Jet ID cut: slant line calopt/pfpt = 0.5, eMax/pfpt = 0 to calopt/pfpt = 1.25, eMax/pfpt = 1.1",1000,0,1000);
   // this cut is if( eMax/pfpt < (22/15 * calopt/pfpt - 11/15) ) {hData_Jet80_CutB->Fill()} 
   TH1F * hData_Jet80_CutA_rej = new TH1F("hData_Jet80_CutA_rej","",1000,0,1000);
-  TH1F * hData_Jet80_CutB_rej = new TH1F("hData_Jet80_CutB_rej","",1000,0,1000);
 
   TH1F * hData_unmatched_Jet80_noCut = new TH1F("hData_unmatched_Jet80_noCut","",1000,0,1000);
   TH1F * hData_unmatched_Jet80_CutA = new TH1F("hData_unmatched_Jet80_CutA","",1000,0,1000);
@@ -91,6 +139,81 @@
   TH1F * hMC_unmatched_Jet55_CutA = new TH1F("hMC_unmatched_Jet55_CutA","",1000,0,1000);
   TH1F * hMC_unmatched_Jet55_CutA_rej = new TH1F("hMC_unmatched_Jet55_CutA_rej","",1000,0,1000);
 
+  
+  //get the spectra with the specific trigger object from the different files. 
+  TH1F *hpbpb_Jet80_gen[nbins_cent],*hpbpb_Jet80_reco[nbins_cent];
+  TH1F *hpbpb_Jet65_gen[nbins_cent],*hpbpb_Jet65_reco[nbins_cent];
+  TH1F *hpbpb_Jet55_gen[nbins_cent],*hpbpb_Jet55_reco[nbins_cent];
+  TH1F *hpbpb_JetComb_gen[nbins_cent],*hpbpb_JetComb_reco[nbins_cent];
+
+  //TH1F *hpbpb_gen[nbins_cent],*hpbpb_reco[nbins_cent];
+  //TH2F *hpbpb_matrix[nbins_cent];
+  TH2F *hpbpb_matrix_HLT[nbins_cent];
+  //TH2F *hpbpb_mcclosure_matrix[nbins_cent];
+  TH2F *hpbpb_mcclosure_matrix_HLT[nbins_cent];
+  //TH2F *hpbpb_response[nbins_cent];
+  TH1F *hpbpb_mcclosure_JetComb_data[nbins_cent];
+  //TH1F *hpbpb_mcclosure_data[nbins_cent];
+  TH1F *hpbpb_mcclosure_Jet80_data[nbins_cent];
+  TH1F *hpbpb_mcclosure_Jet65_data[nbins_cent];
+  TH1F *hpbpb_mcclosure_Jet55_data[nbins_cent];
+  //TH1F *hpbpb_mcclosure_gen[nbins_cent];
+  TH1F *hpbpb_mcclosure_JetComb_gen[nbins_cent];
+  TH1F *hpbpb_mcclosure_Jet80_gen[nbins_cent];
+  TH1F *hpbpb_mcclosure_Jet65_gen[nbins_cent];
+  TH1F *hpbpb_mcclosure_Jet55_gen[nbins_cent];
+
+  TH1F *hpbpb_TrgObj80[nbins_cent];
+  TH1F *hpbpb_TrgObj65[nbins_cent];
+  TH1F *hpbpb_TrgObj55[nbins_cent];
+  TH1F *hpbpb_TrgObjComb[nbins_cent];
+  
+  for(int i = 0;i<nbins_cent;++i){
+    //cout<<"cent bin = "<<i<<endl;
+
+    hpbpb_TrgObj80[i] = new TH1F(Form("hpbpb_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_TrgObj65[i] = new TH1F(Form("hpbpb_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_TrgObj55[i] = new TH1F(Form("hpbpb_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_TrgObjComb[i] = new TH1F(Form("hpbpb_HLTComb_R%d_%s_cent%d",radius,etaWidth,i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+
+
+    //hpbpb_gen[i] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",radius,etaWidth,i),Form("Gen refpt R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    //cout<<"A"<<endl;
+    //hpbpb_reco[i] = new TH1F(Form("hpbpb_reco_R%d_%s_cent%d",radius,etaWidth,i),Form("Reco jtpt R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    //cout<<"B"<<endl;
+    //hpbpb_matrix[i] = new TH2F(Form("hpbpb_matrix_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000,1000,0,1000);
+    hpbpb_matrix_HLT[i] = new TH2F(Form("hpbpb_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000,1000,0,1000);
+    //hpbpb_mcclosure_matrix[i] = new TH2F(Form("hpbpb_mcclosure_matrix_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix for mcclosure refpt jtpt R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000,1000,0,1000);
+    hpbpb_mcclosure_matrix_HLT[i] = new TH2F(Form("hpbpb_mcclosure_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000,1000,0,1000);
+    //cout<<"C"<<endl;
+    //hpbpb_mcclosure_data[i] = new TH1F(Form("hpbpb_mcclosure_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_mcclosure_JetComb_data[i] = new TH1F(Form("hpbpb_mcclosure_JetComb_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test trigger combined  R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_mcclosure_Jet80_data[i] = new TH1F(Form("hpbpb_mcclosure_Jet80_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test trigger 80  R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_mcclosure_Jet65_data[i] = new TH1F(Form("hpbpb_mcclosure_Jet65_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test trigger 65  R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_mcclosure_Jet55_data[i] = new TH1F(Form("hpbpb_mcclosure_Jet55_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test trigger 55  R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+
+    //hpbpb_mcclosure_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_mcclosure_JetComb_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_JetComb_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger combined R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_mcclosure_Jet80_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_Jet80_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_mcclosure_Jet65_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_Jet65_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger 65 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_mcclosure_Jet55_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_Jet55_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger 55 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+
+    hpbpb_JetComb_gen[i] = new TH1F(Form("hpbpb_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i),Form("Gen refpt from HLT trigger combined R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_JetComb_reco[i] = new TH1F(Form("hpbpb_JetComb_reco_R%d_%s_cent%d",radius,etaWidth,i),Form("reco jtpt from HLT trigger combined R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_Jet80_gen[i] = new TH1F(Form("hpbpb_Jet80_gen_R%d_%s_cent%d",radius,etaWidth,i),Form("Gen refpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_Jet80_reco[i] = new TH1F(Form("hpbpb_Jet80_reco_R%d_%s_cent%d",radius,etaWidth,i),Form("reco jtpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_Jet65_gen[i] = new TH1F(Form("hpbpb_Jet65_gen_R%d_%s_cent%d",radius,etaWidth,i),Form("Gen refpt from Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_Jet65_reco[i] = new TH1F(Form("hpbpb_Jet65_reco_R%d_%s_cent%d",radius,etaWidth,i),Form("reco jtpt from Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_Jet55_gen[i] = new TH1F(Form("hpbpb_Jet55_gen_R%d_%s_cent%d",radius,etaWidth,i),Form("Gen refpt from Jet55 && !Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_Jet55_reco[i] = new TH1F(Form("hpbpb_Jet55_reco_R%d_%s_cent%d",radius,etaWidth,i),Form("reco jtpt from Jet55 && !Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+
+	
+  }// centrality bin loop
+  
+
+
+  // Define all the histograms necessary for the analysis: 
+  
   // 1 - Data, 2 - MC
   Float_t pfpt_1, pfpt_2;
   Float_t pfrefpt_2;
@@ -104,9 +227,10 @@
   Int_t jet55_1, jet65_1, jet80_1;
   Int_t jet55_p_1, jet65_p_1, jet80_p_1;
   Int_t jet55_2, jet65_2, jet80_2;
-  Int_t jet55_p_2, jet65_p_2, jet80_p_2;
+  Int_t jet55_p_2;
   Float_t weight;
   Int_t subid_2;
+  Int_t hiBin_1, hiBin_2;
 
   Data_matched->SetBranchAddress("calopt",&calopt_1);
   Data_matched->SetBranchAddress("pfpt",&pfpt_1);
@@ -116,6 +240,7 @@
   Data_matched->SetBranchAddress("phSum",&phSum_1);
   Data_matched->SetBranchAddress("neSum",&neSum_1);
   Data_matched->SetBranchAddress("muSum",&muSum_1);
+  Data_matched->SetBranchAddress("hiBin",&hiBin_1);
   Data_matched->SetBranchAddress("jet55",&jet55_1);
   Data_matched->SetBranchAddress("jet65",&jet65_1);
   Data_matched->SetBranchAddress("jet80",&jet80_1);
@@ -130,6 +255,7 @@
   Data_unmatched->SetBranchAddress("phSum",&phSum_1);
   Data_unmatched->SetBranchAddress("neSum",&neSum_1);
   Data_unmatched->SetBranchAddress("muSum",&muSum_1);
+  Data_unmatched->SetBranchAddress("hiBin",&hiBin_1);
   Data_unmatched->SetBranchAddress("jet55",&jet55_1);
   Data_unmatched->SetBranchAddress("jet65",&jet65_1);
   Data_unmatched->SetBranchAddress("jet80",&jet80_1);
@@ -145,12 +271,14 @@
   MC_matched->SetBranchAddress("phSum",&phSum_2);
   MC_matched->SetBranchAddress("neSum",&neSum_2);
   MC_matched->SetBranchAddress("muSum",&muSum_2);
+  MC_matched->SetBranchAddress("hiBin",&hiBin_2);
   MC_matched->SetBranchAddress("pfrefpt",&pfrefpt_2);
   MC_matched->SetBranchAddress("jet55",&jet55_2);
   MC_matched->SetBranchAddress("jet65",&jet65_2);
   MC_matched->SetBranchAddress("jet80",&jet80_2);
   MC_matched->SetBranchAddress("weight", &weight);
   MC_matched->SetBranchAddress("subid", &subid_2);
+  MC_unmatched->SetBranchAddress("jet55_prescl",&jet55_p_2);
   
   MC_unmatched->SetBranchAddress("pfpt",&pfpt_2);
   MC_unmatched->SetBranchAddress("eMax",&eMax_2);
@@ -159,13 +287,15 @@
   MC_unmatched->SetBranchAddress("phSum",&phSum_2);
   MC_unmatched->SetBranchAddress("neSum",&neSum_2);
   MC_unmatched->SetBranchAddress("muSum",&muSum_2);
+  MC_matched->SetBranchAddress("hiBin",&hiBin_2);
   MC_unmatched->SetBranchAddress("pfrefpt",&pfrefpt_2);
   MC_unmatched->SetBranchAddress("jet55",&jet55_2);
   MC_unmatched->SetBranchAddress("jet65",&jet65_2);
   MC_unmatched->SetBranchAddress("jet80",&jet80_2);
   MC_unmatched->SetBranchAddress("weight", & weight);
   MC_unmatched->SetBranchAddress("subid", &subid_2);
-  
+  MC_unmatched->SetBranchAddress("jet55_prescl",&jet55_p_2);
+
   // data loop
   long entries = Data_matched->GetEntries();
   //entries = 1000;
@@ -175,6 +305,9 @@
 
     if(nentry%10000 == 0) cout<<" nentry = "<<nentry<<endl;
     Data_matched->GetEntry(nentry);
+
+    Int_t cBin = findBin(hiBin_1);
+    if(cBin == -1 || cBin >= nbins_cent) continue;
     
     Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
     
@@ -182,10 +315,18 @@
       
       hData_Jet55_noCut->Fill(pfpt_1, jet55_p_1);
       
-      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-      if(calopt_1/pfpt_1 > 0.85) hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-
+      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
+	hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
+	hpbpb_TrgObj55[cBin]->Fill(pfpt_1, jet55_p_1);
+      }
+      if(calopt_1/pfpt_1 > 0.85){
+	hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
+	hpbpb_TrgObj55[cBin]->Fill(pfpt_1, jet55_p_1);
+      }
+      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
+	hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
+	hpbpb_TrgObj55[cBin]->Fill(pfpt_1, jet55_p_1);
+      }
       if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
       
@@ -195,10 +336,18 @@
       
       hData_Jet65_noCut->Fill(pfpt_1);
       
-      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet65_CutA->Fill(pfpt_1);
-      if(calopt_1/pfpt_1 > 0.85) hData_Jet65_CutA->Fill(pfpt_1);
-      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) hData_Jet65_CutA->Fill(pfpt_1);
-
+      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)){
+	hData_Jet65_CutA->Fill(pfpt_1);
+	hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
+      }
+      if(calopt_1/pfpt_1 > 0.85) {
+	hData_Jet65_CutA->Fill(pfpt_1);
+	hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
+      }
+      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
+	hData_Jet65_CutA->Fill(pfpt_1);
+	hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
+      }
       if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet65_CutA_rej->Fill(pfpt_1);
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet65_CutA_rej->Fill(pfpt_1);
       
@@ -208,10 +357,18 @@
     
       hData_Jet80_noCut->Fill(pfpt_1);
       
-      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet80_CutA->Fill(pfpt_1);
-      if(calopt_1/pfpt_1 > 0.85) hData_Jet80_CutA->Fill(pfpt_1);
-      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) hData_Jet80_CutA->Fill(pfpt_1);
-
+      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
+	hData_Jet80_CutA->Fill(pfpt_1);
+	hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
+      }
+      if(calopt_1/pfpt_1 > 0.85){
+	hData_Jet80_CutA->Fill(pfpt_1);
+	hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
+      }
+      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05){
+	hData_Jet80_CutA->Fill(pfpt_1);
+	hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
+      }
       if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet80_CutA_rej->Fill(pfpt_1);
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet80_CutA_rej->Fill(pfpt_1);
       
@@ -227,6 +384,8 @@
 
     if(nentry%10000 == 0) cout<<" nentry = "<<nentry<<endl;
     Data_unmatched->GetEntry(nentry);
+    Int_t cBin = findBin(hiBin_1);
+    if(cBin == -1 || cBin >= nbins_cent) continue;
     
     Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
 
@@ -234,7 +393,8 @@
     
       hData_unmatched_Jet55_noCut->Fill(pfpt_1, jet55_p_1);
 
-      if(eMax_1/Sumcand < 0.05 ) hData_unmatched_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
+      if(eMax_1/Sumcand < 0.05 ){hpbpb_TrgObj55[cBin]->Fill(pfpt_1);
+	hData_unmatched_Jet55_CutA->Fill(pfpt_1, jet55_p_1);}
       else hData_unmatched_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
       
     }
@@ -243,7 +403,8 @@
 
       hData_unmatched_Jet65_noCut->Fill(pfpt_1);
 
-      if(eMax_1/Sumcand < 0.05  ) hData_unmatched_Jet65_CutA->Fill(pfpt_1);
+      if(eMax_1/Sumcand < 0.05  ){hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
+	hData_unmatched_Jet65_CutA->Fill(pfpt_1);}
       else hData_unmatched_Jet65_CutA_rej->Fill(pfpt_1);
       
     }
@@ -252,7 +413,8 @@
     
       hData_unmatched_Jet80_noCut->Fill(pfpt_1);
 
-      if(eMax_1/Sumcand < 0.05  ) hData_unmatched_Jet80_CutA->Fill(pfpt_1);
+      if(eMax_1/Sumcand < 0.05  ){hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
+	hData_unmatched_Jet80_CutA->Fill(pfpt_1);}
       else hData_unmatched_Jet80_CutA_rej->Fill(pfpt_1);
       
     }
@@ -270,45 +432,169 @@
     
     Float_t Sumcand = chSum_2 + phSum_2 + neSum_2 + muSum_2;
     if(subid_2 != 0) continue;
+
+    Int_t cBin = findBin(hiBin_2);
+    if(cBin == -1 || cBin >= nbins_cent) continue;
+    
     
     if(jet55_2 == 1 && jet65_2==0 && jet80_2 == 0){
       
-      hMC_Jet55_noCut->Fill(pfpt_2, weight);
+      hMC_Jet55_noCut->Fill(pfrefpt_2, weight);
 
-      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) hMC_Jet55_CutA->Fill(pfpt_2, weight);
-      if(calopt_2/pfpt_2 > 0.85) hMC_Jet55_CutA->Fill(pfpt_2, weight);
-      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand < 0.05) hMC_Jet55_CutA->Fill(pfpt_2, weight);
+      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)){
+	hMC_Jet55_CutA->Fill(pfrefpt_2, weight);
+	hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet55_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 
-      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand >= 0.05) hMC_Jet55_CutA_rej->Fill(pfpt_2, weight);
-      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) hMC_Jet55_CutA_rej->Fill(pfpt_2, weight);
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt_2, weight);
+	}
+	
+      }
+      if(calopt_2/pfpt_2 > 0.85) {
+	hMC_Jet55_CutA->Fill(pfrefpt_2, weight);
+	hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet55_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt_2, weight);
+	}
+	
+      }
+      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand < 0.05) {
+	hMC_Jet55_CutA->Fill(pfrefpt_2, weight);
+	hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet55_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfrefpt_2, weight);
+	}
+	
+      }
+      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand >= 0.05) hMC_Jet55_CutA_rej->Fill(pfrefpt_2, weight);
+      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) hMC_Jet55_CutA_rej->Fill(pfrefpt_2, weight);
       
     }
     
     if(jet65_2 == 1 && jet80_2 == 0){
       
 
-      hMC_Jet65_noCut->Fill(pfpt_2, weight);
+      hMC_Jet65_noCut->Fill(pfrefpt_2, weight);
 
-      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) hMC_Jet65_CutA->Fill(pfpt_2, weight);
-      if(calopt_2/pfpt_2 > 0.85) hMC_Jet65_CutA->Fill(pfpt_2, weight);
-      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand < 0.05) hMC_Jet65_CutA->Fill(pfpt_2, weight);
+      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) {
+	hMC_Jet65_CutA->Fill(pfrefpt_2, weight);
+	hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet65_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 
-      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand >= 0.05) hMC_Jet65_CutA_rej->Fill(pfpt_2, weight);
-      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) hMC_Jet65_CutA_rej->Fill(pfpt_2, weight);
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt_2, weight);
+	}
+	
+      }
+      if(calopt_2/pfpt_2 > 0.85) {
+	hMC_Jet65_CutA->Fill(pfrefpt_2, weight);
+	hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet65_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt_2, weight);
+	}
+      }
+      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand < 0.05) {
+	hMC_Jet65_CutA->Fill(pfrefpt_2, weight);
+	hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet65_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt_2, weight);
+	}
+      }
+
+      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand >= 0.05) hMC_Jet65_CutA_rej->Fill(pfrefpt_2, weight);
+      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) hMC_Jet65_CutA_rej->Fill(pfrefpt_2, weight);
 
     }
 
     
     if(jet80_2 == 1){
 
-      hMC_Jet80_noCut->Fill(pfpt_2, weight);
+      hMC_Jet80_noCut->Fill(pfrefpt_2, weight);
 
-      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) hMC_Jet80_CutA->Fill(pfpt_2, weight);
-      if(calopt_2/pfpt_2 > 0.85) hMC_Jet80_CutA->Fill(pfpt_2, weight);
-      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand < 0.05) hMC_Jet80_CutA->Fill(pfpt_2, weight);
+      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) {
+	hMC_Jet80_CutA->Fill(pfrefpt_2, weight);
+	hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet80_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 
-      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand >= 0.05) hMC_Jet80_CutA_rej->Fill(pfpt_2, weight);
-      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) hMC_Jet80_CutA_rej->Fill(pfpt_2, weight);
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt_2, weight);
+	}
+      }
+      if(calopt_2/pfpt_2 > 0.85) {
+	hMC_Jet80_CutA->Fill(pfrefpt_2, weight);
+	hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet80_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt_2, weight);
+	}
+      }
+      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand < 0.05) {
+	hMC_Jet80_CutA->Fill(pfrefpt_2, weight);
+	hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet80_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt_2, weight);
+	}
+      }
+      
+      if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand >= 0.05) hMC_Jet80_CutA_rej->Fill(pfrefpt_2, weight);
+      if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) hMC_Jet80_CutA_rej->Fill(pfrefpt_2, weight);
 
     }
     
@@ -326,14 +612,30 @@
     MC_unmatched->GetEntry(nentry);
 
     if(subid_2 != 0) continue;
+
+    Int_t cBin = findBin(hiBin_2);
+    if(cBin == -1 || cBin >= nbins_cent) continue;
     
     Float_t Sumcand = chSum_2 + phSum_2 + neSum_2 + muSum_2;
 
     if(jet55_2 == 1 && jet65_2==0 && jet80_2 == 0){
       
-      hMC_unmatched_Jet55_noCut->Fill(pfrefpt_2, jet55_p_2*weight);
-      if(eMax_2/Sumcand < 0.05  ) hMC_unmatched_Jet55_CutA->Fill(pfrefpt_2, jet55_p_2*weight);
-      else hMC_unmatched_Jet55_CutA_rej->Fill(pfpt_2, jet55_p_2*weight);
+      hMC_unmatched_Jet55_noCut->Fill(pfrefpt_2, weight);
+      if(eMax_2/Sumcand < 0.05  ){
+	hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet55_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt_2, weight);
+	}
+      
+	hMC_unmatched_Jet55_CutA->Fill(pfrefpt_2, weight);}
+      else hMC_unmatched_Jet55_CutA_rej->Fill(pfrefpt_2, weight);
       
     }
 
@@ -341,8 +643,21 @@
     if(jet65_2 == 1 && jet80_2 == 0){
       
       hMC_unmatched_Jet65_noCut->Fill(pfrefpt_2, weight);
-      if(eMax_2/Sumcand < 0.05  ) hMC_unmatched_Jet65_CutA->Fill(pfrefpt_2, weight);
-      else hMC_unmatched_Jet65_CutA_rej->Fill(pfpt_2);
+      if(eMax_2/Sumcand < 0.05  ){
+	hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet65_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt_2, weight);
+	}
+      
+	hMC_unmatched_Jet65_CutA->Fill(pfrefpt_2, weight);}
+      else hMC_unmatched_Jet65_CutA_rej->Fill(pfrefpt_2);
       
     }
 
@@ -350,16 +665,84 @@
     if(jet80_2 == 1){
       
       hMC_unmatched_Jet80_noCut->Fill(pfrefpt_2, weight);
-      if(eMax_2/Sumcand < 0.05  ) hMC_unmatched_Jet80_CutA->Fill(pfrefpt_2, weight);
-      else hMC_unmatched_Jet80_CutA_rej->Fill(pfpt_2);
+      if(eMax_2/Sumcand < 0.05  ){
+	hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
+	hpbpb_Jet80_reco[cBin]->Fill(pfpt_2, weight);
+	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+
+	if(nentry%2==0) {
+	  hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
+	  hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
+	}
+	if(nentry%2==1) {
+	  hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt_2, weight);
+	}
+      
+	hMC_unmatched_Jet80_CutA->Fill(pfrefpt_2, weight);}
+      
+      else hMC_unmatched_Jet80_CutA_rej->Fill(pfrefpt_2, weight);
       
     }
     
     
   }// mc unmatched  ntuple loop
 
-  TFile fout(Form("PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius),"RECREATE");
+  TFile fout(Form("../../Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius),"RECREATE");
+  fout.cd();
+  
+  for(int i = 0;i<nbins_cent;++i){
+    hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj80[i]);
+    hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj65[i]);
+    hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj55[i]);
 
+    hpbpb_mcclosure_JetComb_data[i]->Add(hpbpb_mcclosure_Jet80_data[i]);
+    hpbpb_mcclosure_JetComb_data[i]->Add(hpbpb_mcclosure_Jet65_data[i]);
+    hpbpb_mcclosure_JetComb_data[i]->Add(hpbpb_mcclosure_Jet55_data[i]);
+
+    hpbpb_mcclosure_JetComb_gen[i]->Add(hpbpb_mcclosure_Jet80_gen[i]);
+    hpbpb_mcclosure_JetComb_gen[i]->Add(hpbpb_mcclosure_Jet65_gen[i]);
+    hpbpb_mcclosure_JetComb_gen[i]->Add(hpbpb_mcclosure_Jet55_gen[i]);
+
+    hpbpb_JetComb_reco[i]->Add(hpbpb_Jet80_reco[i]);
+    hpbpb_JetComb_reco[i]->Add(hpbpb_Jet65_reco[i]);
+    hpbpb_JetComb_reco[i]->Add(hpbpb_Jet55_reco[i]);
+
+    hpbpb_JetComb_gen[i]->Add(hpbpb_Jet80_gen[i]);
+    hpbpb_JetComb_gen[i]->Add(hpbpb_Jet65_gen[i]);
+    hpbpb_JetComb_gen[i]->Add(hpbpb_Jet55_gen[i]);
+    
+  }
+
+  for(int i = 0; i<nbins_cent;++i){
+
+    hpbpb_TrgObjComb[i]->Write();
+    hpbpb_TrgObj80[i]->Write();
+    hpbpb_TrgObj65[i]->Write();
+    hpbpb_TrgObj55[i]->Write();
+
+    hpbpb_matrix_HLT[i]->Write();
+    hpbpb_mcclosure_matrix_HLT[i]->Write();
+    hpbpb_mcclosure_JetComb_data[i]->Write();
+    hpbpb_mcclosure_Jet80_data[i]->Write();
+    hpbpb_mcclosure_Jet65_data[i]->Write();
+    hpbpb_mcclosure_Jet55_data[i]->Write();
+    hpbpb_mcclosure_JetComb_gen[i]->Write();    
+    hpbpb_mcclosure_Jet80_gen[i]->Write();
+    hpbpb_mcclosure_Jet65_gen[i]->Write();
+    hpbpb_mcclosure_Jet55_gen[i]->Write();
+
+    hpbpb_JetComb_reco[i]->Write();
+    hpbpb_Jet80_reco[i]->Write();
+    hpbpb_Jet65_reco[i]->Write();
+    hpbpb_Jet55_reco[i]->Write();
+    hpbpb_JetComb_gen[i]->Write();
+    hpbpb_Jet80_gen[i]->Write();
+    hpbpb_Jet65_gen[i]->Write();
+    hpbpb_Jet55_gen[i]->Write();
+ 
+  }
+
+ 
   // add the unmatched histograms to the matched ones to get the final cut efficiency
   hData_Jet55_noCut->Add(hData_unmatched_Jet55_noCut);
   hData_Jet65_noCut->Add(hData_unmatched_Jet65_noCut);
@@ -385,6 +768,7 @@
   hMC_Jet65_CutA_rej->Add(hMC_unmatched_Jet65_CutA_rej);
   hMC_Jet80_CutA_rej->Add(hMC_unmatched_Jet80_CutA_rej);
 
+  
 
   hData_Jet65_noCut->Write();
   hData_Jet65_CutA->Write();
@@ -397,7 +781,7 @@
   // hData_Jet65_CutB_eff->Write();
   hData_Jet65_CutA_rej->Write();
   // hData_Jet65_CutB_rej->Write();
-  hData_Jet65_CutA_rej_eff = (TH1F*)hData_Jet65_CutA_rej->Clone("hData_Jet65_CutA_rej_eff");
+  TH1F * hData_Jet65_CutA_rej_eff = (TH1F*)hData_Jet65_CutA_rej->Clone("hData_Jet65_CutA_rej_eff");
   hData_Jet65_CutA_rej_eff->Divide(hData_Jet65_noCut);
   hData_Jet65_CutA_rej_eff->Write();
   // hData_Jet65_CutB_rej_eff = (TH1F*)hData_Jet65_CutB_rej->Clone("hData_Jet65_CutB_rej_eff");
@@ -415,7 +799,7 @@
   // hData_Jet55_CutB_eff->Write();
   hData_Jet55_CutA_rej->Write();
   // hData_Jet55_CutB_rej->Write();
-  hData_Jet55_CutA_rej_eff = (TH1F*)hData_Jet55_CutA_rej->Clone("hData_Jet55_CutA_rej_eff");
+  TH1F * hData_Jet55_CutA_rej_eff = (TH1F*)hData_Jet55_CutA_rej->Clone("hData_Jet55_CutA_rej_eff");
   hData_Jet55_CutA_rej_eff->Divide(hData_Jet55_noCut);
   hData_Jet55_CutA_rej_eff->Write();
   // hData_Jet55_CutB_rej_eff = (TH1F*)hData_Jet55_CutB_rej->Clone("hData_Jet55_CutB_rej_eff");
@@ -433,7 +817,7 @@
   // hData_Jet80_CutB_eff->Write();
   hData_Jet80_CutA_rej->Write();
   // hData_Jet80_CutB_rej->Write();
-  hData_Jet80_CutA_rej_eff = (TH1F*)hData_Jet80_CutA_rej->Clone("hData_Jet80_CutA_rej_eff");
+  TH1F * hData_Jet80_CutA_rej_eff = (TH1F*)hData_Jet80_CutA_rej->Clone("hData_Jet80_CutA_rej_eff");
   hData_Jet80_CutA_rej_eff->Divide(hData_Jet80_noCut);
   hData_Jet80_CutA_rej_eff->Write();
   // hData_Jet80_CutB_rej_eff = (TH1F*)hData_Jet80_CutB_rej->Clone("hData_Jet80_CutB_rej_eff");
@@ -740,9 +1124,7 @@
   hData_Combined_Efficiency->Scale(1/10);
   hData_Combined_Efficiency->SetAxisRange(30,350,"X");
   hData_Combined_Efficiency->Draw();
-  hData_noCut_Combined->Draw("same");
-  hData_Combined->Draw("same");
-
+  
   hMC_Combined_Efficiency->SetMarkerStyle(24);
   hMC_Combined_Efficiency->SetMarkerColor(kRed);
   hMC_Combined_Efficiency->Rebin(10);
@@ -772,7 +1154,7 @@
   hData_Jet55->SetMarkerStyle(20);
   hData_Jet55->Draw("same");
 
-  drawText()
+  //drawText()
 
   cTriggerCombination->SaveAs(Form("TriggerCombination_YetkinCuts_R0p%d.pdf",radius),"RECREATE");
 
