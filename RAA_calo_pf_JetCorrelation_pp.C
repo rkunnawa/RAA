@@ -1,8 +1,9 @@
 //
 // Raghav Kunnawalkam Elayavalli
-// Jan 15th 2014
+// March 26th 2014
 // Rutgers, raghav.k.e at CERN dot CH
 //
+// modified version of the current macro which does this matching for the pp, only need to change a few things 
 // Macro to do calo-pf jet correlation (spacial) to study the PF electron issues - this would tell us if PF jets from a jet55 trigger has a calo jet as a background. following is how to do that: 
 //load the forest data files. and then load the calo jets first followed by the pf jet to search for spacial correlation. Once we find the pf jet which is in the same spacial location (which is found by calculating the delta R for all pf jets for one calo jet and the jet which is less than the value of delta R given above becomes it correlated jet), the ratio of the pT of the calo jet and the pf jet (correlated) is calculated. and that distribution is expected to be a gaussian with the outliers clearly saying there is something wrong with the candidates like electron etc...  
 //
@@ -58,25 +59,11 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 
-static const int nbins_cent = 6;
-static const double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
-static const char centWidth[nbins_cent+1][256] = {"0 - 5 %","5 - 10 %","10 - 30 %","30 - 50 %","50 - 70 %","70 - 90 %","0 - 100 %"};
 static const int no_radius = 1;//necessary for the RAA analysis  
 static const int list_radius[no_radius] = {3};
 static const int TrigValue = 4;
-static const char TrigName [TrigValue][256] = {"HLT55","HLT65","HLT80","FullDataset"};
+static const char TrigName [TrigValue][256] = {"HLT40","HLT60","HLT80","FullDataset"};
 
-int findBin(int hiBin){
-  int binNo = -1;
-
-  for(int i = 0;i<nbins_cent;i++){
-    if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
-      binNo = i;
-      break;
-    }
-  }
-  return binNo;
-}
 
 // divide by bin width
 void divideBinWidth(TH1 *h)
@@ -107,7 +94,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "Data"){
+void RAA_calo_pf_JetCorrelation_pp(int startfile = 2, int endfile = 3, int radius=3, int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "Data"){
 
   TH1::SetDefaultSumw2();
 
@@ -115,38 +102,43 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
   timer.Start();
 
   TDatime date;
-
-  cout<<"Running for Algo = "<<algo<<" "<<endl;
   
   bool printDebug = false;
 
-  // Since this has to run on the HiForest files, it is best to run them as condor jobs similar to the PbPb data read macro, along with the jet trees which get their branch address set. 
+  // Since this has to run on the HiForest files, it is best to run them as condor jobs similar to the Pp data read macro, along with the jet trees which get their branch address set. 
   
   std::string infile1;
-  if(dataset == "Data")infile1 = "jetRAA_PbPb_data_forest.txt";
-  if(dataset == "MC")infile1 = "jetRAA_PbPb_mc_forest.txt";
-  if(dataset == "MinBiasUPC")infile1 = "jetRAA_MinBiasUPC_forest.txt";
-  
+  if(dataset == "Data")infile1 = "jetRAA_pp_data_forest.txt";
+  if(dataset == "MC")infile1 = "jetRAA_pp_mc_forest.txt";
+
   std::ifstream instr1(infile1.c_str(),std::ifstream::in);
   std::string filename1;
 
   cout<<"reading from "<<startfile<<" to "<<endfile<<endl;
-  
-  for(int ifile = 0;ifile<startfile;ifile++){
-    instr1>>filename1;
+
+  if(dataset=="MC"){
+    for(int ifile = 0;ifile<4*startfile;ifile++){
+      instr1>>filename1;
+    }
   }
+  if(dataset=="Data"){
+    for(int ifile = 0;ifile<startfile;ifile++){
+      instr1>>filename1;
+    }
+  }
+
   
   const int N = 5;
   
-  TChain *jetpbpb1[N][no_radius];
+  TChain *jetpp1[N][no_radius];
 
   string dir[N][no_radius];
   
   for(int k = 0;k<no_radius;k++){
     dir[0][k] = "hltanalysis";
     dir[1][k] = "skimanalysis";
-    dir[2][k] = Form("ak%s%dCaloJetAnalyzer",algo,3);
-    dir[3][k] = Form("ak%s%dPFJetAnalyzer",algo,radius);
+    dir[2][k] = Form("ak%dCaloJetAnalyzer",3);
+    dir[3][k] = Form("ak%dPFJetAnalyzer",radius);
     dir[4][k] = "hiEvtAnalyzer";
     //dir[5][k] = "hltobject";
     //dir[6][k] = "pfcandAnalyzer";
@@ -162,69 +154,108 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
     //"jetObjTree",
     //"pfTree"
   };
-
+  
   //this loop is to assign the tree values before we go into the file loop. 
   for(int k = 0;k<no_radius;k++){
     for(int t = 0;t<N;t++){
-      jetpbpb1[t][k] = new TChain(string(dir[t][k]+"/"+trees[t]).data());
+      jetpp1[t][k] = new TChain(string(dir[t][k]+"/"+trees[t]).data());
     }//tree loop ends
   }// radius loop ends
   
-  for(int ifile = startfile;ifile<endfile;ifile++){
+  if(dataset == "Data"){
+    for(int ifile = startfile;ifile<endfile;ifile++){
     
-    instr1>>filename1;
-    if(printDebug)cout<<"File: "<<filename1<<endl;
-    for(int k = 0;k<no_radius;k++){
+      instr1>>filename1;
+      if(printDebug)cout<<"File: "<<filename1<<endl;
+      for(int k = 0;k<no_radius;k++){
 
-      for(int t = 0;t<N;t++){
+	for(int t = 0;t<N;t++){
 	
-	jetpbpb1[t][k]->Add(filename1.c_str());
-	if(printDebug)cout << "Tree loaded  " << string(dir[t][k]+"/"+trees[t]).data() << endl;
-	if(printDebug)cout << "Entries : " << jetpbpb1[t][k]->GetEntries() << endl;
+	  jetpp1[t][k]->Add(filename1.c_str());
+	  if(printDebug)cout << "Tree loaded  " << string(dir[t][k]+"/"+trees[t]).data() << endl;
+	  if(printDebug)cout << "Entries : " << jetpp1[t][k]->GetEntries() << endl;
 		
-      }// tree loop ends
+	}// tree loop ends
       
-    }// radius loop ends
+      }// radius loop ends
     
-  }// file loop ends
+    }// file loop ends
 
-  for(int k = 0;k<no_radius;k++){
-    jetpbpb1[2][k]->AddFriend(jetpbpb1[0][k]);
-    jetpbpb1[2][k]->AddFriend(jetpbpb1[1][k]);
-    jetpbpb1[2][k]->AddFriend(jetpbpb1[4][k]);
-    //jetpbpb1[2][k]->AddFriend(jetpbpb1[5][k]);
+  }
+
+  // these different file loops for MC is necessary because of eachfile being split into 4 files except the last pthat 540 which has 5 files. 
+  if(dataset == "MC" && startfile <10){
+    for(int ifile = 4*startfile;ifile<4*endfile;ifile++){
     
-    jetpbpb1[3][k]->AddFriend(jetpbpb1[0][k]);
-    jetpbpb1[3][k]->AddFriend(jetpbpb1[1][k]);
-    jetpbpb1[3][k]->AddFriend(jetpbpb1[4][k]);
-    //jetpbpb1[3][k]->AddFriend(jetpbpb1[5][k]);
+      instr1>>filename1;
+      if(printDebug)cout<<"File: "<<filename1<<endl;
+      for(int k = 0;k<no_radius;k++){
+
+	for(int t = 0;t<N;t++){
+	
+	  jetpp1[t][k]->Add(filename1.c_str());
+	  if(printDebug)cout << "Tree loaded  " << string(dir[t][k]+"/"+trees[t]).data() << endl;
+	  if(printDebug)cout << "Entries : " << jetpp1[t][k]->GetEntries() << endl;
+		
+	}// tree loop ends
+      
+      }// radius loop ends
+    
+    }// file loop ends
+
+  }
+
+  if(dataset == "MC" && startfile == 10){
+    for(int ifile = 4*startfile;ifile<4*endfile+1;ifile++){
+    
+      instr1>>filename1;
+      if(printDebug)cout<<"File: "<<filename1<<endl;
+      for(int k = 0;k<no_radius;k++){
+
+	for(int t = 0;t<N;t++){
+	
+	  jetpp1[t][k]->Add(filename1.c_str());
+	  if(printDebug)cout << "Tree loaded  " << string(dir[t][k]+"/"+trees[t]).data() << endl;
+	  if(printDebug)cout << "Entries : " << jetpp1[t][k]->GetEntries() << endl;
+		
+	}// tree loop ends
+      
+      }// radius loop ends
+    
+    }// file loop ends
+
+  }
+  
+  for(int k = 0;k<no_radius;k++){
+    jetpp1[2][k]->AddFriend(jetpp1[0][k]);
+    jetpp1[2][k]->AddFriend(jetpp1[1][k]);
+    jetpp1[2][k]->AddFriend(jetpp1[4][k]);
+    //jetpp1[2][k]->AddFriend(jetpp1[5][k]);
+    
+    jetpp1[3][k]->AddFriend(jetpp1[0][k]);
+    jetpp1[3][k]->AddFriend(jetpp1[1][k]);
+    jetpp1[3][k]->AddFriend(jetpp1[4][k]);
+    //jetpp1[3][k]->AddFriend(jetpp1[5][k]);
     
   }// radius loop ends
  
   // Ok this should now work. 
 
-  cout<<"total no of entries in the combined forest files = "<<jetpbpb1[2][0]->GetEntries()<<endl;
-  //  if(printDebug)cout<<"total no of entries in the Jet80 Tree     = "<<jetpbpb2[2][0]->GetEntries()<<endl;
+  cout<<"total no of entries in the combined forest files = "<<jetpp1[2][0]->GetEntries()<<endl;
+  //  if(printDebug)cout<<"total no of entries in the Jet80 Tree     = "<<jetpp2[2][0]->GetEntries()<<endl;
 
   // get the centrality weight, vz weight and the scale from the cross section, pt weighting. 
-  static const Int_t nbins_pthat = 9;
-  Double_t xsection[nbins_pthat+1] = {2.034e-01, 1.075e-02, 1.025e-03,  9.865e-05, 1.129e-05, 1.465e-06, 2.837e-07, 5.323e-08, 5.934e-09, 0};
-  Double_t boundaries_pthat[nbins_pthat+1] = {15, 30, 50, 80, 120, 180, 220, 280, 370, 2000};
-
+  static const Int_t nbins_pthat = 11;
+  Double_t xsection[nbins_pthat+1] = {2.034e-01, 1.075e-02, 1.025e-03,  9.865e-05, 1.129e-05, 1.465e-06, 2.837e-07, 5.323e-08, 5.934e-09, 8.125e-10, 1.468e-10, 0};
+  Double_t boundaries_pthat[nbins_pthat+1] = {15, 30, 50, 80, 120, 170, 220, 280, 370, 460, 540, 2000};
   TH1F * hpthatBin = new TH1F("hpthatBin","",nbins_pthat, boundaries_pthat);
 
+  // Vertex reweighting for pp
+  TF1 *fVzPP = new TF1("fVzPP","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
+  fVzPP->SetParameters(8.41684e-01,-2.58609e-02,4.86550e-03,-3.10581e-04,2.07918e-05);
   
-  // Vertex & centrality reweighting for PbPb
-  TF1 *fVz;
-  fVz = new TF1("fVz","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
-  fVz->SetParameters(9.86748e-01, -8.91367e-03, 5.35416e-04, 2.67665e-06, -2.01867e-06);
-
-  //get the centrality weight from the root file created in the plotting macro. 
-  TFile *fcentin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Macros/RAA/PbPb_DataMC_cent_ratio_20141117.root");
-  TH1F *hCentWeight = (TH1F*)fcentin->Get("hCentRatio");
-
   
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_%s_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",dataset,deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_%s_calo_pf_jet_correlation_deltaR_0p%d_ak%d_%d_%d.root",dataset,deltaR,radius,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
 
@@ -282,7 +313,6 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
   int evt_1;
   int run_1;
   int lumi_1;
-  int hiBin_1;
   float pthat_1;
   float vx_1;
   float vy_1;
@@ -294,190 +324,126 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
   float hiHFplus_1;
   float hiHFplusEta4_1;
   float hiHFminusEta4_1;
-  int pcollisionEventSelection_1;
+  int pPAcollisionEventSelectionPA_1;
   int pHBHENoiseFilter_1;
   int pprimaryvertexFilter_1;
   int pVertexFilterCutGplus_1;
 
   // trigger tree
-  int L1_MB_1;
-  int L1_MB_p_1;
-  int L1_sj36_1;
-  int L1_sj52_1;
-  int jetMB_1;
-  int jet55_1;
-  int jet65_1;
+  int jet40_1;
+  int jet60_1;
   int jet80_1;
-  int jetMB_p_1;
-  int L1_sj36_p_1;
-  int L1_sj52_p_1;
-  int jet55_p_1;
-  int jet65_p_1;
+  int jet40_p_1;
+  int jet60_p_1;
   int jet80_p_1;
 
   for(int k = 0;k<no_radius;k++){
     //set the branch addresses:  - one of the most boring parts of the code: 
-    jetpbpb1[2][k]->SetBranchAddress("evt",&evt_1);
-    jetpbpb1[2][k]->SetBranchAddress("run",&run_1);
-    jetpbpb1[2][k]->SetBranchAddress("lumi",&lumi_1);
-    jetpbpb1[2][k]->SetBranchAddress("hiBin",&hiBin_1);
-    if(dataset=="MC") jetpbpb1[2][k]->SetBranchAddress("pthat",&pthat_1);
-    jetpbpb1[2][k]->SetBranchAddress("vz",&vz_1);
-    jetpbpb1[2][k]->SetBranchAddress("vx",&vx_1);
-    jetpbpb1[2][k]->SetBranchAddress("vy",&vy_1);
-    jetpbpb1[2][k]->SetBranchAddress("hiNpix",&hiNpix_1);
-    jetpbpb1[2][k]->SetBranchAddress("hiNtracks",&hiNtracks_1);
-    jetpbpb1[2][k]->SetBranchAddress("hiHFminus",&hiHFminus_1);
-    jetpbpb1[2][k]->SetBranchAddress("hiHF",&hiHF_1);
-    jetpbpb1[2][k]->SetBranchAddress("hiHFplus",&hiHFplus_1);
-    jetpbpb1[2][k]->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4_1);
-    jetpbpb1[2][k]->SetBranchAddress("hiHFminusEta4",&hiHFminusEta4_1);
-    jetpbpb1[2][k]->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection_1);
-    jetpbpb1[2][k]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter_1);
-    //jetpbpb1[2][k]->SetBranchAddress("pprimaryvertexFilter",&pprimaryvertexFilter_1);
-    //jetpbpb1[2][k]->SetBranchAddress("pVertexFilterCutGplus",&pVertexFilterCutGplus_1);
+    jetpp1[2][k]->SetBranchAddress("evt",&evt_1);
+    jetpp1[2][k]->SetBranchAddress("run",&run_1);
+    jetpp1[2][k]->SetBranchAddress("lumi",&lumi_1);
+    if(dataset=="MC") jetpp1[2][k]->SetBranchAddress("pthat",&pthat_1);
+    jetpp1[2][k]->SetBranchAddress("vz",&vz_1);
+    jetpp1[2][k]->SetBranchAddress("vx",&vx_1);
+    jetpp1[2][k]->SetBranchAddress("vy",&vy_1);
+    jetpp1[2][k]->SetBranchAddress("hiNpix",&hiNpix_1);
+    jetpp1[2][k]->SetBranchAddress("hiNtracks",&hiNtracks_1);
+    jetpp1[2][k]->SetBranchAddress("hiHFminus",&hiHFminus_1);
+    jetpp1[2][k]->SetBranchAddress("hiHF",&hiHF_1);
+    jetpp1[2][k]->SetBranchAddress("hiHFplus",&hiHFplus_1);
+    jetpp1[2][k]->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4_1);
+    jetpp1[2][k]->SetBranchAddress("hiHFminusEta4",&hiHFminusEta4_1);
+    jetpp1[2][k]->SetBranchAddress("pPAcollisionEventSelectionPA",&pPAcollisionEventSelectionPA_1);
+    jetpp1[2][k]->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter_1);
+    //jetpp1[2][k]->SetBranchAddress("pprimaryvertexFilter",&pprimaryvertexFilter_1);
+    //jetpp1[2][k]->SetBranchAddress("pVertexFilterCutGplus",&pVertexFilterCutGplus_1);
   
-    jetpbpb1[2][k]->SetBranchAddress("nref",&nrefe_1);
-    jetpbpb1[2][k]->SetBranchAddress("jtpt",&pt_1);
-    jetpbpb1[2][k]->SetBranchAddress("jteta",&eta_1);
-    jetpbpb1[2][k]->SetBranchAddress("jtphi",&phi_1);
-    jetpbpb1[2][k]->SetBranchAddress("rawpt",&raw_1);
-    jetpbpb1[2][k]->SetBranchAddress("jtpu",&jtpu_1);
-    jetpbpb1[2][k]->SetBranchAddress("chargedMax",&chMax_1);
-    jetpbpb1[2][k]->SetBranchAddress("chargedSum",&chSum_1);
-    jetpbpb1[2][k]->SetBranchAddress("trackMax",&trkMax_1);
-    jetpbpb1[2][k]->SetBranchAddress("trackSum",&trkSum_1);
-    jetpbpb1[2][k]->SetBranchAddress("photonMax",&phMax_1);
-    jetpbpb1[2][k]->SetBranchAddress("photonSum",&phSum_1);
-    jetpbpb1[2][k]->SetBranchAddress("neutralMax",&neMax_1);
-    jetpbpb1[2][k]->SetBranchAddress("neutralSum",&neSum_1);
-    jetpbpb1[2][k]->SetBranchAddress("eSum",&eSum_1);
-    jetpbpb1[2][k]->SetBranchAddress("eMax",&eMax_1);
-    jetpbpb1[2][k]->SetBranchAddress("muSum",&muSum_1);
-    jetpbpb1[2][k]->SetBranchAddress("muMax",&muMax_1);
-    jetpbpb1[2][k]->SetBranchAddress("ecalSum",&ecalSum_1);
-    jetpbpb1[2][k]->SetBranchAddress("hcalSum",&hcalSum_1);
+    jetpp1[2][k]->SetBranchAddress("nref",&nrefe_1);
+    jetpp1[2][k]->SetBranchAddress("jtpt",&pt_1);
+    jetpp1[2][k]->SetBranchAddress("jteta",&eta_1);
+    jetpp1[2][k]->SetBranchAddress("jtphi",&phi_1);
+    jetpp1[2][k]->SetBranchAddress("rawpt",&raw_1);
+    jetpp1[2][k]->SetBranchAddress("jtpu",&jtpu_1);
+    jetpp1[2][k]->SetBranchAddress("chargedMax",&chMax_1);
+    jetpp1[2][k]->SetBranchAddress("chargedSum",&chSum_1);
+    jetpp1[2][k]->SetBranchAddress("trackMax",&trkMax_1);
+    jetpp1[2][k]->SetBranchAddress("trackSum",&trkSum_1);
+    jetpp1[2][k]->SetBranchAddress("photonMax",&phMax_1);
+    jetpp1[2][k]->SetBranchAddress("photonSum",&phSum_1);
+    jetpp1[2][k]->SetBranchAddress("neutralMax",&neMax_1);
+    jetpp1[2][k]->SetBranchAddress("neutralSum",&neSum_1);
+    jetpp1[2][k]->SetBranchAddress("eSum",&eSum_1);
+    jetpp1[2][k]->SetBranchAddress("eMax",&eMax_1);
+    jetpp1[2][k]->SetBranchAddress("muSum",&muSum_1);
+    jetpp1[2][k]->SetBranchAddress("muMax",&muMax_1);
+    jetpp1[2][k]->SetBranchAddress("ecalSum",&ecalSum_1);
+    jetpp1[2][k]->SetBranchAddress("hcalSum",&hcalSum_1);
     
-    jetpbpb1[3][k]->SetBranchAddress("nref",&nrefe_2);
-    jetpbpb1[3][k]->SetBranchAddress("jtpt",&pt_2);
-    jetpbpb1[3][k]->SetBranchAddress("jteta",&eta_2);
-    jetpbpb1[3][k]->SetBranchAddress("jtphi",&phi_2);
-    jetpbpb1[3][k]->SetBranchAddress("rawpt",&raw_2);
-    jetpbpb1[3][k]->SetBranchAddress("jtpu",&jtpu_2);
-    jetpbpb1[3][k]->SetBranchAddress("chargedMax",&chMax_2);
-    jetpbpb1[3][k]->SetBranchAddress("chargedSum",&chSum_2);
-    jetpbpb1[3][k]->SetBranchAddress("trackMax",&trkMax_2);
-    jetpbpb1[3][k]->SetBranchAddress("trackSum",&trkSum_2);
-    jetpbpb1[3][k]->SetBranchAddress("photonMax",&phMax_2);
-    jetpbpb1[3][k]->SetBranchAddress("photonSum",&phSum_2);
-    jetpbpb1[3][k]->SetBranchAddress("neutralMax",&neMax_2);
-    jetpbpb1[3][k]->SetBranchAddress("neutralSum",&neSum_2);
-    jetpbpb1[3][k]->SetBranchAddress("eSum",&eSum_2);
-    jetpbpb1[3][k]->SetBranchAddress("eMax",&eMax_2);
-    jetpbpb1[3][k]->SetBranchAddress("muSum",&muSum_2);
-    jetpbpb1[3][k]->SetBranchAddress("muMax",&muMax_2);
-    jetpbpb1[3][k]->SetBranchAddress("ecalSum",&ecalSum_2);
-    jetpbpb1[3][k]->SetBranchAddress("hcalSum",&hcalSum_2);
+    jetpp1[3][k]->SetBranchAddress("nref",&nrefe_2);
+    jetpp1[3][k]->SetBranchAddress("jtpt",&pt_2);
+    jetpp1[3][k]->SetBranchAddress("jteta",&eta_2);
+    jetpp1[3][k]->SetBranchAddress("jtphi",&phi_2);
+    jetpp1[3][k]->SetBranchAddress("rawpt",&raw_2);
+    jetpp1[3][k]->SetBranchAddress("jtpu",&jtpu_2);
+    jetpp1[3][k]->SetBranchAddress("chargedMax",&chMax_2);
+    jetpp1[3][k]->SetBranchAddress("chargedSum",&chSum_2);
+    jetpp1[3][k]->SetBranchAddress("trackMax",&trkMax_2);
+    jetpp1[3][k]->SetBranchAddress("trackSum",&trkSum_2);
+    jetpp1[3][k]->SetBranchAddress("photonMax",&phMax_2);
+    jetpp1[3][k]->SetBranchAddress("photonSum",&phSum_2);
+    jetpp1[3][k]->SetBranchAddress("neutralMax",&neMax_2);
+    jetpp1[3][k]->SetBranchAddress("neutralSum",&neSum_2);
+    jetpp1[3][k]->SetBranchAddress("eSum",&eSum_2);
+    jetpp1[3][k]->SetBranchAddress("eMax",&eMax_2);
+    jetpp1[3][k]->SetBranchAddress("muSum",&muSum_2);
+    jetpp1[3][k]->SetBranchAddress("muMax",&muMax_2);
+    jetpp1[3][k]->SetBranchAddress("ecalSum",&ecalSum_2);
+    jetpp1[3][k]->SetBranchAddress("hcalSum",&hcalSum_2);
     
     if(dataset=="MC"){
 
-      jetpbpb1[2][k]->SetBranchAddress("subid",&subid_1);
-      jetpbpb1[3][k]->SetBranchAddress("subid",&subid_2);
-      jetpbpb1[2][k]->SetBranchAddress("refpt",&refpt_1);
-      jetpbpb1[3][k]->SetBranchAddress("refpt",&refpt_2);
+      jetpp1[2][k]->SetBranchAddress("subid",&subid_1);
+      jetpp1[3][k]->SetBranchAddress("subid",&subid_2);
+      jetpp1[2][k]->SetBranchAddress("refpt",&refpt_1);
+      jetpp1[3][k]->SetBranchAddress("refpt",&refpt_2);
 
     }
     
-    //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_1);
-    //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1_Prescl",&jetMB_p_1);
-    //jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias",&L1_MB_1);
-    //jetpbpb1[2][k]->SetBranchAddress("L1_ZeroBias_Prescl",&L1_MB_p_1);
 
-    // dont forget the include this for data and comment out the second set which is for MC. 
-    if(dataset == "MC"){
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v7",&jet55_1);
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v7_Prescl",&jet55_p_1);
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v7",&jet65_1);
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v7_Prescl",&jet65_p_1);
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v7",&jet80_1);
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v7_Prescl",&jet80_p_1);
-    }
-    if(dataset=="Data" || dataset=="MinBiasUPC"){
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1",&jet55_1);
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet55_v1_Prescl",&jet55_p_1);
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1",&jet65_1);
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet65_v1_Prescl",&jet65_p_1);
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1",&jet80_1);
-      jetpbpb1[2][k]->SetBranchAddress("HLT_HIJet80_v1_Prescl",&jet80_p_1);
-    }
-    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND",&L1_sj36_1);
-    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet36_BptxAND_Prescl",&L1_sj36_p_1);
-    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND",&L1_sj52_1);
-    jetpbpb1[2][k]->SetBranchAddress("L1_SingleJet52_BptxAND_Prescl",&L1_sj52_p_1);
+    jetpp1[2][k]->SetBranchAddress("HLT_PAJet40_NoJetID_v1",&jet40_1);
+    jetpp1[2][k]->SetBranchAddress("HLT_PAJet40_NoJetID_v1_Prescl",&jet40_p_1);
+    jetpp1[2][k]->SetBranchAddress("HLT_PAJet60_NoJetID_v1",&jet60_1);
+    jetpp1[2][k]->SetBranchAddress("HLT_PAJet60_NoJetID_v1_Prescl",&jet60_p_1);
+    jetpp1[2][k]->SetBranchAddress("HLT_PAJet80_NoJetID_v1",&jet80_1);
+    jetpp1[2][k]->SetBranchAddress("HLT_PAJet80_NoJetID_v1_Prescl",&jet80_p_1);
 
-    // jetpbpb1[2][k]->SetBranchAddress("id",&trgObj_id_1);
-    // jetpbpb1[2][k]->SetBranchAddress("pt",&trgObj_pt_1);
-    // jetpbpb1[2][k]->SetBranchAddress("eta",&trgObj_eta_1);
-    // jetpbpb1[2][k]->SetBranchAddress("phi",&trgObj_phi_1);
-    // jetpbpb1[2][k]->SetBranchAddress("mass",&trgObj_mass_1);
+    // jetpp1[2][k]->SetBranchAddress("id",&trgObj_id_1);
+    // jetpp1[2][k]->SetBranchAddress("pt",&trgObj_pt_1);
+    // jetpp1[2][k]->SetBranchAddress("eta",&trgObj_eta_1);
+    // jetpp1[2][k]->SetBranchAddress("phi",&trgObj_phi_1);
+    // jetpp1[2][k]->SetBranchAddress("mass",&trgObj_mass_1);
     
     /*
-    jetpbpb1[2][k]->SetBranchAddress("nPFpart", &nPFpart);
-    jetpbpb1[2][k]->SetBranchAddress("pfId", pfId);
-    jetpbpb1[2][k]->SetBranchAddress("pfPt", pfPt);
-    jetpbpb1[2][k]->SetBranchAddress("pfVsPtInitial", pfVsPtInitial);
-    jetpbpb1[2][k]->SetBranchAddress("pfVsPt", pfVsPt);
-    jetpbpb1[2][k]->SetBranchAddress("pfEta", pfEta);
-    jetpbpb1[2][k]->SetBranchAddress("pfPhi", pfPhi);
-    jetpbpb1[2][k]->SetBranchAddress("pfArea", pfArea);
-    jetpbpb1[2][k]->SetBranchAddress("vn",&v_n);
-    jetpbpb1[2][k]->SetBranchAddress("psin",&psi_n);
-    jetpbpb1[2][k]->SetBranchAddress("sumpt",&sumpT);
+    jetpp1[2][k]->SetBranchAddress("nPFpart", &nPFpart);
+    jetpp1[2][k]->SetBranchAddress("pfId", pfId);
+    jetpp1[2][k]->SetBranchAddress("pfPt", pfPt);
+    jetpp1[2][k]->SetBranchAddress("pfVsPtInitial", pfVsPtInitial);
+    jetpp1[2][k]->SetBranchAddress("pfVsPt", pfVsPt);
+    jetpp1[2][k]->SetBranchAddress("pfEta", pfEta);
+    jetpp1[2][k]->SetBranchAddress("pfPhi", pfPhi);
+    jetpp1[2][k]->SetBranchAddress("pfArea", pfArea);
+    jetpp1[2][k]->SetBranchAddress("vn",&v_n);
+    jetpp1[2][k]->SetBranchAddress("psin",&psi_n);
+    jetpp1[2][k]->SetBranchAddress("sumpt",&sumpT);
     */
 
   }// radius loop
   cout<<"after branch declaration"<<endl;
 
-  // // declare the histograms:
-  // TH1F *hCaloPFCorr[TrigValue][nbins_cent+1], *hCalo[TrigValue][nbins_cent+1], *hPF[TrigValue][nbins_cent+1], *hRatio[TrigValue][nbins_cent+1];
-  // TH2F * hCaloPFpt[TrigValue][nbins_cent+1];
-  // TH2F * hCaloPFCorr_pt[TrigValue][nbins_cent+1];
-  // TH2F * hDeltaR_deltapT[TrigValue][nbins_cent+1];
-  // // TH1F * hDeltaR[TrigValue][nbins_cent+1];
-  // // TH1F * hDeltapT[TrigValue][nbins_cent+1];
-
-  // for(int a = 0;a<TrigValue;a++){
-  //   for(int i = 0;i<nbins_cent+1;i++){
-  //     hCaloPFCorr[a][i] = new TH1F(Form("hCaloPFCorr_%s_cent%d",TrigName[a],i),Form("Ratio Calo jet pT to correlated PF jet for %s %s",TrigName[a],centWidth[i]),200,0,10);
-  //     hCaloPFCorr[a][i]->SetXTitle("PF Jet pT / Calo Jet PT");
-  //     hCaloPFCorr[a][i]->SetYTitle("Counts");
-      
-  //     hCaloPFpt[a][i] = new TH2F(Form("hCaloPFpt_%s_cent%d",TrigName[a],i), Form("Matched Calo jet pT vs PF Jet pT %s %s", TrigName[a], centWidth[i]), nbins_pt,boundaries_pt, nbins_pt, boundaries_pt);
-  //     hCaloPFpt[a][i]->SetXTitle("Calo jet pT");
-  //     hCaloPFpt[a][i]->SetYTitle("Matched PF jet pT");
-
-  //     hCaloPFCorr_pt[a][i] = new TH2F(Form("hCaloPFCorr_pt_%s_cent%d",TrigName[a],i), Form(" Ratio of PF/Calo vs calo pT %s %s", TrigName[a], centWidth[i]), nbins_pt,boundaries_pt, 200,0,10);
-  //     hCaloPFCorr_pt[a][i]->SetXTitle("Calo jet pT");
-  //     hCaloPFCorr_pt[a][i]->SetYTitle("PF Jet pT / Calo Jet PT");
-
-  //     hCalo[a][i] = new TH1F(Form("hCalo_%s_cent%d",TrigName[a],i),Form("Calo jet spectra %s %s",TrigName[a],centWidth[i]),nbins_pt,boundaries_pt);
-  //     hCalo[a][i]->SetXTitle("Jet p_{T} (GeV/c)");
-  //     hCalo[a][i]->SetYTitle("Counts");
-
-  //     hPF[a][i] = new TH1F(Form("hPF_%s_cent%d",TrigName[a],i),Form("PF jet spectra %s %s",TrigName[a],centWidth[i]),nbins_pt,boundaries_pt);
-  //     hPF[a][i]->SetXTitle("Jet p_{T} (GeV/c)");
-  //     hPF[a][i]->SetYTitle("Counts");
-
-  //     hDeltaR_deltapT[a][i] = new TH2F(Form("hDeltaR_deltapT_%s_cent%d",TrigName[a],i), Form(" delta R for matched jets vs delta pT %s %s", TrigName[a], centWidth[i]), 200,0,1, 200,0,200);
-  //     // hDeltaR[a][i] = new TH1F(Form("hPF_%s_cent%d",TrigName[a],i),Form("PF jet spectra %s %s",TrigName[a],centWidth[i]),nbins_pt,boundaries_pt);
-
-  //   }
-  // }
-
   cout<<"after histogram declaration"<<endl;
 
   Float_t calopt, pfpt, deltar, chMax, phMax, neMax, muMax, eMax, chSum, phSum, neSum, muSum, eSum, hcalSum, ecalSum;
-  Int_t hiBin, jet80, jet80_prescl, jet65, jet65_prescl, jet55, jet55_prescl; 
+  Int_t  jet80, jet80_prescl, jet60, jet60_prescl, jet40, jet40_prescl; 
   Int_t evt_value;
   Int_t run_value;
   Int_t lumi_value;
@@ -489,12 +455,12 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
   matchJets->Branch("pfpt",&pfpt,"pfpt/F");         matchJets->Branch("neSum",&neSum,"neSum/F");
   matchJets->Branch("deltar",&deltar,"deltar/F");   matchJets->Branch("muSum",&muSum,"muSum/F");
   matchJets->Branch("chMax",&chMax,"chMax/F");      matchJets->Branch("eSum",&eSum,"eSum/F");
-  matchJets->Branch("phMax",&phMax,"phMax/F");      matchJets->Branch("hiBin",&hiBin,"hiBin/I");
+  matchJets->Branch("phMax",&phMax,"phMax/F"); 
   matchJets->Branch("neMax",&neMax,"neMax/F");      matchJets->Branch("jet80",&jet80,"jet80/I");
   matchJets->Branch("muMax",&muMax,"muMax/F");      matchJets->Branch("jet80_prescl",&jet80_prescl,"jet80_prescl/I");
-  matchJets->Branch("eMax",&eMax,"eMax/F");         matchJets->Branch("jet65",&jet65,"jet65/I");
-  matchJets->Branch("chSum",&chSum,"chSum/F");      matchJets->Branch("jet65_prescl",&jet65_prescl,"jet65_prescl/I");
-  matchJets->Branch("jet55",&jet55,"jet55/I");      matchJets->Branch("jet55_prescl",&jet55_prescl,"jet55_prescl/I");
+  matchJets->Branch("eMax",&eMax,"eMax/F");         matchJets->Branch("jet60",&jet60,"jet60/I");
+  matchJets->Branch("chSum",&chSum,"chSum/F");      matchJets->Branch("jet60_prescl",&jet60_prescl,"jet60_prescl/I");
+  matchJets->Branch("jet40",&jet40,"jet40/I");      matchJets->Branch("jet40_prescl",&jet40_prescl,"jet40_prescl/I");
   matchJets->Branch("hcalSum",&hcalSum,"hcalSum/F");matchJets->Branch("ecalSum",&ecalSum,"ecalSum/F");
   matchJets->Branch("run_value",&run_value,"run_value/I");
   matchJets->Branch("evt_value",&evt_value,"evt_value/I");
@@ -516,12 +482,12 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
   unmatchPFJets->Branch("pfpt",&pfpt,"pfpt/F");         unmatchPFJets->Branch("neSum",&neSum,"neSum/F");
   unmatchPFJets->Branch("deltar",&deltar,"deltar/F");   unmatchPFJets->Branch("muSum",&muSum,"muSum/F");
   unmatchPFJets->Branch("chMax",&chMax,"chMax/F");      unmatchPFJets->Branch("eSum",&eSum,"eSum/F");
-  unmatchPFJets->Branch("phMax",&phMax,"phMax/F");      unmatchPFJets->Branch("hiBin",&hiBin,"hiBin/I");
+  unmatchPFJets->Branch("phMax",&phMax,"phMax/F");
   unmatchPFJets->Branch("neMax",&neMax,"neMax/F");      unmatchPFJets->Branch("jet80",&jet80,"jet80/I");
   unmatchPFJets->Branch("muMax",&muMax,"muMax/F");      unmatchPFJets->Branch("jet80_prescl",&jet80_prescl,"jet80_prescl/I");
-  unmatchPFJets->Branch("eMax",&eMax,"eMax/F");         unmatchPFJets->Branch("jet65",&jet65,"jet65/I");
-  unmatchPFJets->Branch("chSum",&chSum,"chSum/F");      unmatchPFJets->Branch("jet65_prescl",&jet65_prescl,"jet65_prescl/I");
-  unmatchPFJets->Branch("jet55",&jet55,"jet55/I");      unmatchPFJets->Branch("jet55_prescl",&jet55_prescl,"jet55_prescl/I");
+  unmatchPFJets->Branch("eMax",&eMax,"eMax/F");         unmatchPFJets->Branch("jet60",&jet60,"jet60/I");
+  unmatchPFJets->Branch("chSum",&chSum,"chSum/F");      unmatchPFJets->Branch("jet60_prescl",&jet60_prescl,"jet60_prescl/I");
+  unmatchPFJets->Branch("jet40",&jet40,"jet40/I");      unmatchPFJets->Branch("jet40_prescl",&jet40_prescl,"jet40_prescl/I");
   unmatchPFJets->Branch("hcalSum",&hcalSum,"hcalSum/F");unmatchPFJets->Branch("ecalSum",&ecalSum,"ecalSum/F");
   unmatchPFJets->Branch("run_value",&run_value,"run_value/I");
   unmatchPFJets->Branch("evt_value",&evt_value,"evt_value/I");
@@ -538,12 +504,12 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
   unmatchCaloJets->Branch("calopt",&calopt,"calopt/F");   unmatchCaloJets->Branch("neSum",&neSum,"neSum/F");
   unmatchCaloJets->Branch("deltar",&deltar,"deltar/F");   unmatchCaloJets->Branch("muSum",&muSum,"muSum/F");
   unmatchCaloJets->Branch("chMax",&chMax,"chMax/F");      unmatchCaloJets->Branch("eSum",&eSum,"eSum/F");
-  unmatchCaloJets->Branch("phMax",&phMax,"phMax/F");      unmatchCaloJets->Branch("hiBin",&hiBin,"hiBin/I");
+  unmatchCaloJets->Branch("phMax",&phMax,"phMax/F");     
   unmatchCaloJets->Branch("neMax",&neMax,"neMax/F");      unmatchCaloJets->Branch("jet80",&jet80,"jet80/I");
   unmatchCaloJets->Branch("muMax",&muMax,"muMax/F");      unmatchCaloJets->Branch("jet80_prescl",&jet80_prescl,"jet80_prescl/I");
-  unmatchCaloJets->Branch("eMax",&eMax,"eMax/F");         unmatchCaloJets->Branch("jet65",&jet65,"jet65/I");
-  unmatchCaloJets->Branch("chSum",&chSum,"chSum/F");      unmatchCaloJets->Branch("jet65_prescl",&jet65_prescl,"jet65_prescl/I");
-  unmatchCaloJets->Branch("jet55",&jet55,"jet55/I");      unmatchCaloJets->Branch("jet55_prescl",&jet55_prescl,"jet55_prescl/I");
+  unmatchCaloJets->Branch("eMax",&eMax,"eMax/F");         unmatchCaloJets->Branch("jet60",&jet60,"jet60/I");
+  unmatchCaloJets->Branch("chSum",&chSum,"chSum/F");      unmatchCaloJets->Branch("jet60_prescl",&jet60_prescl,"jet60_prescl/I");
+  unmatchCaloJets->Branch("jet40",&jet40,"jet40/I");      unmatchCaloJets->Branch("jet40_prescl",&jet40_prescl,"jet40_prescl/I");
   unmatchCaloJets->Branch("hcalSum",&hcalSum,"hcalSum/F");unmatchCaloJets->Branch("ecalSum",&ecalSum,"ecalSum/F");
   unmatchCaloJets->Branch("run_value",&run_value,"run_value/I");
   unmatchCaloJets->Branch("evt_value",&evt_value,"evt_value/I");
@@ -558,9 +524,6 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
   unmatchCaloJets->Branch("calojtpu",&calojtpu,"calojtpu/F");
 
   
-  //for the Jet 55 spectra: 
-  Float_t effecPrescl = 2.047507;
-  
   // declare the 2d calo and pf candidate vectors, deltaR_calovsPF is going to be a 3d vector like so:
   // calo jet on x axis, pf jet on y axis, and delta R, calopT, pfpT on z axis.
   // we also need to add in the trigger information here since we need to know what trigger the matching comes from. maybe i can run that later as an added check. for now just to see if the algorithm is working should try to run things. 
@@ -569,69 +532,50 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
 
   // start the loop process.
 
-  
   for(int k = 0;k<no_radius;k++){
 
-    Long64_t nentries = jetpbpb1[2][k]->GetEntries();
+    Long64_t nentries = jetpp1[2][k]->GetEntries();
     //Long64_t nentries = 100;
-    
-    TEventList *el = new TEventList("el","el");
-    double pthat_upper = boundaries_pthat[startfile + 1];
-    stringstream selection; selection<<"pthat<"<<pthat_upper;
-    
-    jetpbpb1[2][k]->Draw(">>el",selection.str().c_str());
-    double fentries = el->GetN();
-    delete el;
+
+    Long64_t fentries= 1;
+    if(dataset=="MC"){
+      TEventList *el = new TEventList("el","el");
+      double pthat_upper = boundaries_pthat[startfile + 1];
+      stringstream selection; selection<<"pthat<"<<pthat_upper;
+      
+      jetpp1[2][k]->Draw(">>el",selection.str().c_str());
+      fentries = el->GetN();
+      delete el;
+    }
     
     for(Long64_t nentry = 0; nentry<nentries;nentry++){
       if(printDebug)cout<<"event no = "<<nentry<<endl;
-      for(int t = 0;t<N;t++)  jetpbpb1[t][k]->GetEntry(nentry);
+      for(int t = 0;t<N;t++)  jetpp1[t][k]->GetEntry(nentry);
       
       //int centBin = findBin(hiBin_1);
       //if(centBin==-1) continue;
       //if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
-      if(pcollisionEventSelection_1==0) continue; 
-      if(dataset=="Data" || dataset=="MinBiasUPC") if(pcollisionEventSelection_1==0) continue;
+      if(pPAcollisionEventSelectionPA_1==0) continue; 
+      if(dataset=="Data") if(pHBHENoiseFilter_1==0 ) continue;
 
       if(fabs(vz_1)>15) continue;
       //cout<<"passed the selection"<<endl;
 
       weight = 1;
-      if(dataset=="MC"){
 
+      if(dataset=="MC"){
+	
 	int pthatBin = hpthatBin->FindBin(pthat_1);
 	
-	double scale = (double)(xsection[pthatBin]-xsection[pthatBin-1])/fentries;
-	
-	Float_t weight_cent = hCentWeight->GetBinContent(hCentWeight->FindBin(hiBin_1));
-	Float_t weight_vz = fVz->Eval(vz_1);
+	double scale = (double)(xsection[pthatBin-1]-xsection[pthatBin])/fentries;
 
-	weight = scale*weight_cent*weight_vz;
+	Float_t weight_vz = fVzPP->Eval(vz_1);
+	weight = scale*weight_vz;
+
       }
-
-      int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
-
-      for(int g = 0;g<nrefe_1;g++){
-	    
-	if(eta_1[g]>=-2 && eta_1[g]<2){ //to select inside 
-	      
-	  if(pt_1[g]>=50) jetCounter++;
-	  
-	}//eta selection cut
-	
-      }// jet loop
-      
-      // apply the correct supernova selection cut rejection here: 
-      if(hiNpix_1 > 38000 - 500*jetCounter){
-       	if(printDebug) cout<<"removed this supernova event"<<endl;
-      	continue;
-      }
-
-      // if(jet80_1!=0)cout<<"jet80 = "<<jet80_1<<" jet80_prescl = "<<jet80_p_1<<endl;
-      // if(jet65_1!=0)cout<<"jet65 = "<<jet65_1<<" jet65_prescl = "<<jet65_p_1<<endl;
-      // if(jet55_1!=0)cout<<"jet55 = "<<jet55_1<<" jet55_prescl = "<<jet55_p_1<<endl;
 
       // start doing the search for the match. - best thing to do would be to create a 2D match delta R matrix with each calo jet and pf jet. Once thats done - find the smallest entry in that matrix. the i,j of that smallest entry are matched. now remove the row i and column j and then we have a new distance matrix. where we need to find the smallest element again. keep doing this till we have either no rows or no columns.  
+
       // declare the necessary variables:
       Float_t deltaRCaloPF = 0;
       Float_t calojet_eta = 0;
@@ -725,7 +669,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
 	    deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(subid_2[j]); // 41 - subid only for MC
 	    
 	  }
-
+	  
 	  
 	  ++pfmatchcounter;
 
@@ -735,13 +679,12 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
       }// calo jet loop
 
       // set the event variables before proceeding to the matching. 
-      hiBin = hiBin_1;
       jet80 = jet80_1;
       jet80_prescl = jet80_p_1;
-      jet65 = jet65_1;
-      jet65_prescl = jet65_p_1;
-      jet55 = jet55_1;
-      jet55_prescl = jet55_p_1;
+      jet60 = jet60_1;
+      jet60_prescl = jet60_p_1;
+      jet40 = jet40_1;
+      jet40_prescl = jet40_p_1;
       run_value = run_1;
       evt_value = evt_1;
       lumi_value = lumi_1;
@@ -810,33 +753,6 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
 	ecalSum = deltaR_calovsPF[small_calo][small_pf][18];
 	
 	matchJets->Fill();
-	
-	//now we have the smallest value, lets get the delta R of that particular matched jets 
-	
-	// if(jet80_1){
-	//   hCaloPFCorr[2][centBin]->Fill((Float_t) pfjet_pt/calojet_pt);
-	//   hCaloPFpt[2][centBin]->Fill(calojet_pt,pfjet_pt);
-	//   hCaloPFCorr_pt[2][centBin]->Fill(calojet_pt,(Float_t)pfjet_pt/calojet_pt);
-	//   hCalo[2][centBin]->Fill(calojet_pt);
-	//   hPF[2][centBin]->Fill(pfjet_pt);	    
-	//   hDeltaR_deltapT[2][centBin]->Fill(deltaRCaloPF,deltapT);
-	// }
-	// if(jet65_1 && !jet80_1){
-	//   hCaloPFCorr[1][centBin]->Fill((Float_t) pfjet_pt/calojet_pt);
-	//   hCaloPFpt[1][centBin]->Fill(calojet_pt,pfjet_pt);
-	//   hCaloPFCorr_pt[1][centBin]->Fill(calojet_pt,(Float_t)pfjet_pt/calojet_pt);
-	//   hCalo[1][centBin]->Fill(calojet_pt);
-	//   hPF[1][centBin]->Fill(pfjet_pt);	    
-	//   hDeltaR_deltapT[1][centBin]->Fill(deltaRCaloPF,deltapT);
-	// }
-	// if(jet55_1 && !jet65_1 && !jet80_1){
-	//   hCaloPFCorr[0][centBin]->Fill((Float_t) pfjet_pt/calojet_pt);
-	//   hCaloPFpt[0][centBin]->Fill(calojet_pt,pfjet_pt);
-	//   hCaloPFCorr_pt[0][centBin]->Fill(calojet_pt,(Float_t)pfjet_pt/calojet_pt);
-	//   hCalo[0][centBin]->Fill(calojet_pt);
-	//   hPF[0][centBin]->Fill(pfjet_pt);	    
-	//   hDeltaR_deltapT[0][centBin]->Fill(deltaRCaloPF,deltapT);
-	// }
 	
 	smallDeltaR = 10;
 	for(int b = 0;b<deltaR_calovsPF[small_calo].size();++b){
@@ -924,7 +840,6 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
 
   }// radius loop
 
-  //TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
 
   matchJets->Write();
   matchJets->Print();
@@ -932,28 +847,6 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
   unmatchPFJets->Print();
   unmatchCaloJets->Write();
   unmatchCaloJets->Print();
-  //unmatch_CaloJets->Write();
-  //unmatch_CaloJets->Print();
-  
-  // for(int i = 0;i<nbins_cent;++i){
-
-  //   for(int a = 0;a<TrigValue-1;++a){
-
-  //     hCaloPFCorr[a][i]->Write();
-  //     hCaloPFCorr[a][i]->Print();
-  //     hCalo[a][i]->Write();
-  //     hCalo[a][i]->Print();
-  //     hPF[a][i]->Write();
-  //     hPF[a][i]->Print();
-  //     hCaloPFpt[a][i]->Write();
-  //     hCaloPFpt[a][i]->Print();
-  //     hCaloPFCorr_pt[a][i]->Write();
-  //     hCaloPFCorr_pt[a][i]->Print();
-  //     hDeltaR_deltapT[a][i]->Write();
-  //     hDeltaR_deltapT[a][i]->Print();
-  //   }
-    
-  // }
 
   timer.Stop();
   cout<<"Macro finished: "<<endl;

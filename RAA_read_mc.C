@@ -351,6 +351,7 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
   
   // refer this twiki for the data and MC files: http://twiki.cern.ch/twiki/bin/viewauth/CMS/HiForestPA2014#PYTHIA_HYDJET_embedded_sample
 
+  
   boundaries_pthat[0]=15;
   fileName_pthat[0] = "/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat15_Track9_Jet30_matchEqR_merged_forest_0.root";
   //fileName_pthat[0] = "/mnt/hadoop/cms/store/user/belt/Validation53X/Pyquen_Dijet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_Track9_Jet30_v15_full/hiForest_DijetpT15_Hydjet1p8_STARTHI53_LV1_v15_full.root";
@@ -871,7 +872,7 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
 
 	if(!data[k][h]->pcollisionEventSelection) continue;
         int cBin = findBin(data[k][h]->bin);
-	if(cBin==-1) continue;
+	//if(cBin==-1) continue;
 
         //int cBin = nbins_cent-1;
         double weight_cent=1;
@@ -883,12 +884,6 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
 	if(fabs(data[k][h]->vz)>15) continue;
 
         weight_vz = fVz->Eval(data[k][h]->vz);
-
-	hpbpb_vz[k]->Fill(data[k][h]->vz,weight_vz);
-	hpbpb_vx[k]->Fill(data[k][h]->vx);
-	hpbpb_vy[k]->Fill(data[k][h]->vy);
-
-	hpbpb_cent[k]->Fill(data[k][h]->bin,weight_cent);
 
 	if(scale*weight_cent*weight_vz <=0 ) {
 	  cout<<"RED FLAG RED FLAG RED FLAG"<<endl;
@@ -917,8 +912,17 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
 	  continue;
 	}
 
+	if(data[k][h]->chargedMax[0]/data[k][h]->jtpt[0] < 0.02 || data[k][h]->eMax[0]/data[k][h]->jtpt[0] > 0.6) continue;
+
+	hpbpb_vz[k]->Fill(data[k][h]->vz,weight_vz);
+	hpbpb_vx[k]->Fill(data[k][h]->vx);
+	hpbpb_vy[k]->Fill(data[k][h]->vy);
+
+	hpbpb_cent[k]->Fill(data[k][h]->bin,weight_cent);
+
+#if 0	
         if (cBin>=nbins_cent) continue;
-        if (cBin==-1) continue;
+        //if (cBin==-1) continue;
 	// hPtHat[k]->Fill(data[k][h]->pthat,scale*weight_cent*weight_vz);
 	
         //cout<<"scale = "<<scale<<endl;
@@ -1346,7 +1350,9 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
           }// eta bins loop
 	      
         }//njets loop
-	
+
+
+#endif
       }//nentry loop
 
       if(printDebug)cout<<"no of events inbetween pthat "<<boundaries_pthat[h]<<" and "<<boundaries_pthat[h+1]<<" = "<<test_counter<<endl;
@@ -1355,7 +1361,7 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
     
 
   }// radius loop
-
+#if 0
   for(int k = 0;k<no_radius;k++){
     for(int j = 0;j<nbins_eta;j++){
       for(int i = 0;i<nbins_cent;i++){
@@ -1378,11 +1384,11 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
       }
     }
   }
-  
+#endif  
 
-  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_vz_cent_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
-
+#if 0
   
   for(int i = 0;i<nbins_cent;++i){
     
@@ -1528,6 +1534,14 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
     }
   }
 
+#endif
+
+  hpbpb_vz[0]->Write();
+  hpbpb_vx[0]->Write();
+  hpbpb_vy[0]->Write();
+  hpbpb_cent[0]->Write();
+
+  
   f.Write();
   f.Close();
 

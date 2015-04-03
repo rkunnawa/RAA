@@ -512,7 +512,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   //ofstream fHLT_80,fHLT_65,fHLT_55;
 
   
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_vz_cent_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
   // need to keep all the input histograms in scope of the output file. 
 
@@ -683,8 +683,17 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     }
   }
 
+  TH1F *hpbpb_vx[no_radius];
+  TH1F *hpbpb_vy[no_radius];
+  TH1F *hpbpb_vz[no_radius];
+  TH1F *hpbpb_cent[no_radius];
   
   for(int k = 0;k<no_radius;k++){
+
+    hpbpb_cent[k] = new TH1F(Form("hpbpb_cent_R%d",list_radius[k]),Form("centrality distributions R%d",list_radius[k]),200,0,200);
+    hpbpb_vz[k] = new TH1F(Form("hpbpb_vz_R%d",list_radius[k]),Form("vz distribution R%d",list_radius[k]),60,-15,15);
+    hpbpb_vx[k] = new TH1F(Form("hpbpb_vx_R%d",list_radius[k]),Form("vx distribution R%d",list_radius[k]),60,-15,15);
+    hpbpb_vy[k] = new TH1F(Form("hpbpb_vy_R%d",list_radius[k]),Form("vy distribution R%d",list_radius[k]),60,-15,15);
 
     if(printDebug)cout<<"Running data reading for R = "<<list_radius[k]<<endl;
     // loop for the jetpbpb1[2] tree 
@@ -709,7 +718,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       // get the stuff required for the trigger turn on curve later. in a separate loop till i understand how to put this in here. 
       
       int centBin = findBin(hiBin_1);//tells us the centrality of the event. 
-      if(centBin==-1) continue;
+      //if(centBin==-1) continue;
 
       //if(printDebug)cout<<"cent bin = "<<centBin<<endl;
       //if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
@@ -719,13 +728,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       // if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1 && fabs(vz_1)<15) hEvents_vz15->Fill(1);
       
       if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
-
-#if 0
-      hpbpb_cent[k]->Fill(hiBin_1);
-      hpbpb_vz[k]->Fill(vz_1);
-      hpbpb_vx[k]->Fill(vx_1);
-      hpbpb_vy[k]->Fill(vy_1);
-#endif
 
       if(TMath::Abs(vz_1)>15) continue;
       
@@ -752,7 +754,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	}// jet loop
 	
       }//eta bins loop
-      
+      \
+
       // if(printDebug)cout<<"pixel hit = "<<hiNpix_1<<", jet counter = "<<jetCounter<<endl;
       
       // hpbpb_Npix_before_cut[k][centBin]->Fill(jetCounter,hiNpix_1);
@@ -770,6 +773,14 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
        	if(printDebug) cout<<"removed this supernova event"<<endl;
       	continue;
       }
+
+      if(chMax_1[0]/pt_1[0] < 0.02 || eMax_1[0]/pt_1[0] > 0.6) continue;
+
+      hpbpb_cent[k]->Fill(hiBin_1);
+      hpbpb_vz[k]->Fill(vz_1);
+      hpbpb_vx[k]->Fill(vx_1);
+      hpbpb_vy[k]->Fill(vy_1);
+#if 0
 
       //get the failed events after the beam scrapping and pile up rejection cuts. 
       //if(jetCounter>10){
@@ -1249,7 +1260,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	}//jet loop
 	  
       }//eta bin loop
-   
+
+#endif
     }//nentries_jet55or65 loop
     
   }//radius loop. 
@@ -1258,6 +1270,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   //hEvents_HLT65->Write();
   //hEvents_HLT55->Write();
 
+  #if 0
   for(int i = 0;i<nbins_cent;++i){
     
     for(int t = 0;t<trigValue-1;t++){
@@ -1357,6 +1370,12 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     //evt_electron_good[k]->Write();
   }
 
+  #endif
+  
+  hpbpb_cent[0]->Write();
+  hpbpb_vz[0]->Write();
+  hpbpb_vx[0]->Write();
+  hpbpb_vy[0]->Write();
 
   /*
   hEvents->Write();
