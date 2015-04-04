@@ -119,7 +119,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 40){
+void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 40){
 
   TStopwatch timer;
   timer.Start();
@@ -136,8 +136,8 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
   const int nbins_cent = 6;
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
-
-   
+  
+  
   const int nbins_pt = 39;
   const double boundaries_pt[nbins_pt+1] = {
     3, 4, 5, 7, 9, 12, 
@@ -192,7 +192,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
   TFile *fin; 
   
   //if(location=="MIT") 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_n20_eta_p20_%dGeVCut_ak%s_20150401.root",radius,unfoldingCut,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_n20_eta_p20_%dGeVCut_ak%s_20150403.root",radius,unfoldingCut,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
@@ -227,7 +227,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
   TH1F *RAA_binbybin[nbins_cent+1];
   TH1F *RAA_bayesian[nbins_cent+1];
   
-  for(int i = 0;i<nbins_cent;i++){
+  for(int i = 0;i<nbins_cent;++i){
     
     cout<<"cent = "<<i<<endl;
     dPbPb_TrgComb[i] = (TH1F*)fin->Get(Form("PbPb_measured_spectra_combined_cent%d",i));
@@ -235,7 +235,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     dPbPb_Trg80[i] = (TH1F*)fin->Get(Form("PbPb_measured_spectra_jet80_cent%d",i));
     dPbPb_Trg65[i] = (TH1F*)fin->Get(Form("PbPb_measured_spectra_jet65_cent%d",i));
     dPbPb_Trg55[i] = (TH1F*)fin->Get(Form("PbPb_measured_spectra_jet55_cent%d",i));    
-    //dPbPb_MinBias[i] = (TH1F*)fin->Get(Form("PbPb_measured_spectra_MinBias_cent%d",i));    
+    dPbPb_MinBias[i] = (TH1F*)fin->Get(Form("PbPb_measured_spectra_MinBias_cent%d",i));    
     
     mPbPb_Reco[i] = (TH1F*)fin->Get(Form("hpbpb_reco_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Gen[i] = (TH1F*)fin->Get(Form("hpbpb_gen_R%d_n20_eta_p20_cent%d",radius,i));
@@ -623,7 +623,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     lUnfoldingCut->SetLineStyle(4);
     lUnfoldingCut->SetLineWidth(2);
     
-    for(int i = 0;i<nbins_cent;i++){
+    for(int i = 0;i<nbins_cent;++i){
 
       cRAA->cd(nbins_cent-i);
 
@@ -1199,11 +1199,11 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
       dPbPb_TrgComb[i]->SetAxisRange(50,500,"X");
       dPbPb_TrgComb[i]->Draw();
 
-      // dPbPb_MinBias[i]->SetMarkerStyle(20);
-      // dPbPb_MinBias[i]->SetMarkerColor(kBlack);
-      // //dPbPb_MinBias[i] = (TH1F*)dPbPb_MinBias[i]->Rebin(nbins_pt,Form("rebin_measured_80_cent%d",i),boundaries_pt);
-      // //divideBinWidth(dPbPb_MinBias[i]);
-      // dPbPb_MinBias[i]->Draw("same");
+      dPbPb_MinBias[i]->SetMarkerStyle(20);
+      dPbPb_MinBias[i]->SetMarkerColor(kBlack);
+      //dPbPb_MinBias[i] = (TH1F*)dPbPb_MinBias[i]->Rebin(nbins_pt,Form("rebin_measured_80_cent%d",i),boundaries_pt);
+      //divideBinWidth(dPbPb_MinBias[i]);
+      dPbPb_MinBias[i]->Draw("same");
       
       dPbPb_Trg80[i]->SetMarkerStyle(20);
       dPbPb_Trg80[i]->SetMarkerColor(kRed);
@@ -1230,7 +1230,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     cDataMerge->cd(1);
     TLegend *PbPb_dataMerge = myLegend(0.75,0.65,0.90,0.85);
     PbPb_dataMerge->AddEntry(dPbPb_TrgComb[0],"Combined","pl");
-    //PbPb_dataMerge->AddEntry(dPbPb_MinBias[0],"Jet80","pl");
+    PbPb_dataMerge->AddEntry(dPbPb_MinBias[0],"JetMB","pl");
     PbPb_dataMerge->AddEntry(dPbPb_Trg80[0],"Jet80","pl");
     PbPb_dataMerge->AddEntry(dPbPb_Trg65[0],"Jet65","pl");
     PbPb_dataMerge->AddEntry(dPbPb_Trg55[0],"Jet55","pl");
