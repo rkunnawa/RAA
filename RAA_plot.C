@@ -119,7 +119,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 40){
+void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 30){
 
   TStopwatch timer;
   timer.Start();
@@ -192,7 +192,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
   TFile *fin; 
   
   //if(location=="MIT") 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_n20_eta_p20_%dGeVCut_ak%s_20150403.root",radius,unfoldingCut,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_n20_eta_p20_%dGeVCut_ak%s_20150406.root",radius,unfoldingCut,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
@@ -1063,12 +1063,12 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
 
     uPP_Bayes->SetMarkerColor(kBlack);
     uPP_Bayes->SetMarkerStyle(20);
-    uPP_Bayes->Scale(1./1e3);
+    //uPP_Bayes->Scale(1./1e3);
     uPP_Bayes->Draw("same");
 
     uPP_BinByBin->SetMarkerStyle(33);
     uPP_BinByBin->SetMarkerColor(kRed);
-    uPP_BinByBin->Scale(1./1e3);
+    //uPP_BinByBin->Scale(1./1e3);
     uPP_BinByBin->Draw("same");
 
     TLegend *PP_sigma = myLegend(0.53,0.65,0.85,0.9);

@@ -65,7 +65,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < (18/7 *(Float_t)calopt_1/pfpt_1 - 9/7)) ) hGood->Fill();
   // if(calopt/pfpt > 0.85 & eMax/Sumcand > 0.9) hGood->Fill();
   
-  Int_t radius = 2;
+  Int_t radius = 3;
   char * etaWidth = (char*)"n20_eta_p20";
   TFile * fData, * fMC; 
 
@@ -280,7 +280,7 @@ void RAA_plot_yetkinCutEfficiency(){
   MC_matched->SetBranchAddress("jet80",&jet80_2);
   MC_matched->SetBranchAddress("weight", &weight);
   MC_matched->SetBranchAddress("subid", &subid_2);
-  MC_unmatched->SetBranchAddress("jet55_prescl",&jet55_p_2);
+  MC_matched->SetBranchAddress("jet55_prescl",&jet55_p_2);
   
   MC_unmatched->SetBranchAddress("pfpt",&pfpt_2);
   MC_unmatched->SetBranchAddress("eMax",&eMax_2);
@@ -289,7 +289,7 @@ void RAA_plot_yetkinCutEfficiency(){
   MC_unmatched->SetBranchAddress("phSum",&phSum_2);
   MC_unmatched->SetBranchAddress("neSum",&neSum_2);
   MC_unmatched->SetBranchAddress("muSum",&muSum_2);
-  MC_matched->SetBranchAddress("hiBin",&hiBin_2);
+  MC_unmatched->SetBranchAddress("hiBin",&hiBin_2);
   MC_unmatched->SetBranchAddress("pfrefpt",&pfrefpt_2);
   MC_unmatched->SetBranchAddress("jet55",&jet55_2);
   MC_unmatched->SetBranchAddress("jet65",&jet65_2);
