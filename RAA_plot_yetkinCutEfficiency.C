@@ -39,17 +39,19 @@ static const int nbins_cent = 7;
 static const Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36,40};// multiply by 2.5 to get your actual centrality % (old 2011 data) 
 //now we have to multiply by 5, since centrality goes from 0-200. 
 
-int findBin(int hiBin){
-  int binNo = -1;
-
-  for(int i = 0;i<nbins_cent;i++){
-    if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
-      binNo = i;
-      break;
-    }
-  }
-
-  return binNo;
+int findBin(int bin)
+{
+  int ibin=-1;
+  //! centrality is defined as 0.5% bins of cross section
+  //! in 0-200 bins               
+  if(bin<=10)ibin=0; //! 0-5%
+  else if(bin>10  && bin<=20 )ibin=1; //! 5-10%
+  else if(bin>20  && bin<=60 )ibin=2;  //! 10-30%
+  else if(bin>60  && bin<=100)ibin=3;  //! 30-50%
+  else if(bin>100 && bin<=140)ibin=4;  //! 50-70%
+  else if(bin>140 && bin<=180)ibin=5;  //! 70-90%
+  else if(bin>180 && bin<=200)ibin=6;  //! 90-100%
+  return ibin;
 }
 
 using namespace std;
@@ -63,7 +65,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < (18/7 *(Float_t)calopt_1/pfpt_1 - 9/7)) ) hGood->Fill();
   // if(calopt/pfpt > 0.85 & eMax/Sumcand > 0.9) hGood->Fill();
   
-  Int_t radius = 4;
+  Int_t radius = 3;
   char * etaWidth = (char*)"n20_eta_p20";
   TFile * fData, * fMC; 
 
@@ -278,7 +280,7 @@ void RAA_plot_yetkinCutEfficiency(){
   MC_matched->SetBranchAddress("jet80",&jet80_2);
   MC_matched->SetBranchAddress("weight", &weight);
   MC_matched->SetBranchAddress("subid", &subid_2);
-  MC_unmatched->SetBranchAddress("jet55_prescl",&jet55_p_2);
+  MC_matched->SetBranchAddress("jet55_prescl",&jet55_p_2);
   
   MC_unmatched->SetBranchAddress("pfpt",&pfpt_2);
   MC_unmatched->SetBranchAddress("eMax",&eMax_2);
@@ -287,7 +289,7 @@ void RAA_plot_yetkinCutEfficiency(){
   MC_unmatched->SetBranchAddress("phSum",&phSum_2);
   MC_unmatched->SetBranchAddress("neSum",&neSum_2);
   MC_unmatched->SetBranchAddress("muSum",&muSum_2);
-  MC_matched->SetBranchAddress("hiBin",&hiBin_2);
+  MC_unmatched->SetBranchAddress("hiBin",&hiBin_2);
   MC_unmatched->SetBranchAddress("pfrefpt",&pfrefpt_2);
   MC_unmatched->SetBranchAddress("jet55",&jet55_2);
   MC_unmatched->SetBranchAddress("jet65",&jet65_2);
@@ -885,8 +887,8 @@ void RAA_plot_yetkinCutEfficiency(){
   hData_Jet80_CutA_eff->Scale(1./5);
   hData_Jet80_CutA_eff->SetMarkerColor(kRed);
   hData_Jet80_CutA_eff->SetMarkerStyle(24);
-  hData_Jet80_CutA_eff->SetAxisRange(20,600,"X");
-  hData_Jet80_CutA_eff->SetAxisRange(0,1.2,"Y");
+  hData_Jet80_CutA_eff->SetAxisRange(30,300,"X");
+  hData_Jet80_CutA_eff->SetAxisRange(0.85,1.1,"Y");
   hData_Jet80_CutA_eff->SetXTitle(Form("akPu%dPF p_{T}",radius));
   hData_Jet80_CutA_eff->SetTitle("Data");
   hData_Jet80_CutA_eff->SetYTitle("Jet80_Cut efficiency");
@@ -895,7 +897,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // hData_Jet80_CutB_eff->Scale(1./20);
   // hData_Jet80_CutB_eff->SetMarkerColor(kBlack);
   // hData_Jet80_CutB_eff->SetMarkerStyle(33);
-  // hData_Jet80_CutB_eff->SetAxisRange(20,600,"X");
+  // hData_Jet80_CutB_eff->SetAxisRange(30,300,"X");
   // hData_Jet80_CutB_eff->Draw("same");
 
   cJet80_CutEfficiency_Jet80->cd(2);
@@ -903,8 +905,8 @@ void RAA_plot_yetkinCutEfficiency(){
   hMC_Jet80_CutA_eff->Scale(1./5);
   hMC_Jet80_CutA_eff->SetMarkerColor(kRed);
   hMC_Jet80_CutA_eff->SetMarkerStyle(24);
-  hMC_Jet80_CutA_eff->SetAxisRange(20,600,"X");
-  hMC_Jet80_CutA_eff->SetAxisRange(0,1.2,"Y");
+  hMC_Jet80_CutA_eff->SetAxisRange(30,300,"X");
+  hMC_Jet80_CutA_eff->SetAxisRange(0.85,1.1,"Y");
   hMC_Jet80_CutA_eff->SetXTitle(Form("akPu%dPF ref p_{T}",radius));
   hMC_Jet80_CutA_eff->SetTitle("MC");
   hMC_Jet80_CutA_eff->SetYTitle("Jet80_Cut efficiency");
@@ -913,10 +915,10 @@ void RAA_plot_yetkinCutEfficiency(){
   // hMC_Jet80_CutB_eff->Scale(1./20);
   // hMC_Jet80_CutB_eff->SetMarkerColor(kBlack);
   // hMC_Jet80_CutB_eff->SetMarkerStyle(33);
-  // hMC_Jet80_CutB_eff->SetAxisRange(20,600,"X");
+  // hMC_Jet80_CutB_eff->SetAxisRange(30,300,"X");
   // hMC_Jet80_CutB_eff->Draw("same");
 
-  cJet80_CutEfficiency_Jet80->SaveAs(Form("PbPb_YetkinCuts_Jet80_eMaxSumcand_A_chMaxJtpt_calopfpt_Eff_R0p%d.pdf",radius),"RECREATE");
+  cJet80_CutEfficiency_Jet80->SaveAs(Form("PbPb_YetkinCuts_Jet80_eMaxSumcand_A_chMaxJtpt_calopfpt_Eff_R0p%d_zoomed.pdf",radius),"RECREATE");
 
   // TCanvas * cCutRejection_Jet80 = new TCanvas("cCutRejection_Jet80","",1000,800);
 
@@ -924,7 +926,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // hData_Jet80_CutA_rej->Scale(1./5);
   // hData_Jet80_CutA_rej->SetMarkerColor(kRed);
   // hData_Jet80_CutA_rej->SetMarkerStyle(24);
-  // hData_Jet80_CutA_rej->SetAxisRange(20,600,"X");
+  // hData_Jet80_CutA_rej->SetAxisRange(30,300,"X");
   // hData_Jet80_CutA_rej->SetAxisRange(0,1.2,"Y");
   // hData_Jet80_CutA_rej->SetXTitle("matched akPu3PF p_{T}");
   // hData_Jet80_CutA_rej->SetTitle("Data");
@@ -934,7 +936,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // // hData_Jet80_CutB_rej->Scale(1./20);
   // // hData_Jet80_CutB_rej->SetMarkerColor(kBlack);
   // // hData_Jet80_CutB_rej->SetMarkerStyle(33);
-  // // hData_Jet80_CutB_rej->SetAxisRange(20,600,"X");
+  // // hData_Jet80_CutB_rej->SetAxisRange(30,300,"X");
   // // hData_Jet80_CutB_rej->Draw("same");
 
   // cCutRejection_Jet80->SaveAs("PbPb_YetkinCuts_Jet80_eMaxSumcand_A_chMaxJtpt_calopfpt_rejection.pdf","RECREATE");
@@ -947,8 +949,8 @@ void RAA_plot_yetkinCutEfficiency(){
   hData_Jet55_CutA_eff->Scale(1./5);
   hData_Jet55_CutA_eff->SetMarkerColor(kRed);
   hData_Jet55_CutA_eff->SetMarkerStyle(24);
-  hData_Jet55_CutA_eff->SetAxisRange(20,600,"X");
-  hData_Jet55_CutA_eff->SetAxisRange(0,1.2,"Y");
+  hData_Jet55_CutA_eff->SetAxisRange(30,300,"X");
+  hData_Jet55_CutA_eff->SetAxisRange(0.85,1.1,"Y");
   hData_Jet55_CutA_eff->SetXTitle(Form("akPu%dPF p_{T}",radius));
   hData_Jet55_CutA_eff->SetTitle("Data");
   hData_Jet55_CutA_eff->SetYTitle("Jet55_Cut efficiency");
@@ -957,7 +959,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // hData_Jet55_CutB_eff->Scale(1./20);
   // hData_Jet55_CutB_eff->SetMarkerColor(kBlack);
   // hData_Jet55_CutB_eff->SetMarkerStyle(33);
-  // hData_Jet55_CutB_eff->SetAxisRange(20,600,"X");
+  // hData_Jet55_CutB_eff->SetAxisRange(30,300,"X");
   // hData_Jet55_CutB_eff->SetAxisRange(0,1.2,"Y");
   // hData_Jet55_CutB_eff->Draw("same");
 
@@ -966,8 +968,8 @@ void RAA_plot_yetkinCutEfficiency(){
   hMC_Jet55_CutA_eff->Scale(1./5);
   hMC_Jet55_CutA_eff->SetMarkerColor(kRed);
   hMC_Jet55_CutA_eff->SetMarkerStyle(24);
-  hMC_Jet55_CutA_eff->SetAxisRange(20,600,"X");
-  hMC_Jet55_CutA_eff->SetAxisRange(0,1.2,"Y");
+  hMC_Jet55_CutA_eff->SetAxisRange(30,300,"X");
+  hMC_Jet55_CutA_eff->SetAxisRange(0.85,1.1,"Y");
   hMC_Jet55_CutA_eff->SetXTitle(Form("akPu%dPF ref p_{T}",radius));
   hMC_Jet55_CutA_eff->SetTitle("MC");
   hMC_Jet55_CutA_eff->SetYTitle("Jet55_Cut efficiency");
@@ -976,10 +978,10 @@ void RAA_plot_yetkinCutEfficiency(){
   // hMC_Jet55_CutB_eff->Scale(1./20);
   // hMC_Jet55_CutB_eff->SetMarkerColor(kBlack);
   // hMC_Jet55_CutB_eff->SetMarkerStyle(33);
-  // hMC_Jet55_CutB_eff->SetAxisRange(20,600,"X");
+  // hMC_Jet55_CutB_eff->SetAxisRange(30,300,"X");
   // hMC_Jet55_CutB_eff->Draw("same");
 
-  cJet55_CutEfficiency_Jet55->SaveAs(Form("PbPb_YetkinCuts_Jet55_noJet65noJet80_eMaxSumcand_A_chMaxJtpt_calopfpt_Eff_including_unmatched_R0p%d.pdf",radius),"RECREATE");
+  cJet55_CutEfficiency_Jet55->SaveAs(Form("PbPb_YetkinCuts_Jet55_noJet65noJet80_eMaxSumcand_A_chMaxJtpt_calopfpt_Eff_including_unmatched_R0p%d_zoomed.pdf",radius),"RECREATE");
 
   // TCanvas * cCutRejection_Jet55 = new TCanvas("cCutRejection_Jet55","",1000,800);
 
@@ -987,7 +989,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // hData_Jet55_CutA_rej->Scale(1./5);
   // hData_Jet55_CutA_rej->SetMarkerColor(kRed);
   // hData_Jet55_CutA_rej->SetMarkerStyle(24);
-  // hData_Jet55_CutA_rej->SetAxisRange(20,600,"X");
+  // hData_Jet55_CutA_rej->SetAxisRange(30,300,"X");
   // hData_Jet55_CutA_rej->SetAxisRange(0,1.2,"Y");
   // hData_Jet55_CutA_rej->SetXTitle("matched akPu3PF p_{T}");
   // hData_Jet55_CutA_rej->SetTitle("Data");
@@ -997,7 +999,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // // hData_Jet55_CutB_rej->Scale(1./20);
   // // hData_Jet55_CutB_rej->SetMarkerColor(kBlack);
   // // hData_Jet55_CutB_rej->SetMarkerStyle(33);
-  // // hData_Jet55_CutB_rej->SetAxisRange(20,600,"X");
+  // // hData_Jet55_CutB_rej->SetAxisRange(30,300,"X");
   // // hData_Jet55_CutB_rej->Draw("same");
 
   // cCutRejection_Jet55->SaveAs("PbPb_YetkinCuts_Jet55_noJet65noJet80_eMaxSumcand_A_chMaxJtpt_calopfpt_rejection_including_unmatched.pdf","RECREATE");
@@ -1010,8 +1012,8 @@ void RAA_plot_yetkinCutEfficiency(){
   hData_Jet65_CutA_eff->Scale(1./5);
   hData_Jet65_CutA_eff->SetMarkerColor(kRed);
   hData_Jet65_CutA_eff->SetMarkerStyle(24);
-  hData_Jet65_CutA_eff->SetAxisRange(20,600,"X");
-  hData_Jet65_CutA_eff->SetAxisRange(0,1.2,"Y");
+  hData_Jet65_CutA_eff->SetAxisRange(30,300,"X");
+  hData_Jet65_CutA_eff->SetAxisRange(0.85,1.1,"Y");
   hData_Jet65_CutA_eff->SetXTitle(Form("matched akPu%dPF p_{T}",radius));
   hData_Jet65_CutA_eff->SetTitle("Data");
   hData_Jet65_CutA_eff->SetYTitle("Jet65_Cut efficiency");
@@ -1020,7 +1022,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // hData_Jet65_CutB_eff->Scale(1./20);
   // hData_Jet65_CutB_eff->SetMarkerColor(kBlack);
   // hData_Jet65_CutB_eff->SetMarkerStyle(33);
-  // hData_Jet65_CutB_eff->SetAxisRange(20,600,"X");
+  // hData_Jet65_CutB_eff->SetAxisRange(30,300,"X");
   // hData_Jet65_CutB_eff->Draw("same");
 
   cJet65_CutEfficiency_Jet65->cd(2);
@@ -1028,8 +1030,8 @@ void RAA_plot_yetkinCutEfficiency(){
   hMC_Jet65_CutA_eff->Scale(1./5);
   hMC_Jet65_CutA_eff->SetMarkerColor(kRed);
   hMC_Jet65_CutA_eff->SetMarkerStyle(24);
-  hMC_Jet65_CutA_eff->SetAxisRange(20,600,"X");
-  hMC_Jet65_CutA_eff->SetAxisRange(0,1.2,"Y");
+  hMC_Jet65_CutA_eff->SetAxisRange(30,300,"X");
+  hMC_Jet65_CutA_eff->SetAxisRange(0.85,1.1,"Y");
   hMC_Jet65_CutA_eff->SetXTitle(Form("matched akPu%dPF ref p_{T}",radius));
   hMC_Jet65_CutA_eff->SetTitle("MC");
   hMC_Jet65_CutA_eff->SetYTitle("Jet65_Cut efficiency");
@@ -1038,10 +1040,10 @@ void RAA_plot_yetkinCutEfficiency(){
   // hMC_Jet65_CutB_eff->Scale(1./20);
   // hMC_Jet65_CutB_eff->SetMarkerColor(kBlack);
   // hMC_Jet65_CutB_eff->SetMarkerStyle(33);
-  // hMC_Jet65_CutB_eff->SetAxisRange(20,600,"X");
+  // hMC_Jet65_CutB_eff->SetAxisRange(30,300,"X");
   // hMC_Jet65_CutB_eff->Draw("same");
 
-  cJet65_CutEfficiency_Jet65->SaveAs(Form("PbPb_YetkinCuts_Jet65_noJet80_eMaxSumcand_A_chMaxJtpt_calopfpt_Eff_including_unmatched_R0p%d.pdf",radius),"RECREATE");
+  cJet65_CutEfficiency_Jet65->SaveAs(Form("PbPb_YetkinCuts_Jet65_noJet80_eMaxSumcand_A_chMaxJtpt_calopfpt_Eff_including_unmatched_R0p%d_zoomed.pdf",radius),"RECREATE");
 
   // TCanvas * cCutRejection_Jet65 = new TCanvas("cCutRejection_Jet65","",1000,800);
 
@@ -1049,7 +1051,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // hData_Jet65_CutA_rej->Scale(1./5);
   // hData_Jet65_CutA_rej->SetMarkerColor(kRed);
   // hData_Jet65_CutA_rej->SetMarkerStyle(24);
-  // hData_Jet65_CutA_rej->SetAxisRange(20,600,"X");
+  // hData_Jet65_CutA_rej->SetAxisRange(30,300,"X");
   // hData_Jet65_CutA_rej->SetAxisRange(0, 1.2,"Y");
   // hData_Jet65_CutA_rej->SetXTitle("matched akPu3PF p_{T}");
   // hData_Jet65_CutA_rej->SetTitle("Data");
@@ -1059,7 +1061,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // // hData_Jet65_CutB_rej->Scale(1./20);
   // // hData_Jet65_CutB_rej->SetMarkerColor(kBlack);
   // // hData_Jet65_CutB_rej->SetMarkerStyle(33);
-  // // hData_Jet65_CutB_rej->SetAxisRange(20,600,"X");
+  // // hData_Jet65_CutB_rej->SetAxisRange(30,300,"X");
   // // hData_Jet65_CutB_rej->Draw("same");
 
   // cCutRejection_Jet65->SaveAs("PbPb_YetkinCuts_Jet65_noJet80_eMaxSumcand_A_chMaxJtpt_calopfpt_rejection_including_unmatched.pdf","RECREATE");

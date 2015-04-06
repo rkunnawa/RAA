@@ -56,8 +56,8 @@ void RAA_plot_matched_unmatched_eMaxSumcand(){
   TTree * MC_matched = (TTree*)fMC->Get("matchedJets");
   TTree * MC_unmatched = (TTree*)fMC->Get("unmatchedPFJets");
 
-  int ptSelection = 17;
-  int ptBoundary[ptSelection+1] = {30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200};
+  const int ptSelection = 17;
+  const int ptBoundary[ptSelection+1] = {30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200};
   
   TH2F* hData_eMaxSumcand_calopfpt_ptselection[ptSelection];
   TH2F* hMC_eMaxSumcand_calopfpt_ptselection[ptSelection];
