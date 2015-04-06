@@ -92,7 +92,7 @@ static const double deltaEta[nbins_eta] = {4.0};
 
 // Remove bins with error > central value
 void cleanup(TH1F *h){
-  for (int i=1;i<=h->GetNbinsX();i++){
+  for (int i=1;i<=h->GetNbinsX();++i){
     double val1 = h->GetBinContent(i);
     double valErr1 = h->GetBinError(i);
     if (valErr1>=val1) {
@@ -104,7 +104,7 @@ void cleanup(TH1F *h){
 
 // Remove error 
 void removeError(TH1F *h){
-  for (int i=1;i<=h->GetNbinsX();i++){
+  for (int i=1;i<=h->GetNbinsX();++i){
     h->SetBinError(i,0);
   } 
 }  
@@ -112,12 +112,12 @@ void removeError(TH1F *h){
 // Remove Zero
 void removeZero(TH1 *h){
   double min = 0;
-  for(int i = 1;i<h->GetNbinsX();i++){
+  for(int i = 1;i<h->GetNbinsX();++i){
     if(h->GetBinContent(i)>min&&h->GetBinContent(i)>0)
       min = h->GetBinContent(i);
   }
   
-  for(int i = 1;i<h->GetNbinsX();i++){
+  for(int i = 1;i<h->GetNbinsX();++i){
     if(h->GetBinContent(i) == 0){
       h->SetBinContent(i,min/10.);
       h->SetBinError(i,min/10.);
@@ -128,7 +128,7 @@ void removeZero(TH1 *h){
 // make a histogram from TF1 function
 TH1F *functionHist(TF1 *f, TH1F* h,char *fHistname){
   TH1F *hF = (TH1F*)h->Clone(fHistname);
-  for (int i=1;i<=h->GetNbinsX();i++){
+  for (int i=1;i<=h->GetNbinsX();++i){
     double var = f->Integral(h->GetBinLowEdge(i),h->GetBinLowEdge(i+1))/h->GetBinWidth(i);
     hF->SetBinContent(i,var);
     hF->SetBinError(i,0);
@@ -140,7 +140,7 @@ TH1F *functionHist(TF1 *f, TH1F* h,char *fHistname){
 void divideBinWidth(TH1 *h)
 {
   h->Sumw2();
-  for (int i=0;i<=h->GetNbinsX();i++){
+  for (int i=0;i<=h->GetNbinsX();++i){
     Float_t val = h->GetBinContent(i);
     Float_t valErr = h->GetBinError(i);
     if(val!=0){
@@ -156,7 +156,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 30, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   TStopwatch timer; 
   timer.Start();
@@ -192,6 +192,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
 
   TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  TFile * fPbPb_MB_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   
   cout<<"after input file declaration"<<endl;
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
@@ -234,11 +235,11 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   Int_t unfoldingCutBin = htest->FindBin(unfoldingCut);
   
   // get PbPb data
-  for(int i = 0;i<nbins_cent;i++){
+  for(int i = 0;i<nbins_cent;++i){
     if(printDebug) cout<<"cent_"<<i<<endl;
     dPbPb_TrgComb[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
     //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
-    //dPbPb_TrgComb[i]->Print("base");
+    dPbPb_TrgComb[i]->Print("base");
     dPbPb_Trg80[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLT80_R%d_n20_eta_p20_cent%d",radius,i));
     //dPbPb_Trg80[i]->Scale(4*145.156*1e6);
     dPbPb_Trg80[i]->Print("base");
@@ -250,14 +251,19 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     dPbPb_Trg55[i]->Print("base");
     //dPbPb_TrgComb[i] = (TH1F*)dPbPb_Trg80[i]->Clone(Form("Jet_80_triggered_spectra_data_PbPb_cent%d",i));
 
-    //dPbPb_MinBias[i] = (TH1F*)fData_MinBias_PbPb->Get(Form("hJetMBSpectra_R%d_cent%d",radius,i));
-    //dPbPb_TrgComb[i]->Add(dPbPb_MinBias[i]);
+    dPbPb_MinBias[i] = (TH1F*)fPbPb_MB_in->Get(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
+    dPbPb_MinBias[i]->Print("base");
+    dPbPb_TrgComb[i]->Scale(1./145.156);
+    dPbPb_MinBias[i]->Scale(1./161.939);
     
-    for(int k = 1;k<=unfoldingCutBin;k++) {
+    dPbPb_TrgComb[i]->Add(dPbPb_MinBias[i]);
+        
+    for(int k = 1;k<=unfoldingCut;k++) {
       dPbPb_TrgComb[i]->SetBinContent(k,0);
       dPbPb_Trg80[i]->SetBinContent(k,0);
       dPbPb_Trg65[i]->SetBinContent(k,0);
       dPbPb_Trg55[i]->SetBinContent(k,0);
+      dPbPb_MinBias[i]->SetBinContent(k,0);
     }
     
   }
@@ -266,7 +272,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     
   if(printDebug)cout<<"loaded the data histograms PbPb"<<endl;
   // get PbPb MC
-  for(int i = 0;i<nbins_cent;i++){
+  for(int i = 0;i<nbins_cent;++i){
     
     mPbPb_Gen[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_JetComb_gen_R%d_n20_eta_p20_cent%d",radius,i));
     //mPbPb_Gen[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_gen_R%d_n20_eta_p20_cent%d",radius,i));
@@ -292,7 +298,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     //uPbPb_SVD[i] = (TH1F*)unfoldSvd.Hreco();
   
     
-    for(int k = 1;k<=unfoldingCutBin;k++){
+    for(int k = 1;k<=unfoldingCut;k++){
 
       mPbPb_Gen[i]->SetBinContent(k,0);
       mPbPb_Reco[i]->SetBinContent(k,0);
@@ -348,7 +354,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   //uPP_SVD = (TH1F*)unfoldSvdPP.Hreco();
 
   
-  for(int k = 1;k<=unfoldingCutBin;k++){
+  for(int k = 1;k<=unfoldingCut;k++){
     mPP_Gen->SetBinContent(k,0);
     mPP_Reco->SetBinContent(k,0);
     mPP_mcclosure_data->SetBinContent(k,0);
@@ -373,10 +379,10 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   // response matrix and unfolding for PbPb 
   // going to try it the way kurt has it. 
 
-  for(int i = 0;i<nbins_cent;i++){
+  for(int i = 0;i<nbins_cent;++i){
     if(printDebug) cout<<"centrality bin iteration = "<<i<<endl;
-    TF1 *f = new TF1("f","[0]*pow(x+[2],[1])");
-    f->SetParameters(1e10,-8.8,40);
+    // TF1 *f = new TF1("f","[0]*pow(x+[2],[1])");
+    // f->SetParameters(1e10,-8.8,40);
     // TH1F *hGenSpectraCorr = (TH1F*)mPbPb_Matrix[i]->ProjectionX()->Clone(Form("hGenSpectraCorr_cent%d",i));
     // hGenSpectraCorr->Fit("f"," ");
     // hGenSpectraCorr->Fit("f","","");
@@ -461,7 +467,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   // response matrix and unfolding for PbPb for the closure test 
   // going to try it the way kurt has it. 
 
-  for(int i = 0;i<nbins_cent;i++){
+  for(int i = 0;i<nbins_cent;++i){
     if(printDebug) cout<<"centrality bin iteration = "<<i<<endl;
     TF1 *f = new TF1("f","[0]*pow(x+[2],[1])");
     f->SetParameters(1e10,-8.8,40);
@@ -723,7 +729,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   // do the unfolding - including the iteration systematics (ofcourse). Similar to the above version, we have to create 2 separate unfolding for PbPb and pp.
 
   // first for PbPb
-  for (int i=0;i<nbins_cent;i++) {
+  for (int i=0;i<nbins_cent;++i) {
 
     // Do Bin-by-bin
     if(printDebug) cout<<"doing bin by bin unfolding for PbPb for centrality = "<<i<<endl;
@@ -861,7 +867,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   TH1F *RAA_binbybin[nbins_cent+1];
   TH1F *RAA_measured[nbins_cent+1];
   //uPP_Bayes->Scale(1./64);
-  for(int i = 0;i<nbins_cent;i++){
+  for(int i = 0;i<nbins_cent;++i){
 
     //uPbPb_Bayes[i]->Scale(1./ncoll[i]);
     //uPbPb_Bayes[i]->Scale(1./7.65);
@@ -873,10 +879,13 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     //RAA_bayesian[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
     //RAA_bayesian[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     RAA_bayesian[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
+    cout<<" centrality index = "<< i <<endl;
+    cout<<" centrality width = "<< 0.025*(boundaries_cent[i+1] - boundaries_cent[i]) <<endl;
     //RAA_bayesian[i]->Scale(1./145.156); // triggered value
-    RAA_bayesian[i]->Scale(1./161.939); //minbias value
+    //RAA_bayesian[i]->Scale(1./161.939); //minbias value
     RAA_bayesian[i]->Scale(1./(7.65*1e6));
     RAA_bayesian[i]->Scale(64.*1e9/(ncoll[i]*1e3));
+    cout << " ncoll = "<< ncoll[i] <<endl;
     RAA_bayesian[i]->Scale(5.3*1e3);
 
     //RAA_measured[i]->Scale(1./4);// delta eta
@@ -884,7 +893,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     //RAA_measured[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     RAA_measured[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
     //RAA_measured[i]->Scale(1./145.156);
-    RAA_measured[i]->Scale(1./161.939); // mninbias value
+    //RAA_measured[i]->Scale(1./161.939); // mninbias value
     RAA_measured[i]->Scale(1./(7.65*1e6));
     RAA_measured[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     RAA_measured[i]->Scale(5.3*1e3);
@@ -894,7 +903,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     //RAA_binbybin[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     RAA_binbybin[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
     //RAA_binbybin[i]->Scale(1./145.156);
-    RAA_binbybin[i]->Scale(1./161.939);
+    //RAA_binbybin[i]->Scale(1./161.939);
     RAA_binbybin[i]->Scale(1./(7.65*1e6));
     RAA_binbybin[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     RAA_binbybin[i]->Scale(5.3*1e3);
@@ -902,8 +911,6 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     RAA_bayesian[i]->Divide(uPP_Bayes);
     RAA_measured[i]->Divide(dPP_Comb);
     RAA_binbybin[i]->Divide(uPP_BinByBin);
-
-
     
     if(i!=6){
       RAA_bayesian[i]->SetTitle(Form("RAA ak%s%d%s bayesian unfolded %2.0f - %2.0f cent",algo,radius,jet_type,2.5*boundaries_cent[i], 2.5*boundaries_cent[i+1]));
@@ -927,7 +934,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   TH1F* uPbPb_MC_BayesianIter[nbins_cent+1][Iterations];
 
   // first for PbPb
-  for (int i=0;i<nbins_cent;i++) {
+  for (int i=0;i<nbins_cent;++i) {
 
     // Do Bin-by-bin
     if(printDebug) cout<<"doing bin by bin unfolding for PbPb MC closure test for centrality = "<<i<<endl;
@@ -1071,14 +1078,14 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_%s_%dGeVCut_ak%s_%d.root", radiusPP, etaWidth,unfoldingCut,jet_type,date.GetDate()),"RECREATE");
   fout.cd();
 
-  for(int i = 0;i<nbins_cent;i++){
+  for(int i = 0;i<nbins_cent;++i){
 
     uPbPb_Bayes[i]->Scale(1./deltaEta);// delta eta
     //uPbPb_Bayes[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
     //uPbPb_Bayes[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     uPbPb_Bayes[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
     //uPbPb_Bayes[i]->Scale(1./145.156);
-    uPbPb_Bayes[i]->Scale(1./161.939);
+    //uPbPb_Bayes[i]->Scale(1./161.939);
     uPbPb_Bayes[i]->Scale(1./(7.65*1e6));
     uPbPb_Bayes[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     uPbPb_Bayes[i] = (TH1F*)uPbPb_Bayes[i]->Rebin(nbins_pt,Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i),boundaries_pt);
@@ -1101,7 +1108,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     //uPbPb_BinByBin[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     uPbPb_BinByBin[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
     //uPbPb_BinByBin[i]->Scale(1./145.156);
-    uPbPb_BinByBin[i]->Scale(1./161.939);
+    //uPbPb_BinByBin[i]->Scale(1./161.939);
     uPbPb_BinByBin[i]->Scale(1./(7.65*1e6));
     uPbPb_BinByBin[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     uPbPb_BinByBin[i] = (TH1F*)uPbPb_BinByBin[i]->Rebin(nbins_pt,Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i),boundaries_pt);
@@ -1117,7 +1124,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     //dPbPb_TrgComb[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     dPbPb_TrgComb[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
     //dPbPb_TrgComb[i]->Scale(1./145.156);
-    dPbPb_TrgComb[i]->Scale(1./161.939);
+    //dPbPb_TrgComb[i]->Scale(1./161.939);
     dPbPb_TrgComb[i]->Scale(1./(7.65*1e6));
     dPbPb_TrgComb[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_combined_cent%d",i),boundaries_pt);
@@ -1128,51 +1135,49 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     //dPbPb_Trg80[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
     //dPbPb_Trg80[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     dPbPb_Trg80[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    //dPbPb_Trg80[i]->Scale(1./145.156);
-    dPbPb_Trg80[i]->Scale(1./161.939);
+    dPbPb_Trg80[i]->Scale(1./145.156);
+    //dPbPb_Trg80[i]->Scale(1./161.939);
     dPbPb_Trg80[i]->Scale(1./(7.65*1e6));
     dPbPb_Trg80[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     dPbPb_Trg80[i] = (TH1F*)dPbPb_Trg80[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_jet80_cent%d",i),boundaries_pt);
     divideBinWidth(dPbPb_Trg80[i]);
     dPbPb_Trg80[i]->Write();
-
     
     dPbPb_Trg65[i]->Scale(1./deltaEta);// delta eta
     //dPbPb_Trg65[i]->Scale(1./145.156/1e6);// Jet 65 luminosity
     //dPbPb_Trg65[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     dPbPb_Trg65[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    //dPbPb_Trg65[i]->Scale(1./145.156);
-    dPbPb_Trg65[i]->Scale(1./161.939);
+    dPbPb_Trg65[i]->Scale(1./145.156);
+    //dPbPb_Trg65[i]->Scale(1./161.939);
     dPbPb_Trg65[i]->Scale(1./(7.65*1e6));
     dPbPb_Trg65[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     dPbPb_Trg65[i] = (TH1F*)dPbPb_Trg65[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_jet65_cent%d",i),boundaries_pt);
     divideBinWidth(dPbPb_Trg65[i]);
     dPbPb_Trg65[i]->Write();
-
     
     dPbPb_Trg55[i]->Scale(1./deltaEta);// delta eta
     //dPbPb_Trg55[i]->Scale(1./145.156/1e6);// Jet 55 luminosity
     //dPbPb_Trg55[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
     dPbPb_Trg55[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    //dPbPb_Trg55[i]->Scale(1./145.156);
-    dPbPb_Trg55[i]->Scale(1./161.939);
+    dPbPb_Trg55[i]->Scale(1./145.156);
+    //dPbPb_Trg55[i]->Scale(1./161.939);
     dPbPb_Trg55[i]->Scale(1./(7.65*1e6));
     dPbPb_Trg55[i]->Scale(64.*1e9/(ncoll[i]*1e3));
     dPbPb_Trg55[i] = (TH1F*)dPbPb_Trg55[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_jet55_cent%d",i),boundaries_pt);
     divideBinWidth(dPbPb_Trg55[i]);
     dPbPb_Trg55[i]->Write();
 
-    // dPbPb_MinBias[i]->Scale(1./4);// delta eta
-    // //dPbPb_MinBias[i]->Scale(1./145.156/1e6);// Jet 55 luminosity
-    // //dPbPb_MinBias[i]->Scale(1./1.1153/1e6);// equivalent no of minbias events 
-    // dPbPb_MinBias[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    // //dPbPb_MinBias[i]->Scale(1./145.156);
-    // dPbPb_MinBias[i]->Scale(1./161.939);
-    // dPbPb_MinBias[i]->Scale(1./(7.65*1e6));
-    // dPbPb_MinBias[i]->Scale(64.*1e9/(ncoll[i]*1e3));
-    // dPbPb_MinBias[i] = (TH1F*)dPbPb_MinBias[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_MinBias_cent%d",i),boundaries_pt);
-    // divideBinWidth(dPbPb_MinBias[i]);
-    // dPbPb_MinBias[i]->Write();
+    dPbPb_MinBias[i]->Scale(1./deltaEta);// delta eta
+    //dPbPb_MinBias[i]->Scale(1./145.156/1e6);Jet 55 luminosity
+    //dPbPb_MinBias[i]->Scale(1./1.1153/1e6);equivalent no of minbias events 
+    dPbPb_MinBias[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
+    //dPbPb_MinBias[i]->Scale(1./145.156);
+    //dPbPb_MinBias[i]->Scale(1./161.939);
+    dPbPb_MinBias[i]->Scale(1./(7.65*1e6));
+    dPbPb_MinBias[i]->Scale(64.*1e9/(ncoll[i]*1e3));
+    dPbPb_MinBias[i] = (TH1F*)dPbPb_MinBias[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_MinBias_cent%d",i),boundaries_pt);
+    divideBinWidth(dPbPb_MinBias[i]);
+    dPbPb_MinBias[i]->Write();
 
     
     //mPbPb_ResponseNorm[i] = (TH2F*)mPbPb_ResponseNorm[i]->Rebin2D(nbins_pt,Form("PbPb_normalized_response_matrix_cent%d",i),boundaries_pt);    
@@ -1272,7 +1277,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   mPP_mcclosure_Matrix->Write();
   mPP_mcclosure_data->Write();
   
-  for(int i= 2;i<Iterations;i++){
+  for(int i= 2;i<Iterations;++i){
     uPP_BayesianIter[i] = (TH1F*)uPP_BayesianIter[i]->Rebin(nbins_pt,Form("uPP_BayesianIter%d",i),boundaries_pt);
     divideBinWidth(uPP_BayesianIter[i]);
     uPP_BayesianIter[i]->Write();
@@ -1283,7 +1288,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   
 
   uPP_Bayes->Scale(1./deltaEta);// delta eta
-  uPP_Bayes->Scale(1./5.3); //pp lumi to get it to pico barns 
+  uPP_Bayes->Scale(1./5.3/1e3); //pp lumi to get it to pico barns 
   //uPP_Bayes->Scale(1./1.0466/1e6);
   uPP_Bayes = (TH1F*)uPP_Bayes->Rebin(nbins_pt,"PP_bayesian_unfolded_spectra",boundaries_pt);
   divideBinWidth(uPP_Bayes);
@@ -1297,7 +1302,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   // uPP_SVD->Write();
   
   uPP_BinByBin->Scale(1./deltaEta);// delta eta
-  uPP_BinByBin->Scale(1./5.3); // pp lumi
+  uPP_BinByBin->Scale(1./5.3/1e3); // pp lumi
   //uPP_BinByBin->Scale(1./1.0466/1e6);
   uPP_BinByBin = (TH1F*)uPP_BinByBin->Rebin(nbins_pt,"PP_BinByBin_unfolded_spectra",boundaries_pt);
   divideBinWidth(uPP_BinByBin);
