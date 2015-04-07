@@ -65,7 +65,7 @@ void RAA_plot_yetkinCutEfficiency(){
   // if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < (18/7 *(Float_t)calopt_1/pfpt_1 - 9/7)) ) hGood->Fill();
   // if(calopt/pfpt > 0.85 & eMax/Sumcand > 0.9) hGood->Fill();
   
-  Int_t radius = 3;
+  Int_t radius = 4;
   char * etaWidth = (char*)"n20_eta_p20";
   TFile * fData, * fMC; 
 
