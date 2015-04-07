@@ -51,8 +51,11 @@
 //static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
 
 
-static const int nbins_pt = 39;
-static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300,   330, 362, 395, 430,  468, 507, 548, 592,  638, 686, 1000 };
+static const int nbins_pt = 38;
+static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300,   330, 362, 395, 430,  468, 507, 548, 592,  638, 686, 1000 };
+
+// i removed one bin between 245 and 300 it was at 272. // april 7th after unfolding error macro check etc... 
+
 /*
 static const int nbins_pt = 40;
 static const double boundaries_pt[nbins_pt+1] = {
@@ -156,7 +159,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 30, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_analyze(int radius = 2, int radiusPP = 2, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   TStopwatch timer; 
   timer.Start();
@@ -193,6 +196,9 @@ void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", ch
   TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   TFile * fPbPb_MB_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+
+  // we also need to get the files for the MinBias closure histograms.
+  TFile * fPbPb_MCclosure_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MC_calo_pf_jet_correlation_mcclosure_histograms_deltaR_0p2_akPu%d_20150407.root",radius));
   
   cout<<"after input file declaration"<<endl;
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
@@ -283,11 +289,11 @@ void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", ch
     mPbPb_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_matrix_HLT_R%d_n20_eta_p20_cent%d",radius,i));
     //mPbPb_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_matrix_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Matrix[i]->Print("base");
-    mPbPb_mcclosure_data[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_mcclosure_JetComb_data_R%d_n20_eta_p20_cent%d",radius,i));
+    mPbPb_mcclosure_data[i] = (TH1F*)fPbPb_MCclosure_in->Get(Form("hpbpb_mcclosure_JetComb_data_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_mcclosure_data[i]->Print("base");
-    mPbPb_mcclosure_gen[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_mcclosure_gen_JetComb_R%d_n20_eta_p20_cent%d",radius,i));
+    mPbPb_mcclosure_gen[i] = (TH1F*)fPbPb_MCclosure_in->Get(Form("hpbpb_mcclosure_gen_JetComb_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_mcclosure_gen[i]->Print("base");
-    mPbPb_mcclosure_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_mcclosure_matrix_HLT_R%d_n20_eta_p20_cent%d",radius,i));
+    mPbPb_mcclosure_Matrix[i] = (TH2F*)fPbPb_MCclosure_in->Get(Form("hpbpb_mcclosure_matrix_HLT_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_mcclosure_Matrix[i]->Print("base");
 
     //since SVD is very straight forward, lets do it rignt here:
@@ -855,6 +861,26 @@ void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", ch
 
   delete hPriorPP;
 
+
+  // first correct for the error bars got from the RAA_dataDrivenUnfoldingErrorCheck.C macro
+  
+  // get the root file which has the unfolded error correction.
+  TFile * ferrorin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_R%d_pp_R%d_n20_eta_p20_unfoldingCut_%d_data_driven_correction_akPu%s_20150407.root",radius, radius, unfoldingCut, jet_type));
+
+  // get histograms for each centrality and pp
+  TH1F * hPbPb_BayesCorrected[nbins_cent];
+  TH1F * hPP_BayesCorrected;
+
+  for(int i = 0; i<nbins_cent;++i)
+    hPbPb_BayesCorrected[i] = (TH1F*)ferrorin->Get(Form("PbPb_BayesianUnfolded_cent%d",i));
+  hPP_BayesCorrected = (TH1F*)ferrorin->Get("PP_BayesianUnfolded");
+
+  for(int j = 0; j<1000; ++j){
+    uPP_Bayes->SetBinError(j+1, hPP_BayesCorrected->GetBinError(j+1));
+    for(int i = 0; i<nbins_cent;++i){
+      uPbPb_Bayes[i]->SetBinError(j+1, hPbPb_BayesCorrected[i]->GetBinError(j+1));
+    }
+  }
 
   // calculate the RAA 
   // Scale pp by 1./64 - sigma pp 
