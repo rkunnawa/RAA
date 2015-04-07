@@ -28,9 +28,10 @@
 //static const int nbins_pt = 29;
 //static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
 
+static const int nbins_pt = 1000;
 
-static const int nbins_pt = 39;
-static const double boundaries_pt[nbins_pt+1] = {
+static const int nbins_pt_coarse = 39;
+static const double boundaries_pt_coarse[nbins_pt_coarse+1] = {
   3, 4, 5, 7, 9, 12, 
   15, 18, 21, 24, 28,
   32, 37, 43, 49, 56,
@@ -108,7 +109,7 @@ void divideBinWidth(TH1 *h)
   h->GetYaxis()->CenterTitle();
 }
 
-void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_dataDrivenUnfoldingErrorCheck(int radius = 2, int radiusPP = 2, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   
   TStopwatch timer; 
@@ -146,9 +147,10 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
   
   TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  TFile * fPbPb_MB_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   
-  TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
-  Int_t unfoldingCutBin = htest->FindBin(unfoldingCut);
+  //TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
+  //Int_t unfoldingCutBin = htest->FindBin(unfoldingCut);
   
   cout<<"after input file declaration"<<endl;
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
@@ -192,7 +194,7 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
     if(printDebug) cout<<"cent_"<<i<<endl;
     dPbPb_TrgComb[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
     //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
-    //dPbPb_TrgComb[i]->Print("base");
+    dPbPb_TrgComb[i]->Print("base");
     dPbPb_Trg80[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLT80_R%d_n20_eta_p20_cent%d",radius,i));
     //dPbPb_Trg80[i]->Scale(4*145.156*1e6);
     dPbPb_Trg80[i]->Print("base");
@@ -204,10 +206,14 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
     dPbPb_Trg55[i]->Print("base");
     //dPbPb_TrgComb[i] = (TH1F*)dPbPb_Trg80[i]->Clone(Form("Jet_80_triggered_spectra_data_PbPb_cent%d",i));
 
-    //dPbPb_MinBias[i] = (TH1F*)fData_MinBias_PbPb->Get(Form("hJetMBSpectra_R%d_cent%d",radius,i));
-    //dPbPb_TrgComb[i]->Add(dPbPb_MinBias[i]);
+    dPbPb_MinBias[i] = (TH1F*)fPbPb_MB_in->Get(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
+    dPbPb_MinBias[i]->Print("base");
+    dPbPb_TrgComb[i]->Scale(1./(145.156 * 1e9));
+    dPbPb_MinBias[i]->Scale(1./(161.939 * 1e9));
     
-    for(int k = 1;k<=unfoldingCutBin;k++) {
+    dPbPb_TrgComb[i]->Add(dPbPb_MinBias[i]);
+    
+    for(int k = 1;k<=unfoldingCut;k++) {
       dPbPb_TrgComb[i]->SetBinContent(k,0);
       dPbPb_Trg80[i]->SetBinContent(k,0);
       dPbPb_Trg65[i]->SetBinContent(k,0);
@@ -247,7 +253,7 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
     //uPbPb_SVD[i] = (TH1F*)unfoldSvd.Hreco();
   
     
-    for(int k = 1;k<=unfoldingCutBin;k++){
+    for(int k = 1;k<=unfoldingCut;k++){
 
       mPbPb_Gen[i]->SetBinContent(k,0);
       mPbPb_Reco[i]->SetBinContent(k,0);
@@ -278,7 +284,10 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
   dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_HLTComb_R%d_%s",radiusPP,etaWidth));   
 //dPP_Comb = (TH1F*)dPP_1->Clone(Form("hpp_TrgComb_R%d_n20_eta_p20",radiusPP,etaWidth));   
   dPP_Comb->Print("base");
-  for(int k = 1;k<=unfoldingCutBin;k++) {
+
+  dPP_Comb->Scale(1./(5.3 * 1e9));
+  
+  for(int k = 1;k<=unfoldingCut;k++) {
     dPP_Comb->SetBinContent(k,0);
     dPP_1->SetBinContent(k,0);
     dPP_2->SetBinContent(k,0);
@@ -303,7 +312,7 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
   //uPP_SVD = (TH1F*)unfoldSvdPP.Hreco();
 
   
-  for(int k = 1;k<=unfoldingCutBin;k++){
+  for(int k = 1;k<=unfoldingCut;k++){
     mPP_Gen->SetBinContent(k,0);
     mPP_Reco->SetBinContent(k,0);
     mPP_mcclosure_data->SetBinContent(k,0);
@@ -492,19 +501,20 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
   }
   
   // scale the spectra to the respective units
-  for(int i = 0;i<nbins_cent;++i){
-    dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_combined_cent%d",i),boundaries_pt);
-    divideBinWidth(dPbPb_TrgComb[i]);
-  }
 
-  dPP_Comb = (TH1F*)dPP_Comb->Rebin(nbins_pt,"pp_measured_spectra_combined",boundaries_pt);
-  divideBinWidth(dPP_Comb);
-  dPP_Comb->Scale(1./ dPP_Comb->GetBinContent(nbins_pt));
+  // for(int i = 0;i<nbins_cent;++i){
+  //   dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("PbPb_measured_spectra_combined_cent%d",i),boundaries_pt);
+  //   divideBinWidth(dPbPb_TrgComb[i]);
+  // }
+
+  // dPP_Comb = (TH1F*)dPP_Comb->Rebin(nbins_pt,"pp_measured_spectra_combined",boundaries_pt);
+  // divideBinWidth(dPP_Comb);
+  // dPP_Comb->Scale(1./ dPP_Comb->GetBinContent(nbins_pt));
   
   // Now that we have all the response matrix for the 6 centralities in PbPb and one pp spectra lets start doing the steps:
   // we have 39 pt bins, so we need 1000 gaussian functions for each pt bin.
   
-  Int_t unfoldingTrials = 10;
+  Int_t unfoldingTrials = 100;
   Double_t meanMeasPbPb[nbins_pt][nbins_cent], sigmaMeasPbPb[nbins_pt][nbins_cent];
   Double_t meanMeasPP[nbins_pt], sigmaMeasPP[nbins_pt];
   Double_t meanUnfoldPbPb[nbins_pt][nbins_cent][unfoldingTrials], sigmaUnfoldPbPb[nbins_pt][nbins_cent][unfoldingTrials];
@@ -531,21 +541,23 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
     // now proceed to unfolding for each trial.
 
     for(int i = 0;i<nbins_cent;++i){
-      cout<<"centrality = "<<i<<endl;
+      //cout<<"centrality = "<<i<<endl;
 
-      TH1F * hPreUnfoldingSpectra = new TH1F("hPreUnfoldingSpectra","",nbins_pt,boundaries_pt);
+      TH1F * hPreUnfoldingSpectra = new TH1F("hPreUnfoldingSpectra","",1000,0,1000);
       TH1F * hAfterUnfoldingSpectra;
 
       for(int j = 0;j<nbins_pt;++j){
 	
 	hPreUnfoldingSpectra->SetBinContent(j+1, random->Gaus(meanMeasPbPb[j][i], sigmaMeasPbPb[j][i]));
 	hPreUnfoldingSpectra->SetBinError(j+1, sigmaMeasPbPb[j][i]/sqrt(unfoldingTrials));
-        cout << " before unfolding bin " << j << " value = " << hPreUnfoldingSpectra->GetBinContent(j+1)<<endl;
-        cout << " before unfolding bin " << j << " error = " << hPreUnfoldingSpectra->GetBinError(j+1)<<endl;
+        //if(j==100)cout << " before unfolding bin " << j << " value = " << hPreUnfoldingSpectra->GetBinContent(j+1)<<endl;
+        //if(j==100)cout << " before unfolding bin " << j << " error = " << hPreUnfoldingSpectra->GetBinError(j+1)<<endl;
 	
       }// nbins_pt loop
+
       TH1F* hMCGen          = (TH1F*)mPbPb_Response[i]->ProjectionX();
       removeZero(hMCGen);
+      //cout << " MC bin " << 100 << " value = " << hMCGen->GetBinContent(100)<<endl;
       bayesianUnfold myUnfoldingMulti(mPbPb_Matrix[i], hMCGen, 0);
       myUnfoldingMulti.unfold(hPreUnfoldingSpectra, BayesIter);
 
@@ -553,8 +565,8 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
 
       for(int j = 0;j<nbins_pt;++j){
 	
-	cout << " before unfolding bin " << j << " value = " << hPreUnfoldingSpectra->GetBinContent(j+1)<<endl;
-	cout << " after  unfolding bin " << j << " value = " << hAfterUnfoldingSpectra->GetBinContent(j+1)<<endl;
+	//if(j==100)cout << " before unfolding bin " << j << " value = " << hPreUnfoldingSpectra->GetBinContent(j+1)<<endl;
+	//if(j==100)cout << " after  unfolding bin " << j << " value = " << hAfterUnfoldingSpectra->GetBinContent(j+1)<<endl;
 	
 	meanUnfoldPbPb[j][i][u] = hAfterUnfoldingSpectra->GetBinContent(j+1);
 	sigmaUnfoldPbPb[j][i][u] = hAfterUnfoldingSpectra->GetBinError(j+1);
@@ -564,8 +576,8 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
 	
       }// nbins_pt loop
       
-      hPreUnfoldingSpectra->Print("base");
-      hAfterUnfoldingSpectra->Print("base");
+      //hPreUnfoldingSpectra->Print("base");
+      //hAfterUnfoldingSpectra->Print("base");
       
       delete hPreUnfoldingSpectra;
       delete hAfterUnfoldingSpectra;
@@ -576,7 +588,7 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
     cout<<"pp "<<endl;
 
     // now do it for the pp:
-    TH1F * hPreUnfoldingSpectraPP = new TH1F("hPreUnfoldingSpectraPP","",nbins_pt,boundaries_pt);
+    TH1F * hPreUnfoldingSpectraPP = new TH1F("hPreUnfoldingSpectraPP","",1000,0,1000);
     TH1F * hAfterUnfoldingSpectraPP;
     
     for(int j = 0;j<nbins_pt;++j){
@@ -612,17 +624,21 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
   
   for(int i = 0;i<nbins_cent;++i){
 
-    hCorrUnfoldingPbPb[i] = new TH1F(Form("PbPb_BayesianUnfolded_cent%d",i),"Spectra after correction",nbins_pt, boundaries_pt);
+    hCorrUnfoldingPbPb[i] = new TH1F(Form("PbPb_BayesianUnfolded_cent%d",i),"Spectra after correction", 1000, 0, 1000);
 
     for(int j = 0;j<nbins_pt;++j){
       
-      hAfterUnfoldingptBinDistribution[j] = new TH1F(Form("hAfterUnfoldingptBinDistribution_ptBin%d",j),"",1000,0,2);
+      //hAfterUnfoldingptBinDistribution[j] = new TH1F(Form("hAfterUnfoldingptBinDistribution_ptBin%d",j),"",100,	(meanMeasPbPb[j][i]-10) * sigmaMeasPbPb[j][i], (meanMeasPbPb[j][i]+10) * sigmaMeasPbPb[j][i]);
+      hAfterUnfoldingptBinDistribution[j] = new TH1F(Form("hAfterUnfoldingptBinDistribution_ptBin%d",j),"",100,	0, 1);
       for(int u = 0;u<unfoldingTrials;++u){
 
-	hAfterUnfoldingptBinDistribution[j]->Fill(j+1, meanUnfoldPbPb[j][i][u]);
+	hAfterUnfoldingptBinDistribution[j]->Fill(meanUnfoldPbPb[j][i][u]);
+
+	//if(j==100) cout<< "unfolding_trial = " << u+1 << " mean unfold value = "<< meanUnfoldPbPb[j][i][u] <<endl;
 
       }// unfolding trials loop
 
+      //if(j==100) cout<<"Mean of that value for pt=100 = "<< (Float_t)hAfterUnfoldingptBinDistribution[j]->GetMean() <<endl;      
       hCorrUnfoldingPbPb[i]->SetBinContent(j+1, hAfterUnfoldingptBinDistribution[j]->GetMean());
       hCorrUnfoldingPbPb[i]->SetBinError(j+1, hAfterUnfoldingptBinDistribution[j]->GetRMS());
 
@@ -636,14 +652,15 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
   TH1F * hAfterUnfoldingptBinDistributionPP[nbins_pt];
   TH1F * hCorrUnfoldingPP;
   
-  hCorrUnfoldingPP = new TH1F("PP_BayesianUnfolded","Spectra after unfolding error correction",nbins_pt, boundaries_pt);
+  hCorrUnfoldingPP = new TH1F("PP_BayesianUnfolded","Spectra after unfolding error correction",1000, 0, 1000);
   
   for(int j = 0;j<nbins_pt;++j){
     
-    hAfterUnfoldingptBinDistributionPP[j] = new TH1F(Form("hAfterUnfoldingptBinDistributionPP_ptBin%d",j),"",1000,0,2);
+    //hAfterUnfoldingptBinDistributionPP[j] = new TH1F(Form("hAfterUnfoldingptBinDistributionPP_ptBin%d",j),"",1000,(meanMeasPP[j]-10) * sigmaMeasPP[j], (meanMeasPP[j]+10) * sigmaMeasPP[j]);
+    hAfterUnfoldingptBinDistributionPP[j] = new TH1F(Form("hAfterUnfoldingptBinDistributionPP_ptBin%d",j),"",100, 0, 1);
     for(int u = 0;u<unfoldingTrials;++u){
       
-      hAfterUnfoldingptBinDistributionPP[j]->Fill(j+1, meanUnfoldPP[j][u]);
+      hAfterUnfoldingptBinDistributionPP[j]->Fill(meanUnfoldPP[j][u]);
       
     }// unfolding trials loop
     
@@ -660,11 +677,17 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
   for(int i = 0;i<nbins_cent;i++) {
     hCorrUnfoldingPbPb[i]->Write();
     hCorrUnfoldingPbPb[i]->Print("base");
+
+    dPbPb_TrgComb[i]->Write();
+    dPbPb_TrgComb[i]->Print("base");
+    
   }
 
   hCorrUnfoldingPP->Write();
   hCorrUnfoldingPP->Print("base");
-
+  dPP_Comb->Write();
+  dPP_Comb->Print("base");
+  
   f.Write();
   f.Close();
 
