@@ -119,7 +119,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 30){
+void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
 
   TStopwatch timer;
   timer.Start();
@@ -138,14 +138,14 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
   double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
   
   
-  const int nbins_pt = 39;
+  const int nbins_pt = 38;
   const double boundaries_pt[nbins_pt+1] = {
     3, 4, 5, 7, 9, 12, 
     15, 18, 21, 24, 28,
     32, 37, 43, 49, 56,
     64, 74, 84, 97, 114,
     133, 153, 174, 196,
-    220, 245, 272, 300, 
+    220, 245, 300, 
     330, 362, 395, 430,
     468, 507, 548, 592,
     638, 686, 1000 
@@ -192,10 +192,11 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
   TFile *fin; 
   
   //if(location=="MIT") 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_n20_eta_p20_%dGeVCut_ak%s_20150406.root",radius,unfoldingCut,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_n20_eta_p20_%dGeVCut_ak%s_20150407.root",radius,unfoldingCut,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
+
   
   TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1], *dPbPb_MinBias[nbins_cent+1];
   
@@ -630,7 +631,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
       RAA_measured[i]->SetMarkerColor(kBlack);
       RAA_measured[i]->SetMarkerStyle(24);
       makeHistTitle(RAA_measured[i],"","Jet p_{T} (GeV/c)","R_{AA}");
-      RAA_measured[i]->SetAxisRange(unfoldingCut,299,"X");
+      RAA_measured[i]->SetAxisRange(unfoldingCut+5,299,"X");
       RAA_measured[i]->SetAxisRange(0,2,"Y");
       RAA_measured[i]->Draw("E1");
 
