@@ -119,7 +119,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
+void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
 
   TStopwatch timer;
   timer.Start();
@@ -156,21 +156,24 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
 
   //Boolean Variables for the several plots: 
   bool doSpectra = false;
+
   bool doPbPbIterSys = true;
   bool doPPIterSys = true;
-  bool doRAA = true;
-  bool doPbPbMCClosure = true;
-  bool doPPMCClosure = true;
+  bool doRAA = false;
+  bool doPbPbMCClosure = false;
+  bool doPPMCClosure = false;
   bool doPbPbDatavsMC = false;
   bool doPPDatavsMC = false;
-  bool doPbPbNormRes = true;
-  bool doPPNormRes = true;
-  bool doPbPbsigma = true;
-  bool doPPsigma = true;
+  bool doPbPbNormRes = false;
+  bool doPPNormRes = false;
+  bool doPbPbsigma = false;
+  bool doPPsigma = false;
   bool doGenSpectra = false;
-  bool doPbPbTrgComb = true;
+  bool doPbPbTrgComb = false;
   bool doPbPb12003TrgComb = false;
-  bool doPPTrgComb = true;
+  bool doPPTrgComb = false;
+  bool doPPTrgContribution = false;
+
   bool doRandomCone = false;
   bool doSupernovaData = false;
   bool doSupernovaMC = false;
@@ -192,7 +195,7 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
   TFile *fin; 
   
   //if(location=="MIT") 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_n20_eta_p20_%dGeVCut_ak%s_20150407.root",radius,unfoldingCut,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_n20_eta_p20_%dGeVCut_ak%s_20150409.root",radius,unfoldingCut,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
@@ -211,7 +214,7 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
   TH2F *mPP_ResponseNorm;
   TH1F *mPP_mcclosure_data;
   
-  const int Iterations = 6; //for unfolding systematics. 
+  const int Iterations = 10; //for unfolding systematics. 
   const int BayesIter = 4;
   TH1F *uPbPb_Bayes[nbins_cent+1], *uPbPb_BinByBin[nbins_cent+1]; 
   TH1F *uPbPb_BayesianIter[nbins_cent+1][Iterations];
@@ -253,11 +256,21 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
     mPbPb_mcclosure_gen[i] = (TH1F*)fin->Get(Form("hpbpb_mcclosure_gen_JetComb_R%d_n20_eta_p20_cent%d",radius,i));
     
     for(int j = 0;j<Iterations;j++){
-      uPbPb_BayesianIter[i][j] = (TH1F*)fin->Get(Form("uPbPb_BayesianIter%d_cent%d",j,i));
+      uPbPb_BayesianIter[i][j] = (TH1F*)fin->Get(Form("uPbPb_BayesianIter%d_cent%d",j+1,i));
       //uPbPb_BayesianIter[j][i]->Rebin(10);
       //uPbPb_BayesianIter[j][i]->Scale(1./10);
-      uPbPb_MC_BayesianIter[i][j] = (TH1F*)fin->Get(Form("uPbPb_MC_BayesianIter%d_cent%d",j,i));
+      uPbPb_MC_BayesianIter[i][j] = (TH1F*)fin->Get(Form("uPbPb_MC_BayesianIter%d_cent%d",j+1,i));
     }
+
+    uPbPb_BayesianIter[i][0]->Divide(uPbPb_BayesianIter[i][3]);
+    uPbPb_BayesianIter[i][1]->Divide(uPbPb_BayesianIter[i][3]);
+    uPbPb_BayesianIter[i][2]->Divide(uPbPb_BayesianIter[i][3]);
+    uPbPb_BayesianIter[i][3]->Divide(uPbPb_BayesianIter[i][3]);
+    uPbPb_BayesianIter[i][4]->Divide(uPbPb_BayesianIter[i][3]);
+    uPbPb_BayesianIter[i][5]->Divide(uPbPb_BayesianIter[i][3]);
+    uPbPb_BayesianIter[i][6]->Divide(uPbPb_BayesianIter[i][3]);
+    uPbPb_BayesianIter[i][7]->Divide(uPbPb_BayesianIter[i][3]);
+    uPbPb_BayesianIter[i][8]->Divide(uPbPb_BayesianIter[i][3]);
   
   }
   
@@ -283,13 +296,26 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
 
   for(int i = 0;i<Iterations;i++){
 
-  	uPP_BayesianIter[i] = (TH1F*)fin->Get(Form("uPP_BayesianIter%d",i));
+  	uPP_BayesianIter[i] = (TH1F*)fin->Get(Form("uPP_BayesianIter%d",i+1));
 	//uPP_BayesianIter[i]->Rebin(10);
 	//uPP_BayesianIter[i]->Scale(1./10);
-  	uPP_MC_BayesianIter[i] = (TH1F*)fin->Get(Form("uPP_MC_BayesianIter%d",i));
+  	uPP_MC_BayesianIter[i] = (TH1F*)fin->Get(Form("uPP_MC_BayesianIter%d",i+1));
 
   }
   
+
+  TFile * fPP_in = TFile::Open(Form("../../Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  fPP_in->Print();
+  
+  TH1F * dPPComb = (TH1F*)fPP_in->Get(Form("hpp_HLTComb_R%d_n20_eta_p20",radius)); 
+  
+  TH1F * hPP_80Cont = (TH1F*)fPP_in->Get(Form("hpp_HLT80_R%d_n20_eta_p20",radius));
+  hPP_80Cont->Divide(dPPComb);
+  TH1F * hPP_60Cont = (TH1F*)fPP_in->Get(Form("hpp_HLT60_R%d_n20_eta_p20",radius));
+  hPP_60Cont->Divide(dPPComb);
+  TH1F * hPP_40Cont = (TH1F*)fPP_in->Get(Form("hpp_HLT40_R%d_n20_eta_p20",radius));
+  hPP_40Cont->Divide(dPPComb);
+
   
 
   /*
@@ -415,8 +441,61 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
   //Ok now that we have loaded all the histograms we need - lets start making the plots 
   Double_t scaleFactor[nbins_cent+1] = {1,1e-1,1e-2,1e-3,1e-4,1e-5,1e-6};
 
+
+    
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  if(doPPTrgContribution){
+    // plot the pp trigger contribution 
+    // get the data sepctra from the root files before the unfolding: 
+    TCanvas * cPPTrgCont = new TCanvas("cPPTrgCont","",800,600);
+
+    hPP_80Cont->SetMarkerStyle(20);
+    hPP_80Cont->SetMarkerColor(kBlack);
+    hPP_80Cont->SetXTitle(Form("reco R=0.%d Jet p_{T} (GeV/c)",radius));
+    hPP_80Cont->SetYTitle("Trigger Contribution");
+    hPP_80Cont->SetTitle(" ");
+
+    // hPP_80Cont = (TH1F*)hPP_80Cont->Rebin(nbins_pt, "hPP_80Cont", boundaries_pt);
+    // divideBinWidth(hPP_80Cont);
+    // hPP_60Cont = (TH1F*)hPP_60Cont->Rebin(nbins_pt, "hPP_60Cont", boundaries_pt);
+    // divideBinWidth(hPP_60Cont);
+    // hPP_40Cont = (TH1F*)hPP_40Cont->Rebin(nbins_pt, "hPP_40Cont", boundaries_pt);
+    // divideBinWidth(hPP_40Cont);
+
+    hPP_80Cont->SetAxisRange(20, 140, "X");
+    hPP_80Cont->Draw();
+
+    hPP_60Cont->SetMarkerStyle(20);
+    hPP_60Cont->SetMarkerColor(kGreen);
+
+    hPP_60Cont->Draw("same");
+
+    hPP_40Cont->SetMarkerStyle(20);
+    hPP_40Cont->SetMarkerColor(kBlue);
+
+    hPP_40Cont->Draw("same");
+    
+    TLegend *PP_Contribution = myLegend(0.65,0.25,0.80,0.45);
+    PP_Contribution->AddEntry(hPP_80Cont,"Jet80","pl");
+    PP_Contribution->AddEntry(hPP_60Cont,"Jet60","pl");
+    PP_Contribution->AddEntry(hPP_40Cont,"Jet40","pl");
+    PP_Contribution->SetTextSize(0.04);
+    PP_Contribution->Draw();
+
+    putCMSPrel();
+    putPPLumi();
+    drawText("|#eta|<2, |vz|<15",0.15,0.26,16);
+    drawText("pCES, HBHE",0.15,0.21,16);
+    
+    cPPTrgCont->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_data_trigger_contribution_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
   if(doSpectra){  
     // plot 0 - PbPb and pp Unfolded Spectra compared with Data(measured) and MC Spectra. in a 2 by 1 canvas. with the PbPb doing the multiply by powers of 10. unfolded in black circles, MC in black (dotted) line, measured in red open boxes. 
@@ -531,25 +610,26 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
     linePbPb_iter->SetLineStyle(2);
     linePbPb_iter->SetLineWidth(2);
   
-    TLegend *PbPb_itersys = myLegend(0.63,0.75,0.85,0.9);
+    TLegend *PbPb_itersys = myLegend(0.53,0.65,0.85,0.9);
   
     for(int i = 0;i<nbins_cent;i++){
       cIterSysPbPb->cd(nbins_cent-i);
 
-      for(int j = 2;j<Iterations;j++){
-	uPbPb_BayesianIter[i][j]->Divide(uPbPb_BayesianIter[i][4]);
+      for(int j = 0;j<Iterations-1;j++){
+	cout<<j<<endl;
+	//uPbPb_BayesianIter[i][j]->Divide(uPbPb_BayesianIter[i][3]);
 	uPbPb_BayesianIter[i][j]->SetMarkerStyle(33);
-	uPbPb_BayesianIter[i][j]->SetMarkerColor(j);
-	uPbPb_BayesianIter[i][j]->SetAxisRange(30,299,"X");
+	uPbPb_BayesianIter[i][j]->SetMarkerColor(j+1);
+	uPbPb_BayesianIter[i][j]->SetAxisRange(unfoldingCut,299,"X");
 	uPbPb_BayesianIter[i][j]->SetAxisRange(0,2,"Y");
 
-	if(j==2){
-	  makeHistTitle(uPbPb_BayesianIter[i][j]," ","Jet p_{T} (GeV/c)","Ratio (Unfolded/Nominal)");
+	if(j==0){
+	  makeHistTitle(uPbPb_BayesianIter[i][j]," ","Jet p_{T} (GeV/c)","Ratio (Unfolded/Nominal(4 iterations))");
 	  uPbPb_BayesianIter[i][j]->Draw();
 	}
         uPbPb_BayesianIter[i][j]->Draw("same");
 	
-	if(i==0) PbPb_itersys->AddEntry(uPbPb_BayesianIter[i][j],Form("Iteration %d",j),"pl");
+	if(i==0) PbPb_itersys->AddEntry(uPbPb_BayesianIter[i][j],Form("Iteration %d",j+1),"pl");
 
       }
 
@@ -579,8 +659,8 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
     linePP_iter->SetLineStyle(2);
     linePP_iter->SetLineWidth(2);
 
-    for(int i = 2;i<Iterations; i++){
-      uPP_BayesianIter[i]->Divide(uPP_BayesianIter[4]);
+    for(int i = 0;i<Iterations; i++){
+      uPP_BayesianIter[i]->Divide(uPP_BayesianIter[3]);
       uPP_BayesianIter[i]->SetMarkerStyle(33);
       uPP_BayesianIter[i]->SetMarkerColor(i);
       uPP_BayesianIter[i]->SetAxisRange(30,299,"X");
@@ -591,7 +671,7 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
       uPP_BayesianIter[i]->GetXaxis()->CenterTitle();
       uPP_BayesianIter[i]->GetYaxis()->CenterTitle();
 
-      if(i==2){
+      if(i==0){
 	//makeHistTitle(uPP_BayesianIter[i]," ","Jet p_{T} (GeV/c)","Ratio (unfolded/Nominal)");
 	uPP_BayesianIter[i]->Draw();
       }
@@ -1380,9 +1460,11 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
 
   }
   
-    
+
+ 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
   if(doRandomCone){
 
