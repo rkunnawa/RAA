@@ -159,7 +159,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   TStopwatch timer; 
   timer.Start();
@@ -199,6 +199,8 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
 
   // we also need to get the files for the MinBias closure histograms.
   TFile * fPbPb_MCclosure_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MC_calo_pf_jet_correlation_mcclosure_histograms_deltaR_0p2_akPu%d_20150407.root",radius));
+  //TFile * fPP_MCclosure_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_MC_calo_pf_jet_correlation_deltaR_0p2_ak%d_20150412.root",radius));
+  TFile * fPP_MCclosure_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_MC_calo_pf_jet_correlation_mcclosure_test_sameside_deltaR_0p2_ak%d_20150413.root",radius));
   
   cout<<"after input file declaration"<<endl;
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
@@ -263,7 +265,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     dPbPb_MinBias[i]->Scale(1./161.939);
     
     dPbPb_TrgComb[i]->Add(dPbPb_MinBias[i]);
-        
+    
     for(int k = 1;k<=unfoldingCut;k++) {
       dPbPb_TrgComb[i]->SetBinContent(k,0);
       dPbPb_Trg80[i]->SetBinContent(k,0);
@@ -349,9 +351,9 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   mPP_Reco->Print("base");
   mPP_Matrix = (TH2F*)fPP_in->Get(Form("hpp_matrix_HLT_R%d_%s",radiusPP,etaWidth));
   mPP_Matrix->Print("base");
-  mPP_mcclosure_data = (TH1F*)fPP_in->Get(Form("hpp_mcclosure_JetComb_data_R%d_%s",radiusPP,etaWidth));
+  mPP_mcclosure_data = (TH1F*)fPP_MCclosure_in->Get(Form("hpp_mcclosure_JetComb_data_R%d_%s",radiusPP,etaWidth));
   mPP_mcclosure_data->Print("base");
-  mPP_mcclosure_Matrix = (TH2F*)fPP_in->Get(Form("hpp_mcclosure_matrix_HLT_R%d_%s",radiusPP,etaWidth));
+  mPP_mcclosure_Matrix = (TH2F*)fPP_MCclosure_in->Get(Form("hpp_mcclosure_matrix_HLT_R%d_%s",radiusPP,etaWidth));
   mPP_mcclosure_Matrix->Print("base");
 
   //RooUnfoldResponse ruResponsePP(mPP_Matrix->ProjectionY(),mPP_Matrix->ProjectionX(), mPP_Matrix,"","");
@@ -1097,7 +1099,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   cout<<"writing to output file"<<endl;
 
     
-  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_%s_%dGeVCut_ak%s_%d.root", radiusPP, etaWidth,unfoldingCut,jet_type,date.GetDate()),"RECREATE");
+  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_sameside_%s_%dGeVCut_ak%s_%d.root", radiusPP, etaWidth,unfoldingCut,jet_type,date.GetDate()),"RECREATE");
   fout.cd();
 
   for(int i = 0;i<nbins_cent;++i){
