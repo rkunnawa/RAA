@@ -111,7 +111,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation_v2(int startfile = 2, int endfile = 3, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC", char * etaWidth = "n20_eta_p20"){
+void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radius=4, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC", char * etaWidth = "n20_eta_p20"){
 
   TH1::SetDefaultSumw2();
 
@@ -582,14 +582,14 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 2, int endfile = 3, int radiu
   // start the loop process.
 
   // define the histograms necessary for that MC closure test.
+  TH2F *hpbpb_mcclosure_matrix[nbins_cent];
   TH2F *hpbpb_mcclosure_matrix_HLT[nbins_cent];
-  //TH2F *hpbpb_response[nbins_cent];
   TH1F *hpbpb_mcclosure_JetComb_data[nbins_cent];
-  //TH1F *hpbpb_mcclosure_data[nbins_cent];
+  TH1F *hpbpb_mcclosure_data[nbins_cent];
   TH1F *hpbpb_mcclosure_Jet80_data[nbins_cent];
   TH1F *hpbpb_mcclosure_Jet65_data[nbins_cent];
   TH1F *hpbpb_mcclosure_Jet55_data[nbins_cent];
-  //TH1F *hpbpb_mcclosure_gen[nbins_cent];
+  TH1F *hpbpb_mcclosure_gen[nbins_cent];
   TH1F *hpbpb_mcclosure_JetComb_gen[nbins_cent];
   TH1F *hpbpb_mcclosure_Jet80_gen[nbins_cent];
   TH1F *hpbpb_mcclosure_Jet65_gen[nbins_cent];
@@ -597,19 +597,21 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 2, int endfile = 3, int radiu
   
   for(int i = 0;i<nbins_cent;++i){
     //cout<<"cent bin = "<<i<<endl;
-        hpbpb_mcclosure_matrix_HLT[i] = new TH2F(Form("hpbpb_mcclosure_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000,1000,0,1000);
+    hpbpb_mcclosure_matrix_HLT[i] = new TH2F(Form("hpbpb_mcclosure_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000,1000,0,1000);
+    hpbpb_mcclosure_matrix[i] = new TH2F(Form("hpbpb_mcclosure_matrix_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix for mcclosure refpt jtpt R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000,1000,0,1000);
     //cout<<"C"<<endl;
-    //hpbpb_mcclosure_data[i] = new TH1F(Form("hpbpb_mcclosure_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_mcclosure_data[i] = new TH1F(Form("hpbpb_mcclosure_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     hpbpb_mcclosure_JetComb_data[i] = new TH1F(Form("hpbpb_mcclosure_JetComb_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test trigger combined  R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     hpbpb_mcclosure_Jet80_data[i] = new TH1F(Form("hpbpb_mcclosure_Jet80_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test trigger 80  R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     hpbpb_mcclosure_Jet65_data[i] = new TH1F(Form("hpbpb_mcclosure_Jet65_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test trigger 65  R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     hpbpb_mcclosure_Jet55_data[i] = new TH1F(Form("hpbpb_mcclosure_Jet55_data_R%d_%s_cent%d",radius,etaWidth,i),Form("data for unfolding mc closure test trigger 55  R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 
-    //hpbpb_mcclosure_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_mcclosure_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     hpbpb_mcclosure_JetComb_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_JetComb_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger combined R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     hpbpb_mcclosure_Jet80_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_Jet80_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     hpbpb_mcclosure_Jet65_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_Jet65_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger 65 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     hpbpb_mcclosure_Jet55_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_Jet55_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger 55 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+
 
   }
   for(int k = 0;k<no_radius;k++){
@@ -865,6 +867,26 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 2, int endfile = 3, int radiu
 	
 	Float_t Sumcand = chSum + phSum + neSum + muSum;
 
+	if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	  hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
+	  hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
+	  hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);
+	
+	}
+	if(calopt/pfpt > 0.85) {
+	  hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
+	  hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
+	  hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);
+	
+	}
+	if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
+	  hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
+	  hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
+	  hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);
+	
+	}
+
+
 	if(jet55 == 1 && jet65==0 && jet80 == 0){
 
 	  if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
@@ -1048,6 +1070,12 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 2, int endfile = 3, int radiu
 	
 	Float_t Sumcand = chSum + phSum + neSum + muSum;
 
+	if(eMax/Sumcand < 0.05) {
+	  hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
+	  hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
+	  hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);	  
+	}
+
 	if(jet55 == 1 && jet65==0 && jet80 == 0){
 
 	  if(eMax/Sumcand < 0.05) {
@@ -1182,13 +1210,16 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 2, int endfile = 3, int radiu
 
     hpbpb_mcclosure_matrix_HLT[i]->Write();
     hpbpb_mcclosure_JetComb_data[i]->Write();
+    hpbpb_mcclosure_data[i]->Write();
     hpbpb_mcclosure_Jet80_data[i]->Write();
     hpbpb_mcclosure_Jet65_data[i]->Write();
     hpbpb_mcclosure_Jet55_data[i]->Write();
     hpbpb_mcclosure_JetComb_gen[i]->Write();    
+    hpbpb_mcclosure_gen[i]->Write();    
     hpbpb_mcclosure_Jet80_gen[i]->Write();
     hpbpb_mcclosure_Jet65_gen[i]->Write();
     hpbpb_mcclosure_Jet55_gen[i]->Write();
+    
     
   }
 

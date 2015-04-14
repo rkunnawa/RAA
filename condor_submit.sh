@@ -5,11 +5,11 @@ incrementer=1
 
 destination=/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/
 #filelist=jetRAA_pp_data_forest.txt
-filelist=jetRAA_pp_mc_forest.txt
+#filelist=jetRAA_pp_mc_forest.txt
 #filelist=jetRAA_MinBiasUPC_forest.txt
 #filelist=14010_MinBiasUPC_forest.txt
 #filelist=jetRAA_PbPb_data_forest.txt
-#filelist=jetRAA_PbPb_mc_forest.txt
+filelist=jetRAA_PbPb_mc_forest.txt
 #filelist=PbPb_HydjetMinBias_forest.txt
 #filelist=PbPb_MinBiasUPC_forest.txt
 #filelist2=jet80_filelist.txt
