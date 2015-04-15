@@ -107,7 +107,7 @@ void divideBinWidth(TH1 *h)
   h->GetYaxis()->CenterTitle();
 }
 
-void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   
   TStopwatch timer; 
