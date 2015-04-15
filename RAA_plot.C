@@ -119,7 +119,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
+void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
 
   TStopwatch timer;
   timer.Start();
@@ -193,7 +193,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
   TFile *fin; 
   
   //if(location=="MIT") 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_fullMC_n20_eta_p20_%dGeVCut_ak%s_20150414.root",radius,unfoldingCut,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150415.root",radius,unfoldingCut,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
@@ -1227,11 +1227,11 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
       dPbPb_TrgComb[i]->SetAxisRange(50,500,"X");
       dPbPb_TrgComb[i]->Draw();
 
-      dPbPb_MinBias[i]->SetMarkerStyle(20);
-      dPbPb_MinBias[i]->SetMarkerColor(kBlack);
+      //dPbPb_MinBias[i]->SetMarkerStyle(20);
+      //dPbPb_MinBias[i]->SetMarkerColor(kBlack);
       //dPbPb_MinBias[i] = (TH1F*)dPbPb_MinBias[i]->Rebin(nbins_pt,Form("rebin_measured_80_cent%d",i),boundaries_pt);
       //divideBinWidth(dPbPb_MinBias[i]);
-      dPbPb_MinBias[i]->Draw("same");
+      //dPbPb_MinBias[i]->Draw("same");
       
       dPbPb_Trg80[i]->SetMarkerStyle(20);
       dPbPb_Trg80[i]->SetMarkerColor(kRed);
@@ -1258,7 +1258,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
     cDataMerge->cd(1);
     TLegend *PbPb_dataMerge = myLegend(0.75,0.65,0.90,0.85);
     PbPb_dataMerge->AddEntry(dPbPb_TrgComb[0],"Combined","pl");
-    PbPb_dataMerge->AddEntry(dPbPb_MinBias[0],"JetMB","pl");
+    //PbPb_dataMerge->AddEntry(dPbPb_MinBias[0],"JetMB","pl");
     PbPb_dataMerge->AddEntry(dPbPb_Trg80[0],"Jet80","pl");
     PbPb_dataMerge->AddEntry(dPbPb_Trg65[0],"Jet65","pl");
     PbPb_dataMerge->AddEntry(dPbPb_Trg55[0],"Jet55","pl");

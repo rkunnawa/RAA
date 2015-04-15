@@ -34,6 +34,8 @@ TGraphErrors *tTAAerrNpart=0;
 const int nbins_cent = 6;
 double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
 double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
+double npart[nbins_cent+1] = {389.84, 307.65, 223.95, 107.5, 41.65, 11.55, 112.9};
+
 
 const int nbins_pt = 30;
 const double boundaries_pt[nbins_pt+1] = {

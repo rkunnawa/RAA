@@ -47,7 +47,7 @@
 
 using namespace std;
 
-void RAA_plot_Systematics(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
+void RAA_plot_Systematics(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
 
   
   TStopwatch timer;
@@ -62,7 +62,7 @@ void RAA_plot_Systematics(int radius = 3, char *algo = "Pu", char *jet_type = "P
 
 
   TFile *fin; 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_fullMC_n20_eta_p20_%dGeVCut_ak%s_20150414.root",radius,unfoldingCut,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150415.root",radius,unfoldingCut,jet_type));
 
   // declare the systematics
   SysData systematics;
@@ -93,8 +93,8 @@ void RAA_plot_Systematics(int radius = 3, char *algo = "Pu", char *jet_type = "P
   for(int i = 0; i<nbins_cent; ++i){
 
     RAA_bayesian[i] = (TH1F*)fin->Get(Form("RAA_bayesian_cent%d",i));
-    RAA_JEC_bayesian[i] = (TH1F*)fin->Get(Form("RAA_bayesian_cent%d",i));
-    RAA_Smear_bayesian[i] = (TH1F*)fin->Get(Form("RAA_bayesian_cent%d",i));
+    RAA_JEC_bayesian[i] = (TH1F*)fin->Get(Form("RAA_JEC_bayesian_cent%d",i));
+    RAA_Smear_bayesian[i] = (TH1F*)fin->Get(Form("RAA_Smear_bayesian_cent%d",i));
     RAA_binbybin[i] = (TH1F*)fin->Get(Form("RAA_binbybin_cent%d",i));
     RAA_measured[i] = (TH1F*)fin->Get(Form("RAA_measured_cent%d",i));
     // uPbPb_Bayes[i] = (TH1F*)fin->Get(Form("PbPb_bayesian_unfolded_spectra_combined__cent%d",i));
