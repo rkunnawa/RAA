@@ -35,7 +35,7 @@
 
 using namespace std;
 
-void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
+void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 4){
 
   TH1::SetDefaultSumw2();
   
@@ -294,8 +294,8 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
 
     Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
 
-    if(pfpt_1 > 40 && pfpt_1 <= 180) 
-      pfpt_1 = fResidual->Eval(pfpt_1) * pfpt_1;
+    //if(pfpt_1 > 40 && pfpt_1 <= 180) 
+    //  pfpt_1 = fResidual->Eval(pfpt_1) * pfpt_1;
     
     if(jet40_1 == 1 && jet60_1==0 && jet80_1==0) {
       
@@ -371,8 +371,8 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
     if(nentry%10000 == 0) cout<<" nentry = "<<nentry<<endl;
     Data_unmatched->GetEntry(nentry);
 
-    if(pfpt_1 > 40 && pfpt_1 <= 180) 
-      pfpt_1 = fResidual->Eval(pfpt_1) * pfpt_1;
+    //if(pfpt_1 > 40 && pfpt_1 <= 180) 
+    //  pfpt_1 = fResidual->Eval(pfpt_1) * pfpt_1;
 
     Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
 

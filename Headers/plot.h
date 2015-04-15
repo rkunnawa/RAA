@@ -71,7 +71,7 @@ void drawText(const char *text, float xp, float yp, int size){
   tex->Draw();
 }
 
-void putCMSPrel(double x=0.17, double y=0.96, double size=0.04){
+void putCMSPrel(double x=0.1, double y=0.92, double size=0.02){
   TLatex *tex=0;
   tex = new TLatex(x,y,"CMS Preliminary");
   tex->SetTextSize(size);
@@ -80,7 +80,7 @@ void putCMSPrel(double x=0.17, double y=0.96, double size=0.04){
   tex->Draw();
 }
 
-void putPbPbLumi(double x=0.5, double y=0.96, double size=0.04){
+void putPbPbLumi(double x=0.3, double y=0.92, double size=0.02){
   TLatex *tex=0;
   tex = new TLatex(x,y,"PbPb #int L dt = 145 #mu barns^{-1}");
   tex->SetTextSize(size);
@@ -89,7 +89,7 @@ void putPbPbLumi(double x=0.5, double y=0.96, double size=0.04){
   tex->Draw();
 }
 
-void putPPLumi(double x=0.5, double y=0.96, double size=0.04){
+void putPPLumi(double x=0.6, double y=0.92, double size=0.02){
   TLatex *tex=0;
   tex = new TLatex(x,y,"pp #int L dt = 5.3 pico barns^{-1}");
   tex->SetTextSize(size);
@@ -98,7 +98,7 @@ void putPPLumi(double x=0.5, double y=0.96, double size=0.04){
   tex->Draw();
 }
 
-void putCMSSim(double x=0.17, double y=0.96, double size=0.04){
+void putCMSSim(double x=0.17, double y=0.96, double size=0.02){
   TLatex *tex=0;
   tex = new TLatex(x,y,"CMS Simulation");
   tex->SetTextSize(size);
@@ -157,18 +157,16 @@ void makeHistTitle(TH1 *h,char *title, char *xTitle, char *yTitle, int color = -
   h->GetYaxis()->SetTitleFont(43);
   h->GetYaxis()->SetLabelSize(20);
   h->GetYaxis()->SetTitleSize(22);
-  h->GetYaxis()->SetTitleOffset(2.6);
+  h->GetYaxis()->SetTitleOffset(2.0);
 	
   h->GetXaxis()->SetLabelFont(43);
   h->GetXaxis()->SetTitleFont(43);
   h->GetXaxis()->SetLabelSize(20);
   h->GetXaxis()->SetTitleSize(22);
-  h->GetXaxis()->SetTitleOffset(3.1);
+  h->GetXaxis()->SetTitleOffset(2.0);
 	
   h->GetXaxis()->SetNoExponent();
   h->GetXaxis()->SetMoreLogLabels();
-	
-  h->GetXaxis()->SetTitleOffset(2.4);
 	
 }
 

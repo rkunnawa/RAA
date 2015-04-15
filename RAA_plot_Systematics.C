@@ -47,7 +47,7 @@
 
 using namespace std;
 
-void RAA_plot_Systematics(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
+void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
 
   
   TStopwatch timer;
