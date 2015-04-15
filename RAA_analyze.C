@@ -163,7 +163,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   TStopwatch timer; 
   timer.Start();
@@ -892,7 +892,7 @@ void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", ch
   // first correct for the error bars got from the RAA_dataDrivenUnfoldingErrorCheck.C macro
   
   // get the root file which has the unfolded error correction.
-  TFile * ferrorin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_R%d_pp_R%d_n20_eta_p20_unfoldingCut_%d_data_driven_correction_akPu%s_20150414.root",radius, radius, unfoldingCut, jet_type));
+  TFile * ferrorin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_R%d_pp_R%d_n20_eta_p20_unfoldingCut_%d_data_driven_correction_akPu%s_20150415.root",radius, radius, unfoldingCut, jet_type));
 
   // get histograms for each centrality and pp
   TH1F * hPbPb_BayesCorrected[nbins_cent];
@@ -1375,7 +1375,7 @@ void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", ch
     
     mPbPb_mcclosure_ResponseNorm[i]->Write();
     mPbPb_mcclosure_Response[i]->Write();
-	    mPbPb_mcclosure_Matrix[i]->Write();
+    mPbPb_mcclosure_Matrix[i]->Write();
     
     mPbPb_Gen[i]->Scale(1./deltaEta);// delta eta
     mPbPb_Gen[i] = (TH1F*)mPbPb_Gen[i]->Rebin(nbins_pt,Form("PbPb_Gen_spectra_refpt_cent%d",i),boundaries_pt);
