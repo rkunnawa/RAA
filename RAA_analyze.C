@@ -163,7 +163,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   TStopwatch timer; 
   timer.Start();
@@ -198,6 +198,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   // TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_ak35PF_20150323.root");
 
   TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_withresiduals_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   TFile * fPbPb_MB_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
 
@@ -250,13 +251,13 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   for(int i = 0;i<nbins_cent;++i){
     if(printDebug) cout<<"cent_"<<i<<endl;
     dPbPb_TrgComb[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
-    //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
+    // //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
     dPbPb_TrgComb[i]->Print("base");
     dPbPb_JEC_TrgComb[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_JEC_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
-    //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
+    // //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
     dPbPb_JEC_TrgComb[i]->Print("base");
     dPbPb_Smear_TrgComb[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_Smear_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
-    //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
+    // //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
     dPbPb_Smear_TrgComb[i]->Print("base");
     dPbPb_Trg80[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLT80_R%d_n20_eta_p20_cent%d",radius,i));
     //dPbPb_Trg80[i]->Scale(4*145.156*1e6);
@@ -267,13 +268,15 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
     dPbPb_Trg55[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLT55_R%d_n20_eta_p20_cent%d",radius,i));
     //dPbPb_Trg55[i]->Scale(4*145.156*1e6);
     dPbPb_Trg55[i]->Print("base");
-    //dPbPb_TrgComb[i] = (TH1F*)dPbPb_Trg80[i]->Clone(Form("Jet_80_triggered_spectra_data_PbPb_cent%d",i));
+    //dPbPb_TrgComb[i] = (TH1F*)dPbPb_Trg80[i]->Clone(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius, i));
+    //dPbPb_JEC_TrgComb[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_JEC_HLT80_R%d_n20_eta_p20_cent%d",radius, i));
+    //dPbPb_Smear_TrgComb[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_Smear_HLT80_R%d_n20_eta_p20_cent%d",radius, i));
 
     dPbPb_MinBias[i] = (TH1F*)fPbPb_MB_in->Get(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_MinBias[i]->Print("base");
     dPbPb_TrgComb[i]->Scale(1./145.156);
     dPbPb_MinBias[i]->Scale(1./161.939);
-    //    dPbPb_TrgComb[i]->Add(dPbPb_MinBias[i]);
+    //dPbPb_TrgComb[i]->Add(dPbPb_MinBias[i]);
 
     dPbPb_JEC_MinBias[i] = (TH1F*)fPbPb_MB_in->Get(Form("hpbpb_JEC_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_JEC_MinBias[i]->Print("base");
@@ -358,7 +361,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   dPP_3 = (TH1F*)fPP_in->Get(Form("hpp_HLT40_R%d_%s",radiusPP,etaWidth));
   dPP_3->Print("base");
   dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_HLTComb_R%d_%s",radiusPP,etaWidth));   
-//dPP_Comb = (TH1F*)dPP_1->Clone(Form("hpp_TrgComb_R%d_n20_eta_p20",radiusPP,etaWidth));   
+  //dPP_Comb = (TH1F*)dPP_1->Clone(Form("hpp_TrgComb_R%d_n20_eta_p20",radiusPP,etaWidth));   
   dPP_Comb->Print("base");
   for(int k = 1;k<=unfoldingCut;k++) {
     dPP_Comb->SetBinContent(k,0);
@@ -765,31 +768,26 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   // first for PbPb
   for (int i=0;i<nbins_cent;++i) {
 
-    // Do Bin-by-bin
-    if(printDebug) cout<<"doing bin by bin unfolding for PbPb for centrality = "<<i<<endl;
-
     TH1F* hBinByBinCorRaw = (TH1F*)mPbPb_Response[i]->ProjectionY();
     TH1F* hMCGen          = (TH1F*)mPbPb_Response[i]->ProjectionX(); // gen
+    
+    // Do Bin-by-bin
+    if(printDebug) cout<<"doing bin by bin unfolding for PbPb for centrality = "<<i<<endl;
+    prior myPrior(mPbPb_Matrix[i],dPbPb_TrgComb[i],0);
+    myPrior.unfold(dPbPb_TrgComb[i],1);
+    TH1F* hPrior = (TH1F*)hMCGen->Clone("hPrior");
+    removeZero(hPrior);
+    hPrior->Scale(dPbPb_TrgComb[i]->Integral(0,400)/hPrior->Integral(0,400));
     hBinByBinCorRaw->Divide(hMCGen);
     TF1 *f = new TF1("f","[0]+[1]*x");
-    hBinByBinCorRaw->Fit("f","LL ","",50,300);
+    hBinByBinCorRaw->Fit("f","LL ","",70,300);
     TH1F* hBinByBinCor = (TH1F*)hBinByBinCorRaw->Clone();//functionHist(f,hBinByBinCorRaw,Form("hBinByBinCor_cent%d",i));
     //TH1F* hBinByBinCor = (TH1F*)functionHist(f,hBinByBinCorRaw,Form("hBinByBinCor_cent%d",i));
 
-    if(printDebug) cout<<"passed here after binbybincorrraw"<<endl;
     dPbPb_TrgComb[i]->Print("base");
     uPbPb_BinByBin[i] = (TH1F*)dPbPb_TrgComb[i]->Clone(Form("uPbPb_BinByBin_cent%d",i));
-    if(printDebug) cout<<"maybe here?"<<endl;
     uPbPb_BinByBin[i]->Divide(hBinByBinCor);
-    //      uPbPb_BinByBin[i] = (TH1F*) hMCReco->Clone(Form("hRecoBinByBin_cent%d",i));
-    if(printDebug) cout<<"passed A"<<endl;
     // Do unfolding
-    //prior myPrior(mPbPb_Matrix[i],dPbPb_TrgComb[i],0);
-    //myPrior.unfold(dPbPb_TrgComb[i],1);
-    TH1F* hPrior = (TH1F*)hMCGen->Clone("hPrior");
-    removeZero(hPrior);
-    //hPrior->Scale(dPbPb_TrgComb[i]->Integral(0,1000)/hPrior->Integral(0,1000));
-    if(printDebug) cout<<"passed B"<<endl;
     //TH1F *hReweightedPbPb = (TH1F*)mPbPb_Response[i]->ProjectionY()->Clone(Form("hReweightedPbPb_cent%d",i));
 
     bayesianUnfold myUnfoldingJECSys(mPbPb_Matrix[i],hPrior,0);
@@ -840,7 +838,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   TH1F* hMCGenPP          = (TH1F*)mPP_Response->ProjectionX(); // gen
   hBinByBinCorRawPP->Divide(hMCGenPP);
   TF1 *fPP = new TF1("fPP","[0]+[1]*x");
-  hBinByBinCorRawPP->Fit("fPP","LL ","",50,300);
+  hBinByBinCorRawPP->Fit("fPP","LL ","",70,300);
   TH1F* hBinByBinCorPP = (TH1F*)hBinByBinCorRawPP->Clone();//functionHist(f,hBinByBinCorRaw,Form("hBinByBinCorPP");
   //TH1F* hBinByBinCor = (TH1F*)functionHist(f,hBinByBinCorRaw,Form("hBinByBinCorPP");
 
@@ -892,7 +890,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   // first correct for the error bars got from the RAA_dataDrivenUnfoldingErrorCheck.C macro
   
   // get the root file which has the unfolded error correction.
-  TFile * ferrorin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_R%d_pp_R%d_n20_eta_p20_unfoldingCut_%d_data_driven_correction_akPu%s_20150415.root",radius, radius, unfoldingCut, jet_type));
+  TFile * ferrorin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_R%d_pp_R%d_n20_eta_p20_unfoldingCut_%d_data_driven_correction_akPu%s_20150417.root",radius, radius, unfoldingCut, jet_type));
 
   // get histograms for each centrality and pp
   TH1F * hPbPb_BayesCorrected[nbins_cent];
@@ -1213,7 +1211,7 @@ void RAA_analyze(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", ch
   cout<<"writing to output file"<<endl;
 
     
-  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_fullMC_%s_%dGeVCut_ak%s_%d.root", radiusPP, etaWidth,unfoldingCut,jet_type,date.GetDate()),"RECREATE");
+  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_%s_%dGeVCut_ak%s_%d.root", radiusPP, etaWidth,unfoldingCut,jet_type,date.GetDate()),"RECREATE");
   fout.cd();
 
   for(int i = 0;i<nbins_cent;++i){
