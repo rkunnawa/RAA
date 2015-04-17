@@ -56,7 +56,7 @@ int findBin(int bin)
 
 using namespace std;
 
-void RAA_plot_yetkinCutEfficiency(Int_t radius = 3){
+void RAA_plot_yetkinCutEfficiency(Int_t radius = 2){
 
   TH1::SetDefaultSumw2();
   

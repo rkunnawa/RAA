@@ -119,7 +119,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
+void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 30){
 
   TStopwatch timer;
   timer.Start();
@@ -158,14 +158,14 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
   bool doPbPbIterSys = false;
   bool doPPIterSys = false;
   bool doRAA = true;
-  bool doPbPbMCClosure = false;
-  bool doPPMCClosure = false;
+  bool doPbPbMCClosure = true;
+  bool doPPMCClosure = true;
   bool doPbPbDatavsMC = false;
   bool doPPDatavsMC = false;
-  bool doPbPbNormRes = false;
-  bool doPPNormRes = false;
-  bool doPbPbsigma = false;
-  bool doPPsigma = false;
+  bool doPbPbNormRes = true;
+  bool doPPNormRes = true;
+  bool doPbPbsigma = true;
+  bool doPPsigma = true;
   bool doGenSpectra = false;
   bool doPbPbTrgComb = true;
   bool doPbPb12003TrgComb = false;
@@ -193,7 +193,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
   TFile *fin; 
   
   //if(location=="MIT") 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150417.root",radius,unfoldingCut,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_withresiduals_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150417.root",radius,unfoldingCut,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
@@ -701,7 +701,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
     TCanvas *cPbPbMCclosure = new TCanvas("cPbPbMCclosure","PbPb MC closure test",1200,800);
     makeMultiPanelCanvas(cPbPbMCclosure,3,2,0.0,0.0,0.2,0.15,0.07);
 
-    TLine *linePbPb_mcclosure = new TLine(40,1,300,1);
+    TLine *linePbPb_mcclosure = new TLine(unfoldingCut,1,299,1);
     linePbPb_mcclosure->SetLineStyle(2);
     linePbPb_mcclosure->SetLineWidth(2);
 
@@ -734,7 +734,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
       makeHistTitle(hMCClosurePbPb_Bayesian[i]," ","Jet p_{T} (GeV/c)","Reco/Truth");
       hMCClosurePbPb_Bayesian[i]->SetMarkerStyle(20);
       hMCClosurePbPb_Bayesian[i]->SetMarkerColor(kBlack);
-      hMCClosurePbPb_Bayesian[i]->SetAxisRange(40,300,"X");
+      hMCClosurePbPb_Bayesian[i]->SetAxisRange(40,299,"X");
       hMCClosurePbPb_Bayesian[i]->SetAxisRange(0,2,"Y");
       hMCClosurePbPb_Bayesian[i]->Draw();
 
@@ -773,7 +773,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
     TH1F *hMCClosurePP_Bayesian = (TH1F*)uPP_MC_Bayes->Clone("hMCClosurePP_Bayesian");
     TH1F *hMCClosurePP_BinbyBin = (TH1F*)uPP_MC_BinByBin->Clone("hMCClosurePP_BinbyBin");
 
-    TLine *linePP_mcclosure = new TLine(40,1,300,1);
+    TLine *linePP_mcclosure = new TLine(40,1,299,1);
     linePP_mcclosure->SetLineStyle(2);
     linePP_mcclosure->SetLineWidth(2);
 
