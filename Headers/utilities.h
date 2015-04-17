@@ -59,10 +59,12 @@ class SysData
       hSysEff[i]  = new TH1F(Form("hSysEff_cent%d",i), Form("Effsys_cent%d",i),nbins_pt, boundaries_pt);
       hSysSmear[i]  = new TH1F(Form("hSysSmear_cent%d",i), Form("Smearsys_cent%d",i),nbins_pt, boundaries_pt);
       hSysIter[i] = new TH1F(Form("hSysIter_cent%d",i), Form("Itersys_cent%d",i),nbins_pt, boundaries_pt);
+      hSysJetID[i] = new TH1F(Form("hSysJetID_cent%d",i), Form("JetID_sys_cent%d",i), nbins_pt, boundaries_pt);
       hSys[i]->SetLineColor(kGray);
       hSysJEC[i]->SetLineColor(4);
       hSysSmear[i]->SetLineColor(kGreen+1);
       hSysIter[i]->SetLineColor(2);
+      hSysJetID[i]->SetLineColor(kGreen+2);
     }  
   }
   TH1F *hSys[nbins_cent+1];
@@ -72,6 +74,7 @@ class SysData
   TH1F *hSysSmear[nbins_cent+1];
   TH1F *hSysIter[nbins_cent+1];
   TH1F *hSysNoise[nbins_cent+1];
+  TH1F *hSysJetID[nbins_cent+1];
 	
   void calcTotalSys(int i) {
     TF1 *fNoise = new TF1("f","1+0.3*0.16*abs(1-([0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x))");
@@ -81,18 +84,21 @@ class SysData
     hSysNoise[i]->SetLineColor(6);
     for (int j=1;j<=hSys[i]->GetNbinsX();j++) {
       double effSys = 0.01;
+      double jetidSys = 0.02;
       hSysEff[i]->SetBinContent(j,1+effSys);
       hSysSmear[i]->SetBinContent(j,1.02);
+      hSysJetID[i]->SetBinContent(j, 1+jetidSys);
       double JECSys = hSysJEC[i]->GetBinContent(j)-1;
       double SmearSys = hSysSmear[i]->GetBinContent(j)-1;
       double IterSys = hSysIter[i]->GetBinContent(j)-1; 
-      double NoiseSys = hSysNoise[i]->GetBinContent(j)-1; 
+      double NoiseSys = hSysNoise[i]->GetBinContent(j)-1;
       cout <<effSys<<" "<<JECSys<<" "<<IterSys<<endl;
       double totalSys = sqrt( effSys * effSys +
 			      JECSys * JECSys +
 			      SmearSys * SmearSys +
 			      NoiseSys * NoiseSys +
-			      IterSys* IterSys
+			      IterSys* IterSys +
+			      jetidSys * jetidSys
 			      );
       hSys[i]->SetBinContent(j,totalSys+1);	
       hSys[i]->SetLineWidth(2);				
@@ -107,15 +113,18 @@ class SysData
     hSysNoise[i]->SetLineColor(6);
     for (int j=1;j<=hSysGeneral[i]->GetNbinsX();j++) {
       double effSys = 0.01;
+      double jetidSys = 0.02;
       hSysEff[i]->SetBinContent(j,1+effSys);
       hSysSmear[i]->SetBinContent(j,1.02);
+      hSysJetID[i]->SetBinContent(j, 1+jetidSys);
       double JECSys = hSysJEC[i]->GetBinContent(j)-1;
       double SmearSys = hSysSmear[i]->GetBinContent(j)-1;
       double NoiseSys = hSysNoise[i]->GetBinContent(j)-1; 
       double totalSys = sqrt( effSys * effSys +
 			      JECSys * JECSys +
 			      SmearSys * SmearSys +
-			      NoiseSys * NoiseSys
+			      NoiseSys * NoiseSys +
+			      jetidSys * jetidSys
 			      );
       hSysGeneral[i]->SetBinContent(j,totalSys+1);	
       hSysGeneral[i]->SetLineWidth(2);				
@@ -171,7 +180,7 @@ class SysData
 	
   void DrawNpartSys(double yvalue,int i,double xvalue) {
     double yerrorNpart[6]= {0.0409, 0.0459,0.0578,0.0944, 0.143, 0.176 };
-    double err = hSys[i]->GetBinContent(1)-1;
+    double err = hSys[i]->GetBinContent(hSys[i]->FindBin(100))-1;
     TBox *b = new TBox(xvalue-6.,yvalue*(1-err-yerrorNpart[i]),xvalue+6.,yvalue*(1+err+yerrorNpart[i]));
     //cout << "value " << yvalue<<" err   "<<err<<" xvalue  "<<xvalue<<" "<<yvalue*(1-err)<<" "<<yvalue*(1+err)<<endl;
     b->SetFillColor(kGray);
@@ -197,6 +206,7 @@ class SysData
     TH1F* sys = drawEnvelope(hSys[i],"same",hSys[i]->GetLineColor(),1001,hSys[i]->GetLineColor(),-1);
     TH1F* sysIter = drawEnvelope(hSysIter[i],"same",hSysIter[i]->GetLineColor(),3004,hSysIter[i]->GetLineColor(),-1);
     TH1F* sysJEC = drawEnvelope(hSysJEC[i],"same",hSysJEC[i]->GetLineColor(),3005,hSysJEC[i]->GetLineColor(),-1);
+    TH1F* sysJetID = drawEnvelope(hSysJetID[i],"same",hSysJetID[i]->GetLineColor(),3005,hSysJetID[i]->GetLineColor(),-1);
     TH1F* sysSmear =  drawEnvelope(hSysSmear[i],"same",hSysSmear[i]->GetLineColor(),3001,hSysSmear[i]->GetLineColor(),-1);
     TH1F* sysEff = drawEnvelope(hSysEff[i],"same",hSysEff[i]->GetLineColor(),3002,hSysEff[i]->GetLineColor(),-1);
     TH1F* sysNoise = drawEnvelope(hSysNoise[i],"same",hSysNoise[i]->GetLineColor(),3001,hSysNoise[i]->GetLineColor(),-1);
@@ -210,6 +220,7 @@ class SysData
     leg->AddEntry(sysIter,"Unfolding","f");
     leg->AddEntry(sysJEC,"Jet Energy Scale","f");
     leg->AddEntry(sysEff,"Jet Trigger Efficiency","f");
+    leg->AddEntry(sysJetID, "Jet ID efficiency","f");
     leg->AddEntry(sysSmear,"UE fluctuation","f");
     leg->AddEntry(sysNoise,"HCAL Noise","f");
     if (i==nbins_cent-1)leg->Draw();

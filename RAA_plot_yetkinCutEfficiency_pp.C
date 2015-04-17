@@ -35,7 +35,7 @@
 
 using namespace std;
 
-void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
+void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 4){
 
   TH1::SetDefaultSumw2();
   
@@ -166,6 +166,16 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
   TH1F *hpp_TrgObj40;
   TH1F *hpp_TrgObjComb;
   
+  TH1F * hpp_Data_Jet80_noCut = new TH1F("hpp_Data_Jet80_noCut","",400,0,400);
+  TH1F * hpp_Data_Jet60_noCut = new TH1F("hpp_Data_Jet60_noCut","",400,0,400);
+  TH1F * hpp_Data_Jet40_noCut = new TH1F("hpp_Data_Jet40_noCut","",400,0,400);
+  TH1F * hpp_Data_Comb_noCut = new TH1F("hpp_Data_Comb_noCut","",400,0,400);
+
+  TH1F * hpp_MC_Jet80_noCut = new TH1F("hpp_MC_Jet80_noCut","",400,0,400);
+  TH1F * hpp_MC_Jet60_noCut = new TH1F("hpp_MC_Jet60_noCut","",400,0,400);
+  TH1F * hpp_MC_Jet40_noCut = new TH1F("hpp_MC_Jet40_noCut","",400,0,400);
+  TH1F * hpp_MC_Comb_noCut = new TH1F("hpp_MC_Comb_noCut","",400,0,400);
+
 
   hpp_TrgObj80 = new TH1F(Form("hpp_HLT80_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 80 R%d %s ",radius,etaWidth),400,0,400);
   hpp_TrgObj60 = new TH1F(Form("hpp_HLT60_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 60 && !jet80 R%d %s ",radius,etaWidth),400,0,400);
@@ -300,7 +310,8 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
     if(jet40_1 == 1 && jet60_1==0 && jet80_1==0) {
       
       hData_Jet40_noCut->Fill(pfpt_1, jet40_p_1);
-      
+      hpp_Data_Jet40_noCut->Fill(pfpt_1, jet40_p_1);
+
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
 	hData_Jet40_CutA->Fill(pfpt_1, jet40_p_1);
 	hpp_TrgObj40->Fill(pfpt_1, jet40_p_1);
@@ -320,19 +331,20 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
     
     if(jet60_1 == 1 && jet80_1==0) {
       
-      hData_Jet60_noCut->Fill(pfpt_1, jet60_p_1);
-      
+      hData_Jet60_noCut->Fill(pfpt_1);
+      hpp_Data_Jet60_noCut->Fill(pfpt_1);
+
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)){
-	hData_Jet60_CutA->Fill(pfpt_1, jet60_p_1);
-	hpp_TrgObj60->Fill(pfpt_1, jet60_p_1);
+	hData_Jet60_CutA->Fill(pfpt_1);
+	hpp_TrgObj60->Fill(pfpt_1);
       }
       if(calopt_1/pfpt_1 > 0.85) {
-	hData_Jet60_CutA->Fill(pfpt_1, jet60_p_1);
-	hpp_TrgObj60->Fill(pfpt_1, jet60_p_1);
+	hData_Jet60_CutA->Fill(pfpt_1);
+	hpp_TrgObj60->Fill(pfpt_1);
       }
       if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
-	hData_Jet60_CutA->Fill(pfpt_1, jet60_p_1);
-	hpp_TrgObj60->Fill(pfpt_1, jet60_p_1);
+	hData_Jet60_CutA->Fill(pfpt_1);
+	hpp_TrgObj60->Fill(pfpt_1);
       }
       if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet60_CutA_rej->Fill(pfpt_1);
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet60_CutA_rej->Fill(pfpt_1);
@@ -342,7 +354,8 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
     if(jet80_1 == 1) {
     
       hData_Jet80_noCut->Fill(pfpt_1);
-      
+      hpp_Data_Jet80_noCut->Fill(pfpt_1);
+
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
 	hData_Jet80_CutA->Fill(pfpt_1);
 	hpp_TrgObj80->Fill(pfpt_1);
@@ -379,7 +392,7 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
     if(jet40_1 == 1 && jet60_1 == 0 && jet80_1 == 0) {
     
       hData_unmatched_Jet40_noCut->Fill(pfpt_1, jet40_p_1);
-
+      hpp_Data_Jet40_noCut->Fill(pfpt_1, jet40_p_1);
       if(eMax_1/Sumcand < 0.05 ){hpp_TrgObj40->Fill(pfpt_1);
 	hData_unmatched_Jet40_CutA->Fill(pfpt_1, jet40_p_1);}
       else hData_unmatched_Jet40_CutA_rej->Fill(pfpt_1, jet40_p_1);
@@ -388,18 +401,19 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
 
     if(jet60_1 == 1 && jet80_1==0) {
 
-      hData_unmatched_Jet60_noCut->Fill(pfpt_1, jet60_p_1);
-
-      if(eMax_1/Sumcand < 0.05  ){hpp_TrgObj60->Fill(pfpt_1, jet60_p_1);
-	hData_unmatched_Jet60_CutA->Fill(pfpt_1, jet60_p_1);}
-      else hData_unmatched_Jet60_CutA_rej->Fill(pfpt_1, jet60_p_1);
+      hData_unmatched_Jet60_noCut->Fill(pfpt_1);
+      hpp_Data_Jet60_noCut->Fill(pfpt_1);
+      
+      if(eMax_1/Sumcand < 0.05  ){hpp_TrgObj60->Fill(pfpt_1);
+	hData_unmatched_Jet60_CutA->Fill(pfpt_1);}
+      else hData_unmatched_Jet60_CutA_rej->Fill(pfpt_1);
       
     }
 
     if(jet80_1 == 1) {
     
       hData_unmatched_Jet80_noCut->Fill(pfpt_1);
-
+      hpp_Data_Jet80_noCut->Fill(pfpt_1);
       if(eMax_1/Sumcand < 0.05  ){hpp_TrgObj80->Fill(pfpt_1);
 	hData_unmatched_Jet80_CutA->Fill(pfpt_1);}
       else hData_unmatched_Jet80_CutA_rej->Fill(pfpt_1);
@@ -423,7 +437,7 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
     if(jet40_2 == 1 && jet60_2==0 && jet80_2 == 0){
       
       hMC_Jet40_noCut->Fill(pfrefpt_2, weight);
-
+      hpp_MC_Jet40_noCut->Fill(pfrefpt_2, weight);
       if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)){
 	hMC_Jet40_CutA->Fill(pfrefpt_2, weight);
 	hpp_Jet40_gen->Fill(pfrefpt_2, weight);
@@ -478,6 +492,7 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
       
 
       hMC_Jet60_noCut->Fill(pfrefpt_2, weight);
+      hpp_MC_Jet60_noCut->Fill(pfrefpt_2, weight);
 
       if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) {
 	hMC_Jet60_CutA->Fill(pfrefpt_2, weight);
@@ -532,6 +547,8 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
     if(jet80_2 == 1){
 
       hMC_Jet80_noCut->Fill(pfrefpt_2, weight);
+      hpp_MC_Jet80_noCut->Fill(pfrefpt_2, weight);
+
 
       if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) {
 	hMC_Jet80_CutA->Fill(pfrefpt_2, weight);
@@ -601,6 +618,8 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
     if(jet40_2 == 1 && jet60_2==0 && jet80_2==0){
       
       hMC_unmatched_Jet40_noCut->Fill(pfrefpt_2, weight);
+      hpp_MC_Jet40_noCut->Fill(pfrefpt_2, weight);
+
       if(eMax_2/Sumcand < 0.05  ){
 	hpp_Jet40_gen->Fill(pfrefpt_2, weight);
 	hpp_Jet40_reco->Fill(pfpt_2, weight);
@@ -621,7 +640,8 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
 
     
     if(jet60_2 == 1 && jet80_2==0){
-      
+
+      hpp_MC_Jet60_noCut->Fill(pfrefpt_2, weight);
       hMC_unmatched_Jet60_noCut->Fill(pfrefpt_2, weight);
       if(eMax_2/Sumcand < 0.05  ){
 	hpp_Jet60_gen->Fill(pfrefpt_2, weight);
@@ -643,7 +663,8 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
 
     
     if(jet80_2 == 1){
-      
+
+      hpp_MC_Jet80_noCut->Fill(pfrefpt_2, weight);
       hMC_unmatched_Jet80_noCut->Fill(pfrefpt_2, weight);
       if(eMax_2/Sumcand < 0.05  ){
 	hpp_Jet80_gen->Fill(pfrefpt_2, weight);
@@ -666,13 +687,21 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
     
   }// mc unmatched  ntuple loop
 
-  TFile fout(Form("../../Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius),"RECREATE");
+  TFile fout(Form("../../Output/Pp_withresiduals_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius),"RECREATE");
   fout.cd();
   
   hpp_TrgObjComb->Add(hpp_TrgObj80);
   hpp_TrgObjComb->Add(hpp_TrgObj60);
   hpp_TrgObjComb->Add(hpp_TrgObj40);
 
+  hpp_MC_Comb_noCut->Add(hpp_MC_Jet80_noCut);
+  hpp_MC_Comb_noCut->Add(hpp_MC_Jet60_noCut);
+  hpp_MC_Comb_noCut->Add(hpp_MC_Jet40_noCut);
+  
+  hpp_Data_Comb_noCut->Add(hpp_Data_Jet80_noCut);
+  hpp_Data_Comb_noCut->Add(hpp_Data_Jet60_noCut);
+  hpp_Data_Comb_noCut->Add(hpp_Data_Jet40_noCut);
+  
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet80_data);
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet60_data);
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet40_data);
@@ -688,6 +717,9 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
   hpp_JetComb_gen->Add(hpp_Jet80_gen);
   hpp_JetComb_gen->Add(hpp_Jet60_gen);
   hpp_JetComb_gen->Add(hpp_Jet40_gen);
+
+  hpp_MC_Comb_noCut->Write();
+  hpp_Data_Comb_noCut->Write();
 
   hpp_TrgObjComb->Write();
   hpp_TrgObj80->Write();

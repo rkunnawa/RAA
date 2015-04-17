@@ -47,7 +47,7 @@
 
 using namespace std;
 
-void RAA_plot_Systematics(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
+void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 60){
 
   
   TStopwatch timer;
@@ -277,6 +277,141 @@ void RAA_plot_Systematics(int radius = 4, char *algo = "Pu", char *jet_type = "P
   putCMSPrel();
   linePbPb_iter->Draw();
   cSys->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_total_systematics_unfoldingCut%dGeV_ak%s%d%s_%d.pdf",unfoldingCut, algo, radius, jet_type, date.GetDate()),"RECREATE");
+
+  
+  // // im  plotting the raa vs npart plot here, since it needs the systematics 
+
+    
+  // // plot 3 - RAA as a function of npart - taken from http://dde.web.cern.ch/dde/glauber_lhc.htm for 84 < pT < 97 in PbPb,PP
+  // //        - need to decide if we have to unfold this? or if we can just take that respective pt ranges from the already existing RAA histograms.  this is bin number 16 from the centrality classes weve measured.
+
+  // TFile *fin_R2, *fin_R3, *fin_R4; 
+  // fin_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150415.root",2,unfoldingCut,jet_type));
+  // fin_R3 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150415.root",3,unfoldingCut,jet_type));
+  // fin_R4 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150415.root",4,unfoldingCut,jet_type));
+
+  // // get the histograms.
+  // TH1F * uPbPb_R2_Bayes[nbins_cent], * uPP_R2_Bayes, * uPbPb_R3_Bayes[nbins_cent], * uPP_R3_Bayes, * uPbPb_R4_Bayes[nbins_cent], * uPP_R4_Bayes;
+  // TH1F * mPbPb_R2[nbins_cent], * mPP_R2, * mPbPb_R3[nbins_cent], * mPP_R3, * mPbPb_R4[nbins_cent], * mPP_R4;
+  
+  // TH1F * RAA_R2_Bayes[nbins_cent], * RAA_R3_Bayes[nbins_cent], * RAA_R4_Bayes[nbins_cent];
+  // TH1F * RAA_R2_BinByBin[nbins_cent], * RAA_R3_BinByBin[nbins_cent], * RAA_R4_BinByBin[nbins_cent];
+  // TH1F * RAA_R2_Meas[nbins_cent], * RAA_R3_Meas[nbins_cent], * RAA_R4_Meas[nbins_cent];
+
+  // uPP_R2_Bayes = (TH1F*)fin_R2->Get("PP_bayesian_unfolded_spectra");
+  // uPP_R2_Bayes->Print("base");
+  // uPP_R3_Bayes = (TH1F*)fin_R3->Get("PP_bayesian_unfolded_spectra");
+  // uPP_R3_Bayes->Print("base");
+  // uPP_R4_Bayes = (TH1F*)fin_R4->Get("PP_bayesian_unfolded_spectra");
+  // uPP_R4_Bayes->Print("base");
+
+  // mPP_R2 = (TH1F*)fin_R2->Get("PP_Gen_spectra_refpt");
+  // mPP_R2->Print("base");
+  // mPP_R3 = (TH1F*)fin_R3->Get("PP_Gen_spectra_refpt");
+  // mPP_R3->Print("base");
+  // mPP_R4 = (TH1F*)fin_R4->Get("PP_Gen_spectra_refpt");
+  // mPP_R4->Print("base");
+  
+  // for(int i = 0; i<nbins_cent; ++i){
+
+  //   uPbPb_R2_Bayes[i] = (TH1F*)fin_R2->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
+  //   uPbPb_R2_Bayes[i]->Print("base");
+  //   uPbPb_R3_Bayes[i] = (TH1F*)fin_R3->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
+  //   uPbPb_R3_Bayes[i]->Print("base");
+  //   uPbPb_R4_Bayes[i] = (TH1F*)fin_R4->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
+  //   uPbPb_R3_Bayes[i]->Print("base");
+ 
+  //   mPbPb_R2[i] = (TH1F*)fin_R2->Get(Form("PbPb_Gen_spectra_refpt_cent%d",i));
+  //   mPbPb_R2[i]->Print("base");
+  //   mPbPb_R3[i] = (TH1F*)fin_R3->Get(Form("PbPb_Gen_spectra_refpt_cent%d",i));
+  //   mPbPb_R3[i]->Print("base");
+  //   mPbPb_R4[i] = (TH1F*)fin_R4->Get(Form("PbPb_Gen_spectra_refpt_cent%d",i));
+  //   mPbPb_R4[i]->Print("base");
+    
+  //   RAA_R2_Bayes[i]   = (TH1F*)fin_R2->Get(Form("RAA_bayesian_cent%d",i));  
+  //   RAA_R2_Bayes[i]->Print("base");
+  //   RAA_R3_Bayes[i]   = (TH1F*)fin_R3->Get(Form("RAA_bayesian_cent%d",i));  
+  //   RAA_R3_Bayes[i]->Print("base");
+  //   RAA_R4_Bayes[i]   = (TH1F*)fin_R4->Get(Form("RAA_bayesian_cent%d",i));  
+  //   RAA_R4_Bayes[i]->Print("base");
+    
+  //   RAA_R2_BinByBin[i]   = (TH1F*)fin_R2->Get(Form("RAA_binbybin_cent%d",i));  
+  //   RAA_R3_BinByBin[i]   = (TH1F*)fin_R3->Get(Form("RAA_binbybin_cent%d",i));  
+  //   RAA_R4_BinByBin[i]   = (TH1F*)fin_R4->Get(Form("RAA_binbybin_cent%d",i));  
+    
+  //   RAA_R2_Meas[i]   = (TH1F*)fin_R2->Get(Form("RAA_measured_cent%d",i));  
+  //   RAA_R3_Meas[i]   = (TH1F*)fin_R3->Get(Form("RAA_measured_cent%d",i));  
+  //   RAA_R4_Meas[i]   = (TH1F*)fin_R4->Get(Form("RAA_measured_cent%d",i));  
+    
+  // }
+  // // get the responsible histograms for this.
+  // TH1F * hRAA_R2_npart = new TH1F("hRAA_R2_npart","",45, 0, 450);
+  // //hRAA_R2_npart->LabelsOption(">","X");
+  // TH1F * hRAA_R3_npart = new TH1F("hRAA_R3_npart","",45, 0, 450);
+  // //hRAA_R3_npart->LabelsOption(">","X");
+  // TH1F * hRAA_R4_npart = new TH1F("hRAA_R4_npart","",45, 0, 450);
+  // //hRAA_R4_npart->LabelsOption(">","X");
+
+  // for(int i = 0; i<nbins_cent; ++i){
+  //   hRAA_R2_npart->SetBinContent(hRAA_R2_npart->FindBin(npart[i]), RAA_R2_Bayes[i]->GetBinContent(RAA_R2_Bayes[i]->FindBin(100)));
+  //   hRAA_R2_npart->SetBinError(hRAA_R2_npart->FindBin(npart[i]), RAA_R2_Bayes[i]->GetBinError(RAA_R2_Bayes[i]->FindBin(100)));
+  //   hRAA_R3_npart->SetBinContent(hRAA_R3_npart->FindBin(npart[i]), RAA_R3_Bayes[i]->GetBinContent(RAA_R3_Bayes[i]->FindBin(100)));
+  //   hRAA_R3_npart->SetBinError(hRAA_R3_npart->FindBin(npart[i]), RAA_R3_Bayes[i]->GetBinError(RAA_R3_Bayes[i]->FindBin(100)));
+  //   hRAA_R4_npart->SetBinContent(hRAA_R4_npart->FindBin(npart[i]), RAA_R4_Bayes[i]->GetBinContent(RAA_R4_Bayes[i]->FindBin(100)));    
+  //   hRAA_R4_npart->SetBinError(hRAA_R4_npart->FindBin(npart[i]), RAA_R4_Bayes[i]->GetBinError(RAA_R4_Bayes[i]->FindBin(100)));    
+  // }
+  // TCanvas * cRAA_npart = new TCanvas("cRAA_npart","",600,400);
+  // cRAA_npart->SetGridy();
+  // cRAA_npart->SetGridx();
+
+  // hRAA_R2_npart->SetTitle(" ");
+  // hRAA_R2_npart->SetXTitle(" N_{part} ");
+  // hRAA_R2_npart->SetYTitle(" R_{AA} ");
+  // hRAA_R2_npart->SetMarkerColor(kRed);
+  // hRAA_R2_npart->SetLineColor(kRed);
+  // hRAA_R2_npart->SetMarkerStyle(20);
+  // hRAA_R2_npart->SetAxisRange(0.3,0.9, "Y");
+  // hRAA_R2_npart->Draw("E1");
+  // hRAA_R3_npart->SetMarkerColor(kBlack);
+  // hRAA_R3_npart->SetLineColor(kBlack);
+  // hRAA_R3_npart->SetMarkerStyle(20);
+  // hRAA_R3_npart->Draw("same E1");
+  // hRAA_R4_npart->SetMarkerColor(kBlue);
+  // hRAA_R4_npart->SetLineColor(kBlue);
+  // hRAA_R4_npart->SetMarkerStyle(20);
+  // hRAA_R4_npart->Draw("same E1");
+
+  // drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
+  // drawText("Jet ID cut, |#eta|<2",0.15,0.3,16);
+  // drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
+  // drawText("97 < Jet p_{T} < 114", 0.15,0.8,16);
+  
+  // TLegend * npart = myLegend(0.7,0.7,0.9,0.9);
+  // npart->AddEntry(hRAA_R2_npart,"R=0.2", "pl");
+  // npart->AddEntry(hRAA_R3_npart,"R=0.3", "pl");
+  // npart->AddEntry(hRAA_R4_npart,"R=0.4", "pl");
+  // npart->SetTextSize(0.04);
+  // npart->Draw();
+
+  // for(int i = 0; i<nbins_cent; ++i){
+    
+  //   systematics.calcTotalSys(i);
+  //   systematics.DrawNpartSys(RAA_R3_Bayes[i]->GetBinContent(RAA_R3_Bayes[i]->FindBin(100)),i,npart[i]);
+  //   //TBox *b_npart = new TBox(npart[i]-6.,yv_smr[i]-SmrSys_Npart[i],npart[i]+6.,yv_smr[i]+SmrSys_Npart[i]);
+  //   //b_npart->SetFillColor(kViolet+6);
+  //   //b_npart->SetFillStyle(3001);
+  //   //b_npart->SetLineColor(kViolet+6);
+  //   //b_npart->Draw();  // Draw sys box for smearing
+      
+  // }
+  
+  // putCMSPrel();
+  // putPbPbLumi();
+  // putPPLumi();
+  
+  // cRAA_npart->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_%d.pdf",date.GetDate()),"RECREATE");
+  
+  
   
   
 }

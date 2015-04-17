@@ -56,7 +56,7 @@ int findBin(int bin)
 
 using namespace std;
 
-void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
+void RAA_plot_yetkinCutEfficiency(Int_t radius = 3){
 
   TH1::SetDefaultSumw2();
   
@@ -147,6 +147,15 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
   TH1F *hpbpb_Jet55_gen[nbins_cent],*hpbpb_Jet55_reco[nbins_cent];
   TH1F *hpbpb_JetComb_gen[nbins_cent],*hpbpb_JetComb_reco[nbins_cent];
 
+  TH1F * hpbpb_MC_Comb_noCut[nbins_cent];
+  TH1F * hpbpb_MC_Jet80_noCut[nbins_cent];
+  TH1F * hpbpb_MC_Jet65_noCut[nbins_cent];
+  TH1F * hpbpb_MC_Jet55_noCut[nbins_cent];
+  TH1F * hpbpb_Data_Comb_noCut[nbins_cent];
+  TH1F * hpbpb_Data_Jet55_noCut[nbins_cent];
+  TH1F * hpbpb_Data_Jet65_noCut[nbins_cent];
+  TH1F * hpbpb_Data_Jet80_noCut[nbins_cent];
+
   TH1F *hpbpb_gen[nbins_cent],*hpbpb_reco[nbins_cent];
   TH2F *hpbpb_matrix[nbins_cent];
   TH2F *hpbpb_matrix_HLT[nbins_cent];
@@ -180,6 +189,16 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
   
   for(int i = 0;i<nbins_cent;++i){
     //cout<<"cent bin = "<<i<<endl;
+
+    hpbpb_MC_Jet55_noCut[i] = new TH1F(Form("hpbpb_MC_Jet55_noCut_cent%d",i),"",400,0,400);
+    hpbpb_MC_Jet65_noCut[i] = new TH1F(Form("hpbpb_MC_Jet65_noCut_cent%d",i),"",400,0,400);
+    hpbpb_MC_Jet80_noCut[i] = new TH1F(Form("hpbpb_MC_Jet80_noCut_cent%d",i),"",400,0,400);
+    hpbpb_MC_Comb_noCut[i] = new TH1F(Form("hpbpb_MC_Comb_noCut_cent%d",i),"",400,0,400);
+
+    hpbpb_Data_Jet55_noCut[i] = new TH1F(Form("hpbpb_Data_Jet55_noCut_cent%d",i),"",400,0,400);
+    hpbpb_Data_Jet65_noCut[i] = new TH1F(Form("hpbpb_Data_Jet65_noCut_cent%d",i),"",400,0,400);
+    hpbpb_Data_Jet80_noCut[i] = new TH1F(Form("hpbpb_Data_Jet80_noCut_cent%d",i),"",400,0,400);
+    hpbpb_Data_Comb_noCut[i] = new TH1F(Form("hpbpb_Data_Comb_noCut_cent%d",i),"",400,0,400);
 
     hpbpb_TrgObj80[i] = new TH1F(Form("hpbpb_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_TrgObj65[i] = new TH1F(Form("hpbpb_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
@@ -318,6 +337,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
   // data loop
   long entries = Data_matched->GetEntries();
   //entries = 1000;
+  Float_t Jet55_prescl = 2.0475;
 
   // get the random value for smear systematics, TRandom rnd, value per jet = rnd.Gaus(0,1);
   TRandom rnd; 
@@ -336,35 +356,37 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
 
     if(jet55_1 == 1 && jet65_1 == 0 && jet80_1 == 0 ) {
       
-      hData_Jet55_noCut->Fill(pfpt_1, jet55_p_1);
-      
+      hData_Jet55_noCut->Fill(pfpt_1, Jet55_prescl);
+      hpbpb_Data_Jet55_noCut[cBin]->Fill(pfpt_1, Jet55_prescl);
+
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
-	hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-	hpbpb_TrgObj55[cBin]->Fill(pfpt_1, jet55_p_1);
-	hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), jet55_p_1);
-	hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), jet55_p_1);
+	hData_Jet55_CutA->Fill(pfpt_1, Jet55_prescl);
+	hpbpb_TrgObj55[cBin]->Fill(pfpt_1, Jet55_prescl);
+	hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl);
+	hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), Jet55_prescl);
       }
       if(calopt_1/pfpt_1 > 0.85){
-	hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-	hpbpb_TrgObj55[cBin]->Fill(pfpt_1, jet55_p_1);
-	hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), jet55_p_1);
-	hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), jet55_p_1);
+	hData_Jet55_CutA->Fill(pfpt_1, Jet55_prescl);
+	hpbpb_TrgObj55[cBin]->Fill(pfpt_1, Jet55_prescl);
+	hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl);
+	hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), Jet55_prescl);
       }
       if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
-	hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-	hpbpb_TrgObj55[cBin]->Fill(pfpt_1, jet55_p_1);
-	hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), jet55_p_1);
-	hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), jet55_p_1);
+	hData_Jet55_CutA->Fill(pfpt_1, Jet55_prescl);
+	hpbpb_TrgObj55[cBin]->Fill(pfpt_1, Jet55_prescl);
+	hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl);
+	hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), Jet55_prescl);
       }
-      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
-      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
+      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet55_CutA_rej->Fill(pfpt_1, Jet55_prescl);
+      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet55_CutA_rej->Fill(pfpt_1, Jet55_prescl);
       
     }
     
     if(jet65_1 == 1 && jet80_1 == 0 ) {
       
       hData_Jet65_noCut->Fill(pfpt_1);
-      
+      hpbpb_Data_Jet65_noCut[cBin]->Fill(pfpt_1);
+	    
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)){
 	hData_Jet65_CutA->Fill(pfpt_1);
 	hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
@@ -391,7 +413,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
     if(jet80_1 == 1) {
     
       hData_Jet80_noCut->Fill(pfpt_1);
-      
+      hpbpb_Data_Jet80_noCut[cBin]->Fill(pfpt_1);   
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
 	hData_Jet80_CutA->Fill(pfpt_1);
 	hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
@@ -432,22 +454,24 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
 
     if(jet55_1 == 1 && jet65_1 == 0 && jet80_1 == 0 ) {
     
-      hData_unmatched_Jet55_noCut->Fill(pfpt_1, jet55_p_1);
+      hData_unmatched_Jet55_noCut->Fill(pfpt_1, Jet55_prescl);
+      hpbpb_Data_Jet55_noCut[cBin]->Fill(pfpt_1, Jet55_prescl);
 
       if(eMax_1/Sumcand < 0.05 ){
 	hpbpb_TrgObj55[cBin]->Fill(pfpt_1);
-	hData_unmatched_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-	hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), jet55_p_1);
-	hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), jet55_p_1);
+	hData_unmatched_Jet55_CutA->Fill(pfpt_1, Jet55_prescl);
+	hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl);
+	hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), Jet55_prescl);
 
       }
-      else hData_unmatched_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
+      else hData_unmatched_Jet55_CutA_rej->Fill(pfpt_1, Jet55_prescl);
       
     }
 
     if(jet65_1 == 1 && jet80_1 == 0 ) {
 
       hData_unmatched_Jet65_noCut->Fill(pfpt_1);
+      hpbpb_Data_Jet65_noCut[cBin]->Fill(pfpt_1);
 
       if(eMax_1/Sumcand < 0.05  ){hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
 	hpbpb_JEC_TrgObj65[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)));
@@ -460,6 +484,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
     if(jet80_1 == 1) {
     
       hData_unmatched_Jet80_noCut->Fill(pfpt_1);
+      hpbpb_Data_Jet80_noCut[cBin]->Fill(pfpt_1);
 
       if(eMax_1/Sumcand < 0.05  ){hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
 	hpbpb_JEC_TrgObj80[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)));
@@ -485,6 +510,8 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
 
     Int_t cBin = findBin(hiBin_2);
     if(cBin == -1 || cBin >= nbins_cent) continue;
+
+    
     
     if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)){
       hpbpb_gen[cBin]->Fill(pfrefpt_2, weight);
@@ -509,6 +536,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
     if(jet55_2 == 1 && jet65_2==0 && jet80_2 == 0){
       
       hMC_Jet55_noCut->Fill(pfrefpt_2, weight);
+      hpbpb_MC_Jet55_noCut[cBin]->Fill(pfrefpt_2,weight);
 
       if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)){
 	hMC_Jet55_CutA->Fill(pfrefpt_2, weight);
@@ -516,7 +544,6 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
 	hpbpb_Jet55_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 
-	
       }
       if(calopt_2/pfpt_2 > 0.85) {
 	hMC_Jet55_CutA->Fill(pfrefpt_2, weight);
@@ -542,6 +569,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
     if(jet65_2 == 1 && jet80_2 == 0){
 
       hMC_Jet65_noCut->Fill(pfrefpt_2, weight);
+      hpbpb_MC_Jet65_noCut[cBin]->Fill(pfrefpt_2,weight);
 
       if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) {
 	hMC_Jet65_CutA->Fill(pfrefpt_2, weight);
@@ -574,7 +602,8 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
     if(jet80_2 == 1){
 
       hMC_Jet80_noCut->Fill(pfrefpt_2, weight);
-
+      hpbpb_MC_Jet80_noCut[cBin]->Fill(pfrefpt_2,weight);
+ 
       if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)) {
 	hMC_Jet80_CutA->Fill(pfrefpt_2, weight);
 	hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
@@ -629,8 +658,9 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
 
     }
 
+
     if(jet55_2 == 1 && jet65_2==0 && jet80_2 == 0){
-      
+      hpbpb_MC_Jet55_noCut[cBin]->Fill(pfrefpt_2,weight);
       hMC_unmatched_Jet55_noCut->Fill(pfrefpt_2, weight);
       if(eMax_2/Sumcand < 0.05  ){
 	hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
@@ -645,7 +675,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
 
     
     if(jet65_2 == 1 && jet80_2 == 0){
-      
+      hpbpb_MC_Jet65_noCut[cBin]->Fill(pfrefpt_2,weight);
       hMC_unmatched_Jet65_noCut->Fill(pfrefpt_2, weight);
       if(eMax_2/Sumcand < 0.05  ){
 	hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2, weight);
@@ -659,7 +689,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
 
     
     if(jet80_2 == 1){
-      
+      hpbpb_MC_Jet80_noCut[cBin]->Fill(pfrefpt_2,weight);
       hMC_unmatched_Jet80_noCut->Fill(pfrefpt_2, weight);
       if(eMax_2/Sumcand < 0.05  ){
 	hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
@@ -679,6 +709,15 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
   fout.cd();
   
   for(int i = 0;i<nbins_cent;++i){
+
+    hpbpb_MC_Comb_noCut[i]->Add(hpbpb_MC_Jet80_noCut[i]);
+    hpbpb_MC_Comb_noCut[i]->Add(hpbpb_MC_Jet65_noCut[i]);
+    hpbpb_MC_Comb_noCut[i]->Add(hpbpb_MC_Jet55_noCut[i]);
+
+    hpbpb_Data_Comb_noCut[i]->Add(hpbpb_Data_Jet80_noCut[i]);
+    hpbpb_Data_Comb_noCut[i]->Add(hpbpb_Data_Jet65_noCut[i]);
+    hpbpb_Data_Comb_noCut[i]->Add(hpbpb_Data_Jet55_noCut[i]);
+
     hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj80[i]);
     hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj65[i]);
     hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj55[i]);
@@ -710,6 +749,10 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 4){
   }
 
   for(int i = 0; i<nbins_cent;++i){
+
+    hpbpb_MC_Comb_noCut[i]->Write();
+    hpbpb_Data_Comb_noCut[i]->Write();
+    
 
     hpbpb_TrgObjComb[i]->Write();
     hpbpb_TrgObj80[i]->Write();
