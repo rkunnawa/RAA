@@ -422,6 +422,10 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 60 , char *algo = "Pu", char *jet_
   drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
   drawText("97 < Jet p_{T} < 114", 0.15,0.8,16);
   
+  double errorNpart[6]= {0.0409, 0.0459,0.0578,0.0944, 0.143, 0.176 };
+
+  TBox * b = new TBox()
+  
   TLegend * npart = myLegend(0.7,0.7,0.9,0.9);
   npart->AddEntry(hRAA_R2_npart,"R=0.2", "pl");
   npart->AddEntry(hRAA_R3_npart,"R=0.3", "pl");
