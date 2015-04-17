@@ -107,7 +107,7 @@ void divideBinWidth(TH1 *h)
   h->GetYaxis()->CenterTitle();
 }
 
-void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 30, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   
   TStopwatch timer; 
@@ -144,7 +144,7 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, int radiusPP = 4, char* a
   // TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_akPF_20150319.root");
   
   TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
-  TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_withresiduals_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   TFile * fPbPb_MB_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   
   //TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
@@ -668,7 +668,7 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, int radiusPP = 4, char* a
     
   }// nbins_pt loop
     
-  TFile f(Form("../../Output/PbPb_R%d_pp_withresiduals_R%d_%s_unfoldingCut_%d_data_driven_correction_ak%s%s_%d.root",radius, radiusPP, etaWidth ,unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("../../Output/PbPb_R%d_pp_R%d_%s_unfoldingCut_%d_data_driven_correction_ak%s%s_%d.root",radius, radiusPP, etaWidth ,unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
   f.cd();
 
   for(int i = 0;i<nbins_cent;i++) {

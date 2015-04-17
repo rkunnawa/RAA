@@ -55,6 +55,9 @@ static const int nbins_pt_fine = 400;
 static const int nbins_pt = 30;
 static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
 
+//static const int nbins_pt = 17;
+//static const double boundaries_pt[nbins_pt+1] = {  3, 5, 9, 15, 21, 28, 37, 49, 64, 84, 114, 153, 196, 245, 300, 330, 362, 395};
+
 
 //static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300,   330, 362, 395, 430,  468, 507, 548, 592,  638, 686, 1000 };
 
@@ -163,7 +166,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 60, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 30, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   TStopwatch timer; 
   timer.Start();
