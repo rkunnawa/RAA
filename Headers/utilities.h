@@ -130,21 +130,27 @@ class SysData
       hSysGeneral[i]->SetLineWidth(2);				
     }
   }
-	
-  void Draw(TH1F *h,int i) {
-    for (int j=1;j<=hSys[i]->GetNbinsX();j++) {
+  
+  void Draw(TH1F *h,int i, int color) {
+
+    Int_t beginning = h->FindBin(60); Int_t end = h->FindBin(299);
+
+    if(i==0){ beginning = h->FindBin(100); }
+    if(i==5 || i==4 || i==3) { end = h->FindBin(240);}
+
+    for (int j=beginning;j<=end;j++) {
       double val = h->GetBinContent(j);
       double err = hSys[i]->GetBinContent(j)-1;
       cout << "Sys Value Check" <<val<<" "<<err<<" "<<h->GetBinLowEdge(j)<<" "<<val*(1-err)<<" "<<h->GetBinLowEdge(j+1)<<" "<<val*(1+err)<<endl;
       TBox *b = new TBox(h->GetBinLowEdge(j),val*(1-err),h->GetBinLowEdge(j+1),val*(1+err));
       //b->SetFillColor(kGray);
-      b->SetFillStyle(1001);
+      b->SetFillStyle(0);
       //b->SetLineColor(kGray);
 			
-			
+      
       //***********For Gunther's Color Systematics Band Peference
-      b->SetFillColor(5);
-      b->SetLineColor(5);
+      b->SetFillColor(color);
+      b->SetLineColor(color);
       b->Draw();
     }
   }
@@ -177,16 +183,16 @@ class SysData
     }
   }
 	
-	
+  
   void DrawNpartSys(double yvalue,int i,double xvalue) {
     double yerrorNpart[6]= {0.0409, 0.0459,0.0578,0.0944, 0.143, 0.176 };
     double err = hSys[i]->GetBinContent(hSys[i]->FindBin(100))-1;
-    TBox *b = new TBox(xvalue-6.,yvalue*(1-err-yerrorNpart[i]),xvalue+6.,yvalue*(1+err+yerrorNpart[i]));
+    TBox *b = new TBox(xvalue-10.,yvalue*(1-err-yerrorNpart[i]),xvalue+10.,yvalue*(1+err+yerrorNpart[i]));
     //cout << "value " << yvalue<<" err   "<<err<<" xvalue  "<<xvalue<<" "<<yvalue*(1-err)<<" "<<yvalue*(1+err)<<endl;
     b->SetFillColor(kGray);
     b->SetFillStyle(1001);
     b->SetLineColor(kGray);
-			
+    
     //***********For Gunther's Color Systematics Band Peference
     //b->SetFillColor(5);
     //b->SetLineColor(5);
