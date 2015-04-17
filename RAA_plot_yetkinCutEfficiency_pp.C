@@ -35,7 +35,7 @@
 
 using namespace std;
 
-void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 4){
+void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 3){
 
   TH1::SetDefaultSumw2();
   
@@ -296,6 +296,8 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 4){
   long entries = Data_matched->GetEntries();
   //entries = 1000;
   cout<<"matched Data ntuple "<<endl;
+
+  Float_t Jet40_prescl = 9.275;
   
   for(long nentry = 0; nentry < entries; ++nentry ){
 
@@ -304,28 +306,28 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 4){
 
     Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
 
-    if(pfpt_1 > 40 && pfpt_1 <= 180) 
-      pfpt_1 = fResidual->Eval(pfpt_1) * pfpt_1;
+    //if(pfpt_1 > 40 && pfpt_1 <= 180) 
+    //  pfpt_1 = fResidual->Eval(pfpt_1) * pfpt_1;
     
     if(jet40_1 == 1 && jet60_1==0 && jet80_1==0) {
       
-      hData_Jet40_noCut->Fill(pfpt_1, jet40_p_1);
-      hpp_Data_Jet40_noCut->Fill(pfpt_1, jet40_p_1);
+      hData_Jet40_noCut->Fill(pfpt_1, Jet40_prescl);
+      hpp_Data_Jet40_noCut->Fill(pfpt_1, Jet40_prescl);
 
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
-	hData_Jet40_CutA->Fill(pfpt_1, jet40_p_1);
-	hpp_TrgObj40->Fill(pfpt_1, jet40_p_1);
+	hData_Jet40_CutA->Fill(pfpt_1, Jet40_prescl);
+	hpp_TrgObj40->Fill(pfpt_1, Jet40_prescl);
       }
       if(calopt_1/pfpt_1 > 0.85){
-	hData_Jet40_CutA->Fill(pfpt_1, jet40_p_1);
-	hpp_TrgObj40->Fill(pfpt_1, jet40_p_1);
+	hData_Jet40_CutA->Fill(pfpt_1, Jet40_prescl);
+	hpp_TrgObj40->Fill(pfpt_1, Jet40_prescl);
       }
       if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
-	hData_Jet40_CutA->Fill(pfpt_1, jet40_p_1);
-	hpp_TrgObj40->Fill(pfpt_1, jet40_p_1);
+	hData_Jet40_CutA->Fill(pfpt_1, Jet40_prescl);
+	hpp_TrgObj40->Fill(pfpt_1, Jet40_prescl);
       }
-      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet40_CutA_rej->Fill(pfpt_1, jet40_p_1);
-      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet40_CutA_rej->Fill(pfpt_1, jet40_p_1);
+      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet40_CutA_rej->Fill(pfpt_1, Jet40_prescl);
+      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet40_CutA_rej->Fill(pfpt_1, Jet40_prescl);
       
     }
     
@@ -384,18 +386,18 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 4){
     if(nentry%10000 == 0) cout<<" nentry = "<<nentry<<endl;
     Data_unmatched->GetEntry(nentry);
 
-    if(pfpt_1 > 40 && pfpt_1 <= 180) 
-      pfpt_1 = fResidual->Eval(pfpt_1) * pfpt_1;
+    //if(pfpt_1 > 40 && pfpt_1 <= 180) 
+    //  pfpt_1 = fResidual->Eval(pfpt_1) * pfpt_1;
 
     Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
 
     if(jet40_1 == 1 && jet60_1 == 0 && jet80_1 == 0) {
     
-      hData_unmatched_Jet40_noCut->Fill(pfpt_1, jet40_p_1);
-      hpp_Data_Jet40_noCut->Fill(pfpt_1, jet40_p_1);
+      hData_unmatched_Jet40_noCut->Fill(pfpt_1, Jet40_prescl);
+      hpp_Data_Jet40_noCut->Fill(pfpt_1, Jet40_prescl);
       if(eMax_1/Sumcand < 0.05 ){hpp_TrgObj40->Fill(pfpt_1);
-	hData_unmatched_Jet40_CutA->Fill(pfpt_1, jet40_p_1);}
-      else hData_unmatched_Jet40_CutA_rej->Fill(pfpt_1, jet40_p_1);
+	hData_unmatched_Jet40_CutA->Fill(pfpt_1, Jet40_prescl);}
+      else hData_unmatched_Jet40_CutA_rej->Fill(pfpt_1, Jet40_prescl);
       
     }
 
@@ -687,7 +689,7 @@ void RAA_plot_yetkinCutEfficiency_pp(Int_t radius = 4){
     
   }// mc unmatched  ntuple loop
 
-  TFile fout(Form("../../Output/Pp_withresiduals_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius),"RECREATE");
+  TFile fout(Form("../../Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius),"RECREATE");
   fout.cd();
   
   hpp_TrgObjComb->Add(hpp_TrgObj80);
