@@ -569,6 +569,9 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
 
   // start the loop process.
 
+  // define histograms that will count the number of events which pass the Selection Cuts. 
+  TH1F * hEvents = new TH1F("hEvents","",20,0,10);
+
   
   for(int k = 0;k<no_radius;k++){
 
@@ -590,11 +593,14 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
       //int centBin = findBin(hiBin_1);
       //if(centBin==-1) continue;
       //if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
+      hEvents->Fill(0);
       if(pcollisionEventSelection_1==0) continue; 
+      hEvents->Fill(1);
       if(dataset=="Data" || dataset=="MinBiasUPC") if(pcollisionEventSelection_1==0) continue;
-
+      hEvents->Fill(2);
       if(fabs(vz_1)>15) continue;
       //cout<<"passed the selection"<<endl;
+      hEvents->Fill(3);
 
       weight = 1;
       if(dataset=="MC"){
@@ -626,7 +632,7 @@ void RAA_calo_pf_JetCorrelation(int startfile = 44, int endfile = 66, int radius
        	if(printDebug) cout<<"removed this supernova event"<<endl;
       	continue;
       }
-
+      hEvents->Fill(4)
       // if(jet80_1!=0)cout<<"jet80 = "<<jet80_1<<" jet80_prescl = "<<jet80_p_1<<endl;
       // if(jet65_1!=0)cout<<"jet65 = "<<jet65_1<<" jet65_prescl = "<<jet65_p_1<<endl;
       // if(jet55_1!=0)cout<<"jet55 = "<<jet55_1<<" jet55_prescl = "<<jet55_p_1<<endl;
