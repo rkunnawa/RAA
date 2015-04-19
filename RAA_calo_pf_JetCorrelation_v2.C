@@ -111,7 +111,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radius=4, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC", char * etaWidth = "n20_eta_p20"){
+void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "Data", char * etaWidth = "n20_eta_p20"){
 
   TH1::SetDefaultSumw2();
 
@@ -214,9 +214,9 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radiu
   static const Int_t nbins_pthat = 9;
   Double_t xsection[nbins_pthat+1] = {2.034e-01, 1.075e-02, 1.025e-03,  9.865e-05, 1.129e-05, 1.465e-06, 2.837e-07, 5.323e-08, 5.934e-09, 0};
   Double_t boundaries_pthat[nbins_pthat+1] = {15, 30, 50, 80, 120, 170, 220, 280, 370, 2000};
-
+  
   TH1F * hpthatBin = new TH1F("hpthatBin","",nbins_pthat, boundaries_pthat);
-
+  
   
   // Vertex & centrality reweighting for PbPb
   TF1 *fVz;
@@ -228,7 +228,7 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radiu
   TH1F *hCentWeight = (TH1F*)fcentin->Get("hCentRatio");
 
   
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_%s_calo_pf_jet_correlation_mcclosure_histograms_deltaR_0p%d_ak%s%d_%d_%d.root",dataset,deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_%s_eventCounting_histogram_deltaR_0p%d_ak%s%d_%d_%d.root",dataset,deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
 
@@ -581,6 +581,10 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radiu
 
   // start the loop process.
 
+  // define histograms that will count the number of events which pass the Selection Cuts. 
+  TH1F * hEvents = new TH1F("hEvents","",20,0,10);
+
+
   // define the histograms necessary for that MC closure test.
   TH2F *hpbpb_mcclosure_matrix[nbins_cent];
   TH2F *hpbpb_mcclosure_matrix_HLT[nbins_cent];
@@ -634,10 +638,13 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radiu
       if(printDebug)cout<<"event no = "<<nentry<<endl;
       for(int t = 0;t<N;t++)  jetpbpb1[t][k]->GetEntry(nentry);
       
+      hEvents->Fill(0);
       if(pcollisionEventSelection_1==0) continue; 
+      hEvents->Fill(1);
       if(dataset=="Data" || dataset=="MinBiasUPC") if(pHBHENoiseFilter_1==0) continue;
-
+      hEvents->Fill(2);
       if(fabs(vz_1)>15) continue;
+      hEvents->Fill(3);
       //cout<<"passed the selection"<<endl;
 
       weight = 1;
@@ -671,6 +678,8 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radiu
       	continue;
       }
 
+      hEvents->Fill(4);
+
       // if(jet80_1!=0)cout<<"jet80 = "<<jet80_1<<" jet80_prescl = "<<jet80_p_1<<endl;
       // if(jet65_1!=0)cout<<"jet65 = "<<jet65_1<<" jet65_prescl = "<<jet65_p_1<<endl;
       // if(jet55_1!=0)cout<<"jet55 = "<<jet55_1<<" jet55_prescl = "<<jet55_p_1<<endl;
@@ -693,6 +702,8 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radiu
 
       int cBin = findBin(hiBin_1);
       if(cBin == -1 || cBin >= nbins_cent) continue;
+      
+      hEvents->Fill(5);
 
       //if(nentry%100000 == 0) cout<<"jetMB_1 = "<<jetMB_1<<endl;
       
@@ -862,135 +873,139 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radiu
 	
 	//matchJets->Fill();
 
+	if(c==0)hEvents->Fill(6);
+
 	// fill in the matched histograms with the Jet ID cuts:
-	if(subid!=0) continue;
+	if(dataset=="MC"){
+	  if(subid!=0) continue;
 	
-	Float_t Sumcand = chSum + phSum + neSum + muSum;
-
-	if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
-	  hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
-	  hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
-	  hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);
-	
-	}
-	if(calopt/pfpt > 0.85) {
-	  hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
-	  hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
-	  hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);
-	
-	}
-	if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
-	  hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
-	  hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
-	  hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);
-	
-	}
-
-
-	if(jet55 == 1 && jet65==0 && jet80 == 0){
+	  Float_t Sumcand = chSum + phSum + neSum + muSum;
 
 	  if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt, weight);
-	    }
+	    hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
+	    hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
+	    hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);
+	
 	  }
-
 	  if(calopt/pfpt > 0.85) {
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt, weight);
-	    }
+	    hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
+	    hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
+	    hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);
+	
 	  }
-
 	  if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt, weight);
-	    }
+	    hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
+	    hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
+	    hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);
+	
 	  }
+
+
+	  if(jet55 == 1 && jet65==0 && jet80 == 0){
+
+	    if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
+
+	    if(calopt/pfpt > 0.85) {
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
+
+	    if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
 	  
+	  }
+
+	  if(jet65 == 1 && jet80 == 0){
+
+	    if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
+
+	    if(calopt/pfpt > 0.85) {
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
+
+	    if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
+	  
+	  
+	  }
+
+	  if(jet80==1){
+
+	    if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
+
+	    if(calopt/pfpt > 0.85) {
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
+
+	    if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
+	  
+	  
+	  }
+
 	}
-
-	if(jet65 == 1 && jet80 == 0){
-
-	  if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt, weight);
-	    }
-	  }
-
-	  if(calopt/pfpt > 0.85) {
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt, weight);
-	    }
-	  }
-
-	  if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt, weight);
-	    }
-	  }
-	  
-	  
-	}
-
-	if(jet80==1){
-
-	  if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt, weight);
-	    }
-	  }
-
-	  if(calopt/pfpt > 0.85) {
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt, weight);
-	    }
-	  }
-
-	  if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt, weight);
-	    }
-	  }
-	  
-	  
-	}
-
 	
         
 	
@@ -1065,61 +1080,65 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radiu
 	
 	//unmatchPFJets->Fill();
 
+	if(b==0) hEvents->Fill(7);
+
 	// fill in the matched histograms with the Jet ID cuts:
-	if(subid!=0) continue;
+	if(dataset=="MC"){
+	  if(subid!=0) continue;
 	
-	Float_t Sumcand = chSum + phSum + neSum + muSum;
-
-	if(eMax/Sumcand < 0.05) {
-	  hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
-	  hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
-	  hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);	  
-	}
-
-	if(jet55 == 1 && jet65==0 && jet80 == 0){
+	  Float_t Sumcand = chSum + phSum + neSum + muSum;
 
 	  if(eMax/Sumcand < 0.05) {
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt, weight);
-	    }
+	    hpbpb_mcclosure_gen[cBin]->Fill(pfrefpt, weight);
+	    hpbpb_mcclosure_data[cBin]->Fill(pfpt, weight);
+	    hpbpb_mcclosure_matrix[cBin]->Fill(pfrefpt, pfpt, weight);	  
 	  }
+
+	  if(jet55 == 1 && jet65==0 && jet80 == 0){
+
+	    if(eMax/Sumcand < 0.05) {
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet55_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
 	  
-	}
-
-	if(jet65 == 1 && jet80 == 0){
-
-	  if(eMax/Sumcand < 0.05) {
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt, weight);
-	    }
 	  }
+
+	  if(jet65 == 1 && jet80 == 0){
+
+	    if(eMax/Sumcand < 0.05) {
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet65_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
 	  
 	  
-	}
-
-	if(jet80==1){
-
-	  if(eMax/Sumcand < 0.05) {
-	    if(nentry%2==0) {
-	      hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
-	      hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt, weight);
-	    }
 	  }
+
+	  if(jet80==1){
+
+	    if(eMax/Sumcand < 0.05) {
+	      if(nentry%2==0) {
+		hpbpb_mcclosure_matrix_HLT[cBin]->Fill(pfrefpt, pfpt, weight);
+		hpbpb_mcclosure_Jet80_gen[cBin]->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt, weight);
+	      }
+	    }
 	  
 	  
-	}
+	  }
 	
+	}
 	
       }// unmatched PF jets
       
@@ -1194,6 +1213,7 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radiu
     
   // }
 
+#if 0
   for(int i = 0;i<nbins_cent;++i){
 
     hpbpb_mcclosure_JetComb_data[i]->Add(hpbpb_mcclosure_Jet80_data[i]);
@@ -1220,8 +1240,11 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radiu
     hpbpb_mcclosure_Jet65_gen[i]->Write();
     hpbpb_mcclosure_Jet55_gen[i]->Write();
     
-    
   }
+
+#endif 
+
+  hEvents->Write();
 
   timer.Stop();
   cout<<"Macro finished: "<<endl;

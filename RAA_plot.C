@@ -119,7 +119,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 30){
+void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 30){
 
   TStopwatch timer;
   timer.Start();
@@ -192,8 +192,8 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
   
   TFile *fin; 
   
-  //if(location=="MIT") 
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_withresiduals_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150417.root",radius,unfoldingCut,jet_type));
+  //if(location=="MIT") PbPb_pp_calopfpt_ppNoJetidcut_R0p2_unfold_mcclosure_oppside_trgMC_n20_eta_p20_30GeVCut_akPF_20150417
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150417.root",radius,unfoldingCut,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
@@ -654,8 +654,30 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
       RAA_measured[i]->SetMarkerColor(kBlack);
       RAA_measured[i]->SetMarkerStyle(24);
       makeHistTitle(RAA_measured[i],"","Jet p_{T} (GeV/c)","R_{AA}");
-      RAA_measured[i]->SetAxisRange(unfoldingCut+5,299,"X");
-      RAA_measured[i]->SetAxisRange(0,2,"Y");
+
+      if(i==0){
+	for(int j = RAA_measured[i]->FindBin(unfoldingCut); j<RAA_measured[i]->FindBin(100); ++j){
+	  RAA_measured[i]->SetBinContent(j,0);
+	  RAA_bayesian[i]->SetBinContent(j,0);
+	  RAA_binbybin[i]->SetBinContent(j,0);
+	}
+      }
+      if(i==5 || i==4 || i==3){
+	for(int j = RAA_measured[i]->FindBin(240); j<RAA_measured[i]->FindBin(300); ++j){
+	  RAA_measured[i]->SetBinContent(j,0);
+	  RAA_bayesian[i]->SetBinContent(j,0);
+	  RAA_binbybin[i]->SetBinContent(j,0);
+	}
+      }
+      if(i==1 || i==2){
+        for(int j = RAA_measured[i]->FindBin(unfoldingCut); j<RAA_measured[i]->FindBin(unfoldingCut+30); ++j){
+	  RAA_measured[i]->SetBinContent(j,0);
+	  RAA_bayesian[i]->SetBinContent(j,0);
+	  RAA_binbybin[i]->SetBinContent(j,0);
+	}
+      }
+      RAA_measured[i]->SetAxisRange(unfoldingCut+30, 299, "X");
+      RAA_measured[i]->SetAxisRange(0.2,1.8,"Y");
       RAA_measured[i]->Draw("E1");
 
       RAA_bayesian[i]->SetMarkerColor(kBlack);
@@ -667,7 +689,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
       RAA_binbybin[i]->Draw("same E1");
 
       lineRAA->Draw();
-      lUnfoldingCut->Draw();
+      //lUnfoldingCut->Draw();
       drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
 
     }
@@ -690,7 +712,7 @@ void RAA_plot(int radius = 3, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("Jet RAA dataset Trigger Combined",0.1,0.3,16);
     drawText("Pile up rejection cut applied",0.1,0.2,16);
 
-    cRAA->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_withresiduals_%dGeVCut_ak%s%d%s_%d.pdf",unfoldingCut,algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cRAA->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_ppnoJetID_%dGeVCut_ak%s%d%s_%d.pdf",unfoldingCut,algo,radius,jet_type,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

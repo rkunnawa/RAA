@@ -47,7 +47,7 @@
 
 using namespace std;
 
-void RAA_plot_finalpaper(Int_t unfoldingCut = 60 , char *algo = "Pu", char *jet_type = "PF"){
+void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_type = "PF"){
     
   TStopwatch timer;
   timer.Start();
@@ -60,9 +60,9 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 60 , char *algo = "Pu", char *jet_
   TH2::SetDefaultSumw2();
 
   TFile *fin_R2, *fin_R3, *fin_R4; 
-  fin_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150415.root",2,unfoldingCut,jet_type));
-  fin_R3 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150415.root",3,unfoldingCut,jet_type));
-  fin_R4 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150415.root",4,unfoldingCut,jet_type));
+  fin_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150417.root",2,unfoldingCut,jet_type));
+  fin_R3 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150417.root",3,unfoldingCut,jet_type));
+  fin_R4 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150417.root",4,unfoldingCut,jet_type));
 
   // get the histograms.
   TH1F * uPbPb_R2_Bayes[nbins_cent], * uPP_R2_Bayes, * uPbPb_R3_Bayes[nbins_cent], * uPP_R3_Bayes, * uPbPb_R4_Bayes[nbins_cent], * uPP_R4_Bayes;
@@ -303,142 +303,6 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 60 , char *algo = "Pu", char *jet_
   drawText("50-70% x 10^{10}", 0.8,0.54,16);
   drawText("70-90% x 10^{12}", 0.8,0.63,16);
 
-
   cSpectra->SaveAs(Form("../../Plots/Final_paper_plots_spectra_%d.pdf",date.GetDate()),"RECREATE");
-
-
-  
-  
-  // plot 2 - Bayesian unfolded RAA as a function of pT for the different radii
-  //        - regular 6 panel plot 
-  
-  // again this will be a 6 panel plot. showing measured, unfolded Bayesian, and unfolded Bin By Bin methods. 
-  TCanvas *cRAA = new TCanvas("cRAA","RAA",1200,800);
-  makeMultiPanelCanvasWithGap(cRAA,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
-
-  TLegend *tRAA = myLegend(0.45,0.75,0.85,0.9);
-  TLine *lineRAA = new TLine(unfoldingCut,1,299,1);
-  lineRAA->SetLineStyle(2);
-  lineRAA->SetLineWidth(2);
-
-  TLine *lUnfoldingCut = new TLine(unfoldingCut+30,0,unfoldingCut+30,2);
-  lUnfoldingCut->SetLineStyle(4);
-  lUnfoldingCut->SetLineWidth(2);
-    
-  for(int i = 0;i<nbins_cent;++i){
-
-    cRAA->cd(nbins_cent-i);
-
-    RAA_R2_Bayes[i]->SetMarkerColor(kRed);
-    RAA_R2_Bayes[i]->SetMarkerStyle(20);
-    makeHistTitle(RAA_R2_Bayes[i],"","Jet p_{T} (GeV/c)","R_{AA}");
-    RAA_R2_Bayes[i]->SetAxisRange(unfoldingCut,299,"X");
-    RAA_R2_Bayes[i]->SetAxisRange(0,2,"Y");
-    RAA_R2_Bayes[i]->Draw("E1");
-
-    RAA_R3_Bayes[i]->SetMarkerColor(kBlack);
-    RAA_R3_Bayes[i]->SetMarkerStyle(20);
-    RAA_R3_Bayes[i]->Draw("same E1");
-
-    RAA_R4_Bayes[i]->SetMarkerStyle(20);
-    RAA_R4_Bayes[i]->SetMarkerColor(kBlue);
-    RAA_R4_Bayes[i]->Draw("same E1");
-
-    lineRAA->Draw();
-    //lUnfoldingCut->Draw();
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
-
-  }
-    
-  tRAA->AddEntry(RAA_R2_Bayes[0],"R=0.2","pl");
-  tRAA->AddEntry(RAA_R3_Bayes[0],"R=0.3","pl");
-  tRAA->AddEntry(RAA_R4_Bayes[0],"R=0.4","pl");
-  tRAA->SetTextSize(0.04);
-
-  cRAA->cd(1);
-  tRAA->Draw();
-  cRAA->cd(1);
-  putCMSPrel();
-  putPbPbLumi();
-  putPPLumi();
-  drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.2,0.23,16);
-  //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
-  cRAA->cd(2);
-  drawText("Jet ID cut, |#eta|<2",0.1,0.3,16);
-  drawText("|vz|<15, HBHEfilter, pCES",0.1,0.2,16);
-  cRAA->cd(3);
-  drawText("Jet RAA dataset, trigger combined",0.1,0.3,16);
-  drawText("Pile up rejection cut applied",0.1,0.2,16);
-
-  cRAA->SaveAs(Form("../../Plots/Final_paper_plots_RAA_%d.pdf",date.GetDate()),"RECREATE");
-    
-  
-
-  
-  
-  // plot 3 - RAA as a function of npart - taken from http://dde.web.cern.ch/dde/glauber_lhc.htm for 84 < pT < 97 in PbPb,PP
-  //        - need to decide if we have to unfold this? or if we can just take that respective pt ranges from the already existing RAA histograms.  this is bin number 16 from the centrality classes weve measured.
-
-  // get the responsible histograms for this.
-  TH1F * hRAA_R2_npart = new TH1F("hRAA_R2_npart","",45, 0, 450);
-  //hRAA_R2_npart->LabelsOption(">","X");
-  TH1F * hRAA_R3_npart = new TH1F("hRAA_R3_npart","",45, 0, 450);
-  //hRAA_R3_npart->LabelsOption(">","X");
-  TH1F * hRAA_R4_npart = new TH1F("hRAA_R4_npart","",45, 0, 450);
-  //hRAA_R4_npart->LabelsOption(">","X");
-
-  for(int i = 0; i<nbins_cent; ++i){
-    hRAA_R2_npart->SetBinContent(hRAA_R2_npart->FindBin(npart[i]), RAA_R2_Bayes[i]->GetBinContent(RAA_R2_Bayes[i]->FindBin(100)));
-    hRAA_R2_npart->SetBinError(hRAA_R2_npart->FindBin(npart[i]), RAA_R2_Bayes[i]->GetBinError(RAA_R2_Bayes[i]->FindBin(100)));
-    hRAA_R3_npart->SetBinContent(hRAA_R3_npart->FindBin(npart[i]), RAA_R3_Bayes[i]->GetBinContent(RAA_R3_Bayes[i]->FindBin(100)));
-    hRAA_R3_npart->SetBinError(hRAA_R3_npart->FindBin(npart[i]), RAA_R3_Bayes[i]->GetBinError(RAA_R3_Bayes[i]->FindBin(100)));
-    hRAA_R4_npart->SetBinContent(hRAA_R4_npart->FindBin(npart[i]), RAA_R4_Bayes[i]->GetBinContent(RAA_R4_Bayes[i]->FindBin(100)));    
-    hRAA_R4_npart->SetBinError(hRAA_R4_npart->FindBin(npart[i]), RAA_R4_Bayes[i]->GetBinError(RAA_R4_Bayes[i]->FindBin(100)));    
-  }
-
-  TCanvas * cRAA_npart = new TCanvas("cRAA_npart","",600,400);
-  cRAA_npart->SetGridy();
-  cRAA_npart->SetGridx();
-
-  hRAA_R2_npart->SetTitle(" ");
-  hRAA_R2_npart->SetXTitle(" N_{part} ");
-  hRAA_R2_npart->SetYTitle(" R_{AA} ");
-  hRAA_R2_npart->SetMarkerColor(kRed);
-  hRAA_R2_npart->SetLineColor(kRed);
-  hRAA_R2_npart->SetMarkerStyle(20);
-  hRAA_R2_npart->SetAxisRange(0.3,0.9, "Y");
-  hRAA_R2_npart->Draw("E1");
-  hRAA_R3_npart->SetMarkerColor(kBlack);
-  hRAA_R3_npart->SetLineColor(kBlack);
-  hRAA_R3_npart->SetMarkerStyle(20);
-  hRAA_R3_npart->Draw("same E1");
-  hRAA_R4_npart->SetMarkerColor(kBlue);
-  hRAA_R4_npart->SetLineColor(kBlue);
-  hRAA_R4_npart->SetMarkerStyle(20);
-  hRAA_R4_npart->Draw("same E1");
-
-  drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
-  drawText("Jet ID cut, |#eta|<2",0.15,0.3,16);
-  drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
-  drawText("97 < Jet p_{T} < 114", 0.15,0.8,16);
-  
-  double errorNpart[6]= {0.0409, 0.0459,0.0578,0.0944, 0.143, 0.176 };
-
-  TBox * b = new TBox()
-  
-  TLegend * npart = myLegend(0.7,0.7,0.9,0.9);
-  npart->AddEntry(hRAA_R2_npart,"R=0.2", "pl");
-  npart->AddEntry(hRAA_R3_npart,"R=0.3", "pl");
-  npart->AddEntry(hRAA_R4_npart,"R=0.4", "pl");
-  npart->SetTextSize(0.04);
-  npart->Draw();
-
-  putCMSPrel();
-  putPbPbLumi();
-  putPPLumi();
-  
-  cRAA_npart->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_%d.pdf",date.GetDate()),"RECREATE");
-  
-  
 
 }

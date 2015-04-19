@@ -94,7 +94,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radius=3, int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC", char *etaWidth = "n20_eta_p20"){
+void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radius=3, int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "Data", char *etaWidth = "n20_eta_p20"){
 
   TH1::SetDefaultSumw2();
 
@@ -255,7 +255,7 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
   fVzPP->SetParameters(8.41684e-01,-2.58609e-02,4.86550e-03,-3.10581e-04,2.07918e-05);
   
   
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_%s_calo_pf_jet_correlation_mcclosure_test_sameside_deltaR_0p%d_ak%d_%d_%d.root",dataset,deltaR,radius,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_%s_eventCounting_histogram_deltaR_0p%d_ak%d_%d_%d.root",dataset,deltaR,radius,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
 
@@ -524,6 +524,8 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
   unmatchCaloJets->Branch("calojtpu",&calojtpu,"calojtpu/F");
 
 
+  TH1F * hEvents = new TH1F("hEvents","",20,0,10);
+
   // define the histograms 
 
   // define the histograms necessary for that MC closure test.
@@ -584,14 +586,20 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
       if(printDebug)cout<<"event no = "<<nentry<<endl;
       for(int t = 0;t<N;t++)  jetpp1[t][k]->GetEntry(nentry);
       
+      hEvents->Fill(0);
+
       //int centBin = findBin(hiBin_1);
       //if(centBin==-1) continue;
       //if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
       if(pPAcollisionEventSelectionPA_1==0) continue; 
+      hEvents->Fill(1);
       if(dataset=="Data") if(pHBHENoiseFilter_1==0 ) continue;
+      hEvents->Fill(2);
 
       if(fabs(vz_1)>15) continue;
       //cout<<"passed the selection"<<endl;
+
+      hEvents->Fill(3);
 
       weight = 1;
 
@@ -786,113 +794,118 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	
 	//matchJets->Fill();
 	
-	// fill in the matched histograms with the Jet ID cuts:
-	if(subid!=0) continue;
+	if(c==0) hEvents->Fill(4);
+	  
+	if(dataset=="MC"){
+	  // fill in the matched histograms with the Jet ID cuts:
+	  if(subid!=0) continue;
 	
-	Float_t Sumcand = chSum + phSum + neSum + muSum;
+	  Float_t Sumcand = chSum + phSum + neSum + muSum;
 
-	if(jet40 == 1 && jet60==0 && jet80 == 0){
+	  if(jet40 == 1 && jet60==0 && jet80 == 0){
 
-	  if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
+	    if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
+	      }
 	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
-	    }
-	  }
 
-	  if(calopt/pfpt > 0.85) {
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
+	    if(calopt/pfpt > 0.85) {
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
+	      }
 	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
-	    }
-	  }
 
-	  if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
+	    if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
+	      }
 	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
-	    }
-	  }
 	  
-	}
-
-	if(jet60 == 1 && jet80 == 0){
-
-	  if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
-	    }
 	  }
 
-	  if(calopt/pfpt > 0.85) {
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
-	    }
-	  }
+	  if(jet60 == 1 && jet80 == 0){
 
-	  if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
+	    if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
+	      }
 	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
-	    }
-	  }
-	  
-	  
-	}
 
-	if(jet80==1){
+	    if(calopt/pfpt > 0.85) {
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
+	      }
+	    }
 
-	  if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
+	    if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
+	      }
 	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
-	    }
-	  }
-
-	  if(calopt/pfpt > 0.85) {
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
-	    }
-	  }
-
-	  if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
-	    }
-	  }
 	  
 	  
+	  }
+
+	  if(jet80==1){
+
+	    if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
+	      }
+	    }
+
+	    if(calopt/pfpt > 0.85) {
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
+	      }
+	    }
+
+	    if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
+	      }
+	    }
+	  
+	  
+	  }
+
 	}
 
 
@@ -940,53 +953,57 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	
 	//unmatchPFJets->Fill();
 
-	// fill in the matched histograms with the Jet ID cuts:
-	if(subid!=0) continue;
+	if(b==0) hEvents->Fill(5);
+
+	if(dataset=="MC"){
+	  // fill in the matched histograms with the Jet ID cuts:
+	  if(subid!=0) continue;
 	
-	Float_t Sumcand = chSum + phSum + neSum + muSum;
+	  Float_t Sumcand = chSum + phSum + neSum + muSum;
 
-	if(jet40 == 1 && jet60 == 0 && jet80 == 0){
+	  if(jet40 == 1 && jet60 == 0 && jet80 == 0){
 
-	  if(eMax/Sumcand < 0.05) {
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
+	    if(eMax/Sumcand < 0.05) {
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
+	      }
 	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
-	    }
+	  
 	  }
+
+	  if(jet60 == 1 && jet80 == 0){
+
+	    if(eMax/Sumcand < 0.05) {
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
+	      }
+	    }
 	  
-	}
-
-	if(jet60 == 1 && jet80 == 0){
-
-	  if(eMax/Sumcand < 0.05) {
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
-	    }
+	  
 	  }
+
+	  if(jet80==1){
+
+	    if(eMax/Sumcand < 0.05) {
+	      if(nentry%2==1) {
+		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+		hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
+	      }
+	      if(nentry%2==1) {
+		hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
+	      }
+	    }
 	  
 	  
-	}
-
-	if(jet80==1){
-
-	  if(eMax/Sumcand < 0.05) {
-	    if(nentry%2==1) {
-	      hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-	      hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
-	    }
-	    if(nentry%2==1) {
-	      hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
-	    }
 	  }
-	  
-	  
 	}
 
 	
@@ -1040,7 +1057,7 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
   // unmatchCaloJets->Write();
   // unmatchCaloJets->Print();
 
-
+#if 0
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet80_data);
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet60_data);
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet40_data);
@@ -1059,6 +1076,9 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
   hpp_mcclosure_Jet60_gen->Write();
   hpp_mcclosure_Jet40_gen->Write();
     
+#endif
+
+  hEvents->Write();
 
   timer.Stop();
   cout<<"Macro finished: "<<endl;

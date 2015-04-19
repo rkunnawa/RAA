@@ -131,6 +131,8 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF"){
   TStopwatch timer;
   timer.Start();
 
+  cout<<"started the macro"<<endl;
+  
   TDatime date;
 
   gStyle->SetOptStat(0);
@@ -142,12 +144,20 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF"){
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
 
   // load in the necessary files:
-  TFile *f_unfold_R2 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfold_marguerite_jet80_chMaxjtpt_norawptcut_test_65GeVCut_akPu2PF_20150205_test.root");
-  TFile *f_unfold_R3 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfold_marguerite_jet80_chMaxjtpt_norawptcut_test_65GeVCut_akPu3PF_20150205_test.root");
-  TFile *f_unfold_R4 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_unfold_marguerite_jet80_chMaxjtpt_norawptcut_test_65GeVCut_akPu4PF_20150205_test.root");
+  TFile *f_unfold_R2 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p2_unfold_mcclosure_oppside_trgMC_n20_eta_p20_30GeVCut_akPF_20150417.root");
+  TFile *f_unfold_R3 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p3_unfold_mcclosure_oppside_trgMC_n20_eta_p20_30GeVCut_akPF_20150417.root");
+  TFile *f_unfold_R4 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p4_unfold_mcclosure_oppside_trgMC_n20_eta_p20_30GeVCut_akPF_20150417.root");
 
-  TFile *fPbPb_data = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_marguerite_chMaxjtpt_norawptcut_file_spectra_histograms_akPuPF_20150204.root");
-  TFile *fPP_data = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt_norawptcut_akPF_20150204.root");
+  TFile *fPbPb_data_R2 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p2.root");
+  TFile *fPP_data_R2 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pp_CutEfficiency_noJetID_exclusionhighertriggers_A_R0p2.root");
+
+  TFile *fPbPb_data_R3 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p3.root");
+  TFile *fPP_data_R3 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pp_CutEfficiency_noJetID_exclusionhighertriggers_A_R0p3.root");
+
+  TFile *fPbPb_data_R4 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p4.root");
+  TFile *fPP_data_R4 = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pp_CutEfficiency_noJetID_exclusionhighertriggers_A_R0p4.root");
+
+  cout<<"loaded the files "<<endl;
 
   // get the latest histograms 
   // first array index corresponds to radius 
@@ -159,14 +169,15 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF"){
   TH1F *RAA_binbybin[3][nbins_cent];
   TH1F *RAA_bayesian[3][nbins_cent];
 
-  Double_t xAxis1[48] = {30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500};
+  Double_t xAxis1[38] = {30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400};
 
   for(int i = 0;i<nbins_cent;i++){
+
+    cout<<i<<endl;
 
     PbPb_bayesian[0][i] = (TH1F*)f_unfold_R2->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
     PbPb_measured[0][i] = (TH1F*)f_unfold_R2->Get(Form("PbPb_measured_spectra_combined_cent%d",i));
     PbPb_binbybin[0][i] = (TH1F*)f_unfold_R2->Get(Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i));
-
     PbPb_bayesian[1][i] = (TH1F*)f_unfold_R3->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
     PbPb_measured[1][i] = (TH1F*)f_unfold_R3->Get(Form("PbPb_measured_spectra_combined_cent%d",i));
     PbPb_binbybin[1][i] = (TH1F*)f_unfold_R3->Get(Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i));
@@ -176,51 +187,65 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF"){
     PbPb_binbybin[2][i] = (TH1F*)f_unfold_R4->Get(Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i));
 
     // this can be HLT80 or HLTComb, check with both: 
-    PbPb_measured_fine[0][i] = (TH1F*)fPbPb_data->Get(Form("hpbpb_HLT80_R2_n20_eta_p20_cent%d",i));
-    PbPb_measured_fine[0][i] = (TH1F*)PbPb_measured_fine[0][i]->Rebin(47,Form("PbPb_measured_rebin_R2",i),xAxis1);
+    PbPb_measured_fine[0][i] = (TH1F*)fPbPb_data_R2->Get(Form("hpbpb_HLTComb_R2_n20_eta_p20_cent%d",i));
+    PbPb_measured_fine[0][i] = (TH1F*)PbPb_measured_fine[0][i]->Rebin(37,Form("PbPb_measured_rebin_R2",i),xAxis1);
     //divideBinWidth(PbPb_measured_fine[0][i]);
-    PbPb_measured_fine[1][i] = (TH1F*)fPbPb_data->Get(Form("hpbpb_HLT80_R3_n20_eta_p20_cent%d",i));
-    PbPb_measured_fine[1][i] = (TH1F*)PbPb_measured_fine[1][i]->Rebin(47,Form("PbPb_measured_rebin_R3",i),xAxis1);
+    PbPb_measured_fine[1][i] = (TH1F*)fPbPb_data_R3->Get(Form("hpbpb_HLTComb_R3_n20_eta_p20_cent%d",i));
+    PbPb_measured_fine[1][i] = (TH1F*)PbPb_measured_fine[1][i]->Rebin(37,Form("PbPb_measured_rebin_R3",i),xAxis1);
     //divideBinWidth(PbPb_measured_fine[1][i]);
-    PbPb_measured_fine[2][i] = (TH1F*)fPbPb_data->Get(Form("hpbpb_HLT80_R4_n20_eta_p20_cent%d",i));
-    PbPb_measured_fine[2][i] = (TH1F*)PbPb_measured_fine[2][i]->Rebin(47,Form("PbPb_measured_rebin_R4",i),xAxis1);
+    PbPb_measured_fine[2][i] = (TH1F*)fPbPb_data_R4->Get(Form("hpbpb_HLTComb_R4_n20_eta_p20_cent%d",i));
+    PbPb_measured_fine[2][i] = (TH1F*)PbPb_measured_fine[2][i]->Rebin(37,Form("PbPb_measured_rebin_R4",i),xAxis1);
     //divideBinWidth(PbPb_measured_fine[2][i]);
-
+    
     RAA_bayesian[0][i] = (TH1F*)f_unfold_R2->Get(Form("RAA_bayesian_cent%d",i));
     RAA_measured[0][i] = (TH1F*)f_unfold_R2->Get(Form("RAA_measured_cent%d",i));
     RAA_binbybin[0][i] = (TH1F*)f_unfold_R2->Get(Form("RAA_binbybin_cent%d",i));
-
+    
     RAA_bayesian[1][i] = (TH1F*)f_unfold_R3->Get(Form("RAA_bayesian_cent%d",i));
     RAA_measured[1][i] = (TH1F*)f_unfold_R3->Get(Form("RAA_measured_cent%d",i));
     RAA_binbybin[1][i] = (TH1F*)f_unfold_R3->Get(Form("RAA_binbybin_cent%d",i));
-
+    
     RAA_bayesian[2][i] = (TH1F*)f_unfold_R4->Get(Form("RAA_bayesian_cent%d",i));
     RAA_measured[2][i] = (TH1F*)f_unfold_R4->Get(Form("RAA_measured_cent%d",i));
     RAA_binbybin[2][i] = (TH1F*)f_unfold_R4->Get(Form("RAA_binbybin_cent%d",i));
-
+    
+    // for(int j = 1; j<=RAA_bayesian[0][i]->GetNbinsX(); ++j){
+      
+    //   cout<<j<<endl;
+    //   RAA_bayesian[0][i]->SetBinError(j, RAA_measured[0][i]->GetBinError(j));
+    //   RAA_bayesian[1][i]->SetBinError(j, RAA_measured[1][i]->GetBinError(j));
+    //   RAA_bayesian[2][i]->SetBinError(j, RAA_measured[2][i]->GetBinError(j));
+      
+    // }
+    
   }
-
+  
+  cout<<"loaded PbPb histograms "<<endl;
+  
   PP_bayesian[0] = (TH1F*)f_unfold_R2->Get("PP_bayesian_unfolded_spectra");
   PP_measured[0] = (TH1F*)f_unfold_R2->Get("PP_measured_unfolded_spectra");
   PP_binbybin[0] = (TH1F*)f_unfold_R2->Get("PP_binbybin_unfolded_spectra");
-
+  
   PP_bayesian[1] = (TH1F*)f_unfold_R3->Get("PP_bayesian_unfolded_spectra");
   PP_measured[1] = (TH1F*)f_unfold_R3->Get("PP_measured_unfolded_spectra");
   PP_binbybin[1] = (TH1F*)f_unfold_R3->Get("PP_binbybin_unfolded_spectra");
-
+  
   PP_bayesian[2] = (TH1F*)f_unfold_R4->Get("PP_bayesian_unfolded_spectra");
   PP_measured[2] = (TH1F*)f_unfold_R4->Get("PP_measured_unfolded_spectra");
   PP_binbybin[2] = (TH1F*)f_unfold_R4->Get("PP_binbybin_unfolded_spectra");
-
-  PP_measured_fine[0] = (TH1F*)fPP_data->Get("hpp_Trg80_R2_n20_eta_p20");
-  PP_measured_fine[0] = (TH1F*)PP_measured_fine[0]->Rebin(47,"PP_measured_rebin_R2",xAxis1);
+  
+  PP_measured_fine[0] = (TH1F*)fPP_data_R2->Get("hpp_HLTComb_R2_n20_eta_p20");
+  PP_measured_fine[0] = (TH1F*)PP_measured_fine[0]->Rebin(37,"PP_measured_rebin_R2",xAxis1);
   //divideBinWidth(PP_measured_fine[0]);
-  PP_measured_fine[1] = (TH1F*)fPP_data->Get("hpp_Trg80_R3_n20_eta_p20");
-  PP_measured_fine[1] = (TH1F*)PP_measured_fine[1]->Rebin(47,"PP_measured_rebin_R3",xAxis1);
+  PP_measured_fine[1] = (TH1F*)fPP_data_R3->Get("hpp_HLTComb_R3_n20_eta_p20");
+  PP_measured_fine[1] = (TH1F*)PP_measured_fine[1]->Rebin(37,"PP_measured_rebin_R3",xAxis1);
   //divideBinWidth(PP_measured_fine[1]);
-  PP_measured_fine[2] = (TH1F*)fPP_data->Get("hpp_Trg80_R4_n20_eta_p20");
-  PP_measured_fine[2] = (TH1F*)PP_measured_fine[2]->Rebin(47,"PP_measured_rebin_R4",xAxis1);
+  PP_measured_fine[2] = (TH1F*)fPP_data_R4->Get("hpp_HLTComb_R4_n20_eta_p20");
+  PP_measured_fine[2] = (TH1F*)PP_measured_fine[2]->Rebin(37,"PP_measured_rebin_R4",xAxis1);
   //divideBinWidth(PP_measured_fine[2]);
+  
+  cout<<"loaded pp histograms "<<endl;
+  
   
   //lets get the pas histograms
 
@@ -969,7 +994,7 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF"){
       RAA_bayesian[1][i]->SetMarkerColor(kBlack);
       RAA_bayesian[1][i]->SetMarkerStyle(20);
       makeHistTitle(RAA_bayesian[1][i],"","Jet p_{T} (GeV/c)","R_{AA}");
-      RAA_bayesian[1][i]->SetAxisRange(100,299,"X");
+      RAA_bayesian[1][i]->SetAxisRange(60,299,"X");
       RAA_bayesian[1][i]->SetAxisRange(0,2,"Y");
       RAA_bayesian[1][i]->Draw("E0");
 
@@ -1636,7 +1661,7 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF"){
     PASPP_measured->Draw("same");
 
     TLegend *PP_sigma = myLegend(0.43,0.65,0.75,0.9);
-    PP_sigma->AddEntry(PP_measured_fine[1],"current calculation, chMax/jtpt > 0.05","pl");
+    PP_sigma->AddEntry(PP_measured_fine[1]," latest Jet ID cut","pl");
     PP_sigma->AddEntry(PASPP_measured,"2012 PAS, trxMax/jtpt > 0.1","pl");
     PP_sigma->SetTextSize(0.04);
     PP_sigma->Draw();
