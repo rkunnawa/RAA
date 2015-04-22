@@ -107,7 +107,7 @@ void divideBinWidth(TH1 *h)
   h->GetYaxis()->CenterTitle();
 }
 
-void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 30, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, int radiusPP = 4, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 30, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   TStopwatch timer; 
   timer.Start();
@@ -121,31 +121,19 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
   
   TDatime date;//this is just here to get them to run optimized. 
 
-  // //TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_final_chMaxjtpt_ak%s%s_20150202.root",algo,jet_type));
-  // //TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_allcutswithouteSum_ak%s%s_20150203.root",algo,jet_type));
-  // //TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_nocut_spectra_ak%s%s_20150203.root",algo,jet_type));
-  // TFile* fMC_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_mc_ak%s%s_20150304.root",algo,jet_type));
-  // TFile *fMC_pp_in;
-  // //fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_akPF_20150320.root");
-  // fMC_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_mc_spectra_chMaxjtpt0p02_eMaxjtpt0p6_ak3PF_20150225.root");
-  
-  // //TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_spectra_histograms_akPuPF_20150128.root");
-  // //TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_doga_file_spectra_histograms_akPuPF_20150202.root");
-  // //TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_marguerite_file_spectra_histograms_akPuPF_20150203.root");
-  // //TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_marguerite_allcutswithouteSum_file_spectra_histograms_akPuPF_20150203.root");
-  // TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_akPuPF_20150304.root");
-  // TFile * fData_MinBias_PbPb = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_trigger_turnoncurves_SuperNovaRejected_akPuPF_20150304.root");
-  
-  // //TFile *fData_PbPb_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_marguerite_nocut_file_spectra_histograms_akPuPF_20150203.root");
-  // //TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_chMaxjtpt_akPF_20150203.root");
-  // //TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_allcutwithouteSum_akPF_20150203.root");
-  // //TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_akPF_20150226.root");
-  // TFile *fData_pp_in = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_akPF_20150319.root");
-  
-  TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  // Raghav's files: 
+  //TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  //  //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_noJetID_exclusionhighertriggers_A_R0p%d.root",radius));
+
+  // Pawan's files:
+  TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuplehistograms/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
-  TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_noJetID_exclusionhighertriggers_A_R0p%d.root",radius));
+  TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuplehistograms/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+
   TFile * fPbPb_MB_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+
+
   
   //TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
   //Int_t unfoldingCutBin = htest->FindBin(unfoldingCut);
@@ -637,7 +625,9 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
 
       //if(j==100) cout<<"Mean of that value for pt=100 = "<< (Float_t)hAfterUnfoldingptBinDistribution[j]->GetMean() <<endl;      
       hCorrUnfoldingPbPb[i]->SetBinContent(j+1, hAfterUnfoldingptBinDistribution[j]->GetMean());
+      //cout<<"centrality bin "<<i<<", pT bin "<<j<<" bin Content = "<<hCorrUnfoldingPbPb[i]->GetBinContent(j+1)<<endl;
       hCorrUnfoldingPbPb[i]->SetBinError(j+1, hAfterUnfoldingptBinDistribution[j]->GetRMS());
+      //cout<<"centrality bin "<<i<<", pT bin "<<j<<" bin Error   = "<<hCorrUnfoldingPbPb[i]->GetBinError(j+1)<<endl;
 
       delete hAfterUnfoldingptBinDistribution[j];
       
@@ -662,26 +652,37 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 3, int radiusPP = 3, char* a
     }// unfolding trials loop
     
     hCorrUnfoldingPP->SetBinContent(j+1, hAfterUnfoldingptBinDistributionPP[j]->GetMean());
+    //cout<<"PP pT bin "<<j<<" bin Content = "<<hCorrUnfoldingPP->GetBinContent(j+1)<<endl;
     hCorrUnfoldingPP->SetBinError(j+1, hAfterUnfoldingptBinDistributionPP[j]->GetRMS());
+    //cout<<"PP pT bin "<<j<<" bin Error   = "<<hCorrUnfoldingPP->GetBinError(j+1)<<endl;
     
     delete hAfterUnfoldingptBinDistributionPP[j];
     
   }// nbins_pt loop
     
-  TFile f(Form("../../Output/PbPb_R%d_pp_R%d_%s_unfoldingCut_%d_data_driven_correction_ak%s%s_%d.root",radius, radiusPP, etaWidth ,unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("../../Output/Pawan_ntuple_PbPb_R%d_pp_R%d_%s_unfoldingCut_%d_data_driven_correction_ak%s%s_%d.root",radius, radiusPP, etaWidth ,unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
   f.cd();
 
   for(int i = 0;i<nbins_cent;i++) {
+
+    hCorrUnfoldingPbPb[i]->Scale(145.156 * 1e9);
+    //hCorrUnfoldingPbPb[i] = (TH1F*)hCorrUnfoldingPbPb[i]->Rebin(nbins_pt_coarse, Form("PbPb_BayesianUnfolded_cent%d",i), boundaries_pt_coarse);
     hCorrUnfoldingPbPb[i]->Write();
     hCorrUnfoldingPbPb[i]->Print("base");
 
+    dPbPb_TrgComb[i]->Scale(145.156 * 1e9);
+    //dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt_coarse, Form("PbPb_measured_cent%d",i), boundaries_pt_coarse);
     dPbPb_TrgComb[i]->Write();
     dPbPb_TrgComb[i]->Print("base");
     
   }
 
+  hCorrUnfoldingPP->Scale(5.3 * 1e9);
+  //hCorrUnfoldingPP = (TH1F*)hCorrUnfoldingPP->Rebin(nbins_pt_coarse, "PP_BayesianUnfolded", boundaries_pt_coarse);
   hCorrUnfoldingPP->Write();
   hCorrUnfoldingPP->Print("base");
+  dPP_Comb->Scale(5.3 * 1e9);
+  //dPP_Comb = (TH1F*)dPP_Comb->Rebin(nbins_pt_coarse, "PP_measured", boundaries_pt_coarse);  
   dPP_Comb->Write();
   dPP_Comb->Print("base");
   
