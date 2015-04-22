@@ -36,6 +36,57 @@
 
 // Feb 20th - only running pp for the different eta bins to give the spectra to the Jet RpA analysis for interpolation 
 
+
+// April 19th - adding the necessary no of events which pass the event selection cuts 
+
+/*
+  PbPb: 
+  Total number of events: 
+  (const Double_t)2.2724146e+07
+  # of events passing pcollisionEventSelection
+  (const Double_t)2.2724146e+07
+  # of events passing HBHENoiseFilter 
+  (const Double_t)2.2695568e+07
+  # of events passing vz < 15 
+  (const Double_t)2.1970588e+07
+  # of events passing Super nova cut: 
+  (const Double_t)2.1967032e+07
+  # of events passing Centrality - 0-90% 
+  (const Double_t)2.1966046e+07
+  # of events having matched PF and Calo Jets 
+  (const Double_t)1.041393e+07
+  # of events having unmatched PF jets only 
+  (const Double_t)4.886594e+06
+
+  Total fraction of events studied  = (# of events having matched + # of event having unmatched) / Total number of events
+                                    = 0.673
+  Therefore PbPb Luminosity scaling = 0.673 * 145.156 = 97.69
+  If we are only looking at the selection cuts (without the matching) , then scaling factor = 0.967
+
+  PP: 
+  Total number of events: 
+  (const Double_t)3.3224444e+07
+  # of events passing pPAcollisionEventSelectionPA
+  (const Double_t)3.2591536e+07
+  # of events passing HBHENoiseFilter
+  (const Double_t)3.250238e+07
+  # of events passing vz < 15 
+  (const Double_t)3.210568e+07
+  # of events having matched PF and Calo Jets
+  (const Double_t)9.322065e+06
+  # of events having unmatched PF jets only 
+  (const Double_t)2.06469e+05
+
+  Total fraction of events studied = (# of events having matched + # of event having unmatched) / Total number of events
+                                   = 0.28679
+  therefore pp luminosity scaling  = 0.287 * 5.3 = 1.5211
+  If we are only looking at the selection cuts (without the matching), then scaling factor = 0.966
+
+  Need to implement these guys when we scale the numbers below: 
+
+ */
+
+
 #include <iostream>
 #include <stdio.h>
 
@@ -166,7 +217,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 30, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
+void RAA_analyze(int radius = 2, int radiusPP = 2, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 30, char* etaWidth = (char*) "n20_eta_p20", double deltaEta = 4.0){
 
   TStopwatch timer; 
   timer.Start();
@@ -202,7 +253,8 @@ void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", ch
 
   TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_withresiduals_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
-  TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_noJetID_exclusionhighertriggers_A_R0p%d.root",radius));
   TFile * fPbPb_MB_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
 
   // we also need to get the files for the MinBias closure histograms.
@@ -220,9 +272,9 @@ void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", ch
   
   // histogram declarations with the following initial appendage: d - Data, m - MC, u- Unfolded
   // for the MC closure test, ive kept separate 
-
+  
   // setup the radius and the eta bin loop here later. not for the time being. Aug 20th. only run the -2 < eta < 2 with the differenent centrality bins 
-
+  
   TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1], *dPbPb_Smear_TrgComb[nbins_cent+1], *dPbPb_JEC_TrgComb[nbins_cent+1];
   
   TH1F *mPbPb_Gen[nbins_cent+1], *mPbPb_Reco[nbins_cent+1];
@@ -1214,7 +1266,7 @@ void RAA_analyze(int radius = 3, int radiusPP = 3, char* algo = (char*) "Pu", ch
   cout<<"writing to output file"<<endl;
 
     
-  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_calopfpt_jetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_%s_%dGeVCut_ak%s_%d.root", radiusPP, etaWidth,unfoldingCut,jet_type,date.GetDate()),"RECREATE");
+  TFile fout(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_%s_%dGeVCut_ak%s_%d.root", radiusPP, etaWidth,unfoldingCut,jet_type,date.GetDate()),"RECREATE");
   fout.cd();
 
   for(int i = 0;i<nbins_cent;++i){
