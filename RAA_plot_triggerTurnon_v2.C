@@ -9,6 +9,7 @@
 #include <TLegend.h>
 #include <TGraphAsymmErrors.h>
 #include <TLine.h>
+#include <TDatime.h>
 //#include "Headers/plot.h"
 
 void CorrectBinWidth(TH1 *h1)
@@ -43,6 +44,8 @@ void RAA_plot_triggerTurnon_v2() {
   TH1::SetDefaultSumw2();
   //gStyle->SetOptStat(0);
 
+  TDatime date; 
+
   static const int nbins_pt = 39;
   static const double boundaries_pt[nbins_pt+1] = {
     3, 4, 5, 7, 9, 12,
@@ -56,12 +59,12 @@ void RAA_plot_triggerTurnon_v2() {
     638, 686, 1000
   };
 
-  TFile * fin = TFile::Open("../../Output/PbPb_MinBiasUPC_supernova30_nojetid_prescl_akPuPF_20150322.root");
+  TFile * fin = TFile::Open("../../Output/PbPb_MinBiasUPC_supernova30_nojetid_prescl_akPuPF_20150420.root");
   
-  TH1F * hDenominator  = (TH1F*)fin->Get("hDenominator_R3");
-  TH1F * hNumerator_80  = (TH1F*)fin->Get("hNumerator_80_R3");
-  TH1F * hNumerator_65  = (TH1F*)fin->Get("hNumerator_65_R3");
-  TH1F * hNumerator_55  = (TH1F*)fin->Get("hNumerator_55_R3");
+  TH1F * hDenominator  = (TH1F*)fin->Get("hDenominator_R3_cent0");
+  TH1F * hNumerator_80  = (TH1F*)fin->Get("hNumerator_80_R3_cent0");
+  TH1F * hNumerator_65  = (TH1F*)fin->Get("hNumerator_65_R3_cent0");
+  TH1F * hNumerator_55  = (TH1F*)fin->Get("hNumerator_55_R3_cent0");
 
   CorrectBinWidth(hDenominator);
   CorrectBinWidth(hNumerator_55);
@@ -109,7 +112,7 @@ void RAA_plot_triggerTurnon_v2() {
   gr_turnon_jet80->Draw("psame");
   leg->Draw();
 
-  c3->SaveAs("../../Plots/trigger_turnon_hlt_pbpb_supernova30_nojetid_prescl_akPu3PF.pdf","RECREATE");
+  c3->SaveAs(Form("../../Plots/trigger_turnon_hlt_pbpb_supernova30_nojetid_prescl_akPu3PF_cent0_%d.pdf",date.GetDate()),"RECREATE");
 
   TH1F * hRatio_Jet80 = (TH1F*)hNumerator_80->Clone("hRatio_Jet80");
   hRatio_Jet80->Divide(hDenominator);
@@ -146,6 +149,6 @@ void RAA_plot_triggerTurnon_v2() {
   line->Draw();
   leg->Draw();
   
-  c4->SaveAs("../../Plots/trigger_spectra_ratio_supernov30_nojetid_prescl_akPu3PF.pdf","RECREATE");
+  c4->SaveAs(Form("../../Plots/trigger_spectra_ratio_supernov30_nojetid_prescl_akPu3PF_cent0_cent%d.pdf",date.GetDate()),"RECREATE");
 
 }

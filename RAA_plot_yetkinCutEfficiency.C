@@ -147,6 +147,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 2){
   TH1F *hpbpb_Jet55_gen[nbins_cent],*hpbpb_Jet55_reco[nbins_cent];
   TH1F *hpbpb_JetComb_gen[nbins_cent],*hpbpb_JetComb_reco[nbins_cent];
 
+  TH1F * hpbpb_MC_noCut[nbins_cent];
   TH1F * hpbpb_MC_Comb_noCut[nbins_cent];
   TH1F * hpbpb_MC_Jet80_noCut[nbins_cent];
   TH1F * hpbpb_MC_Jet65_noCut[nbins_cent];
@@ -190,6 +191,8 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 2){
   for(int i = 0;i<nbins_cent;++i){
     //cout<<"cent bin = "<<i<<endl;
 
+    hpbpb_MC_noCut[i] = new TH1F(Form("hpbpb_MC_noCut_cent%d",i),"",400,0,400);
+    
     hpbpb_MC_Jet55_noCut[i] = new TH1F(Form("hpbpb_MC_Jet55_noCut_cent%d",i),"",400,0,400);
     hpbpb_MC_Jet65_noCut[i] = new TH1F(Form("hpbpb_MC_Jet65_noCut_cent%d",i),"",400,0,400);
     hpbpb_MC_Jet80_noCut[i] = new TH1F(Form("hpbpb_MC_Jet80_noCut_cent%d",i),"",400,0,400);
@@ -509,9 +512,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 2){
     if(subid_2 != 0) continue;
 
     Int_t cBin = findBin(hiBin_2);
-    if(cBin == -1 || cBin >= nbins_cent) continue;
-
-    
+    if(cBin == -1 || cBin >= nbins_cent) continue;    
     
     if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)){
       hpbpb_gen[cBin]->Fill(pfrefpt_2, weight);
@@ -532,6 +533,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 2){
 	
     }
 
+    hpbpb_MC_noCut[cBin]->Fill(pfrefpt_2, weight);
     
     if(jet55_2 == 1 && jet65_2==0 && jet80_2 == 0){
       
@@ -658,6 +660,7 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 2){
 
     }
 
+    hpbpb_MC_noCut[cBin]->Fill(pfrefpt_2, weight);
 
     if(jet55_2 == 1 && jet65_2==0 && jet80_2 == 0){
       hpbpb_MC_Jet55_noCut[cBin]->Fill(pfrefpt_2,weight);
@@ -750,6 +753,8 @@ void RAA_plot_yetkinCutEfficiency(Int_t radius = 2){
 
   for(int i = 0; i<nbins_cent;++i){
 
+    hpbpb_MC_noCut[i]->Write();
+    
     hpbpb_MC_Comb_noCut[i]->Write();
     hpbpb_Data_Comb_noCut[i]->Write();
     

@@ -168,17 +168,20 @@ void divideBinWidth(TH1 *h)
   h->GetYaxis()->CenterTitle();
 }
 
-int findBin(int hiBin){
-  int binNo = -1;
+int findBin(int bin){
 
-  for(int i = 0;i<nbins_cent;i++){
-    if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
-      binNo = i;
-      break;
-    }
-  }
+  int ibin=-1;
+  //! centrality is defined as 0.5% bins of cross section
+  //! in 0-200 bins               
+  if(bin<=10)ibin=0; //! 0-5%
+  else if(bin>10  && bin<=20 )ibin=1; //! 5-10%
+  else if(bin>20  && bin<=60 )ibin=2;  //! 10-30%
+  else if(bin>60  && bin<=100)ibin=3;  //! 30-50%
+  else if(bin>100 && bin<=140)ibin=4;  //! 50-70%
+  else if(bin>140 && bin<=180)ibin=5;  //! 70-90%
+  else if(bin>180 && bin<=200)ibin=6;  //! 90-100%
 
-  return binNo;
+  return ibin;
 }
 
 
@@ -520,6 +523,8 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   TH1F *hEvents_HLT65 = new TH1F("hEvents_HLT65","",4,0,2);
   TH1F *hEvents_HLT55 = new TH1F("hEvents_HLT55","",4,0,2);
   TH1F *hEvents = new TH1F("hEvents","",4,0,2);
+
+#if 0
   TH1F *hEvents_pCES = new TH1F("hEvents_pCES","",4,0,2);
   TH1F *hEvents_pHBHE = new TH1F("hEvents_pHBHE","",4,0,2);
   TH1F *hEvents_vz15 = new TH1F("hEvents_vz15","",4,0,2);
@@ -617,6 +622,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 
 
 
+
   TH1F * hpbpb_Jet[trigValue-1][nbins_cent];
   TH1F * hpbpb_Jet_chMaxJtpt[trigValue-1][5][nbins_cent];
   TH1F * hpbpb_Jet_eMaxJtpt[trigValue-1][9][nbins_cent];
@@ -687,13 +693,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   TH1F *hpbpb_vy[no_radius];
   TH1F *hpbpb_vz[no_radius];
   TH1F *hpbpb_cent[no_radius];
+
+#endif
   
   for(int k = 0;k<no_radius;k++){
 
-    hpbpb_cent[k] = new TH1F(Form("hpbpb_cent_R%d",list_radius[k]),Form("centrality distributions R%d",list_radius[k]),200,0,200);
-    hpbpb_vz[k] = new TH1F(Form("hpbpb_vz_R%d",list_radius[k]),Form("vz distribution R%d",list_radius[k]),60,-15,15);
-    hpbpb_vx[k] = new TH1F(Form("hpbpb_vx_R%d",list_radius[k]),Form("vx distribution R%d",list_radius[k]),60,-15,15);
-    hpbpb_vy[k] = new TH1F(Form("hpbpb_vy_R%d",list_radius[k]),Form("vy distribution R%d",list_radius[k]),60,-15,15);
+    // hpbpb_cent[k] = new TH1F(Form("hpbpb_cent_R%d",list_radius[k]),Form("centrality distributions R%d",list_radius[k]),200,0,200);
+    // hpbpb_vz[k] = new TH1F(Form("hpbpb_vz_R%d",list_radius[k]),Form("vz distribution R%d",list_radius[k]),60,-15,15);
+    // hpbpb_vx[k] = new TH1F(Form("hpbpb_vx_R%d",list_radius[k]),Form("vx distribution R%d",list_radius[k]),60,-15,15);
+    // hpbpb_vy[k] = new TH1F(Form("hpbpb_vy_R%d",list_radius[k]),Form("vy distribution R%d",list_radius[k]),60,-15,15);
 
     if(printDebug)cout<<"Running data reading for R = "<<list_radius[k]<<endl;
     // loop for the jetpbpb1[2] tree 
@@ -718,7 +726,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       // get the stuff required for the trigger turn on curve later. in a separate loop till i understand how to put this in here. 
       
       int centBin = findBin(hiBin_1);//tells us the centrality of the event. 
-      //if(centBin==-1) continue;
+      if(centBin==-1 || centBin==nbins_cent) continue;
 
       //if(printDebug)cout<<"cent bin = "<<centBin<<endl;
       //if(printDebug)cout<<"centrality bin = "<<5*boundaries_cent[centBin]<< " to "<<5*boundaries_cent[centBin+1]<<endl;
@@ -754,7 +762,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
 	}// jet loop
 	
       }//eta bins loop
-      \
+      
 
       // if(printDebug)cout<<"pixel hit = "<<hiNpix_1<<", jet counter = "<<jetCounter<<endl;
       
@@ -774,12 +782,15 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       	continue;
       }
 
-      if(chMax_1[0]/pt_1[0] < 0.02 || eMax_1[0]/pt_1[0] > 0.6) continue;
+      hEvents->Fill(1);
+      if(jet80_1)hEvents_HLT80->Fill(1);
+      
+      // if(chMax_1[0]/pt_1[0] < 0.02 || eMax_1[0]/pt_1[0] > 0.6) continue;
 
-      hpbpb_cent[k]->Fill(hiBin_1);
-      hpbpb_vz[k]->Fill(vz_1);
-      hpbpb_vx[k]->Fill(vx_1);
-      hpbpb_vy[k]->Fill(vy_1);
+      // hpbpb_cent[k]->Fill(hiBin_1);
+      // hpbpb_vz[k]->Fill(vz_1);
+      // hpbpb_vx[k]->Fill(vx_1);
+      // hpbpb_vy[k]->Fill(vy_1);
 #if 0
 
       //get the failed events after the beam scrapping and pile up rejection cuts. 
@@ -1370,13 +1381,13 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
     //evt_electron_good[k]->Write();
   }
 
-  #endif
   
   hpbpb_cent[0]->Write();
   hpbpb_vz[0]->Write();
   hpbpb_vx[0]->Write();
   hpbpb_vy[0]->Write();
-
+#endif
+  
   /*
   hEvents->Write();
   hEvents_pCES->Write();
