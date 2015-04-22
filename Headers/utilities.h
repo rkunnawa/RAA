@@ -184,9 +184,9 @@ class SysData
   }
 	
   
-  void DrawNpartSys(double yvalue,int i,double xvalue) {
+  void DrawNpartSys(double yvalue,int i,double xvalue, int binno) {
     double yerrorNpart[6]= {0.0409, 0.0459,0.0578,0.0944, 0.143, 0.176 };
-    double err = hSys[i]->GetBinContent(hSys[i]->FindBin(100))-1;
+    double err = hSys[i]->GetBinContent(hSys[i]->FindBin(binno))-1;
     TBox *b = new TBox(xvalue-10.,yvalue*(1-err-yerrorNpart[i]),xvalue+10.,yvalue*(1+err+yerrorNpart[i]));
     //cout << "value " << yvalue<<" err   "<<err<<" xvalue  "<<xvalue<<" "<<yvalue*(1-err)<<" "<<yvalue*(1+err)<<endl;
     b->SetFillColor(kGray);
@@ -200,8 +200,8 @@ class SysData
     b->Draw();
 		
   }
-	
-	
+  
+  
   void DrawComponent(int i) {
     calcTotalSys(i);
     TH1D *h = new TH1D(Form("hSysTmp_cent%d",i),"",nbins_pt, boundaries_pt);

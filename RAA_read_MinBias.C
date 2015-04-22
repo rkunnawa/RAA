@@ -137,18 +137,22 @@ void divideBinWidth(TH1 *h)
   h->GetYaxis()->CenterTitle();
 }
 
-int findBin(int hiBin){
-  int binNo = -1;
+int findBin(int bin)
+{
+  int ibin=-1;
+  //! centrality is defined as 0.5% bins of cross section
+  //! in 0-200 bins               
+  if(bin<=10)ibin=0; //! 0-5%
+  else if(bin>10  && bin<=20 )ibin=1; //! 5-10%
+  else if(bin>20  && bin<=60 )ibin=2;  //! 10-30%
+  else if(bin>60  && bin<=100)ibin=3;  //! 30-50%
+  else if(bin>100 && bin<=140)ibin=4;  //! 50-70%
+  else if(bin>140 && bin<=180)ibin=5;  //! 70-90%
+  else if(bin>180 && bin<=200)ibin=6;  //! 90-100%
+  return ibin;
 
-  for(int i = 0;i<nbins_cent;i++){
-    if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
-      binNo = i;
-      break;
-    }
-  }
-
-  return binNo;
 }
+
 
 double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 {
@@ -172,7 +176,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   
   cout<<"Running for Algo = "<<algo<<" "<<jet_type<<endl;
   
-  bool printDebug = true;
+  bool printDebug = false;
 
   // Now im going to change the file reading here for PbPb to look at the unmerged files through condor. 
   std::string infile1;
@@ -421,6 +425,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   */
   
   TH1F *hEvents  = new TH1F("hEvents","",2,0,1);
+  TH1F *hEvents_Jet80  = new TH1F("hEvents_Jet80","",2,0,1);
   TH1F *hJets = new TH1F("hJets","",2,0,1);
 
   TH1F *hJetMB_80_1 = new TH1F("hJetMB_80_1","",200,0,200);
@@ -511,23 +516,27 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
   // jet55  prescl = 2.0475 (2.0292)
 
   
-  TH1F* hDenominator[no_radius]; 
-  TH1F* hNumerator_80[no_radius];
-  TH1F* hNumerator_65[no_radius];
-  TH1F* hNumerator_55[no_radius];
+  TH1F* hDenominator[nbins_cent][no_radius]; 
+  TH1F* hNumerator_80[nbins_cent][no_radius];
+  TH1F* hNumerator_65[nbins_cent][no_radius];
+  TH1F* hNumerator_55[nbins_cent][no_radius];
 
-  TH1F * hNumerator_55_n65_n80[no_radius];
-  TH1F * hNumerator_65_n80[no_radius];
+  TH1F * hNumerator_55_n65_n80[nbins_cent][no_radius];
+  TH1F * hNumerator_65_n80[nbins_cent][no_radius];
 
-  for(int k = 0;k<no_radius;k++){
+  
+  for(int k = 0;k<no_radius;++k){
 
-    hDenominator[k] =new TH1F(Form("hDenominator_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
-    hNumerator_80[k] =new TH1F(Form("hNumerator_80_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
-    hNumerator_65[k] =new TH1F(Form("hNumerator_65_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
-    hNumerator_55[k] =new TH1F(Form("hNumerator_55_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
-    hNumerator_55_n65_n80[k] =new TH1F(Form("hNumerator_55_n65_n80_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
-    hNumerator_65_n80[k] =new TH1F(Form("hNumerator_65_n80_R%d",list_radius[k]),"",nbins_pt,boundaries_pt);
+    for(int i = 0; i<nbins_cent; ++i){
 
+      hDenominator[i][k] =new TH1F(Form("hDenominator_R%d_cent%d",list_radius[k], i),"",nbins_pt,boundaries_pt);
+      hNumerator_80[i][k] =new TH1F(Form("hNumerator_80_R%d_cent%d",list_radius[k], i),"",nbins_pt,boundaries_pt);
+      hNumerator_65[i][k] =new TH1F(Form("hNumerator_65_R%d_cent%d",list_radius[k], i),"",nbins_pt,boundaries_pt);
+      hNumerator_55[i][k] =new TH1F(Form("hNumerator_55_R%d_cent%d",list_radius[k], i),"",nbins_pt,boundaries_pt);
+      hNumerator_55_n65_n80[i][k] =new TH1F(Form("hNumerator_55_n65_n80_R%d_cent%d",list_radius[k], i),"",nbins_pt,boundaries_pt);
+      hNumerator_65_n80[i][k] =new TH1F(Form("hNumerator_65_n80_R%d_cent%d",list_radius[k], i),"",nbins_pt,boundaries_pt);
+
+    }
   }
   
   // but these prescl values are derived from the triggered data sample, need to check if they are the same in the minbias sample 
@@ -554,17 +563,22 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
       if(printDebug && jentry%100000==0)cout<<jentry<<": event = "<<evt_1<<"; run = "<<run_1<<endl;
       
       int centBin = findBin(hiBin_1);//tells us the centrality of the event. 
-
+      if(centBin == -1 || centBin >=nbins_cent) continue;
+      
       if(pHBHENoiseFilter_1==0 || pcollisionEventSelection_1==0) continue; 
 
       if(fabs(vz_1)>15) continue;
       
       //if(jetMB_1==0 || jet80_p_1==0 || jet65_p_1==0 || jet55_p_1==0)  continue;
-      if(jetMB_1==0)  continue;
-
-      hEvents->Fill(1);
+      //if(jetMB_1==0)  continue;
 
       if(nrefe_1 > 30) continue;
+
+
+      hEvents->Fill(1);
+      if(jet80_1)hEvents_Jet80->Fill(1);
+
+#if 0
       //apply the supernova rejection cut:
       //int jetCounter = 0;//counts jets which are going to be used in the supernova cut rejection. 
       //for(int g = 0;g<nrefe_1;g++)
@@ -607,16 +621,16 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
       for(int j = 0;j<nrefe_1;++j){
       //for(int j = 0;j<1;++j){ // plotting the leading jet. 
 	
-	if(chMax_1[j]/pt_1[j] < 0.02 || eMax_1[j]/pt_1[j]>0.6) continue; 
+	//if(chMax_1[j]/pt_1[j] < 0.02 || eMax_1[j]/pt_1[j]>0.6) continue; 
 	
-	hDenominator[k]->Fill(pt_1[j]);
+	hDenominator[k][centBin]->Fill(pt_1[j]);
 	
-	if(jet80_1==1) hNumerator_80[k]->Fill(pt_1[j], jet80_p_1); 
-	if(jet65_1==1) hNumerator_65[k]->Fill(pt_1[j], jet65_p_1); 
-	if(jet55_1==1) hNumerator_55[k]->Fill(pt_1[j], jet55_p_1);
+	if(jet80_1==1) hNumerator_80[k][centBin]->Fill(pt_1[j], jet80_p_1); 
+	if(jet65_1==1) hNumerator_65[k][centBin]->Fill(pt_1[j], jet65_p_1); 
+	if(jet55_1==1) hNumerator_55[k][centBin]->Fill(pt_1[j], jet55_p_1);
 	
-	if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k]->Fill(pt_1[j]);
-	if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k]->Fill(pt_1[j]);
+	if(jet55_1==1 && jet65_1==0 && jet80_1==0) hNumerator_55_n65_n80[k][centBin]->Fill(pt_1[j]);
+	if(jet65_1==1 && jet80_1==0) hNumerator_65_n80[k][centBin]->Fill(pt_1[j]);
 	
 	
 	// if(jetMB_1==1 && jet80_p_1==1) {
@@ -634,6 +648,7 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
 	
 	
       }
+#endif
 	
       //trigger_info->Fill();
 
@@ -684,27 +699,32 @@ void RAA_read_MinBias(int startfile = 0, int endfile = 1, char *algo = "Pu", cha
     TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_supernova30_jetid_prescl_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
     f.cd();
 
+    hEvents->Write();
+    hEvents_Jet80->Write();
+
     //jets_ID->Write();
     //hJets->Write();
     //hEvents->Write();
-
+#if 0
     //trigger_info->Write();
-    for(int k = 0;k<no_radius;k++){
-      hDenominator[k]->Write();
-      hNumerator_80[k]->Write();
-      hNumerator_65[k]->Write();
-      hNumerator_55[k]->Write();
-      hNumerator_55_n65_n80[k]->Write();
-      hNumerator_65_n80[k]->Write();
-      hDenominator[k]->Print();
-      hNumerator_80[k]->Print();
-      hNumerator_65[k]->Print();
-      hNumerator_55[k]->Print();
-      hNumerator_55_n65_n80[k]->Print();
-      hNumerator_65_n80[k]->Print();
+    for(int i = 0; i<nbins_cent; ++i){
+      for(int k = 0;k<no_radius; ++k){
+	hDenominator[k][i]->Write();
+	hNumerator_80[k][i]->Write();
+	hNumerator_65[k][i]->Write();
+	hNumerator_55[k][i]->Write();
+	hNumerator_55_n65_n80[k][i]->Write();
+	hNumerator_65_n80[k][i]->Write();
+	//hDenominator[k][i]->Print();
+	//hNumerator_80[k][i]->Print();
+	//hNumerator_65[k][i]->Print();
+	//hNumerator_55[k][i]->Print();
+	//hNumerator_55_n65_n80[k][i]->Print();
+	//hNumerator_65_n80[k][i]->Print();
 
+      }
     }
-
+#endif
     
     
 #if 0
