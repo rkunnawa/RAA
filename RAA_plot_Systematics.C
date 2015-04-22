@@ -766,7 +766,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   hRAA_R2_npart->SetMarkerColor(kRed);
   hRAA_R2_npart->SetLineColor(kRed);
   hRAA_R2_npart->SetMarkerStyle(20);
-  hRAA_R2_npart->SetAxisRange(0.0,1.1, "Y");
+  hRAA_R2_npart->SetAxisRange(0.3,1.2, "Y");
   hRAA_R2_npart->Draw("E1");
   hRAA_R3_npart->SetMarkerColor(kBlack);
   hRAA_R3_npart->SetLineColor(kBlack);
@@ -790,20 +790,162 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   npart1->Draw();
  
   for(int i = 0; i<nbins_cent; ++i){
-    systematics_R3.calcTotalSys(i);
-    systematics_R3.DrawNpartSys(RAA_R3_Bayes[i]->GetBinContent(RAA_R3_Bayes[i]->FindBin(100)),i,npart[i]);
+    //systematics_R3.calcTotalSys(i);
+    systematics_R3.DrawNpartSys(RAA_R3_Bayes[i]->GetBinContent(RAA_R3_Bayes[i]->FindBin(100)),i,npart[i], 100);
   }
 
   hRAA_R2_npart->Draw("same E1");
   hRAA_R3_npart->Draw("same E1");
   hRAA_R4_npart->Draw("same E1");
+  
+  putCMSPrel();
+  putPbPbLumi();
+  putPPLumi();
+  
+  cRAA_npart->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_97_pT_114_%d.pdf",date.GetDate()),"RECREATE");
+
+  // plot npart raa for dufferent pt range around 130
+  
+  // get the responsible histograms for this.
+  TH1F * hRAA_R2_npart2 = new TH1F("hRAA_R2_npart2","",450, 0, 450);
+  //hRAA_R2_npart2->LabelsOption(">","X");
+  TH1F * hRAA_R3_npart2 = new TH1F("hRAA_R3_npart2","",450, 0, 450);
+  //hRAA_R3_npart2->LabelsOption(">","X");
+  TH1F * hRAA_R4_npart2 = new TH1F("hRAA_R4_npart2","",450, 0, 450);
+  //hRAA_R4_npart2->LabelsOption(">","X");
+
+  for(int i = 0; i<nbins_cent; ++i){
+    hRAA_R2_npart2->SetBinContent(hRAA_R2_npart2->FindBin(npart[i])-3, RAA_R2_Bayes[i]->GetBinContent(RAA_R2_Bayes[i]->FindBin(135)));
+    hRAA_R2_npart2->SetBinError(hRAA_R2_npart2->FindBin(npart[i])-3, RAA_R2_Bayes[i]->GetBinError(RAA_R2_Bayes[i]->FindBin(135)));
+    
+    hRAA_R3_npart2->SetBinContent(hRAA_R3_npart2->FindBin(npart[i]), RAA_R3_Bayes[i]->GetBinContent(RAA_R3_Bayes[i]->FindBin(135)));
+    hRAA_R3_npart2->SetBinError(hRAA_R3_npart2->FindBin(npart[i]), RAA_R3_Bayes[i]->GetBinError(RAA_R3_Bayes[i]->FindBin(135)));
+    
+    hRAA_R4_npart2->SetBinContent(hRAA_R4_npart2->FindBin(npart[i])+3, RAA_R4_Bayes[i]->GetBinContent(RAA_R4_Bayes[i]->FindBin(135)));    
+    hRAA_R4_npart2->SetBinError(hRAA_R4_npart2->FindBin(npart[i])+3, RAA_R4_Bayes[i]->GetBinError(RAA_R4_Bayes[i]->FindBin(135)));    
+  }
+
+
+  TCanvas * cRAA_npart2 = new TCanvas("cRAA_npart2","",600,400);
+  cRAA_npart2->SetGridy();
+  cRAA_npart2->SetGridx();
+
+  hRAA_R2_npart2->SetTitle(" ");
+  hRAA_R2_npart2->SetXTitle(" N_{part} ");
+  hRAA_R2_npart2->SetYTitle(" R_{AA} ");
+  hRAA_R2_npart2->SetMarkerColor(kRed);
+  hRAA_R2_npart2->SetLineColor(kRed);
+  hRAA_R2_npart2->SetMarkerStyle(20);
+  hRAA_R2_npart2->SetAxisRange(0.3,1.2, "Y");
+  hRAA_R2_npart2->Draw("E1");
+  hRAA_R3_npart2->SetMarkerColor(kBlack);
+  hRAA_R3_npart2->SetLineColor(kBlack);
+  hRAA_R3_npart2->SetMarkerStyle(20);
+  hRAA_R3_npart2->Draw("same E1");
+  hRAA_R4_npart2->SetMarkerColor(kBlue);
+  hRAA_R4_npart2->SetLineColor(kBlue);
+  hRAA_R4_npart2->SetMarkerStyle(20);
+  hRAA_R4_npart2->Draw("same E1");
+
+  drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
+  drawText("Jet ID cut, |#eta|<2",0.15,0.3,16);
+  drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
+  drawText("133 < Jet p_{T} < 153", 0.15,0.8,16);
+  
+  TLegend * npart2 = myLegend(0.7,0.7,0.9,0.9);
+  npart2->AddEntry(hRAA_R2_npart2,"R=0.2", "pl");
+  npart2->AddEntry(hRAA_R3_npart2,"R=0.3", "pl");
+  npart2->AddEntry(hRAA_R4_npart2,"R=0.4", "pl");
+  npart2->SetTextSize(0.04);
+  npart2->Draw();
+ 
+  for(int i = 0; i<nbins_cent; ++i){
+    //systematics_R3.calcTotalSys(i);
+    systematics_R3.DrawNpartSys(RAA_R3_Bayes[i]->GetBinContent(RAA_R3_Bayes[i]->FindBin(135)),i,npart[i], 135);
+  }
+
+  hRAA_R2_npart2->Draw("same E1");
+  hRAA_R3_npart2->Draw("same E1");
+  hRAA_R4_npart2->Draw("same E1");
 
   
   putCMSPrel();
   putPbPbLumi();
   putPPLumi();
   
-  cRAA_npart->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_%d.pdf",date.GetDate()),"RECREATE");
+  cRAA_npart2->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_133_pT_153_%d.pdf",date.GetDate()),"RECREATE");
+
+  // plot RAA vs Npart for a smaller pT : 74 - 84
+
+    // get the responsible histograms for this.
+  TH1F * hRAA_R2_npart3 = new TH1F("hRAA_R2_npart3","",450, 0, 450);
+  //hRAA_R2_npart3->LabelsOption(">","X");
+  TH1F * hRAA_R3_npart3 = new TH1F("hRAA_R3_npart3","",450, 0, 450);
+  //hRAA_R3_npart3->LabelsOption(">","X");
+  TH1F * hRAA_R4_npart3 = new TH1F("hRAA_R4_npart3","",450, 0, 450);
+  //hRAA_R4_npart3->LabelsOption(">","X");
+
+  for(int i = 0; i<nbins_cent; ++i){
+    hRAA_R2_npart3->SetBinContent(hRAA_R2_npart3->FindBin(npart[i])-3, RAA_R2_Bayes[i]->GetBinContent(RAA_R2_Bayes[i]->FindBin(80)));
+    hRAA_R2_npart3->SetBinError(hRAA_R2_npart3->FindBin(npart[i])-3, RAA_R2_Bayes[i]->GetBinError(RAA_R2_Bayes[i]->FindBin(80)));
+    
+    hRAA_R3_npart3->SetBinContent(hRAA_R3_npart3->FindBin(npart[i]), RAA_R3_Bayes[i]->GetBinContent(RAA_R3_Bayes[i]->FindBin(80)));
+    hRAA_R3_npart3->SetBinError(hRAA_R3_npart3->FindBin(npart[i]), RAA_R3_Bayes[i]->GetBinError(RAA_R3_Bayes[i]->FindBin(80)));
+    
+    hRAA_R4_npart3->SetBinContent(hRAA_R4_npart3->FindBin(npart[i])+3, RAA_R4_Bayes[i]->GetBinContent(RAA_R4_Bayes[i]->FindBin(80)));    
+    hRAA_R4_npart3->SetBinError(hRAA_R4_npart3->FindBin(npart[i])+3, RAA_R4_Bayes[i]->GetBinError(RAA_R4_Bayes[i]->FindBin(80)));    
+  }
+
+
+  TCanvas * cRAA_npart3 = new TCanvas("cRAA_npart3","",600,400);
+  cRAA_npart3->SetGridy();
+  cRAA_npart3->SetGridx();
+
+  hRAA_R2_npart3->SetTitle(" ");
+  hRAA_R2_npart3->SetXTitle(" N_{part} ");
+  hRAA_R2_npart3->SetYTitle(" R_{AA} ");
+  hRAA_R2_npart3->SetMarkerColor(kRed);
+  hRAA_R2_npart3->SetLineColor(kRed);
+  hRAA_R2_npart3->SetMarkerStyle(20);
+  hRAA_R2_npart3->SetAxisRange(0.3,1.2, "Y");
+  hRAA_R2_npart3->Draw("E1");
+  hRAA_R3_npart3->SetMarkerColor(kBlack);
+  hRAA_R3_npart3->SetLineColor(kBlack);
+  hRAA_R3_npart3->SetMarkerStyle(20);
+  hRAA_R3_npart3->Draw("same E1");
+  hRAA_R4_npart3->SetMarkerColor(kBlue);
+  hRAA_R4_npart3->SetLineColor(kBlue);
+  hRAA_R4_npart3->SetMarkerStyle(20);
+  hRAA_R4_npart3->Draw("same E1");
+
+  drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
+  drawText("Jet ID cut, |#eta|<2",0.15,0.3,16);
+  drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
+  drawText("74 < Jet p_{T} < 84", 0.15,0.8,16);
+  
+  TLegend * npart3 = myLegend(0.7,0.7,0.9,0.9);
+  npart3->AddEntry(hRAA_R2_npart3,"R=0.2", "pl");
+  npart3->AddEntry(hRAA_R3_npart3,"R=0.3", "pl");
+  npart3->AddEntry(hRAA_R4_npart3,"R=0.4", "pl");
+  npart3->SetTextSize(0.04);
+  npart3->Draw();
+ 
+  for(int i = 0; i<nbins_cent; ++i){
+    //systematics_R3.calcTotalSys(i);
+    systematics_R3.DrawNpartSys(RAA_R3_Bayes[i]->GetBinContent(RAA_R3_Bayes[i]->FindBin(80)),i,npart[i], 80);
+  }
+
+  hRAA_R2_npart3->Draw("same E1");
+  hRAA_R3_npart3->Draw("same E1");
+  hRAA_R4_npart3->Draw("same E1");
+
+  
+  putCMSPrel();
+  putPbPbLumi();
+  putPPLumi();
+  
+  cRAA_npart3->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_74_pT_84_%d.pdf",date.GetDate()),"RECREATE");
+
   
   
   // plot the RAA for each radii here along with the systematics shown in yellow, for measured, bayesian and bin by bin unfoldeding.

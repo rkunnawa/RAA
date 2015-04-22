@@ -46,7 +46,7 @@
 
 #define pi 3.14159265
 
-static const int nbins_pt = 39;
+static const int nbins_pt = 31;
 static const double boundaries_pt[nbins_pt+1] = {
   3, 4, 5, 7, 9, 12, 
   15, 18, 21, 24, 28,
@@ -54,9 +54,7 @@ static const double boundaries_pt[nbins_pt+1] = {
   64, 74, 84, 97, 114,
   133, 153, 174, 196,
   220, 245, 272, 300, 
-  330, 362, 395, 430,
-  468, 507, 548, 592,
-  638, 686, 1000 
+  330, 362, 395
 };
 
 static const int no_radius = 1;//necessary for the RAA analysis  
@@ -94,7 +92,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radius=3, int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "Data", char *etaWidth = "n20_eta_p20"){
+void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radius=2, int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC", char *etaWidth = "n20_eta_p20"){
 
   TH1::SetDefaultSumw2();
 
@@ -255,7 +253,7 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
   fVzPP->SetParameters(8.41684e-01,-2.58609e-02,4.86550e-03,-3.10581e-04,2.07918e-05);
   
   
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_%s_eventCounting_histogram_deltaR_0p%d_ak%d_%d_%d.root",dataset,deltaR,radius,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_%s_closure_histogram_deltaR_0p%d_ak%d_%d_%d.root",dataset,deltaR,radius,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
 
@@ -530,34 +528,35 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 
   // define the histograms necessary for that MC closure test.
   TH2F *hpp_mcclosure_matrix_HLT;
+  TH2F *hpp_mcclosure_matrix;
   //TH2F *hpp_response;
   TH1F *hpp_mcclosure_JetComb_data;
-  //TH1F *hpp_mcclosure_data;
+  TH1F *hpp_mcclosure_data;
   TH1F *hpp_mcclosure_Jet80_data;
   TH1F *hpp_mcclosure_Jet60_data;
   TH1F *hpp_mcclosure_Jet40_data;
-  //TH1F *hpp_mcclosure_gen;
+  TH1F *hpp_mcclosure_gen;
   TH1F *hpp_mcclosure_JetComb_gen;
   TH1F *hpp_mcclosure_Jet80_gen;
   TH1F *hpp_mcclosure_Jet60_gen;
   TH1F *hpp_mcclosure_Jet40_gen;
   
-  hpp_mcclosure_matrix_HLT = new TH2F(Form("hpp_mcclosure_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),1000,0,1000,1000,0,1000);
+  hpp_mcclosure_matrix_HLT = new TH2F(Form("hpp_mcclosure_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
+  hpp_mcclosure_matrix = new TH2F(Form("hpp_mcclosure_matrix_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt,nbins_pt,boundaries_pt);
   //cout<<"C"<<endl;
-  //hpp_mcclosure_data = new TH1F(Form("hpp_mcclosure_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test R%d %s ",radius,etaWidth),1000,0,1000);
-  hpp_mcclosure_JetComb_data = new TH1F(Form("hpp_mcclosure_JetComb_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger combined  R%d %s ",radius,etaWidth),1000,0,1000);
-  hpp_mcclosure_Jet80_data = new TH1F(Form("hpp_mcclosure_Jet80_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 80  R%d %s ",radius,etaWidth),1000,0,1000);
-  hpp_mcclosure_Jet60_data = new TH1F(Form("hpp_mcclosure_Jet60_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 60  R%d %s ",radius,etaWidth),1000,0,1000);
-  hpp_mcclosure_Jet40_data = new TH1F(Form("hpp_mcclosure_Jet40_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 40  R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_mcclosure_data = new TH1F(Form("hpp_mcclosure_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt);
+  hpp_mcclosure_JetComb_data = new TH1F(Form("hpp_mcclosure_JetComb_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger combined  R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt);
+  hpp_mcclosure_Jet80_data = new TH1F(Form("hpp_mcclosure_Jet80_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 80  R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt);
+  hpp_mcclosure_Jet60_data = new TH1F(Form("hpp_mcclosure_Jet60_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 60  R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt);
+  hpp_mcclosure_Jet40_data = new TH1F(Form("hpp_mcclosure_Jet40_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 40  R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt);
 
-  //hpp_mcclosure_gen = new TH1F(Form("hpp_mcclosure_gen_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test R%d %s ",radius,etaWidth),1000,0,1000);
-  hpp_mcclosure_JetComb_gen = new TH1F(Form("hpp_mcclosure_gen_JetComb_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger combined R%d %s ",radius,etaWidth),1000,0,1000);
-  hpp_mcclosure_Jet80_gen = new TH1F(Form("hpp_mcclosure_gen_Jet80_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 80 R%d %s ",radius,etaWidth),1000,0,1000);
-  hpp_mcclosure_Jet60_gen = new TH1F(Form("hpp_mcclosure_gen_Jet60_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 60 R%d %s ",radius,etaWidth),1000,0,1000);
-  hpp_mcclosure_Jet40_gen = new TH1F(Form("hpp_mcclosure_gen_Jet40_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 40 R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_mcclosure_gen = new TH1F(Form("hpp_mcclosure_gen_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt);
+  hpp_mcclosure_JetComb_gen = new TH1F(Form("hpp_mcclosure_gen_JetComb_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger combined R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt);
+  hpp_mcclosure_Jet80_gen = new TH1F(Form("hpp_mcclosure_gen_Jet80_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 80 R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt);
+  hpp_mcclosure_Jet60_gen = new TH1F(Form("hpp_mcclosure_gen_Jet60_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 60 R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt);
+  hpp_mcclosure_Jet40_gen = new TH1F(Form("hpp_mcclosure_gen_Jet40_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 40 R%d %s ",radius,etaWidth),nbins_pt,boundaries_pt);
 
   
-
   // declare the 2d calo and pf candidate vectors, deltaR_calovsPF is going to be a 3d vector like so:
   // calo jet on x axis, pf jet on y axis, and delta R, calopT, pfpT on z axis.
   // we also need to add in the trigger information here since we need to know what trigger the matching comes from. maybe i can run that later as an added check. for now just to see if the algorithm is working should try to run things. 
@@ -802,6 +801,16 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	
 	  Float_t Sumcand = chSum + phSum + neSum + muSum;
 
+	  if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	    if(nentry%2==1) {
+	      hpp_mcclosure_matrix->Fill(pfrefpt, pfpt, weight);
+	      hpp_mcclosure_gen->Fill(pfrefpt, weight);
+	    }
+	    if(nentry%2==1) {
+	      hpp_mcclosure_data->Fill(pfpt, weight);
+	    }
+	  }
+	  
 	  if(jet40 == 1 && jet60==0 && jet80 == 0){
 
 	    if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
@@ -961,6 +970,17 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	
 	  Float_t Sumcand = chSum + phSum + neSum + muSum;
 
+	  if(eMax/Sumcand < 0.05) {
+	    if(nentry%2==1) {
+	      hpp_mcclosure_matrix->Fill(pfrefpt, pfpt, weight);
+	      hpp_mcclosure_gen->Fill(pfrefpt, weight);
+	    }
+	    if(nentry%2==1) {
+	      hpp_mcclosure_data->Fill(pfpt, weight);
+	    }
+	  }
+	  
+	  
 	  if(jet40 == 1 && jet60 == 0 && jet80 == 0){
 
 	    if(eMax/Sumcand < 0.05) {
@@ -1057,7 +1077,7 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
   // unmatchCaloJets->Write();
   // unmatchCaloJets->Print();
 
-#if 0
+
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet80_data);
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet60_data);
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet40_data);
@@ -1067,16 +1087,18 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
   hpp_mcclosure_JetComb_gen->Add(hpp_mcclosure_Jet40_gen);
 
   hpp_mcclosure_matrix_HLT->Write();
+  hpp_mcclosure_matrix->Write();
   hpp_mcclosure_JetComb_data->Write();
+  hpp_mcclosure_data->Write();
   hpp_mcclosure_Jet80_data->Write();
   hpp_mcclosure_Jet60_data->Write();
   hpp_mcclosure_Jet40_data->Write();
   hpp_mcclosure_JetComb_gen->Write();    
+  hpp_mcclosure_gen->Write();    
   hpp_mcclosure_Jet80_gen->Write();
   hpp_mcclosure_Jet60_gen->Write();
   hpp_mcclosure_Jet40_gen->Write();
     
-#endif
 
   hEvents->Write();
 

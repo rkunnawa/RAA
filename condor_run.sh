@@ -28,7 +28,7 @@ process=$4
 
 echo "Processing..."
 
-root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
+#root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
 #mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_vz_cent_akPuPF_20150324_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/data/.
 
 #root -b -q RAA_fragBiasCheck.C\+\($startfile,$endfile\)
@@ -45,10 +45,10 @@ root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
 #mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_ak35PF_20150323_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/data/.
 
 #root -b -q RAA_calo_pf_JetCorrelation_v2.C\+\($startfile,$endfile\)
-#mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_Data_eventCounting_histogram_deltaR_0p2_akPu3_20150419_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/data/.
+#mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MC_closure_histogram_deltaR_0p2_akPu2_20150422_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/mc/.
 
-#root -b -q RAA_calo_pf_JetCorrelation_pp.C\+\($startfile,$endfile\)
-#mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_Data_eventCounting_histogram_deltaR_0p2_ak3_20150419_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/.
+root -b -q RAA_calo_pf_JetCorrelation_pp.C\+\($startfile,$endfile\)
+mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_MC_closure_histogram_deltaR_0p2_ak2_20150422_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PP/2013/.
 
 #mv PbPb_data_ak3_Vs_20140820_$endfile.root ../../Output/.
 
