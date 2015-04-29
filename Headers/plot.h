@@ -158,6 +158,7 @@ void makeHistTitle(TH1 *h,char *title, char *xTitle, char *yTitle, int color = -
   h->GetYaxis()->SetLabelSize(20);
   h->GetYaxis()->SetTitleSize(22);
   h->GetYaxis()->SetTitleOffset(2.0);
+  h->GetYaxis()->SetMoreLogLabels();
 	
   h->GetXaxis()->SetLabelFont(43);
   h->GetXaxis()->SetTitleFont(43);
@@ -462,113 +463,6 @@ void makeMultiPanelCanvasWithoutGap(TCanvas*& canv,
   }
 }
 
-
-/*
-  void prepareNcollUnc(int nbins, float maxpt=300.){
-	
-  int fillsty = 1001;
-	
-  const int n = nbins;
-	
-  double xvalue[n];
-  double yvalue[n];
-  double xerror[n];
-  double yerror1[n], yerror2[n], yerror3[n], yerror4[n], yerror5[n], yerror6[n];
-	
-
-
-  for(int i=0;i<nbins;i++){
-
-  xvalue[i] = 300.1 + 1.2*(double)i, yvalue[i]=1.0, xerror[i]=0.0;  
-    
-  // TAA
-  yerror1[i]=0.0409, yerror2[i]=0.0459, yerror3[i]=0.0578, yerror4[i]=0.0944, yerror5[i]=0.143, yerror6[i]=0.176;
- 
-    
-  // add 6% error 
-  yerror1[i]=TMath::Sqrt(yerror1[i]*yerror1[i]+0.06*0.06);
-  yerror2[i]=TMath::Sqrt(yerror2[i]*yerror2[i]+0.06*0.06);
-  yerror3[i]=TMath::Sqrt(yerror3[i]*yerror3[i]+0.06*0.06);
-  yerror4[i]=TMath::Sqrt(yerror4[i]*yerror4[i]+0.06*0.06);
-  yerror5[i]=TMath::Sqrt(yerror5[i]*yerror5[i]+0.06*0.06);
-  yerror6[i]=TMath::Sqrt(yerror6[i]*yerror6[i]+0.06*0.06);
-  cout<<"TAA + Lumi uncertainty = "<<yerror1[i]<<endl;   
-  
-  }
-  
-  
-  // int ci = 29;
-  int ci = 15;
-
-  tTAAerr[0] = new TGraphErrors(n,xvalue,yvalue,xerror,yerror1);
-  tTAAerr[0]->SetFillColor(ci);
-  tTAAerr[0]->SetLineColor(ci);
-  tTAAerr[0]->SetFillStyle(fillsty);
-
-  tTAAerr[1] = new TGraphErrors(n,xvalue,yvalue,xerror,yerror2);
-  tTAAerr[1]->SetFillColor(ci);
-  tTAAerr[1]->SetFillStyle(fillsty);
-
-  tTAAerr[2] = new TGraphErrors(n,xvalue,yvalue,xerror,yerror3);
-  tTAAerr[2] ->SetFillColor(ci);
-  tTAAerr[2] ->SetFillStyle(fillsty);
-
-  tTAAerr[3]  = new TGraphErrors(n,xvalue,yvalue,xerror,yerror4);
-  tTAAerr[3]->SetFillColor(ci);
-  tTAAerr[3]->SetFillStyle(fillsty);
-
-  tTAAerr[4] = new TGraphErrors(n,xvalue,yvalue,xerror,yerror5);
-  tTAAerr[4]->SetFillColor(ci);
-  tTAAerr[4]->SetFillStyle(fillsty);
-
-  tTAAerr[5] = new TGraphErrors(n,xvalue,yvalue,xerror,yerror6);
-  tTAAerr[5]->SetFillColor(ci);
-  tTAAerr[5]->SetFillStyle(fillsty);
-  
-
-
-  }
-
-  void DrawNpartTAABand(){
-  double xvalueNpart[6];
-  double yerrorNpart[6];
-  xvalueNpart[0] = 381.29; xvalueNpart[1] = 329.41; xvalueNpart[2] = 224.28;
-  xvalueNpart[3] = 108.12; xvalueNpart[4] = 42.04;  xvalueNpart[5] = 11.43;
-  yerrorNpart[0]=0.0409, yerrorNpart[1]=0.0459, yerrorNpart[2]=0.0578, yerrorNpart[3]=0.0944, yerrorNpart[4]=0.143, yerrorNpart[5]=0.176;
-  	
-  int ci = 30;
-  	
-  for (int i=0;i<6;i++) {
-		
-  TBox *b = new TBox(xvalueNpart[i]-5,1.-yerrorNpart[i]/2,xvalueNpart[i]+5,1.+yerrorNpart[i]/2);
-  b->SetFillColor(ci);
-  b->SetFillStyle(3001);
-  b->SetLineColor(ci);
-  b->Draw();
-  }
- 
- 
-  }
- 
-
- 
-
-  void dumpDatatoTxt(const char *centbin,TH1F *h, TH1F *hsys, TH1F *htotStat, const char *txtfile){
-  ofstream outf(txtfile,ios::out);
-  for(int ix=1;ix<=h->GetNbinsX();ix++){
-  double pt = h->GetBinCenter(ix);
-  double val = h->GetBinContent(ix);
-  double Uncorerr = h->GetBinError(ix);
-  double syserr = hsys->GetBinContent(ix)-1;
-  double totStaterr = htotStat->GetBinError(ix);
-
-  outf<<setprecision(0) << fixed <<pt<<"\t" << setprecision(3) << fixed <<val<<"\t" << setprecision(5) << fixed << totStaterr<<"\t"<< setprecision(4) << fixed << syserr*val << endl;
-  }
-
-  outf.close();
-  }
-
-*/
 
 TGraphErrors *ShiftGraph(TGraphErrors* pGraph, Double_t pNumber){
   // shifts a graph by the absolute value in the argument

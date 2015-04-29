@@ -135,8 +135,8 @@ class SysData
 
     Int_t beginning = h->FindBin(60); Int_t end = h->FindBin(299);
 
-    if(i==0){ beginning = h->FindBin(100); }
-    if(i==5 || i==4 || i==3) { end = h->FindBin(240);}
+    //if(i==0){ beginning = h->FindBin(100); }
+    //if(i==5 || i==4 || i==3) { end = h->FindBin(240);}
 
     for (int j=beginning;j<=end;j++) {
       double val = h->GetBinContent(j);
@@ -146,8 +146,7 @@ class SysData
       //b->SetFillColor(kGray);
       b->SetFillStyle(0);
       //b->SetLineColor(kGray);
-			
-      
+		             
       //***********For Gunther's Color Systematics Band Peference
       b->SetFillColor(color);
       b->SetLineColor(color);
@@ -207,7 +206,7 @@ class SysData
     TH1D *h = new TH1D(Form("hSysTmp_cent%d",i),"",nbins_pt, boundaries_pt);
     makeHistTitle(h,"","Jet p_{T} (GeV/c)","Systematic uncertainty");
     h->SetAxisRange(-0.25,0.4,"Y");
-    h->SetAxisRange(50,299,"X");
+    h->SetAxisRange(60,299,"X");
     h->Draw();
     TH1F* sys = drawEnvelope(hSys[i],"same",hSys[i]->GetLineColor(),1001,hSys[i]->GetLineColor(),-1);
     TH1F* sysIter = drawEnvelope(hSysIter[i],"same",hSysIter[i]->GetLineColor(),3004,hSysIter[i]->GetLineColor(),-1);
@@ -283,7 +282,7 @@ void checkMaximumSys(TH1F *hSys, TH1F *h, int opt=0,double minVal = 1)
 
 
 
-void prepareNcollUnc(int nbins, float maxpt=300.){
+void prepareNcollUnc(int nbins, float maxpt=299.){
 	
   int fillsty = 1001;
 	
@@ -347,8 +346,8 @@ void prepareNcollUnc(int nbins, float maxpt=300.){
 
 
 }
-/*
-  void DrawNpartTAABand(){
+
+void DrawNpartTAABand(){
   double xvalueNpart[6];
   double yerrorNpart[6];
   xvalueNpart[0] = 381.29; xvalueNpart[1] = 329.41; xvalueNpart[2] = 224.28;
@@ -359,17 +358,17 @@ void prepareNcollUnc(int nbins, float maxpt=300.){
   	
   for (int i=0;i<6;i++) {
 		
-  TBox *b = new TBox(xvalueNpart[i]-5,1.-yerrorNpart[i]/2,xvalueNpart[i]+5,1.+yerrorNpart[i]/2);
-  b->SetFillColor(ci);
-  b->SetFillStyle(3001);
-  b->SetLineColor(ci);
-  b->Draw();
+    TBox *b = new TBox(xvalueNpart[i]-5,1.-yerrorNpart[i]/2,xvalueNpart[i]+5,1.+yerrorNpart[i]/2);
+    b->SetFillColor(ci);
+    b->SetFillStyle(3001);
+    b->SetLineColor(ci);
+    b->Draw();
   }
  
  
-  }
+}
  
-*/
+
  
 
 void dumpDatatoTxt(const char *centbin,TH1F *h, TH1F *hsys, TH1F *htotStat, const char *txtfile)

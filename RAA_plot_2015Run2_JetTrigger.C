@@ -103,7 +103,7 @@ void RAA_plot_2015Run2_JetTrigger(int radius = 3, char * algo= "Pu", char * jet_
   hRatio->Draw();
   cRatio->SaveAs("../../Plots/scalefactor_2p75_5p02_ratio_jetpT_pthat30.pdf","RECREATE");
     
-
+  
 
 }
 
