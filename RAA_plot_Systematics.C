@@ -1,5 +1,5 @@
 // Raghav Kunnawalkam Elayavalli
-// April 13 2014
+// April 13 2015
 // Rutgers
 // raghav.k.e at CERN dot CH
 
@@ -22,7 +22,7 @@
 #include <TLegend.h>
 #include <TGraphErrors.h>
 #include <TGraphAsymmErrors.h>
-#include <TH1.h>
+#include <TH1.h>3
 #include <TH2.h>
 #include <TH3.h>
 #include <TFile.h>
@@ -62,7 +62,6 @@ TLegend *getLegend(double x1, double y1, double x2, double y2)
 using namespace std;
 
 void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 30){
-
   
   TStopwatch timer;
   timer.Start();
@@ -74,11 +73,22 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
-  TFile *fin_R2, *fin_R3, *fin_R4; 
-  fin_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150420.root",2,unfoldingCut,jet_type));
-  fin_R3 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150420.root",3,unfoldingCut,jet_type));
-  fin_R4 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150420.root",4,unfoldingCut,jet_type));
+  char * etaWidth = (char*) "n16_eta_p16";
 
+  TFile *fin_R2, *fin_R3, *fin_R4; 
+  fin_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Raghav_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n16_eta_p16_%dGeVCut_ak%s_20150428.root",2,unfoldingCut,jet_type));
+  fin_R3 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Raghav_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n16_eta_p16_%dGeVCut_ak%s_20150428.root",3,unfoldingCut,jet_type));
+  fin_R4 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Raghav_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n16_eta_p16_%dGeVCut_ak%s_20150428.root",4,unfoldingCut,jet_type));
+  
+  // // get the unfolded error correction files and histograms
+  // TFile * fError_R2, * fError_R3, * fError_R4;
+  // fError_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Raghav_ntuple_PbPb_R%d_pp_R%d_noJetID_n16_eta_p16_unfoldingCut_%d_AbsEta1p6_data_driven_correction_akPu%s_20150424.root",2,2,unfoldingCut, jet_type));
+  // fError_R3 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Raghav_ntuple_PbPb_R%d_pp_R%d_noJetID_n16_eta_p16_unfoldingCut_%d_AbsEta1p6_data_driven_correction_akPu%s_20150424.root",3,3,unfoldingCut, jet_type));
+  // fError_R4 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Raghav_ntuple_PbPb_R%d_pp_R%d_noJetID_n16_eta_p16_unfoldingCut_%d_AbsEta1p6_data_driven_correction_akPu%s_20150424.root",4,4,unfoldingCut, jet_type));
+
+  // TH1F * hPbPb_R2_ErrorFix[nbins_cent], * hPbPb_R3_ErrorFix[nbins_cent], * hPbPb_R4_ErrorFix[nbins_cent];
+  // TH1F * hPbPb_R2_measured[nbins_cent], * hPbPb_R3_measured[nbins_cent], * hPbPb_R4_measured[nbins_cent];
+  
   // get the histograms.
   TH1F * uPbPb_R2_Bayes[nbins_cent], * uPP_R2_Bayes, * uPbPb_R3_Bayes[nbins_cent], * uPP_R3_Bayes, * uPbPb_R4_Bayes[nbins_cent], * uPP_R4_Bayes;
   TH1F * mPbPb_R2[nbins_cent], * mPP_R2, * mPbPb_R3[nbins_cent], * mPP_R3, * mPbPb_R4[nbins_cent], * mPP_R4;
@@ -102,6 +112,14 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   mPP_R4->Print("base");
   
   for(int i = 0; i<nbins_cent; ++i){
+    cout<<i<<endl;
+    // hPbPb_R2_ErrorFix[i] = (TH1F*)fError_R2->Get(Form("PbPb_BayesianUnfolded_cent%d",i));
+    // hPbPb_R3_ErrorFix[i] = (TH1F*)fError_R3->Get(Form("PbPb_BayesianUnfolded_cent%d",i));
+    // hPbPb_R4_ErrorFix[i] = (TH1F*)fError_R4->Get(Form("PbPb_BayesianUnfolded_cent%d",i));
+
+    // hPbPb_R2_measured[i] = (TH1F*)fError_R2->Get(Form("hpbpb_HLTComb_R2_%s_cent%d",etaWidth,i));
+    // hPbPb_R3_measured[i] = (TH1F*)fError_R3->Get(Form("hpbpb_HLTComb_R3_%s_cent%d",etaWidth,i));
+    // hPbPb_R4_measured[i] = (TH1F*)fError_R4->Get(Form("hpbpb_HLTComb_R4_%s_cent%d",etaWidth,i));
 
     uPbPb_R2_Bayes[i] = (TH1F*)fin_R2->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
     uPbPb_R2_Bayes[i]->Print("base");
@@ -307,9 +325,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cPbPb_Its_R2->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, 2),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
 
-  cPbPb_Its_R2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR2%s_%d.pdf",unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
+  cPbPb_Its_R2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR2%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
   
 
   TCanvas * cPP_Its_R2 = new TCanvas("cPP_Its_R2","",600,400);
@@ -343,9 +361,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type, 2),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
-  cPP_Its_R2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_iteration_systematics_%dGeVCut_akR2%s_%d.pdf",unfoldingCut,jet_type,date.GetDate()),"RECREATE");
+  cPP_Its_R2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_iteration_systematics_%dGeVCut_akR2%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut,jet_type,date.GetDate()),"RECREATE");
 
   // define the Jet ID efficiency as a function of jet pT: taken from the above plots: 
   TF1 * fPol = new TF1("fPol","[0]+[1]*x");
@@ -372,8 +391,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cRAA_JEC_sys_R2->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R0.2",algo, jet_type),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cRAA_JEC_sys_R2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR2%s_%d.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cRAA_JEC_sys_R2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR2%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
 
     // plot for the Smear sys
 
@@ -396,8 +416,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cRAA_Smear_sys_R2->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R2",algo, jet_type, radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cRAA_Smear_sys_R2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R2%s_%d.pdf",unfoldingCut, algo, jet_type, date.GetDate()));
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cRAA_Smear_sys_R2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R2%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut, algo, jet_type, date.GetDate()));
 
 
   // draw the total systematics
@@ -421,7 +442,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cSys_R2->cd(1);
   putCMSPrel();
   linePbPb_iter->Draw();
-  cSys_R2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_total_systematics_unfoldingCut%dGeV_ak%sR2%s_%d.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
+  cSys_R2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_total_systematics_unfoldingCut%dGeV_ak%sR2%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
 
 
   TCanvas * cPbPb_Its_R3 = new TCanvas("cPbPb_Its_R3","",1000,800);
@@ -459,9 +480,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cPbPb_Its_R3->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, 3),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-
-  cPbPb_Its_R3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR3%s_%d.pdf",unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  
+  cPbPb_Its_R3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR3%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
   
 
   TCanvas * cPP_Its_R3 = new TCanvas("cPP_Its_R3","",600,400);
@@ -495,9 +517,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type, 3),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-
-  cPP_Its_R3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_iteration_systematics_%dGeVCut_akR3%s_%d.pdf",unfoldingCut,jet_type,date.GetDate()),"RECREATE");
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  
+  cPP_Its_R3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_iteration_systematics_%dGeVCut_akR3%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut,jet_type,date.GetDate()),"RECREATE");
 
   // plot for the JEC sys
 
@@ -521,8 +544,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cRAA_JEC_sys_R3->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.3",algo, jet_type),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cRAA_JEC_sys_R3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR3%s_%d.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cRAA_JEC_sys_R3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR3%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
 
     // plot for the Smear sys
 
@@ -545,8 +569,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cRAA_Smear_sys_R3->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.3",algo, jet_type),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cRAA_Smear_sys_R3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R3%s_%d.pdf",unfoldingCut, algo, jet_type, date.GetDate()));
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cRAA_Smear_sys_R3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R3%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut, algo, jet_type, date.GetDate()));
 
 
   // draw the total systematics
@@ -570,7 +595,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cSys_R3->cd(1);
   putCMSPrel();
   linePbPb_iter->Draw();
-  cSys_R3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_total_systematics_unfoldingCut%dGeV_ak%sR3%s_%d.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
+  cSys_R3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_total_systematics_unfoldingCut%dGeV_ak%sR3%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
 
 
 
@@ -609,9 +634,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cPbPb_Its_R4->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, 4),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-
-  cPbPb_Its_R4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR4%s_%d.pdf",unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cPbPb_Its_R4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR4%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
   
 
   TCanvas * cPP_Its_R4 = new TCanvas("cPP_Its_R4","",600,400);
@@ -645,9 +670,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type, 4),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-
-  cPP_Its_R4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_iteration_systematics_%dGeVCut_akR4%s_%d.pdf",unfoldingCut,jet_type,date.GetDate()),"RECREATE");
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cPP_Its_R4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_iteration_systematics_%dGeVCut_akR4%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut,jet_type,date.GetDate()),"RECREATE");
 
   // plot for the JEC sys
 
@@ -671,8 +696,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cRAA_JEC_sys_R4->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.4",algo, jet_type),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cRAA_JEC_sys_R4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR4%s_%d.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cRAA_JEC_sys_R4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR4%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
 
     // plot for the Smear sys
 
@@ -695,8 +721,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cRAA_Smear_sys_R4->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R4",algo, jet_type, radius),0.2,0.23,20);
-  drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cRAA_Smear_sys_R4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R4%s_%d.pdf",unfoldingCut, algo, jet_type, date.GetDate()));
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
+  cRAA_Smear_sys_R4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R4%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut, algo, jet_type, date.GetDate()));
 
 
   // draw the total systematics
@@ -720,8 +747,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cSys_R4->cd(1);
   putCMSPrel();
   linePbPb_iter->Draw();
-  cSys_R4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_total_systematics_unfoldingCut%dGeV_ak%sR4%s_%d.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
-
+  cSys_R4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_total_systematics_unfoldingCut%dGeV_ak%sR4%s_%d_raghav_ntuple_AbsEta1p6.pdf",unfoldingCut, algo, jet_type, date.GetDate()),"RECREATE");
 
   
   // im  plotting the raa vs npart plot here, since it needs the systematics
@@ -778,7 +804,8 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   hRAA_R4_npart->Draw("same E1");
 
   drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
-  drawText("Jet ID cut, |#eta|<2",0.15,0.3,16);
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15, Jet ID Cut",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15, Jet ID Cut",0.6,0.31,20);
   drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
   drawText("97 < Jet p_{T} < 114", 0.15,0.8,16);
   
@@ -802,7 +829,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putPbPbLumi();
   putPPLumi();
   
-  cRAA_npart->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_97_pT_114_%d.pdf",date.GetDate()),"RECREATE");
+  cRAA_npart->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_97_pT_114_%d_raghav_ntuple_AbsEta1p6.pdf",date.GetDate()),"RECREATE");
 
   // plot npart raa for dufferent pt range around 130
   
@@ -848,7 +875,8 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   hRAA_R4_npart2->Draw("same E1");
 
   drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
-  drawText("Jet ID cut, |#eta|<2",0.15,0.3,16);
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15, Jet ID Cut",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15, Jet ID Cut",0.6,0.31,20);
   drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
   drawText("133 < Jet p_{T} < 153", 0.15,0.8,16);
   
@@ -873,7 +901,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putPbPbLumi();
   putPPLumi();
   
-  cRAA_npart2->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_133_pT_153_%d.pdf",date.GetDate()),"RECREATE");
+  cRAA_npart2->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_133_pT_153_%d_raghav_ntuple_AbsEta1p6.pdf",date.GetDate()),"RECREATE");
 
   // plot RAA vs Npart for a smaller pT : 74 - 84
 
@@ -919,7 +947,8 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   hRAA_R4_npart3->Draw("same E1");
 
   drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
-  drawText("Jet ID cut, |#eta|<2",0.15,0.3,16);
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15, Jet ID Cut",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15, Jet ID Cut",0.6,0.31,20);
   drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
   drawText("74 < Jet p_{T} < 84", 0.15,0.8,16);
   
@@ -944,7 +973,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putPbPbLumi();
   putPPLumi();
   
-  cRAA_npart3->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_74_pT_84_%d.pdf",date.GetDate()),"RECREATE");
+  cRAA_npart3->SaveAs(Form("../../Plots/Final_paper_plots_RAA_npart_74_pT_84_%d_raghav_ntuple_AbsEta1p6.pdf",date.GetDate()),"RECREATE");
 
   
   
@@ -961,36 +990,36 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
     cRAA_R2->cd(nbins_cent-i);
 
-    if(i==0){
-      for(int j = RAA_R2_Bayes[i]->FindBin(unfoldingCut); j<RAA_R2_Bayes[i]->FindBin(100); ++j){
-	RAA_R2_Meas[i]->SetBinContent(j,0);
-	RAA_R2_Bayes[i]->SetBinContent(j,0);
-	RAA_R2_BinByBin[i]->SetBinContent(j,0);
-	RAA_R2_Meas[i]->SetBinError(j,0);
-	RAA_R2_Bayes[i]->SetBinError(j,0);
-	RAA_R2_BinByBin[i]->SetBinError(j,0);
-      }
-    }
-    if(i==5 || i==4 || i==3){
-      for(int j = RAA_R2_Bayes[i]->FindBin(240); j<RAA_R2_Bayes[i]->FindBin(300); ++j){
-	RAA_R2_Meas[i]->SetBinContent(j,0);
-	RAA_R2_Bayes[i]->SetBinContent(j,0);
-	RAA_R2_BinByBin[i]->SetBinContent(j,0);
-	RAA_R2_Meas[i]->SetBinError(j,0);
-	RAA_R2_Bayes[i]->SetBinError(j,0);
-	RAA_R2_BinByBin[i]->SetBinError(j,0);
-      }
-    }
-    if(i==1 || i==2){
-      for(int j = RAA_R2_Bayes[i]->FindBin(unfoldingCut); j<RAA_R2_Bayes[i]->FindBin(unfoldingCut+30); ++j){
-	RAA_R2_Meas[i]->SetBinContent(j,0);
-	RAA_R2_Bayes[i]->SetBinContent(j,0);
-	RAA_R2_BinByBin[i]->SetBinContent(j,0);
-	RAA_R2_Meas[i]->SetBinError(j,0);
-	RAA_R2_Bayes[i]->SetBinError(j,0);
-	RAA_R2_BinByBin[i]->SetBinError(j,0);
-      }
-    }
+    // if(i==0){
+    //   for(int j = RAA_R2_Bayes[i]->FindBin(unfoldingCut); j<RAA_R2_Bayes[i]->FindBin(100); ++j){
+    // 	RAA_R2_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R2_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R2_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R2_Meas[i]->SetBinError(j,0);
+    // 	RAA_R2_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R2_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
+    // if(i==5 || i==4 || i==3){
+    //   for(int j = RAA_R2_Bayes[i]->FindBin(240); j<RAA_R2_Bayes[i]->FindBin(300); ++j){
+    // 	RAA_R2_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R2_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R2_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R2_Meas[i]->SetBinError(j,0);
+    // 	RAA_R2_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R2_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
+    // if(i==1 || i==2){
+    //   for(int j = RAA_R2_Bayes[i]->FindBin(unfoldingCut); j<RAA_R2_Bayes[i]->FindBin(unfoldingCut+30); ++j){
+    // 	RAA_R2_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R2_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R2_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R2_Meas[i]->SetBinError(j,0);
+    // 	RAA_R2_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R2_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
 
     RAA_R2_Meas[i]->SetMarkerColor(kBlack);
     RAA_R2_Meas[i]->SetMarkerStyle(24);
@@ -1034,13 +1063,14 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s R=0.2 %s Jets",algo,jet_type),0.2,0.23,16);
   //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
   cRAA_R2->cd(2);
-  drawText("Jet ID cut, |#eta|<2",0.1,0.3,16);
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15, Jet ID Cut",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15, Jet ID Cut",0.6,0.31,20);
   drawText("|vz|<15, HBHEfilter, pCES",0.1,0.2,16);
   cRAA_R2->cd(3);
   drawText("Jet RAA dataset, trigger combined",0.1,0.3,16);
   drawText("Pile up rejection cut applied",0.1,0.2,16);
 
-  cRAA_R2->SaveAs(Form("../../Plots/Final_paper_plots_RAA_R2_%d.pdf",date.GetDate()),"RECREATE");
+  cRAA_R2->SaveAs(Form("../../Plots/Final_paper_plots_RAA_R2_%d_raghav_ntuple_AbsEta1p6.pdf",date.GetDate()),"RECREATE");
     
   // draw it for R=0.3
   TCanvas *cRAA_R3 = new TCanvas("cRAA_R3","RAA",1200,800);
@@ -1055,36 +1085,36 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
     cRAA_R3->cd(nbins_cent-i);
 
-    if(i==0){
-      for(int j = RAA_R3_Bayes[i]->FindBin(unfoldingCut); j<RAA_R3_Bayes[i]->FindBin(100); ++j){
-	RAA_R3_Meas[i]->SetBinContent(j,0);
-	RAA_R3_Bayes[i]->SetBinContent(j,0);
-	RAA_R3_BinByBin[i]->SetBinContent(j,0);
-	RAA_R3_Meas[i]->SetBinError(j,0);
-	RAA_R3_Bayes[i]->SetBinError(j,0);
-	RAA_R3_BinByBin[i]->SetBinError(j,0);
-      }
-    }
-    if(i==5 || i==4 || i==3){
-      for(int j = RAA_R3_Bayes[i]->FindBin(240); j<RAA_R3_Bayes[i]->FindBin(300); ++j){
-	RAA_R3_Meas[i]->SetBinContent(j,0);
-	RAA_R3_Bayes[i]->SetBinContent(j,0);
-	RAA_R3_BinByBin[i]->SetBinContent(j,0);
-	RAA_R3_Meas[i]->SetBinError(j,0);
-	RAA_R3_Bayes[i]->SetBinError(j,0);
-	RAA_R3_BinByBin[i]->SetBinError(j,0);
-      }
-    }
-    if(i==1 || i==2){
-      for(int j = RAA_R3_Bayes[i]->FindBin(unfoldingCut); j<RAA_R3_Bayes[i]->FindBin(unfoldingCut+30); ++j){
-	RAA_R3_Meas[i]->SetBinContent(j,0);
-	RAA_R3_Bayes[i]->SetBinContent(j,0);
-	RAA_R3_BinByBin[i]->SetBinContent(j,0);
-	RAA_R3_Meas[i]->SetBinError(j,0);
-	RAA_R3_Bayes[i]->SetBinError(j,0);
-	RAA_R3_BinByBin[i]->SetBinError(j,0);
-      }
-    }
+    // if(i==0){
+    //   for(int j = RAA_R3_Bayes[i]->FindBin(unfoldingCut); j<RAA_R3_Bayes[i]->FindBin(100); ++j){
+    // 	RAA_R3_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R3_Meas[i]->SetBinError(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
+    // if(i==5 || i==4 || i==3){
+    //   for(int j = RAA_R3_Bayes[i]->FindBin(240); j<RAA_R3_Bayes[i]->FindBin(300); ++j){
+    // 	RAA_R3_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R3_Meas[i]->SetBinError(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
+    // if(i==1 || i==2){
+    //   for(int j = RAA_R3_Bayes[i]->FindBin(unfoldingCut); j<RAA_R3_Bayes[i]->FindBin(unfoldingCut+30); ++j){
+    // 	RAA_R3_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R3_Meas[i]->SetBinError(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
 
     RAA_R3_Meas[i]->SetMarkerColor(kBlack);
     RAA_R3_Meas[i]->SetMarkerStyle(24);
@@ -1128,13 +1158,15 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s R=0.3 %s Jets",algo,jet_type),0.2,0.23,16);
   //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
   cRAA_R3->cd(2);
-  drawText("Jet ID cut, |#eta|<2",0.1,0.3,16);
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15, Jet ID Cut",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15, Jet ID Cut",0.6,0.31,20);
+
   drawText("|vz|<15, HBHEfilter, pCES",0.1,0.2,16);
   cRAA_R3->cd(3);
   drawText("Jet RAA dataset, trigger combined",0.1,0.3,16);
   drawText("Pile up rejection cut applied",0.1,0.2,16);
 
-  cRAA_R3->SaveAs(Form("../../Plots/Final_paper_plots_RAA_R3_%d.pdf",date.GetDate()),"RECREATE");
+  cRAA_R3->SaveAs(Form("../../Plots/Final_paper_plots_RAA_R3_%d_raghav_ntuple_AbsEta1p6.pdf",date.GetDate()),"RECREATE");
 
   // plot it for R=0.4
    TCanvas *cRAA_R4 = new TCanvas("cRAA_R4","RAA",1200,800);
@@ -1149,36 +1181,36 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
     cRAA_R4->cd(nbins_cent-i);
 
-    if(i==0){
-      for(int j = RAA_R4_Bayes[i]->FindBin(unfoldingCut); j<RAA_R4_Bayes[i]->FindBin(100); ++j){
-	RAA_R4_Meas[i]->SetBinContent(j,0);
-	RAA_R4_Bayes[i]->SetBinContent(j,0);
-	RAA_R4_BinByBin[i]->SetBinContent(j,0);
-	RAA_R4_Meas[i]->SetBinError(j,0);
-	RAA_R4_Bayes[i]->SetBinError(j,0);
-	RAA_R4_BinByBin[i]->SetBinError(j,0);
-      }
-    }
-    if(i==5 || i==4 || i==3){
-      for(int j = RAA_R4_Bayes[i]->FindBin(240); j<RAA_R4_Bayes[i]->FindBin(300); ++j){
-	RAA_R4_Meas[i]->SetBinContent(j,0);
-	RAA_R4_Bayes[i]->SetBinContent(j,0);
-	RAA_R4_BinByBin[i]->SetBinContent(j,0);
-	RAA_R4_Meas[i]->SetBinError(j,0);
-	RAA_R4_Bayes[i]->SetBinError(j,0);
-	RAA_R4_BinByBin[i]->SetBinError(j,0);
-      }
-    }
-    if(i==1 || i==2){
-      for(int j = RAA_R4_Bayes[i]->FindBin(unfoldingCut); j<RAA_R4_Bayes[i]->FindBin(unfoldingCut+30); ++j){
-	RAA_R4_Meas[i]->SetBinContent(j,0);
-	RAA_R4_Bayes[i]->SetBinContent(j,0);
-	RAA_R4_BinByBin[i]->SetBinContent(j,0);
-	RAA_R4_Meas[i]->SetBinError(j,0);
-	RAA_R4_Bayes[i]->SetBinError(j,0);
-	RAA_R4_BinByBin[i]->SetBinError(j,0);
-      }
-    }
+    // if(i==0){
+    //   for(int j = RAA_R4_Bayes[i]->FindBin(unfoldingCut); j<RAA_R4_Bayes[i]->FindBin(100); ++j){
+    // 	RAA_R4_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R4_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R4_Meas[i]->SetBinError(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R4_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
+    // if(i==5 || i==4 || i==3){
+    //   for(int j = RAA_R4_Bayes[i]->FindBin(240); j<RAA_R4_Bayes[i]->FindBin(300); ++j){
+    // 	RAA_R4_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R4_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R4_Meas[i]->SetBinError(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R4_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
+    // if(i==1 || i==2){
+    //   for(int j = RAA_R4_Bayes[i]->FindBin(unfoldingCut); j<RAA_R4_Bayes[i]->FindBin(unfoldingCut+30); ++j){
+    // 	RAA_R4_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R4_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R4_Meas[i]->SetBinError(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R4_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
 
     RAA_R4_Meas[i]->SetMarkerColor(kBlack);
     RAA_R4_Meas[i]->SetMarkerStyle(24);
@@ -1222,17 +1254,16 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s R=0.4 %s Jets",algo,jet_type),0.2,0.23,16);
   //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
   cRAA_R4->cd(2);
-  drawText("Jet ID cut, |#eta|<2",0.1,0.3,16);
+  if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6,  Jet ID Cut",0.6,0.31,20);
+  if(etaWidth=="n20_eta_p20")drawText("|#eta|<2 , Jet ID Cut",0.6,0.31,20);
   drawText("|vz|<15, HBHEfilter, pCES",0.1,0.2,16);
   cRAA_R4->cd(3);
   drawText("Jet RAA dataset, trigger combined",0.1,0.3,16);
   drawText("Pile up rejection cut applied",0.1,0.2,16);
 
-  cRAA_R4->SaveAs(Form("../../Plots/Final_paper_plots_RAA_R4_%d.pdf",date.GetDate()),"RECREATE");
-    
+  cRAA_R4->SaveAs(Form("../../Plots/Final_paper_plots_RAA_R4_%d_raghav_ntuple_AbsEta1p6.pdf",date.GetDate()),"RECREATE");
 
 
-  
   
   // plot 2 - Bayesian unfolded RAA as a function of pT for the different radii
   //        - regular 6 panel plot 
@@ -1254,36 +1285,36 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
     cRAA->cd(nbins_cent-i);
 
-    if(i==0){
-      for(int j = RAA_R3_Bayes[i]->FindBin(unfoldingCut); j<RAA_R3_Bayes[i]->FindBin(100); ++j){
-	RAA_R2_Bayes[i]->SetBinContent(j,0);
-	RAA_R3_Bayes[i]->SetBinContent(j,0);
-	RAA_R4_Bayes[i]->SetBinContent(j,0);
-	RAA_R2_Bayes[i]->SetBinError(j,0);
-	RAA_R3_Bayes[i]->SetBinError(j,0);
-	RAA_R4_Bayes[i]->SetBinError(j,0);
-      }
-    }
-    if(i==5 || i==4 || i==3){
-      for(int j = RAA_R3_Bayes[i]->FindBin(240); j<RAA_R3_Bayes[i]->FindBin(300); ++j){
-	RAA_R2_Bayes[i]->SetBinContent(j,0);
-	RAA_R3_Bayes[i]->SetBinContent(j,0);
-	RAA_R4_Bayes[i]->SetBinContent(j,0);
-	RAA_R2_Bayes[i]->SetBinError(j,0);
-	RAA_R3_Bayes[i]->SetBinError(j,0);
-	RAA_R4_Bayes[i]->SetBinError(j,0);
-      }
-    }
-    if(i==1 || i==2){
-      for(int j = RAA_R3_Bayes[i]->FindBin(unfoldingCut); j<RAA_R3_Bayes[i]->FindBin(unfoldingCut+30); ++j){
-	RAA_R2_Bayes[i]->SetBinContent(j,0);
-	RAA_R3_Bayes[i]->SetBinContent(j,0);
-	RAA_R4_Bayes[i]->SetBinContent(j,0);
-	RAA_R2_Bayes[i]->SetBinError(j,0);
-	RAA_R3_Bayes[i]->SetBinError(j,0);
-	RAA_R4_Bayes[i]->SetBinError(j,0);
-      }
-    }
+    // if(i==0){
+    //   for(int j = RAA_R3_Bayes[i]->FindBin(unfoldingCut); j<RAA_R3_Bayes[i]->FindBin(100); ++j){
+    // 	RAA_R2_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R2_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinError(j,0);
+    //   }
+    // }
+    // if(i==5 || i==4 || i==3){
+    //   for(int j = RAA_R3_Bayes[i]->FindBin(240); j<RAA_R3_Bayes[i]->FindBin(300); ++j){
+    // 	RAA_R2_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R2_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinError(j,0);
+    //   }
+    // }
+    // if(i==1 || i==2){
+    //   for(int j = RAA_R3_Bayes[i]->FindBin(unfoldingCut); j<RAA_R3_Bayes[i]->FindBin(unfoldingCut+30); ++j){
+    // 	RAA_R2_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R2_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R4_Bayes[i]->SetBinError(j,0);
+    //   }
+    // }
 
     RAA_R2_Bayes[i]->SetMarkerColor(kRed);
     RAA_R2_Bayes[i]->SetMarkerStyle(20);
@@ -1337,9 +1368,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText("Jet RAA dataset, trigger combined",0.1,0.3,16);
   drawText("Pile up rejection cut applied",0.1,0.2,16);
 
-  cRAA->SaveAs(Form("../../Plots/Final_paper_plots_RAA_%d.pdf",date.GetDate()),"RECREATE");
+  cRAA->SaveAs(Form("../../Plots/Final_paper_plots_RAA_%d_raghav_ntuple_AbsEta1p6.pdf",date.GetDate()),"RECREATE");
     
 
+  
   // plot - comparison with ATLAS
   // get the ATLAS most central bin 0-10% RAA from the hepdata http://hepdata.cedar.ac.uk/view/ins1326911/next
 
@@ -1601,7 +1633,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   leg5->Draw();
  
   
-  cATLAS->SaveAs(Form("../../Plots/comparison_with_ATLAS_RAA_%d.pdf",date.GetDate()),"RECREATE");
+  cATLAS->SaveAs(Form("../../Plots/comparison_with_ATLAS_RAA_%d_raghav_ntuple_AbsEta1p6.pdf",date.GetDate()),"RECREATE");
 
 
 
@@ -1647,7 +1679,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   legpp_1->SetTextSize(0.04);
   legpp_1->Draw();
   
-  cATLAS_pp->SaveAs(Form("../../Plots/comparison_with_ATLAS_pp_spectra_%d.pdf",date.GetDate()),"RECREATE");
+  cATLAS_pp->SaveAs(Form("../../Plots/comparison_with_ATLAS_pp_spectra_%d_raghav_ntuple_AbsEta1p6.pdf",date.GetDate()),"RECREATE");
   
   
   // TAA for atlas plots:// which is in inverse milli barns 
@@ -1933,7 +1965,124 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   legpbpb_5->SetTextSize(0.04);
   legpbpb_5->Draw();
 
-  cATLAS_pbpb->SaveAs(Form("../../Plots/comparison_with_ATLAS_pbpb_spectra_%d.pdf",date.GetDate()),"RECREATE");
+  cATLAS_pbpb->SaveAs(Form("../../Plots/comparison_with_ATLAS_pbpb_spectra_%d_raghav_ntuple_AbsEta1p6.pdf",date.GetDate()),"RECREATE");
 
+
+#if 0
+  // do the statistical error check
+  // we have three histograms here:
+  // 1) input data spectra.
+  // 2) bayesian unfolding after 4 iterations - take it from the iteration systematics. 
+  // 3) error fixed unfolding.
+
+  // make those Error histograms:
+  TH1F * hError_R2_Meas[nbins_cent], * hError_R2_4Iter[nbins_cent], * hError_R2_Fixed[nbins_cent];
+  TH1F * hError_R3_Meas[nbins_cent], * hError_R3_4Iter[nbins_cent], * hError_R3_Fixed[nbins_cent];
+  TH1F * hError_R4_Meas[nbins_cent], * hError_R4_4Iter[nbins_cent], * hError_R4_Fixed[nbins_cent];
+
+  for(int i = 0; i<nbins_cent; ++i){
+
+    hError_R2_Meas[i] = new TH1F(Form("hError_R2_Meas_cent%d",i),"",nbins_pt, boundaries_pt); 
+    hError_R2_4Iter[i] = new TH1F(Form("hError_R2_4Iter_cent%d",i),"",nbins_pt, boundaries_pt); 
+    hError_R2_Fixed[i] = new TH1F(Form("hError_R2_Fixed_cent%d",i),"",nbins_pt, boundaries_pt); 
+
+    hError_R3_Meas[i] = new TH1F(Form("hError_R3_Meas_cent%d",i),"",nbins_pt, boundaries_pt); 
+    hError_R3_4Iter[i] = new TH1F(Form("hError_R3_4Iter_cent%d",i),"",nbins_pt, boundaries_pt); 
+    hError_R3_Fixed[i] = new TH1F(Form("hError_R3_Fixed_cent%d",i),"",nbins_pt, boundaries_pt); 
+
+    hError_R4_Meas[i] = new TH1F(Form("hError_R4_Meas_cent%d",i),"",nbins_pt, boundaries_pt); 
+    hError_R4_4Iter[i] = new TH1F(Form("hError_R4_4Iter_cent%d",i),"",nbins_pt, boundaries_pt); 
+    hError_R4_Fixed[i] = new TH1F(Form("hError_R4_Fixed_cent%d",i),"",nbins_pt, boundaries_pt); 
+
+    
+    for(int j = 1; j<=nbins_pt; ++j){
+
+      hError_R3_Meas[i] ->SetBinContent(j, hPbPb_R3_measured[i]->GetBinError(j));
+      hError_R3_4Iter[i]->SetBinContent(j, uPbPb_BayesianIter_R3[i][4]->GetBinError(j));
+      hError_R3_Fixed[i]->SetBinContent(j, uPbPb_R3_Bayes[i]->GetBinError(j));
+      
+      hError_R2_Meas[i] ->SetBinContent(j, hPbPb_R2_measured[i]->GetBinError(j));
+      hError_R2_4Iter[i]->SetBinContent(j, uPbPb_BayesianIter_R2[i][4]->GetBinError(j));
+      hError_R2_Fixed[i]->SetBinContent(j, uPbPb_R2_Bayes[i]->GetBinError(j));
+      
+      hError_R4_Meas[i] ->SetBinContent(j, hPbPb_R4_measured[i]->GetBinError(j));
+      hError_R4_4Iter[i]->SetBinContent(j, uPbPb_BayesianIter_R4[i][4]->GetBinError(j));
+      hError_R4_Fixed[i]->SetBinContent(j, uPbPb_R4_Bayes[i]->GetBinError(j));
+      
+    }
+    
+  }
+ 
+  
+  TCanvas * cErrorFix_R2 = new TCanvas("cErrorFix_R2","",800,600);
+  makeMultiPanelCanvasWithGap(cErrorFix_R2,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  
+  for(int i = 0; i<nbins_cent; ++i){
+    
+    cErrorFix_R2->cd(nbins_cent-i);
+
+    hError_R2_Meas[i]->SetMarkerStyle(24);
+    hError_R2_Meas[i]->SetMarkerColor(kBlack);
+    hError_R2_Meas[i]->SetAxisRange(50, 299, "X");
+    hError_R2_Meas[i]->Draw();
+
+    hError_R2_4Iter[i]->SetMarkerStyle(25);
+    hError_R2_4Iter[i]->SetMarkerColor(kRed);
+    hError_R2_4Iter[i]->Draw("same");
+    hError_R2_Fixed[i]->SetMarkerStyle(26);
+    hError_R2_Fixed[i]->SetMarkerColor(kRed);
+    hError_R2_Fixed[i]->Draw("same");
+    
+  }
+
+  cErrorFix_R2->SaveAs(Form(""),"RECREATE");
+
+    TCanvas * cErrorFix_R3 = new TCanvas("cErrorFix_R3","",800,600);
+  makeMultiPanelCanvasWithGap(cErrorFix_R3,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  
+  for(int i = 0; i<nbins_cent; ++i){
+    
+    cErrorFix_R3->cd(nbins_cent-i);
+
+    hError_R3_Meas[i]->SetMarkerStyle(24);
+    hError_R3_Meas[i]->SetMarkerColor(kBlack);
+    hError_R3_Meas[i]->SetAxisRange(50, 299, "X");
+    hError_R3_Meas[i]->Draw();
+
+    hError_R3_4Iter[i]->SetMarkerStyle(25);
+    hError_R3_4Iter[i]->SetMarkerColor(kRed);
+    hError_R3_4Iter[i]->Draw("same");
+    hError_R3_Fixed[i]->SetMarkerStyle(26);
+    hError_R3_Fixed[i]->SetMarkerColor(kRed);
+    hError_R3_Fixed[i]->Draw("same");
+    
+  }
+
+  cErrorFix_R3->SaveAs(Form(""),"RECREATE");
+
+  TCanvas * cErrorFix_R4 = new TCanvas("cErrorFix_R4","",800,600);
+  makeMultiPanelCanvasWithGap(cErrorFix_R4,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  
+  for(int i = 0; i<nbins_cent; ++i){
+    
+    cErrorFix_R4->cd(nbins_cent-i);
+
+    hError_R4_Meas[i]->SetMarkerStyle(24);
+    hError_R4_Meas[i]->SetMarkerColor(kBlack);
+    hError_R4_Meas[i]->SetAxisRange(50, 299, "X");
+    hError_R4_Meas[i]->Draw();
+
+    hError_R4_4Iter[i]->SetMarkerStyle(25);
+    hError_R4_4Iter[i]->SetMarkerColor(kRed);
+    hError_R4_4Iter[i]->Draw("same");
+    hError_R4_Fixed[i]->SetMarkerStyle(26);
+    hError_R4_Fixed[i]->SetMarkerColor(kRed);
+    hError_R4_Fixed[i]->Draw("same");
+    
+  }
+
+  cErrorFix_R4->SaveAs(Form(""),"RECREATE");
+
+#endif
   
 }

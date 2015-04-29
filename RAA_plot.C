@@ -157,19 +157,19 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
 
   bool doPbPbIterSys = false;
   bool doPPIterSys = false;
-  bool doRAA = true;
-  bool doPbPbMCClosure = true;
-  bool doPPMCClosure = true;
+  bool doRAA = false;
+  bool doPbPbMCClosure = false;
+  bool doPPMCClosure = false;
   bool doPbPbDatavsMC = false;
   bool doPPDatavsMC = false;
   bool doPbPbNormRes = true;
   bool doPPNormRes = true;
-  bool doPbPbsigma = true;
-  bool doPPsigma = true;
+  bool doPbPbsigma = false;
+  bool doPPsigma = false;
   bool doGenSpectra = false;
-  bool doPbPbTrgComb = true;
+  bool doPbPbTrgComb = false;
   bool doPbPb12003TrgComb = false;
-  bool doPPTrgComb = true;
+  bool doPPTrgComb = false;
   bool doPPTrgContribution = false;
 
   bool doRandomCone = false;
@@ -193,7 +193,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
   TFile *fin; 
   
   //if(location=="MIT") PbPb_pp_calopfpt_ppNoJetidcut_R0p2_unfold_mcclosure_oppside_trgMC_n20_eta_p20_30GeVCut_akPF_20150417
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n20_eta_p20_%dGeVCut_ak%s_20150420.root",radius,unfoldingCut,jet_type));
+  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Raghav_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n16_eta_p16_%dGeVCut_ak%s_20150428.root",radius,unfoldingCut,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))

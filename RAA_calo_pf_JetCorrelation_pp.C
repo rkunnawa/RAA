@@ -92,7 +92,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radius=2, int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC", char *etaWidth = "n20_eta_p20"){
+void RAA_calo_pf_JetCorrelation_pp(int startfile = 10, int endfile = 11, int radius=2, int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC", char *etaWidth = "n20_eta_p20"){
 
   TH1::SetDefaultSumw2();
 
@@ -253,7 +253,7 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
   fVzPP->SetParameters(8.41684e-01,-2.58609e-02,4.86550e-03,-3.10581e-04,2.07918e-05);
   
   
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_%s_closure_histogram_deltaR_0p%d_ak%d_%d_%d.root",dataset,deltaR,radius,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_%s_closure_histogram_noJetID_deltaR_0p%d_ak%d_%d_%d.root",dataset,deltaR,radius,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
 
@@ -801,7 +801,7 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	
 	  Float_t Sumcand = chSum + phSum + neSum + muSum;
 
-	  if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	  //if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
 	    if(nentry%2==1) {
 	      hpp_mcclosure_matrix->Fill(pfrefpt, pfpt, weight);
 	      hpp_mcclosure_gen->Fill(pfrefpt, weight);
@@ -809,11 +809,11 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	    if(nentry%2==1) {
 	      hpp_mcclosure_data->Fill(pfpt, weight);
 	    }
-	  }
+	    //}
 	  
 	  if(jet40 == 1 && jet60==0 && jet80 == 0){
 
-	    if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	    //if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
 	      if(nentry%2==1) {
 		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
 		hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
@@ -821,33 +821,33 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	      if(nentry%2==1) {
 		hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
 	      }
-	    }
+	      //}
 
-	    if(calopt/pfpt > 0.85) {
-	      if(nentry%2==1) {
-		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-		hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
-	      }
-	      if(nentry%2==1) {
-		hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
-	      }
-	    }
+	    // if(calopt/pfpt > 0.85) {
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+	    // 	hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
+	    //   }
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
+	    //   }
+	    // }
 
-	    if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
-	      if(nentry%2==1) {
-		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-		hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
-	      }
-	      if(nentry%2==1) {
-		hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
-	      }
-	    }
+	    // if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+	    // 	hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
+	    //   }
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
+	    //   }
+	    // }
 	  
 	  }
 
 	  if(jet60 == 1 && jet80 == 0){
 
-	    if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	    //if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
 	      if(nentry%2==1) {
 		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
 		hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
@@ -855,34 +855,34 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	      if(nentry%2==1) {
 		hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
 	      }
-	    }
+	      //}
 
-	    if(calopt/pfpt > 0.85) {
-	      if(nentry%2==1) {
-		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-		hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
-	      }
-	      if(nentry%2==1) {
-		hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
-	      }
-	    }
+	    // if(calopt/pfpt > 0.85) {
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+	    // 	hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
+	    //   }
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
+	    //   }
+	    // }
 
-	    if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
-	      if(nentry%2==1) {
-		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-		hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
-	      }
-	      if(nentry%2==1) {
-		hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
-	      }
-	    }
+	    // if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+	    // 	hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
+	    //   }
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
+	    //   }
+	    // }
 	  
 	  
 	  }
 
 	  if(jet80==1){
 
-	    if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
+	    //if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < ((Float_t)18/7 *(Float_t)calopt/pfpt - (Float_t)9/7)){
 	      if(nentry%2==1) {
 		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
 		hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
@@ -890,27 +890,27 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	      if(nentry%2==1) {
 		hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
 	      }
-	    }
+	      //}
 
-	    if(calopt/pfpt > 0.85) {
-	      if(nentry%2==1) {
-		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-		hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
-	      }
-	      if(nentry%2==1) {
-		hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
-	      }
-	    }
+	    // if(calopt/pfpt > 0.85) {
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+	    // 	hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
+	    //   }
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
+	    //   }
+	    // }
 
-	    if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
-	      if(nentry%2==1) {
-		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
-		hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
-	      }
-	      if(nentry%2==1) {
-		hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
-	      }
-	    }
+	    // if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) {
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
+	    // 	hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
+	    //   }
+	    //   if(nentry%2==1) {
+	    // 	hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
+	    //   }
+	    // }
 	  
 	  
 	  }
@@ -970,7 +970,7 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	
 	  Float_t Sumcand = chSum + phSum + neSum + muSum;
 
-	  if(eMax/Sumcand < 0.05) {
+	  //if(eMax/Sumcand < 0.05) {
 	    if(nentry%2==1) {
 	      hpp_mcclosure_matrix->Fill(pfrefpt, pfpt, weight);
 	      hpp_mcclosure_gen->Fill(pfrefpt, weight);
@@ -978,12 +978,12 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	    if(nentry%2==1) {
 	      hpp_mcclosure_data->Fill(pfpt, weight);
 	    }
-	  }
+	    //}
 	  
 	  
 	  if(jet40 == 1 && jet60 == 0 && jet80 == 0){
 
-	    if(eMax/Sumcand < 0.05) {
+	    //if(eMax/Sumcand < 0.05) {
 	      if(nentry%2==1) {
 		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
 		hpp_mcclosure_Jet40_gen->Fill(pfrefpt, weight);
@@ -991,13 +991,13 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	      if(nentry%2==1) {
 		hpp_mcclosure_Jet40_data->Fill(pfpt, weight);
 	      }
-	    }
+	      //}
 	  
 	  }
 
 	  if(jet60 == 1 && jet80 == 0){
 
-	    if(eMax/Sumcand < 0.05) {
+	    //if(eMax/Sumcand < 0.05) {
 	      if(nentry%2==1) {
 		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
 		hpp_mcclosure_Jet60_gen->Fill(pfrefpt, weight);
@@ -1005,14 +1005,14 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	      if(nentry%2==1) {
 		hpp_mcclosure_Jet60_data->Fill(pfpt, weight);
 	      }
-	    }
+	      //}
 	  
 	  
 	  }
 
 	  if(jet80==1){
 
-	    if(eMax/Sumcand < 0.05) {
+	    //if(eMax/Sumcand < 0.05) {
 	      if(nentry%2==1) {
 		hpp_mcclosure_matrix_HLT->Fill(pfrefpt, pfpt, weight);
 		hpp_mcclosure_Jet80_gen->Fill(pfrefpt, weight);
@@ -1020,7 +1020,7 @@ void RAA_calo_pf_JetCorrelation_pp(int startfile = 1, int endfile = 2, int radiu
 	      if(nentry%2==1) {
 		hpp_mcclosure_Jet80_data->Fill(pfpt, weight);
 	      }
-	    }
+	      //}
 	  
 	  
 	  }
