@@ -39,8 +39,10 @@ void RAA_unfold_svd(int radius = 3, char* algo = (char*) "Pu", char *jet_type = 
 
   // Raghav's files: 
   TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_rebinned_eMaxSumcand_A_R0p%d.root",radius));
-  TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_rebinned_eMaxSumcand_A_R0p%d.root",radius));
-  //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_noJetID_exclusionhighertriggers_A_R0p%d.root",radius));
+  //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_rebinned_eMaxSumcand_A_R0p%d.root",radius));
+  // no jet ID cut. 
+  TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_exclusionhighertriggers_rebinned_eMaxSumcand_A_R0p%d.root",radius));
+
 
   // Pawan's files:
   // TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuplehistograms/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
@@ -50,8 +52,8 @@ void RAA_unfold_svd(int radius = 3, char* algo = (char*) "Pu", char *jet_type = 
   TFile * fPbPb_MB_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
 
   // we also need to get the files for the MinBias closure histograms.
-  TFile * fPbPb_MCclosure_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MC_calo_pf_jet_correlation_mcclosure_histograms_deltaR_0p2_akPu%d_20150413.root",radius));
-  TFile * fPP_MCclosure_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_MC_calo_pf_jet_correlation_deltaR_0p2_ak%d_20150412.root",radius));
+  TFile * fPbPb_MCclosure_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MC_closure_histogram_deltaR_0p2_akPu%d_20150423.root",radius));
+  TFile * fPP_MCclosure_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_MC_closure_histogram_deltaR_0p2_ak%d_20150423.root",radius));
   //TFile * fPP_MCclosure_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/pp_MC_calo_pf_jet_correlation_mcclosure_test_sameside_deltaR_0p2_ak%d_20150413.root",radius));
   
   cout<<"after input file declaration"<<endl;
@@ -83,7 +85,6 @@ void RAA_unfold_svd(int radius = 3, char* algo = (char*) "Pu", char *jet_type = 
   TH1F *uPP_MC_SVD;
   
   // would be better to read in the histograms and rebin them. come to think of it, it would be better to have them already rebinned (and properly scaled - to the level of differential cross section in what ever barns (inverse micro barns) but keep it consistent) from the read macro. 
-
       
   // get PbPb data
   for(int i = 0;i<nbins_cent;++i){
@@ -91,14 +92,11 @@ void RAA_unfold_svd(int radius = 3, char* algo = (char*) "Pu", char *jet_type = 
     if(printDebug) cout<<"cent_"<<i<<endl;
     dPbPb_TrgComb[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
     dPbPb_TrgComb[i]->Print("base");
-    mPbPb_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_matrix_HLT_R%d_n20_eta_p20_cent%d",radius,i));
+    mPbPb_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_matrix_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_Matrix[i]->Print("base");
-    mPbPb_mcclosure_data[i] = (TH1F*)fPbPb_MCclosure_in->Get(Form("hpbpb_mcclosure_JetComb_data_R%d_n20_eta_p20_cent%d",radius,i));
-    mPbPb_mcclosure_data[i]->Rebin(10);
-    mPbPb_mcclosure_date[i]->Scale(1./10);
+    mPbPb_mcclosure_data[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_reco_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_mcclosure_data[i]->Print("base");
-    mPbPb_mcclosure_Matrix[i] = (TH2F*)fPbPb_MCclosure_in->Get(Form("hpbpb_mcclosure_matrix_HLT_R%d_n20_eta_p20_cent%d",radius,i));
-    mPbPb_mcclosure_Matrix[i]->Rebin2D(10);
+    mPbPb_mcclosure_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_matrix_R%d_n20_eta_p20_cent%d",radius,i));
     mPbPb_mcclosure_Matrix[i]->Print("base");
   }
 
@@ -106,16 +104,14 @@ void RAA_unfold_svd(int radius = 3, char* algo = (char*) "Pu", char *jet_type = 
   dPP_Comb->Print("base");
   mPP_Matrix = (TH2F*)fPP_in->Get(Form("hpp_matrix_HLT_R%d_%s",radius,etaWidth));
   mPP_Matrix->Print("base");
-  mPP_mcclosure_data = (TH1F*)fPP_MCclosure_in->Get(Form("hpp_mcclosure_JetComb_data_R%d_%s",radius,etaWidth));
-  mPP_mcclosure_data->Rebin(10);
+  mPP_mcclosure_data = (TH1F*)fPP_in->Get(Form("hpp_JetComb_reco_R%d_%s",radius,etaWidth));
   mPP_mcclosure_data->Print("base");
-  mPP_mcclosure_Matrix = (TH2F*)fPP_MCclosure_in->Get(Form("hpp_mcclosure_matrix_HLT_R%d_%s",radius,etaWidth));
-  mPP_mcclosure_Matrix->Rebin2D(10);
+  mPP_mcclosure_Matrix = (TH2F*)fPP_in->Get(Form("hpp_matrix_HLT_R%d_%s",radius,etaWidth));
   mPP_mcclosure_Matrix->Print("base");
   
   Int_t nSVDIter = 1;
   
-  for(int j = 5; j<6; ++j){
+  for(int j = 4; j<=6; ++j){
     nSVDIter = j;
 
     for(int i = 0;i<nbins_cent;++i){
@@ -141,21 +137,33 @@ void RAA_unfold_svd(int radius = 3, char* algo = (char*) "Pu", char *jet_type = 
     //regularization parameter definition: 
     RooUnfoldSvd unfoldSvdMCPP(&ruResponseMCPP, mPP_mcclosure_data, nSVDIter);
     uPP_MC_SVD = (TH1F*)unfoldSvdMCPP.Hreco();
-    uPP_MC_SVD->SetName("PP_MC_SVD_unfolding_cent%d");
+    uPP_MC_SVD->SetName("PP_MC_SVD_unfolding");
 
     RooUnfoldResponse ruResponsePP(mPP_Matrix->ProjectionY(),mPP_Matrix->ProjectionX(), mPP_Matrix,"","");
     //regularization parameter definition: 
     RooUnfoldSvd unfoldSvdPP(&ruResponsePP, dPP_Comb, nSVDIter);
     uPP_SVD = (TH1F*)unfoldSvdPP.Hreco();
-    uPP_SVD->SetName("PP_SVD_unfolding_cent%d");
+    uPP_SVD->SetName("PP_SVD_unfolding");
   
-    TFile fout(Form("../../Output/svd_unfolding_HLTmatrix_param%d_R%d_%d.root",nSVDIter,radius,date.GetDate()),"RECREATE");
+    TFile fout(Form("../../Output/svd_unfolding_sameside_matrix_param%d_R%d_%d.root",nSVDIter,radius,date.GetDate()),"RECREATE");
     for(int i = 0; i<nbins_cent;i++){
 
       dPbPb_TrgComb[i]->Write();
       uPbPb_SVD[i]->Write();
-    
+      mPbPb_Matrix[i]->Write();
+      mPbPb_mcclosure_data[i]->Write();
+      uPbPb_MC_SVD[i]->Write();
+      mPbPb_mcclosure_Matrix[i]->Write();
+  
     }
+
+    uPP_SVD->Write();
+    dPP_Comb->Write();
+    mPP_Matrix->Write();
+    mPP_mcclosure_data->Write();
+    uPP_MC_SVD->Write();
+    mPP_mcclosure_Matrix->Write();
+    
     fout.Close();
     
   }// svd unfolding iterations loop
