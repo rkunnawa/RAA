@@ -41,14 +41,14 @@
 #include "Headers/plot.h"
 
 static const int nbins_cent = 6;
-static const Int_t nSVD =3;
+static const Int_t nSVD =7;
 double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
 static const int nbins_pt = 30;
 static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
 
 using namespace std;
 
-void RAA_plot_SVD_unfolding_check(int radius = 3){
+void RAA_plot_SVD_unfolding_check(int radius = 3, char * etaWidth = (char*)"n20_eta_p20"){
 
   TStopwatch timer;
   timer.Start();
@@ -62,7 +62,7 @@ void RAA_plot_SVD_unfolding_check(int radius = 3){
 
   // get the input SVD files and histograms
   //Int_t nSVDIter[nSVD] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
-  Int_t nSVDIter[nSVD] = {4,5,6};
+  Int_t nSVDIter[nSVD] = {12,13,14,15,16,17,18};
   TFile * fin[nSVD];
   TFile * fPbPb_MCin;
   TFile * fPP_MCin;
@@ -76,30 +76,30 @@ void RAA_plot_SVD_unfolding_check(int radius = 3){
   TH1F * hMC_Closure[nSVD][nbins_cent];
   TH1F * hMC_Closure_pp[nSVD];
 
-  TFile * fPbPb_in = TFile::Open(Form("../../Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_rebinned_eMaxSumcand_A_R0p%d.root",radius));
-  TFile * fPP_in = TFile::Open(Form("../../Output/Pp_CutEfficiency_YetkinCuts_exclusionhighertriggers_rebinned_eMaxSumcand_A_R0p%d.root",radius));
+  TFile * fPbPb_in = TFile::Open(Form("../../Output/Pawan_ntuple_PbPb_data_MC_spectra_JetID_CutA_analysisbins_%s_R0p%d.root",etaWidth,radius));
+  TFile * fPP_in = TFile::Open(Form("../../Output/Pawan_ntuple_PP_data_MC_spectra_residualFactor_analysisbins_%s_R0p%d.root",etaWidth,radius));
   
   for(int j = 0; j<nSVD; ++j){
-    cout<<"iteration j = "<<nSVDIter[j]<<endl;
+    cout<<"resolution parameter j = "<<nSVDIter[j]<<endl;
     for(int i = 0; i<nbins_cent; ++i){
       cout<<"centrality bin = "<<i<<endl;
-      fin[j] = TFile::Open(Form("../../Output/svd_unfolding_sameside_matrix_param%d_R%d_20150424.root",nSVDIter[j],radius));
-      if(j==0) hmatrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_matrix_R%d_n20_eta_p20_cent%d",radius,i));
-      if(j==0) hData[i] = (TH1F*)fin[j]->Get(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
+      fin[j] = TFile::Open(Form("../../Output/svd_unfolding_matrix_param%d_%s_R%d_20150501.root",nSVDIter[j], etaWidth,radius));
+      if(j==0) hmatrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_matrix_R%d_%s_cent%d",radius,etaWidth,i));
+      if(j==0) hData[i] = (TH1F*)fin[j]->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",radius,etaWidth,i));
       if(j==0) hGen[i] = (TH1F*)hmatrix[i]->ProjectionX();
       hSVD[j][i] = (TH1F*)fin[j]->Get(Form("PbPb_SVD_unfolding_cent%d",i));
-      hSVD_MC[j][i] = (TH1F*)fin[j]->Get(Form("PbPb_MC_SVD_unfolding_cent%d",i));
-      hMC_Closure[j][i] = (TH1F*)hSVD_MC[j][i]->Clone(Form("hSVD_Closure_iter%d_cent%d",j,i));
-      hMC_Closure[j][i]->Divide(hGen[i]);
+      //hSVD_MC[j][i] = (TH1F*)fin[j]->Get(Form("PbPb_MC_SVD_unfolding_cent%d",i));
+      //hMC_Closure[j][i] = (TH1F*)hSVD_MC[j][i]->Clone(Form("hSVD_Closure_iter%d_cent%d",j,i));
+      //hMC_Closure[j][i]->Divide(hGen[i]);
 
     }
 
-    hSVD_pp[j] = (TH1F*)fin[j]->Get("PP_SVD_unfolding_cent%d");
-    hSVD_MC_pp[j] = (TH1F*)fin[j]->Get("PP_MC_SVD_unfolding_cent%d");
-    if(j==0)hData_pp = (TH1F*)fin[j]->Get(Form("hpp_HLTComb_R%d_n20_eta_p20",radius));
-    if(j==0)hGen_pp = (TH1F*)fPP_MCin->Get(Form("hpp_mcclosure_gen_JetComb_R%d_n20_eta_p20",radius));
-    hMC_Closure_pp[j] = (TH1F*)hSVD_MC_pp[j]->Clone(Form("hSVD_Closure_PP_iter%d",j));
-    hMC_Closure_pp[j]->Divide(hGen_pp);
+    hSVD_pp[j] = (TH1F*)fin[j]->Get("PP_SVD_unfolding");
+    //hSVD_MC_pp[j] = (TH1F*)fin[j]->Get("PP_MC_SVD_unfolding_cent%d");
+    if(j==0)hData_pp = (TH1F*)fin[j]->Get(Form("hpp_HLTComb_R%d_%s",radius,etaWidth));
+    //if(j==0)hGen_pp = (TH1F*)fPP_MCin->Get(Form("hpp_mcclosure_gen_JetComb_R%d_%s",radius,etaWidth));
+    //hMC_Closure_pp[j] = (TH1F*)hSVD_MC_pp[j]->Clone(Form("hSVD_Closure_PP_iter%d",j));
+    //hMC_Closure_pp[j]->Divide(hGen_pp);
     
   }
 
@@ -142,6 +142,7 @@ void RAA_plot_SVD_unfolding_check(int radius = 3){
 
   cSVD_check->SaveAs(Form("../../Plots/SVD_unfolding_%d_iteration_check_R%d_%d.pdf",nSVD,radius,date.GetDate()),"RECREATE");
   
+#if 0
   // plot the MC closure for PbPb
 
   TCanvas * cClosure_PbPb = new TCanvas("cClosure_PbPb","",1200,1000);
@@ -173,7 +174,7 @@ void RAA_plot_SVD_unfolding_check(int radius = 3){
   drawText("SVD Unfolding",0.2,0.2,14);
 
   cClosure_PbPb->SaveAs(Form("../../Plots/SVD_unfolding_%d_mcclosure_same_check_R%d_%d.pdf",nSVD,radius,date.GetDate()),"RECREATE");
-
+#endif
 
   // Do the spectra check for pp and PP mc closure.
   // Start plotting the curves in 6 different centrality bins.
@@ -203,6 +204,7 @@ void RAA_plot_SVD_unfolding_check(int radius = 3){
 
   cSVD_check_pp->SaveAs(Form("../../Plots/SVD_unfolding_%d_iteration_check_pp_R%d_%d.pdf",nSVD,radius,date.GetDate()),"RECREATE");
   
+#if 0
   // plot the MC closure for PbPb
 
   TCanvas * cClosure_pp = new TCanvas("cClosure_pp","",1200,1000);
@@ -227,7 +229,7 @@ void RAA_plot_SVD_unfolding_check(int radius = 3){
   drawText("SVD Unfolding pp",0.2,0.2,14);
 
   cClosure_pp->SaveAs(Form("../../Plots/SVD_unfolding_%d_mcclosure_same_check_pp_R%d_%d.pdf",nSVD,radius,date.GetDate()),"RECREATE");
-
+#endif
   
   //
   timer.Stop();
