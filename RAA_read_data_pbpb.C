@@ -187,7 +187,7 @@ int findBin(int bin){
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", char *jet_type = "PF"){
+void RAA_read_data_pbpb(int startfile = 0, int endfile = 22, char *algo = "Pu", char *jet_type = "PF"){
 
   TH1::SetDefaultSumw2();
   //gStyle->SetOptStat(0);
@@ -523,6 +523,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   TH1F *hEvents_HLT65 = new TH1F("hEvents_HLT65","",4,0,2);
   TH1F *hEvents_HLT55 = new TH1F("hEvents_HLT55","",4,0,2);
   TH1F *hEvents = new TH1F("hEvents","",4,0,2);
+  TH1F *hCentEvents = new TH1F("hCentEvents","",10,0,10);
 
 #if 0
   TH1F *hEvents_pCES = new TH1F("hEvents_pCES","",4,0,2);
@@ -774,8 +775,6 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       // if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1 && fabs(vz_1)<15 && (hiNpix_1 < 38000 - 500*jetCounter)) hEvents_supernova->Fill(1);
       //if(k==1 && pcollisionEventSelection_1 == 1 && pHBHENoiseFilter_1 ==1 && fabs(vz_1)<15 && (hiNpix_1 < 38000 - 500*jetCounter) && eta_1[0] > -2 && eta_1[0] < 2) hEvents_eta2->Fill(1);
       
-
-      
       // apply the correct supernova selection cut rejection here: 
       if(hiNpix_1 > 38000 - 500*jetCounter){
        	if(printDebug) cout<<"removed this supernova event"<<endl;
@@ -783,6 +782,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
       }
 
       hEvents->Fill(1);
+      hCentEvents->Fill(centBin);
       if(jet80_1)hEvents_HLT80->Fill(1);
       
       // if(chMax_1[0]/pt_1[0] < 0.02 || eMax_1[0]/pt_1[0] > 0.6) continue;
@@ -1388,6 +1388,7 @@ void RAA_read_data_pbpb(int startfile = 0, int endfile = 1, char *algo = "Pu", c
   hpbpb_vy[0]->Write();
 #endif
   
+  hCentEvents->Write();
   /*
   hEvents->Write();
   hEvents_pCES->Write();

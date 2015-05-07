@@ -119,7 +119,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 40){
+void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 40){
 
   TStopwatch timer;
   timer.Start();
@@ -161,8 +161,8 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
   bool doPPMCClosure = true;
   bool doPbPbDatavsMC = false;
   bool doPPDatavsMC = false;
-  bool doPbPbNormRes = true;
-  bool doPPNormRes = true;
+  bool doPbPbNormRes = false;
+  bool doPPNormRes = false;
   bool doPbPbsigma = false;
   bool doPPsigma = false;
   bool doGenSpectra = false;
@@ -191,8 +191,8 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
   
   TFile *fin;
 
-  char * etaWidth = (char*)"10_eta_18";
-  Float_t etaBoundary = 1.8; 
+  char * etaWidth = (char*)"20_eta_20";
+  Float_t etaBoundary = 2.0; 
   
   //if(location=="MIT") PbPb_pp_calopfpt_ppNoJetidcut_R0p2_unfold_mcclosure_oppside_trgMC_n20_eta_p20_30GeVCut_akPF_20150417
   fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_%s_%dGeVCut_ak%s_20150506.root",radius,etaWidth,unfoldingCut,jet_type));
@@ -734,11 +734,14 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
 
       cPbPbMCclosure->cd(nbins_cent-i);
       //hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_Reco[i]->Clone(Form("hMCClosurePbPb_Meas_cent%d",i));
-      hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_mcclosure_data[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_Meas_cent%d",i),boundaries_pt);
-      hMCClosurePbPb_Bayesian[i] = (TH1F*)uPbPb_MC_Bayes[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_Bayesian_cent%d",i),boundaries_pt);
-      hMCClosurePbPb_BinByBin[i] = (TH1F*)uPbPb_MC_BinByBin[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_BinByBin_cent%d",i),boundaries_pt);
+      //hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_mcclosure_data[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_Meas_cent%d",i),boundaries_pt);
+      hMCClosurePbPb_Meas[i] = (TH1F*)mPbPb_mcclosure_data[i]->Clone(Form("hMCClosurePbPb_Meas_cent%d",i));
+      //hMCClosurePbPb_Bayesian[i] = (TH1F*)uPbPb_MC_Bayes[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_Bayesian_cent%d",i),boundaries_pt);
+      hMCClosurePbPb_Bayesian[i] = (TH1F*)uPbPb_MC_Bayes[i]->Clone(Form("hMCClosurePbPb_Bayesian_cent%d",i));
+      //hMCClosurePbPb_BinByBin[i] = (TH1F*)uPbPb_MC_BinByBin[i]->Rebin(nbins_pt,Form("hMCClosurePbPb_BinByBin_cent%d",i),boundaries_pt);
+      hMCClosurePbPb_BinByBin[i] = (TH1F*)uPbPb_MC_BinByBin[i]->Clone(Form("hMCClosurePbPb_BinByBin_cent%d",i));
 
-      mPbPb_mcclosure_gen[i] = (TH1F*)mPbPb_mcclosure_gen[i]->Rebin(nbins_pt,Form("mc_pbpb_mcclosure_gen_cent%d",i),boundaries_pt);
+      //mPbPb_mcclosure_gen[i] = (TH1F*)mPbPb_mcclosure_gen[i]->Rebin(nbins_pt,Form("mc_pbpb_mcclosure_gen_cent%d",i),boundaries_pt);
 
       hMCClosurePbPb_Meas[i]->Divide(mPbPb_mcclosure_gen[i]);
       hMCClosurePbPb_Bayesian[i]->Divide(mPbPb_mcclosure_gen[i]);
@@ -791,8 +794,8 @@ void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfo
     //plot 5 - PP MC closure test
     TCanvas * cPPMCclosure = new TCanvas("cPPMCclosure","PP MC closure test",600,600);
     //TH1F *hMCClosurePP_Meas = (TH1F*)mPP_Reco->Clone("hMCClosurePP_Meas");
-    mPP_mcclosure_gen = (TH1F*)mPP_mcclosure_gen->Rebin(nbins_pt,"mPP_mcclosure_gen",boundaries_pt);
-    divideBinWidth(mPP_mcclosure_gen);
+    //mPP_mcclosure_gen = (TH1F*)mPP_mcclosure_gen->Rebin(nbins_pt,"mPP_mcclosure_gen",boundaries_pt);
+    //divideBinWidth(mPP_mcclosure_gen);
     TH1F *hMCClosurePP_Meas = (TH1F*)mPP_mcclosure_data->Clone("hMCClosurePP_Meas");
     TH1F *hMCClosurePP_Bayesian = (TH1F*)uPP_MC_Bayes->Clone("hMCClosurePP_Bayesian");
     TH1F *hMCClosurePP_BinbyBin = (TH1F*)uPP_MC_BinByBin->Clone("hMCClosurePP_BinbyBin");
