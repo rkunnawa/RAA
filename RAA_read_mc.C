@@ -141,17 +141,18 @@ static const int trigValue = 4;
 static const char trigName [trigValue][256] = {"HLT55","HLT65","HLT80","Combined"};
 static const Float_t effecPrescl = 2.047507;
 
-int findBin(int hiBin){
-  int binNo = -1;
-
-  for(int i = 0;i<nbins_cent;i++){
-    if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
-      binNo = i;
-      break;
-    }
-  }
-
-  return binNo;
+int findBin(int bin){
+  int ibin=-1;
+  //! centrality is defined as 0.5% bins of cross section
+  //! in 0-200 bins               
+  if(bin<=10)ibin=0; //! 0-5%
+  else if(bin>10  && bin<=20 )ibin=1; //! 5-10%
+  else if(bin>20  && bin<=60 )ibin=2;  //! 10-30%
+  else if(bin>60  && bin<=100)ibin=3;  //! 30-50%
+  else if(bin>100 && bin<=140)ibin=4;  //! 50-70%
+  else if(bin>140 && bin<=180)ibin=5;  //! 70-90%
+  else if(bin>180 && bin<=200)ibin=6;  //! 90-100%
+  return ibin;
 }
 
 
@@ -828,6 +829,8 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
 
   }
   
+  TH1F * hCentEvents = new TH1F("hCentEvents","",10,0,10);
+
   for(int k = 0;k<no_radius;k++){
     if(printDebug)cout<<"Filling MC for radius = "<<list_radius[k]<<endl;
     // fill PbPb MC 
@@ -872,7 +875,7 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
 
 	if(!data[k][h]->pcollisionEventSelection) continue;
         int cBin = findBin(data[k][h]->bin);
-	//if(cBin==-1) continue;
+	if(cBin== -1 || cBin == nbins_cent) continue;
 
         //int cBin = nbins_cent-1;
         double weight_cent=1;
@@ -912,6 +915,8 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
 	  continue;
 	}
 
+	hCentEvents->Fill(cBin);
+
 	if(data[k][h]->chargedMax[0]/data[k][h]->jtpt[0] < 0.02 || data[k][h]->eMax[0]/data[k][h]->jtpt[0] > 0.6) continue;
 
 	hpbpb_vz[k]->Fill(data[k][h]->vz,weight_vz);
@@ -919,6 +924,7 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
 	hpbpb_vy[k]->Fill(data[k][h]->vy);
 
 	hpbpb_cent[k]->Fill(data[k][h]->bin,weight_cent);
+	
 
 #if 0	
         if (cBin>=nbins_cent) continue;
@@ -1388,6 +1394,9 @@ void RAA_read_mc(int startfile = 0, int endfile = 9, char *algo = "Pu", char *je
 
   TFile f(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_mc_vz_cent_ak%s%s_%d_%d.root",algo,jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
+
+  hCentEvents->Write();
+
 #if 0
   
   for(int i = 0;i<nbins_cent;++i){

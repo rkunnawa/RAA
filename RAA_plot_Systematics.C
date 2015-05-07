@@ -73,8 +73,8 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
-  char * etaWidth = (char*) "10_eta_18";
-  Float_t etaBoundary = 1.8; 
+  char * etaWidth = (char*) "10_eta_10";
+  Float_t etaBoundary = 2.0; 
 
   TFile *fin_R2, *fin_R3, *fin_R4; 
   fin_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_%s_%dGeVCut_ak%s_20150506.root",2,etaWidth,unfoldingCut,jet_type));
@@ -83,9 +83,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
   // // get the unfolded error correction files and histograms
   TFile * fError_R2, * fError_R3, * fError_R4;
-  fError_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_noFakeWeight_data_driven_correction_akPu%s_20150505.root",2,2, etaWidth, unfoldingCut, jet_type));
-  fError_R3 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_noFakeWeight_data_driven_correction_akPu%s_20150505.root",3,3, etaWidth, unfoldingCut, jet_type));
-  fError_R4 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_noFakeWeight_data_driven_correction_akPu%s_20150505.root",4,4, etaWidth, unfoldingCut, jet_type));
+  fError_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_noFakeWeight_data_driven_correction_akPu%s_20150506.root",2,2, etaWidth, unfoldingCut, jet_type));
+  fError_R3 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_noFakeWeight_data_driven_correction_akPu%s_20150506.root",3,3, etaWidth, unfoldingCut, jet_type));
+  fError_R4 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_noFakeWeight_data_driven_correction_akPu%s_20150506.root",4,4, etaWidth, unfoldingCut, jet_type));
 
 
   TH1F * hPbPb_R2_ErrorFix[nbins_cent], * hPbPb_R3_ErrorFix[nbins_cent], * hPbPb_R4_ErrorFix[nbins_cent];
@@ -162,7 +162,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   prepareNcollUnc(nbins_pt, 300.);
   
   // get the necessary histograms
-  const int Iterations = 6; //for unfolding systematics. 
+  const int Iterations = 18; //for unfolding systematics. 
   const int BayesIter = 4;
   TH1F *uPbPb_BayesianIter_R2[nbins_cent+1][Iterations];
   TH1F *uPP_BayesianIter_R2[Iterations];
@@ -1953,7 +1953,6 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cATLAS_pbpb->SaveAs(Form("../../Plots/comparison_with_ATLAS_pbpb_spectra_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
 
 
-#if 0
   // do the statistical error check
   // we have three histograms here:
   // 1) input data spectra.
@@ -1981,26 +1980,26 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     
     for(int j = 1; j<=nbins_pt; ++j){
 
-      hError_R2_Meas[i]->SetBinContent(j, hPbPb_R2_measured[i]->GetBinError(j)/hPbPb_R2_measured[i]->GetBinContent(j));
+      hError_R2_Meas[i]->SetBinContent(j, hPbPb_R2_measured[i]->GetBinError(j));
       hError_R2_Meas[i]->SetTitle(" ");
       hError_R2_Meas[i]->SetXTitle("Jet p_{T} (GeV/c)");
       hError_R2_Meas[i]->SetYTitle("Statistical Error Bar height");
-      hError_R2_4Iter[i]->SetBinContent(j, uPbPb_BayesianIter_R2[i][4]->GetBinError(j)/uPbPb_BayesianIter_R2[i][4]->GetBinContent(j));
-      hError_R2_Fixed[i]->SetBinContent(j, hPbPb_R2_ErrorFix[i]->GetBinError(j)/hPbPb_R2_ErrorFix[i]->GetBinContent(j));
+      hError_R2_4Iter[i]->SetBinContent(j, uPbPb_BayesianIter_R2[i][4]->GetBinError(j));
+      hError_R2_Fixed[i]->SetBinContent(j, hPbPb_R2_ErrorFix[i]->GetBinError(j));
       
-      hError_R3_Meas[i]->SetBinContent(j, hPbPb_R3_measured[i]->GetBinError(j)/hPbPb_R3_measured[i]->GetBinContent(j));
+      hError_R3_Meas[i]->SetBinContent(j, hPbPb_R3_measured[i]->GetBinError(j));
       hError_R3_Meas[i]->SetTitle(" ");
       hError_R3_Meas[i]->SetXTitle("Jet p_{T} (GeV/c)");
       hError_R3_Meas[i]->SetYTitle("Statistical Error Bar height");
-      hError_R3_4Iter[i]->SetBinContent(j, uPbPb_BayesianIter_R3[i][4]->GetBinError(j)/uPbPb_BayesianIter_R3[i][4]->GetBinContent(j));
-      hError_R3_Fixed[i]->SetBinContent(j, hPbPb_R3_ErrorFix[i]->GetBinError(j)/hPbPb_R3_ErrorFix[i]->GetBinContent(j));
+      hError_R3_4Iter[i]->SetBinContent(j, uPbPb_BayesianIter_R3[i][4]->GetBinError(j));
+      hError_R3_Fixed[i]->SetBinContent(j, hPbPb_R3_ErrorFix[i]->GetBinError(j));
       
-      hError_R4_Meas[i]->SetBinContent(j, hPbPb_R4_measured[i]->GetBinError(j)/hPbPb_R4_measured[i]->GetBinContent(j));
+      hError_R4_Meas[i]->SetBinContent(j, hPbPb_R4_measured[i]->GetBinError(j));
       hError_R4_Meas[i]->SetTitle(" ");
       hError_R4_Meas[i]->SetXTitle("Jet p_{T} (GeV/c)");
       hError_R4_Meas[i]->SetYTitle("Statistical Error Bar height");
-      hError_R4_4Iter[i]->SetBinContent(j, uPbPb_BayesianIter_R4[i][4]->GetBinError(j)/uPbPb_BayesianIter_R4[i][4]->GetBinContent(j));
-      hError_R4_Fixed[i]->SetBinContent(j, hPbPb_R4_ErrorFix[i]->GetBinError(j)/hPbPb_R4_ErrorFix[i]->GetBinContent(j));
+      hError_R4_4Iter[i]->SetBinContent(j, uPbPb_BayesianIter_R4[i][4]->GetBinError(j));
+      hError_R4_Fixed[i]->SetBinContent(j, hPbPb_R4_ErrorFix[i]->GetBinError(j));
       
     }
     
@@ -2105,7 +2104,6 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   err_R4->Draw();
   
   cErrorFix_R4->SaveAs(Form("../../Plots/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,4,date.GetDate()),"RECREATE");
-#endif
   // make plot to compare the bayesian unfolded spectra with 4 iterations and with the data driven error corrections. 
 
   
