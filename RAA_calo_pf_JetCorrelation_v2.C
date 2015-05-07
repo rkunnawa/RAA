@@ -109,7 +109,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radius=2, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC", char * etaWidth = "n20_eta_p20"){
+void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC", char * etaWidth = "n20_eta_p20"){
 
   TH1::SetDefaultSumw2();
 
@@ -318,7 +318,10 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
   int jet80_p_1;
 
   for(int k = 0;k<no_radius;k++){
-    //set the branch addresses:  - one of the most boring parts of the code: 
+    //set the branch addresses:  - one of the most boring parts of the code:
+
+
+    
     jetpbpb1[2][k]->SetBranchAddress("evt",&evt_1);
     jetpbpb1[2][k]->SetBranchAddress("run",&run_1);
     jetpbpb1[2][k]->SetBranchAddress("lumi",&lumi_1);
@@ -345,6 +348,8 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
     jetpbpb1[2][k]->SetBranchAddress("jtphi",&phi_1);
     jetpbpb1[2][k]->SetBranchAddress("rawpt",&raw_1);
     jetpbpb1[2][k]->SetBranchAddress("jtpu",&jtpu_1);
+
+    
     jetpbpb1[2][k]->SetBranchAddress("chargedMax",&chMax_1);
     jetpbpb1[2][k]->SetBranchAddress("chargedSum",&chSum_1);
     jetpbpb1[2][k]->SetBranchAddress("trackMax",&trkMax_1);
@@ -388,6 +393,9 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
       jetpbpb1[2][k]->SetBranchAddress("refpt",&refpt_1);
       jetpbpb1[3][k]->SetBranchAddress("refpt",&refpt_2);
 
+      // set the branch address for gen eta and phi here: 1 - Calo , 2- Pf for variables.
+      //                     for Trees, 2- Calo, 3 - PF. refer Line 147
+      
     }
     
     //jetpbpb1[2][k]->SetBranchAddress("HLT_PAZeroBiasPixel_SingleTrack_v1",&jetMB_1);
@@ -705,7 +713,8 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
       hEvents->Fill(5);
 
       //if(nentry%100000 == 0) cout<<"jetMB_1 = "<<jetMB_1<<endl;
-      
+
+      // start calo jet loop
       for(int g = 0;g<nrefe_1;g++){
 	
 	calojet_eta = eta_1[g];
@@ -719,7 +728,9 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
 	deltaR_calovsPF.push_back(vector<vector<double> > ());
 	
 	calosize++;
-	
+
+
+	// start pf jet lop
 	for(int j = 0;j<nrefe_2;j++){
 
 	  pfjet_eta = eta_2[j];
@@ -734,6 +745,7 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
 	  // if(deltaRCaloPF > (Float_t)deltaR/10) continue;
 	  deltapT = TMath::Abs(calojet_pt - pfjet_pt);
 
+	  // fill the 2D matrix rrequired for matching 
 	  deltaR_calovsPF[calomatchcounter].push_back(vector<double> ());
 	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(deltaRCaloPF); // 0 - delta R
 	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(deltapT); // 1 - delta pT	  
@@ -838,7 +850,8 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
 	    }
 	  }
 	}
-	
+
+	// condition for matching 
 	if(smallDeltaR > (Float_t)deltaR/10 || deltaR_calovsPF[small_calo][small_pf][16] == 1) continue;
 	
 	calopt = deltaR_calovsPF[small_calo][small_pf][3];
@@ -872,6 +885,7 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
 	
 	//matchJets->Fill();
 
+#if 0
 	if(c==0)hEvents->Fill(6);
 
 	// fill in the matched histograms with the Jet ID cuts:
@@ -1002,38 +1016,10 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
 	    }
 	  
 	  
-	  }
+	  }// jet 80 condition
 
-	}
-	
-        
-	
-	//now we have the smallest value, lets get the delta R of that particular matched jets 
-	
-	// if(jet80_1){
-	//   hCaloPFCorr[2][centBin]->Fill((Float_t) pfjet_pt/calojet_pt);
-	//   hCaloPFpt[2][centBin]->Fill(calojet_pt,pfjet_pt);
-	//   hCaloPFCorr_pt[2][centBin]->Fill(calojet_pt,(Float_t)pfjet_pt/calojet_pt);
-	//   hCalo[2][centBin]->Fill(calojet_pt);
-	//   hPF[2][centBin]->Fill(pfjet_pt);	    
-	//   hDeltaR_deltapT[2][centBin]->Fill(deltaRCaloPF,deltapT);
-	// }
-	// if(jet65_1 && !jet80_1){
-	//   hCaloPFCorr[1][centBin]->Fill((Float_t) pfjet_pt/calojet_pt);
-	//   hCaloPFpt[1][centBin]->Fill(calojet_pt,pfjet_pt);
-	//   hCaloPFCorr_pt[1][centBin]->Fill(calojet_pt,(Float_t)pfjet_pt/calojet_pt);
-	//   hCalo[1][centBin]->Fill(calojet_pt);
-	//   hPF[1][centBin]->Fill(pfjet_pt);	    
-	//   hDeltaR_deltapT[1][centBin]->Fill(deltaRCaloPF,deltapT);
-	// }
-	// if(jet55_1 && !jet65_1 && !jet80_1){
-	//   hCaloPFCorr[0][centBin]->Fill((Float_t) pfjet_pt/calojet_pt);
-	//   hCaloPFpt[0][centBin]->Fill(calojet_pt,pfjet_pt);
-	//   hCaloPFCorr_pt[0][centBin]->Fill(calojet_pt,(Float_t)pfjet_pt/calojet_pt);
-	//   hCalo[0][centBin]->Fill(calojet_pt);
-	//   hPF[0][centBin]->Fill(pfjet_pt);	    
-	//   hDeltaR_deltapT[0][centBin]->Fill(deltaRCaloPF,deltapT);
-	// }
+	}// for filling MC closure histograms
+#endif	  
 	
 	smallDeltaR = 10;
 	for(int b = 0;b<deltaR_calovsPF[small_calo].size();++b){
@@ -1045,7 +1031,6 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
 
       }// running it for the number of calo jets: 
 
-      //if(printDebug)cout<<"now going to find unmatched pf jets"<<endl;
       // ok Now lets find the un-matched jets and fill the necessary unmatched ntuple:
 
       if(deltaR_calovsPF.size() == 0) continue;
@@ -1078,6 +1063,8 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
 	ecalSum = deltaR_calovsPF[0][b][18];
 	
 	//unmatchPFJets->Fill();
+
+#if 0
 
 	if(b==0) hEvents->Fill(7);
 
@@ -1137,12 +1124,17 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
 	  
 	  }
 	
-	}
+	} // if dataset == MC
+
+#endif
+
+	// still in umatched loop 
 	
       }// unmatched PF jets
       
       //if(printDebug)cout<<"now going to find unmatched calo jets"<<endl;
 
+#if 0
       if(deltaR_calovsPF[0].size() == 0) continue;
       
       for(int a = 0;a<deltaR_calovsPF.size();++a){
@@ -1176,7 +1168,10 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 1, int endfile = 2, int radiu
 	//unmatchCaloJets->Fill();
 
       }
-
+#endif
+      // put centrality histogram here.
+      
+      
     }// event loop 
 
   }// radius loop

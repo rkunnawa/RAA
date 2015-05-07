@@ -39,23 +39,33 @@ static const int nbins_cent = 7;
 static const Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36,40};// multiply by 2.5 to get your actual centrality % (old 2011 data) 
 //now we have to multiply by 5, since centrality goes from 0-200. 
 
-int findBin(int hiBin){
-  int binNo = -1;
-
-  for(int i = 0;i<nbins_cent;i++){
-    if(hiBin>=5*boundaries_cent[i] && hiBin<5*boundaries_cent[i+1]) {
-      binNo = i;
-      break;
-    }
-  }
-
-  return binNo;
+int findBin(int bin)
+{
+  int ibin=-1;
+  //! centrality is defined as 0.5% bins of cross section
+  //! in 0-200 bins               
+  if(bin<=10)ibin=0; //! 0-5%
+  else if(bin>10  && bin<=20 )ibin=1; //! 5-10%
+  else if(bin>20  && bin<=60 )ibin=2;  //! 10-30%
+  else if(bin>60  && bin<=100)ibin=3;  //! 30-50%
+  else if(bin>100 && bin<=140)ibin=4;  //! 50-70%
+  else if(bin>140 && bin<=180)ibin=5;  //! 70-90%
+  else if(bin>180 && bin<=200)ibin=6;  //! 90-100%
+  return ibin;
 }
+
+static const int nbins_pt = 30;
+static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
+
+
 
 using namespace std;
 
-void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
-
+void RAA_plot_yetkinCutEfficiency_minbias(char* etaWidth = (char*)"10_eta_18",
+					  Int_t radius = 4,
+					  Int_t etaLow = 10,
+					  Int_t etaHigh = 18)
+{
   TH1::SetDefaultSumw2();
   
   // the cut is a 3 step cut based on the different value of the calopt/pfpt - copy the following lines into your loop (with the corresponding branch address set)
@@ -64,17 +74,18 @@ void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
   // if(calopt/pfpt > 0.85 & eMax/Sumcand > 0.9) hGood->Fill();
   
   
-  char * etaWidth = (char*)"n20_eta_p20";
-  TFile * fData, * fMC; 
+  cout<<"etaWidth = "<<etaWidth<<endl;
 
-  if(radius == 2) fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MinBiasUPC_calo_pf_jet_correlation_deltaR_0p2_akPu2_20150402.root");
-  if(radius == 3) fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MinBiasUPC_calo_pf_jet_correlation_deltaR_0p2_akPu3_20150402.root");
-  //if(radius == 3) fData = TFile::Open("/export/d00/scratch/pawan/condorfiles/pbpb/ntuples/Merged_JetRAA_akPu3_PbPb_Data.root");
-  if(radius == 4) fData = TFile::Open("/export/d00/scratch/rkunnawa/rootfiles/PbPb_MinBiasUPC_calo_pf_jet_correlation_deltaR_0p2_akPu4_20150402.root");
+  bool isSymm = false;
+  if(etaLow == etaHigh) isSymm = true;
+  
+  TFile * fData;
 
+  fData = TFile::Open("/mnt/hadoop/cms/store/user/pawan/ntuples/JetRaa_akPu234_PbPb_MinBias.root");
 
-  TTree * Data_matched = (TTree*)fData->Get("matchedJets");
-  TTree * Data_unmatched = (TTree*)fData->Get("unmatchedPFJets");
+  TTree * Data_matched= (TTree*)fData->Get(Form("akPu%dJetAnalyzer/matchedJets",radius));
+  TTree * Data_unmatched = (TTree*)fData->Get(Form("akPu%dJetAnalyzer/unmatchedPFJets",radius));
+
 
   // TTree * MC_matched = (TTree*)fMC->Get("matchedJets");
   // TTree * MC_unmatched = (TTree*)fMC->Get("unmatchedPFJets");
@@ -107,6 +118,7 @@ void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
   TH1F *hpbpb_TrgObj65[nbins_cent];
   TH1F *hpbpb_TrgObj55[nbins_cent];
   TH1F *hpbpb_TrgObjComb[nbins_cent];
+  TH1F * hpbpb_noTrg[nbins_cent];
 
   // JEC systematics
   TH1F *hpbpb_JEC_TrgObjComb[nbins_cent];
@@ -117,6 +129,8 @@ void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
   for(int i = 0;i<nbins_cent;++i){
     //cout<<"cent bin = "<<i<<endl;
 
+    hpbpb_noTrg[i] = new TH1F(Form("hpbpb_noTrg_R%d_%s_cent%d",radius,etaWidth,i),"",400,0,400);
+    
     hpbpb_TrgObj80[i] = new TH1F(Form("hpbpb_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_TrgObj65[i] = new TH1F(Form("hpbpb_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_TrgObj55[i] = new TH1F(Form("hpbpb_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
@@ -180,7 +194,9 @@ void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
   Int_t subid_2;
   Int_t hiBin_1, hiBin_2;
   Int_t jetMB_1, jetMB_p_1;
-
+  Float_t eta_1, eta_2;
+  Float_t pfrawpt_1, pfrawpt_2;
+  
   Data_matched->SetBranchAddress("calopt",&calopt_1);
   Data_matched->SetBranchAddress("pfpt",&pfpt_1);
   Data_matched->SetBranchAddress("eMax",&eMax_1);
@@ -198,6 +214,8 @@ void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
   Data_matched->SetBranchAddress("jet55_prescl",&jet55_p_1);
   Data_matched->SetBranchAddress("jet65_prescl",&jet65_p_1);
   Data_matched->SetBranchAddress("jet80_prescl",&jet80_p_1);
+  Data_matched->SetBranchAddress("pfeta",&eta_1);
+  Data_matched->SetBranchAddress("pfrawpt",&pfrawpt_1);
   
   Data_unmatched->SetBranchAddress("pfpt",&pfpt_1);
   Data_unmatched->SetBranchAddress("eMax",&eMax_1);
@@ -215,7 +233,9 @@ void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
   Data_unmatched->SetBranchAddress("jet55_prescl",&jet55_p_1);
   Data_unmatched->SetBranchAddress("jet65_prescl",&jet65_p_1);
   Data_unmatched->SetBranchAddress("jet80_prescl",&jet80_p_1);
-
+  Data_unmatched->SetBranchAddress("pfeta",&eta_1);
+  Data_unmatched->SetBranchAddress("pfrawpt",&pfrawpt_1);
+  
 #if 0
   MC_matched->SetBranchAddress("calopt",&calopt_2);
   MC_matched->SetBranchAddress("pfpt",&pfpt_2);
@@ -269,7 +289,15 @@ void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
     if(cBin == -1 || cBin >= nbins_cent) continue;
     
     Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
+
+    if(isSymm && TMath::Abs(eta_1) > (Float_t)etaHigh/10) continue;       
+    if(!isSymm && (TMath::Abs(eta_1) < (Float_t)etaLow/10 || TMath::Abs(eta_1) > (Float_t)etaHigh/10)) continue;
+       
     
+    if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
+    if(calopt_1/pfpt_1 > 0.85) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
+    if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
+   
     if(jetMB_1 == 1 && jet55_1 == 0 && jet65_1 == 0 && jet80_1 == 0 ) {
       
       //hData_Jet55_noCut->Fill(pfpt_1, jet55_p_1);
@@ -354,6 +382,11 @@ void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
     if(cBin == -1 || cBin >= nbins_cent) continue;
     
     Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
+
+    
+    if(isSymm && TMath::Abs(eta_1) > (Float_t)etaHigh/10) continue;       
+    if(!isSymm && (TMath::Abs(eta_1) < (Float_t)etaLow/10 || TMath::Abs(eta_1) > (Float_t)etaHigh/10)) continue;   
+    if(eMax_1/Sumcand < 0.05) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
 
     if(jet55_1 == 1 && jet65_1 == 0 && jet80_1 == 0 ) {
     
@@ -658,7 +691,7 @@ void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
 
 #endif
 
-  TFile fout(Form("../../Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius),"RECREATE");
+  TFile fout(Form("../../Output/Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius),"RECREATE");
   fout.cd();
 
 #if 0
@@ -690,6 +723,7 @@ void RAA_plot_yetkinCutEfficiency_minbias(Int_t radius = 4){
 
   for(int i = 0; i<nbins_cent;++i){
 
+    hpbpb_noTrg[i]->Write();
     hpbpb_TrgObjComb[i]->Write();
     hpbpb_JEC_TrgObjComb[i]->Write();
     hpbpb_Smear_TrgObjComb[i]->Write();

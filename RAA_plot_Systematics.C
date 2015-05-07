@@ -162,7 +162,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   prepareNcollUnc(nbins_pt, 300.);
   
   // get the necessary histograms
-  const int Iterations = 18; //for unfolding systematics. 
+  const int Iterations = 6; //for unfolding systematics. 
   const int BayesIter = 4;
   TH1F *uPbPb_BayesianIter_R2[nbins_cent+1][Iterations];
   TH1F *uPP_BayesianIter_R2[Iterations];

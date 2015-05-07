@@ -246,8 +246,6 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
 
   chPbPb_Sys->SaveAs(Form("PbPb_spectra_bayesian_unfolded_prior_smear_shift_systematics_%s_R%d_%d.pdf",etaWidth,radius,date.GetDate()),"RECREATE");
 
-  
-  
 
   // make the plots - 3x2 plots.
   TCanvas * cDataMC_raw = new TCanvas("cDataMC_raw","",1000,800);

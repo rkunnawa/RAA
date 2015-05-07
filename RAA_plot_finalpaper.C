@@ -47,7 +47,7 @@
 
 using namespace std;
 
-void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_type = "PF"){
+void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_type = "PF"){
     
   TStopwatch timer;
   timer.Start();
@@ -59,10 +59,16 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
+  char * etaWidth = (char*) "10_eta_10";
+  char * etaLable = (char*) "0.0 < |eta| < 1.0";
+  Float_t etaLow = 0;
+  Float_t etaHigh = 1.0;
+  Float_t deltaEta = 2.0; 
+
   TFile *fin_R2, *fin_R3, *fin_R4; 
-  fin_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Raghav_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n16_eta_p16_%dGeVCut_ak%s_20150428.root",2,unfoldingCut,jet_type));
-  fin_R3 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Raghav_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n16_eta_p16_%dGeVCut_ak%s_20150428.root",3,unfoldingCut,jet_type));
-  fin_R4 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Raghav_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_unfold_mcclosure_oppside_trgMC_n16_eta_p16_%dGeVCut_ak%s_20150428.root",4,unfoldingCut,jet_type));
+  fin_R2 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_%s_%dGeVCut_ak%s_20150506.root",2,etaWidth,unfoldingCut,jet_type));
+  fin_R3 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_%s_%dGeVCut_ak%s_20150506.root",3,etaWidth,unfoldingCut,jet_type));
+  fin_R4 = TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_%s_%dGeVCut_ak%s_20150506.root",4,etaWidth,unfoldingCut,jet_type));
 
   // get the histograms.
   TH1F * uPbPb_R2_Bayes[nbins_cent], * uPP_R2_Bayes, * uPbPb_R3_Bayes[nbins_cent], * uPP_R3_Bayes, * uPbPb_R4_Bayes[nbins_cent], * uPP_R4_Bayes;
@@ -144,14 +150,9 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
   //   mPbPb_Reco[i]->Write();
 
   // take MC to nano barns from milli barns 
-  mPP_R2->Scale(1e6);
-  mPP_R3->Scale(1e6);
-  mPP_R4->Scale(1e6);
-
-  // divide by delta eta = 4. 
-  mPP_R2->Scale(1./4);
-  mPP_R3->Scale(1./4);
-  mPP_R4->Scale(1./4);
+  //mPP_R2->Scale(1e6);
+  //mPP_R3->Scale(1e6);
+  //mPP_R4->Scale(1e6);
 
   for(int i = 0; i<nbins_cent; ++i){
 
@@ -198,10 +199,10 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
     uPbPb_R2_Bayes[i]->SetAxisRange(unfoldingCut, 299, "X");
     uPbPb_R2_Bayes[i]->Draw("same");
 
-    mPbPb_R2[i]->Scale(ScaleFactor[i+2]);
-    mPbPb_R2[i]->SetLineColor(kRed);
-    mPbPb_R2[i]->SetAxisRange(unfoldingCut, 299, "X");
-    mPbPb_R2[i]->Draw("same Lhist");
+    // mPbPb_R2[i]->Scale(ScaleFactor[i+2]);
+    // mPbPb_R2[i]->SetLineColor(kRed);
+    // mPbPb_R2[i]->SetAxisRange(unfoldingCut, 299, "X");
+    // mPbPb_R2[i]->Draw("same Lhist");
   }
 
   TLegend * leg1_R2 = myLegend(0.15,0.1,0.25,0.2);
@@ -213,12 +214,13 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
 
   TLegend * leg2_R2 = myLegend(0.75,0.8,0.85,0.9);
   leg2_R2->AddEntry(uPbPb_R2_Bayes[0],"PbPb Data","pl");
-  leg2_R2->AddEntry(mPbPb_R2[0],"PYTHIA+HYDJET","pl");
+  //leg2_R2->AddEntry(mPbPb_R2[0],"PYTHIA+HYDJET","pl");
   leg2_R2->SetTextSize(0.02);
   leg2_R2->Draw();
   
   drawText("R=0.2, anti k_{T} PF Jets", 0.15,0.2,16);
   drawText("R=0.2, anti k_{T} Pu PF Jets", 0.75,0.78,16);
+  drawText(Form("%s", etaLable),0.15,0.25,16);
 
   putCMSPrel();
   putPbPbLumi();
@@ -232,7 +234,7 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
   drawText("50-70% x 10^{10}", 0.8,0.54,16);
   drawText("70-90% x 10^{12}", 0.8,0.63,16);
 
-  cSpectra_R2->SaveAs(Form("../../Plots/Final_paper_plots_spectra_akR2_%d.pdf",date.GetDate()),"RECREATE");
+  cSpectra_R2->SaveAs(Form("../../Plots/Final_paper_plots_spectra_akR2_%s_%d.pdf",etaWidth,date.GetDate()),"RECREATE");
 
   
   TCanvas * cSpectra_R3 = new TCanvas("cSpectra_R3","",1200,1000);
@@ -262,10 +264,10 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
     uPbPb_R3_Bayes[i]->SetAxisRange(unfoldingCut, 299, "X");
     uPbPb_R3_Bayes[i]->Draw("same");
 
-    mPbPb_R3[i]->Scale(ScaleFactor[i+2]);
-    mPbPb_R3[i]->SetLineColor(kRed);
-    mPbPb_R3[i]->SetAxisRange(unfoldingCut, 299, "X");
-    mPbPb_R3[i]->Draw("same Lhist");
+    // mPbPb_R3[i]->Scale(ScaleFactor[i+2]);
+    // mPbPb_R3[i]->SetLineColor(kRed);
+    // mPbPb_R3[i]->SetAxisRange(unfoldingCut, 299, "X");
+    // mPbPb_R3[i]->Draw("same Lhist");
   }
 
   TLegend * leg1_R3 = myLegend(0.15,0.1,0.25,0.2);
@@ -277,12 +279,13 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
 
   TLegend * leg2_R3 = myLegend(0.75,0.8,0.85,0.9);
   leg2_R3->AddEntry(uPbPb_R3_Bayes[0],"PbPb Data","pl");
-  leg2_R3->AddEntry(mPbPb_R3[0],"PYTHIA+HYDJET","pl");
+  // leg2_R3->AddEntry(mPbPb_R3[0],"PYTHIA+HYDJET","pl");
   leg2_R3->SetTextSize(0.02);
   leg2_R3->Draw();
   
   drawText("R=0.3, anti k_{T} PF Jets", 0.15,0.2,16);
   drawText("R=0.3, anti k_{T} Pu PF Jets", 0.75,0.78,16);
+  drawText(Form("%s", etaLable),0.15,0.25,16);
 
   putCMSPrel();
   putPbPbLumi();
@@ -296,7 +299,7 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
   drawText("50-70% x 10^{10}", 0.8,0.54,16);
   drawText("70-90% x 10^{12}", 0.8,0.63,16);
 
-  cSpectra_R3->SaveAs(Form("../../Plots/Final_paper_plots_spectra_akR3_%d.pdf",date.GetDate()),"RECREATE");
+  cSpectra_R3->SaveAs(Form("../../Plots/Final_paper_plots_spectra_akR3_%s_%d.pdf",etaWidth, date.GetDate()),"RECREATE");
 
 
   
@@ -327,10 +330,10 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
     uPbPb_R4_Bayes[i]->SetAxisRange(unfoldingCut, 299, "X");
     uPbPb_R4_Bayes[i]->Draw("same");
 
-    mPbPb_R4[i]->Scale(ScaleFactor[i+2]);
-    mPbPb_R4[i]->SetLineColor(kRed);
-    mPbPb_R4[i]->SetAxisRange(unfoldingCut, 299, "X");
-    mPbPb_R4[i]->Draw("same Lhist");
+    // mPbPb_R4[i]->Scale(ScaleFactor[i+2]);
+    // mPbPb_R4[i]->SetLineColor(kRed);
+    // mPbPb_R4[i]->SetAxisRange(unfoldingCut, 299, "X");
+    // mPbPb_R4[i]->Draw("same Lhist");
   }
 
   TLegend * leg1_R4 = myLegend(0.15,0.1,0.25,0.2);
@@ -342,13 +345,14 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
 
   TLegend * leg2_R4 = myLegend(0.75,0.8,0.85,0.9);
   leg2_R4->AddEntry(uPbPb_R4_Bayes[0],"PbPb Data","pl");
-  leg2_R4->AddEntry(mPbPb_R4[0],"PYTHIA+HYDJET","pl");
+  // leg2_R4->AddEntry(mPbPb_R4[0],"PYTHIA+HYDJET","pl");
   leg2_R4->SetTextSize(0.02);
   leg2_R4->Draw();
   
   drawText("R=0.4, anti k_{T} PF Jets", 0.15,0.2,16);
   drawText("R=0.4, anti k_{T} Pu PF Jets", 0.75,0.78,16);
-
+  drawText(Form("%s", etaLable),0.15,0.25,16);
+  
   putCMSPrel();
   putPbPbLumi();
   putPPLumi();
@@ -361,7 +365,7 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 30 , char *algo = "Pu", char *jet_
   drawText("50-70% x 10^{10}", 0.8,0.54,16);
   drawText("70-90% x 10^{12}", 0.8,0.63,16);
 
-  cSpectra_R4->SaveAs(Form("../../Plots/Final_paper_plots_spectra_akR4_%d.pdf",date.GetDate()),"RECREATE");
+  cSpectra_R4->SaveAs(Form("../../Plots/Final_paper_plots_spectra_akR4_%s_%d.pdf",etaWidth, date.GetDate()),"RECREATE");
 
 
 }
