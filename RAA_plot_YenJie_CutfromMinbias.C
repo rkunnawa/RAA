@@ -65,7 +65,7 @@ void RAA_plot_YenJie_CutfromMinBias(char* etaWidth = (char*)"10_eta_18", Int_t r
 {
 
   TStopwatch timer;
-  
+  gStyle->SetOptStat(0);
   TH1::SetDefaultSumw2();
 
   cout<<"etaWidth = "<<etaWidth<<endl;
