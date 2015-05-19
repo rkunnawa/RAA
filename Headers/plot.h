@@ -158,7 +158,7 @@ void makeHistTitle(TH1 *h,char *title, char *xTitle, char *yTitle, int color = -
   h->GetYaxis()->SetLabelSize(20);
   h->GetYaxis()->SetTitleSize(22);
   h->GetYaxis()->SetTitleOffset(2.0);
-  h->GetYaxis()->SetMoreLogLabels();
+  //h->GetYaxis()->SetMoreLogLabels();
 	
   h->GetXaxis()->SetLabelFont(43);
   h->GetXaxis()->SetTitleFont(43);
@@ -167,7 +167,7 @@ void makeHistTitle(TH1 *h,char *title, char *xTitle, char *yTitle, int color = -
   h->GetXaxis()->SetTitleOffset(2.0);
 	
   h->GetXaxis()->SetNoExponent();
-  h->GetXaxis()->SetMoreLogLabels();
+  //h->GetXaxis()->SetMoreLogLabels();
 	
 }
 

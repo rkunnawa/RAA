@@ -58,10 +58,10 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 using namespace std;
 
 
-void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
+void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
 				  Int_t radius = 4,
 				  Int_t etaLow = 10,
-				  Int_t etaHigh = 18)
+				  Int_t etaHigh = 10)
 {
   
   TH1::SetDefaultSumw2();
@@ -152,6 +152,8 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
   TH1F *hpbpb_Jet55_gen[nbins_cent],*hpbpb_Jet55_reco[nbins_cent],*hpbpb_Jet55_raw[nbins_cent],*hpbpb_Jet55_GenSmear[nbins_cent],*hpbpb_Jet55_RecoSmear[nbins_cent];
   TH1F *hpbpb_JetComb_gen[nbins_cent],*hpbpb_JetComb_reco[nbins_cent],*hpbpb_JetComb_raw[nbins_cent],*hpbpb_JetComb_GenSmear[nbins_cent],*hpbpb_JetComb_RecoSmear[nbins_cent];
 
+  TH1F * hpbpb_JetComb_gen2pSmear[nbins_cent],  * hpbpb_Jet80_gen2pSmear[nbins_cent],  * hpbpb_Jet65_gen2pSmear[nbins_cent],  * hpbpb_Jet55_gen2pSmear[nbins_cent];
+
   TH1F * hpbpb_MC_noCut[nbins_cent];
   TH1F * hpbpb_MC_Comb_noCut[nbins_cent];
   TH1F * hpbpb_MC_Jet80_noCut[nbins_cent];
@@ -166,6 +168,7 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
   TH2F *hpbpb_matrix[nbins_cent];
   TH2F *hpbpb_matrix_HLT[nbins_cent];
   TH2F *hpbpb_matrix_HLT_GenSmear[nbins_cent];
+  TH2F *hpbpb_matrix_HLT_gen2pSmear[nbins_cent];
   TH2F *hpbpb_matrix_HLT_RecoSmear[nbins_cent];
   TH2F *hpbpb_matrix_HLT_BothSmear[nbins_cent];
   TH2F *hpbpb_mcclosure_matrix[nbins_cent];
@@ -260,6 +263,7 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
     
     hpbpb_matrix_HLT[i] = new TH2F(Form("hpbpb_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400,400,0,400);
     hpbpb_matrix_HLT_GenSmear[i] = new TH2F(Form("hpbpb_matrix_HLT_GenSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400,400,0,400);
+    hpbpb_matrix_HLT_gen2pSmear[i] = new TH2F(Form("hpbpb_matrix_HLT_gen2pSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400,400,0,400);
     hpbpb_matrix_HLT_RecoSmear[i] = new TH2F(Form("hpbpb_matrix_HLT_RecoSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400,400,0,400);
     hpbpb_matrix_HLT_BothSmear[i] = new TH2F(Form("hpbpb_matrix_HLT_BothSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400,400,0,400);
 
@@ -291,12 +295,16 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
     hpbpb_Jet55_reco[i] = new TH1F(Form("hpbpb_Jet55_reco_R%d_%s_cent%d",radius,etaWidth,i),Form("reco jtpt from Jet55 && !Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
 
     hpbpb_JetComb_GenSmear[i] = new TH1F(Form("hpbpb_JetComb_GenSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("GenSmear refpt from HLT trigger combined R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
+    hpbpb_JetComb_gen2pSmear[i] = new TH1F(Form("hpbpb_JetComb_gen2pSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("gen2pSmear refpt from HLT trigger combined R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_JetComb_RecoSmear[i] = new TH1F(Form("hpbpb_JetComb_RecoSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("RecoSmear jtpt from HLT trigger combined R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_Jet80_GenSmear[i] = new TH1F(Form("hpbpb_Jet80_GenSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("GenSmear refpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
+    hpbpb_Jet80_gen2pSmear[i] = new TH1F(Form("hpbpb_Jet80_gen2pSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("gen2pSmear refpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_Jet80_RecoSmear[i] = new TH1F(Form("hpbpb_Jet80_RecoSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("RecoSmear jtpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_Jet65_GenSmear[i] = new TH1F(Form("hpbpb_Jet65_GenSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("GenSmear refpt from Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
+    hpbpb_Jet65_gen2pSmear[i] = new TH1F(Form("hpbpb_Jet65_gen2pSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("gen2pSmear refpt from Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_Jet65_RecoSmear[i] = new TH1F(Form("hpbpb_Jet65_RecoSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("RecoSmear jtpt from Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_Jet55_GenSmear[i] = new TH1F(Form("hpbpb_Jet55_GenSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("GenSmear refpt from Jet55 && !Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
+    hpbpb_Jet55_gen2pSmear[i] = new TH1F(Form("hpbpb_Jet55_gen2pSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("gen2pSmear refpt from Jet55 && !Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_Jet55_RecoSmear[i] = new TH1F(Form("hpbpb_Jet55_RecoSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("RecoSmear jtpt from Jet55 && !Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
 
 
@@ -703,6 +711,9 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 
 	hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
 	hpbpb_Jet55_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), weight);
+	hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hpbpb_Jet55_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_Jet55_RecoSmear[cBin]->Fill(pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_Jet55_raw[cBin]->Fill(pfrawpt_2, weight);
@@ -723,6 +734,9 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_Jet55_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_Jet55_RecoSmear[cBin]->Fill(pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_Jet55_raw[cBin]->Fill(pfrawpt_2, weight);
+	hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
@@ -742,6 +756,9 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_Jet55_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_Jet55_RecoSmear[cBin]->Fill(pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_Jet55_raw[cBin]->Fill(pfrawpt_2, weight);
+	hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
@@ -771,6 +788,9 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_Jet65_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_Jet65_RecoSmear[cBin]->Fill(pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_Jet65_raw[cBin]->Fill(pfrawpt_2, weight);
+	hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
@@ -789,6 +809,9 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_Jet65_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_Jet65_RecoSmear[cBin]->Fill(pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_Jet65_raw[cBin]->Fill(pfrawpt_2, weight);
+	hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
@@ -807,6 +830,9 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_Jet65_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_Jet65_RecoSmear[cBin]->Fill(pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_Jet65_raw[cBin]->Fill(pfrawpt_2, weight);
+	hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
@@ -837,6 +863,9 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_Jet80_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_Jet80_RecoSmear[cBin]->Fill(pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_Jet80_raw[cBin]->Fill(pfrawpt_2, weight);
+	hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
@@ -855,6 +884,10 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_Jet80_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_Jet80_RecoSmear[cBin]->Fill(pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_Jet80_raw[cBin]->Fill(pfrawpt_2, weight);
+
+	hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
@@ -873,6 +906,10 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_Jet80_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_Jet80_RecoSmear[cBin]->Fill(pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_Jet80_raw[cBin]->Fill(pfrawpt_2, weight);
+
+	hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
@@ -936,7 +973,9 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2 + rnd.Gaus(0,1), weight);
-	
+	hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
      	hMC_unmatched_Jet55_CutA->Fill(pfrefpt_2, weight);
 	hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
 	hpbpb_anaBin_Jet55_reco[cBin]->Fill(pfpt_2, weight);
@@ -962,7 +1001,9 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2 + rnd.Gaus(0,1), weight);
-	
+	hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hMC_unmatched_Jet65_CutA->Fill(pfrefpt_2, weight);
 	hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2, weight);
 	hpbpb_anaBin_Jet65_reco[cBin]->Fill(pfpt_2, weight);
@@ -988,7 +1029,9 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
 	hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2, weight);
 	hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2, pfpt_2 + rnd.Gaus(0,1), weight);
 	hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2 + rnd.Gaus(0,1), pfpt_2 + rnd.Gaus(0,1), weight);
-	
+	hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2, weight);
+
 	hMC_unmatched_Jet80_CutA->Fill(pfrefpt_2, weight);
 	hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2, weight);
 	hpbpb_anaBin_Jet80_reco[cBin]->Fill(pfpt_2, weight);
@@ -1085,6 +1128,10 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
     hpbpb_JetComb_GenSmear[i]->Add(hpbpb_Jet80_GenSmear[i]);
     hpbpb_JetComb_GenSmear[i]->Add(hpbpb_Jet65_GenSmear[i]);
     hpbpb_JetComb_GenSmear[i]->Add(hpbpb_Jet55_GenSmear[i]);
+
+    hpbpb_JetComb_gen2pSmear[i]->Add(hpbpb_Jet80_gen2pSmear[i]);
+    hpbpb_JetComb_gen2pSmear[i]->Add(hpbpb_Jet65_gen2pSmear[i]);
+    hpbpb_JetComb_gen2pSmear[i]->Add(hpbpb_Jet55_gen2pSmear[i]);
     
     hpbpb_JetComb_gen[i]->Add(hpbpb_Jet80_gen[i]);
     hpbpb_JetComb_gen[i]->Add(hpbpb_Jet65_gen[i]);
@@ -1094,6 +1141,7 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
     divideBinWidth(hpbpb_JetComb_reco[i]);
 
     divideBinWidth(hpbpb_JetComb_GenSmear[i]);
+    divideBinWidth(hpbpb_JetComb_gen2pSmear[i]);
     divideBinWidth(hpbpb_JetComb_RecoSmear[i]);
     
     divideBinWidth(hpbpb_JetComb_raw[i]);
@@ -1180,6 +1228,11 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_18",
     hpbpb_Jet80_GenSmear[i]->Write();
     hpbpb_Jet65_GenSmear[i]->Write();
     hpbpb_Jet55_GenSmear[i]->Write();
+
+    hpbpb_JetComb_gen2pSmear[i]->Write();
+    hpbpb_Jet80_gen2pSmear[i]->Write();
+    hpbpb_Jet65_gen2pSmear[i]->Write();
+    hpbpb_Jet55_gen2pSmear[i]->Write();
 
     hpbpb_JetComb_raw[i]->Write();
     hpbpb_Jet80_raw[i]->Write();
