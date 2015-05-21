@@ -61,7 +61,7 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 
 using namespace std;
 
-void RAA_plot_YenJie_CutfromMinBias_Mar(char* etaWidth = (char*)"20_eta_20", char * etaLabel = (char*) "0.0 < |#eta| < 2.0", Int_t radius = 2){
+void RAA_plot_YenJie_CutfromMinBias_Mar(char* etaWidth = (char*)"20_eta_20", char * etaLabel = (char*) "0.0 < |#eta| < 2.0", Int_t radius = 4){
   TStopwatch timer;
   gStyle->SetOptStat(0);
   TH1::SetDefaultSumw2();
@@ -112,7 +112,7 @@ void RAA_plot_YenJie_CutfromMinBias_Mar(char* etaWidth = (char*)"20_eta_20", cha
     //hcalovsPFpt80[i]=(TH2F*)fMinBias->Get(Form("hcalopfpt_TrgObj80_%d_%s_cent%d",radius,etaWidth,i));
     //hcalovsPFpt80_MC[i]=(TH2F*)fMinBias_MC->Get(Form("hcalopfpt_TrgObj80_%d_%s_cent%d",radius,etaWidth,i));
     
-    hMinBias_MC[i] = (TH1F*)fMinBias_MC->Get(Form("hpbpb_HLT80_R%d_%s_cent%d",radius,etaWidth,i));
+    hMinBias_MC[i] = (TH1F*)fMinBias_MC->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",radius,etaWidth,i));
     hMinBias_MC[i]->Print("base");
 
     //cout<< "my histo   "<<Form("hcalopfpt_TrgObj80_%d_%s_cent%d",radius,etaWidth,i)<<endl;
@@ -126,8 +126,8 @@ void RAA_plot_YenJie_CutfromMinBias_Mar(char* etaWidth = (char*)"20_eta_20", cha
     //   divideBinWidth(hMinBias[i]);
     // }
     // // find the bin number of 15 GeV
-    // bin_no = hJetTrigComb[i]->FindBin(15);
-    // bin_end=hJetTrigComb[i]->FindBin(25);
+    bin_no = hJetTrigComb_MC[i]->FindBin(15);
+    bin_end= hJetTrigComb_MC[i]->FindBin(25);
     
     // cout<<"bin no"<<bin_no<<endl;
     
@@ -153,7 +153,7 @@ void RAA_plot_YenJie_CutfromMinBias_Mar(char* etaWidth = (char*)"20_eta_20", cha
     float scaleweight_MC=hJetTrigComb_MC[i]->GetBinContent(bin_no)/hMinBias_MC[i]->GetBinContent(bin_no); 
     float scalerangeweight_MC=hJetTrigComb_MC[i]->Integral(bin_no,bin_end)/hMinBias_MC[i]->Integral(bin_no,bin_end);
     cout<<" weight_MC  "<<scalerangeweight_MC<<endl;
-
+    
     // normalize the histogram by the jet entries in bin of pT = 15.
     //    hJetTrigComb[i]->Scale(1./hJetTrigComb[i]->GetBinContent(bin_no));
     //    hMinBias[i]->Scale(1./hMinBias[i]->GetBinContent(bin_no));
@@ -187,7 +187,7 @@ void RAA_plot_YenJie_CutfromMinBias_Mar(char* etaWidth = (char*)"20_eta_20", cha
 
   // make the subtraction plot from the MC
   // make the plots: just a 3x2 panel plot showing all the above three curves and write to Output.
-  TH2F * hBlankSpectra_MC = new TH2F("hBlankSpectra","",400,13,299,100,1e-9,1e2);
+  TH2F * hBlankSpectra_MC = new TH2F("hBlankSpectra","",400,13,299,100,1e-10,1e5);
   TCanvas * cFakeSub_MC = new TCanvas("cFakeSub_MC","",1000,800);
   makeMultiPanelCanvasWithGap(cFakeSub_MC,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
   //cFakeSub->Divide(3,2);
@@ -229,7 +229,7 @@ void RAA_plot_YenJie_CutfromMinBias_Mar(char* etaWidth = (char*)"20_eta_20", cha
     hSubtracted_MC[i]->SetMarkerColor(kBlue);
     hSubtracted_MC[i]->Draw("same");
     //cout<<"working here   too"<<endl; 
-    if(i==5)drawText("norm. to pt range(15-25) GeV",0.4,0.7,20);
+    if(i==5)drawText("norm. to pt range(15-25) GeV",0.2,0.73,20);
     drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.7,0.9,20);    
     if(i==4){   drawText(Form("|vz|<15, %s",etaLabel),0.3,0.8,20); }
   }
@@ -243,7 +243,7 @@ void RAA_plot_YenJie_CutfromMinBias_Mar(char* etaWidth = (char*)"20_eta_20", cha
   lSub_MC->SetTextSize(0.03);
   lSub_MC->Draw();
 
-  cFakeSub_MC->SaveAs(Form("May21/PbPb_FakeMinBias_SubtractedFrom_MC_SubidNot0_R%d_%s_%d.pdf",radius, etaWidth, date.GetDate()),"RECREATE");
+  cFakeSub_MC->SaveAs(Form("May21/PbPb_FakeMinBias_SubtractedFrom_MC_fullHydjet_SubidNot0_R%d_%s_%d.pdf",radius, etaWidth, date.GetDate()),"RECREATE");
 
 #if 0
   

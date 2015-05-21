@@ -266,7 +266,7 @@ void RAA_analyze(int radius = 2, int param1 = 1, int param2 = 1, char* algo = (c
   // we also need to get the files for the MC closure histograms.
   TFile * fMCClosure = TFile::Open("Histogram_pp_PbPb_unfoldMatrix.root");
   
-  TFile * fMinBias = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedwithout80_%s_R0p%d.root",etaWidth,radius)); //MinBias File 
+  TFile * fMinBias = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,radius)); //MinBias File 
 
   cout<<"after input file declaration"<<endl;
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
@@ -1166,7 +1166,7 @@ void RAA_analyze(int radius = 2, int param1 = 1, int param2 = 1, char* algo = (c
   // first correct for the error bars got from the RAA_dataDrivenUnfoldingErrorCheck.C macro
   // get the root file which has the unfolded error correction.
   
-  TFile * ferrorin = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s_20150518.root",radius, radius, etaWidth, 40, jet_type)); // need to add unfolding cut and smear variable 
+  TFile * ferrorin = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s.root",radius, radius, etaWidth, 40, jet_type)); // need to add unfolding cut and smear variable 
 
   // get histograms for each centrality and pp
   TH1F * hPbPb_BayesCorrected[nbins_cent];
