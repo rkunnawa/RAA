@@ -38,7 +38,10 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 
 using namespace std;
 
-void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t radius = 4, Int_t etaLow = 10, Int_t etaHigh = 18){
+void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"20_eta_20", 
+				     Int_t radius = 4, 
+				     Int_t etaLow = 20, 
+				     Int_t etaHigh = 20){
 
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
@@ -174,6 +177,11 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t
   TH1F *hpp_TrgObj40;
   TH1F *hpp_TrgObjComb;
 
+  TH1F *hpp_JEC_TrgObj80;
+  TH1F *hpp_JEC_TrgObj60;
+  TH1F *hpp_JEC_TrgObj40;
+  TH1F *hpp_JEC_TrgObjComb;
+
   TH1F *hpp_anaBin_TrgObj80;
   TH1F *hpp_anaBin_TrgObj60;
   TH1F *hpp_anaBin_TrgObj40;
@@ -195,11 +203,15 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t
   hpp_TrgObj40 = new TH1F(Form("hpp_HLT40_R%d_%s",radius,etaWidth),Form("Spectra from Jet 40 && !jet60 && !jet80 R%d %s ",radius,etaWidth),400,0,400);
   hpp_TrgObjComb = new TH1F(Form("hpp_HLTComb_R%d_%s",radius,etaWidth),Form("Trig Combined Spectra R%d %s ",radius,etaWidth),400,0,400);
 
+  hpp_JEC_TrgObj80 = new TH1F(Form("hpp_JEC_HLT80_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 80 R%d %s ",radius,etaWidth),400,0,400);
+  hpp_JEC_TrgObj60 = new TH1F(Form("hpp_JEC_HLT60_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 60 && !jet80 R%d %s ",radius,etaWidth),400,0,400);
+  hpp_JEC_TrgObj40 = new TH1F(Form("hpp_JEC_HLT40_R%d_%s",radius,etaWidth),Form("Spectra from Jet 40 && !jet60 && !jet80 R%d %s ",radius,etaWidth),400,0,400);
+  hpp_JEC_TrgObjComb = new TH1F(Form("hpp_JEC_HLTComb_R%d_%s",radius,etaWidth),Form("Trig Combined Spectra R%d %s ",radius,etaWidth),400,0,400);
+
   hpp_anaBin_TrgObj80 = new TH1F(Form("hpp_anaBin_HLT80_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 80 R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);
   hpp_anaBin_TrgObj60 = new TH1F(Form("hpp_anaBin_HLT60_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 60 && !jet80 R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);
   hpp_anaBin_TrgObj40 = new TH1F(Form("hpp_anaBin_HLT40_R%d_%s",radius,etaWidth),Form("Spectra from Jet 40 && !jet60 && !jet80 R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);
   hpp_anaBin_TrgObjComb = new TH1F(Form("hpp_anaBin_HLTComb_R%d_%s",radius,etaWidth),Form("Trig Combined Spectra R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);
-
   
   hpp_gen = new TH1F(Form("hpp_gen_R%d_%s",radius,etaWidth),Form("Gen refpt R%d %s ",radius,etaWidth),400,0,400);
   //cout<<"A"<<endl;
@@ -354,6 +366,7 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t
       //if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
 	hData_Jet40_CutA->Fill(pfpt_1, Jet40_prescl);
 	hpp_TrgObj40->Fill(pfpt_1, Jet40_prescl);
+	hpp_JEC_TrgObj40->Fill(pfpt_1*1.005, Jet40_prescl);
 	hpp_anaBin_TrgObj40->Fill(pfpt_1, Jet40_prescl);
 	//}
 	//if(calopt_1/pfpt_1 > 0.85){
@@ -377,6 +390,7 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t
       //if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)){
 	hData_Jet60_CutA->Fill(pfpt_1);
 	hpp_TrgObj60->Fill(pfpt_1);
+	hpp_JEC_TrgObj60->Fill(pfpt_1*1.005);
 	hpp_anaBin_TrgObj60->Fill(pfpt_1);
 	//}
 	// //if(calopt_1/pfpt_1 > 0.85) {
@@ -400,6 +414,7 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t
       //if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
 	hData_Jet80_CutA->Fill(pfpt_1);
 	hpp_TrgObj80->Fill(pfpt_1);
+	hpp_JEC_TrgObj80->Fill(pfpt_1*1.005);
 	hpp_anaBin_TrgObj80->Fill(pfpt_1);
 	//}
 	// //if(calopt_1/pfpt_1 > 0.85){
@@ -440,6 +455,7 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t
       hpp_Data_Jet40_noCut->Fill(pfpt_1, Jet40_prescl);
       //if(eMax_1/Sumcand < 0.05 ){
       hpp_TrgObj40->Fill(pfpt_1, Jet40_prescl);
+      hpp_JEC_TrgObj40->Fill(pfpt_1*1.005, Jet40_prescl);
       hpp_anaBin_TrgObj40->Fill(pfpt_1, Jet40_prescl);
       hData_unmatched_Jet40_CutA->Fill(pfpt_1, Jet40_prescl);
       //}else hData_unmatched_Jet40_CutA_rej->Fill(pfpt_1, Jet40_prescl);
@@ -453,6 +469,7 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t
       
       //if(eMax_1/Sumcand < 0.05  ){
 	hpp_TrgObj60->Fill(pfpt_1);
+	hpp_JEC_TrgObj60->Fill(pfpt_1*1.005);
 	hpp_anaBin_TrgObj60->Fill(pfpt_1);
 	hData_unmatched_Jet60_CutA->Fill(pfpt_1);
 	//}else hData_unmatched_Jet60_CutA_rej->Fill(pfpt_1);
@@ -465,6 +482,7 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t
       hpp_Data_Jet80_noCut->Fill(pfpt_1);
       //if(eMax_1/Sumcand < 0.05  ){
       hpp_TrgObj80->Fill(pfpt_1);
+      hpp_JEC_TrgObj80->Fill(pfpt_1*1.005);
       hpp_anaBin_TrgObj80->Fill(pfpt_1);
       hData_unmatched_Jet80_CutA->Fill(pfpt_1);
       //}else hData_unmatched_Jet80_CutA_rej->Fill(pfpt_1);
@@ -785,6 +803,15 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t
   divideBinWidth(hpp_TrgObj80);
   divideBinWidth(hpp_TrgObj60);
   divideBinWidth(hpp_TrgObj40);
+  
+  hpp_JEC_TrgObjComb->Add(hpp_JEC_TrgObj80);
+  hpp_JEC_TrgObjComb->Add(hpp_JEC_TrgObj60);
+  hpp_JEC_TrgObjComb->Add(hpp_JEC_TrgObj40);
+
+  divideBinWidth(hpp_JEC_TrgObjComb);
+  divideBinWidth(hpp_JEC_TrgObj80);
+  divideBinWidth(hpp_JEC_TrgObj60);
+  divideBinWidth(hpp_JEC_TrgObj40);
 
   hpp_anaBin_TrgObjComb->Add(hpp_anaBin_TrgObj80);
   hpp_anaBin_TrgObjComb->Add(hpp_anaBin_TrgObj60);
@@ -846,6 +873,11 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"10_eta_18", Int_t
   hpp_TrgObj80->Write();
   hpp_TrgObj60->Write();
   hpp_TrgObj40->Write();
+
+  hpp_JEC_TrgObjComb->Write();
+  hpp_JEC_TrgObj80->Write();
+  hpp_JEC_TrgObj60->Write();
+  hpp_JEC_TrgObj40->Write();
 
   hpp_matrix_HLT->Write();
   hpp_mcclosure_matrix_HLT->Write();

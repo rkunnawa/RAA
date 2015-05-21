@@ -66,9 +66,9 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
   Float_t deltaEta = 2.0; 
 
   TFile *fin_R2, *fin_R3, *fin_R4; 
-  fin_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150518.root",2,etaWidth,unfoldingCut,jet_type));
-  fin_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150518.root",3,etaWidth,unfoldingCut,jet_type));
-  fin_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150518.root",4,etaWidth,unfoldingCut,jet_type));
+  fin_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",2,etaWidth,30,jet_type));
+  fin_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",3,etaWidth,40,jet_type));
+  fin_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",4,etaWidth,50,jet_type));
 
   // get the histograms.
   TH1F * uPbPb_R2_Bayes[nbins_cent], * uPP_R2_Bayes, * uPbPb_R3_Bayes[nbins_cent], * uPP_R3_Bayes, * uPbPb_R4_Bayes[nbins_cent], * uPP_R4_Bayes;
@@ -182,7 +182,7 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
   uPP_R2_Bayes->SetMarkerStyle(20);
   uPP_R2_Bayes->SetMarkerColor(kBlack);
   makeHistTitle(uPP_R2_Bayes," "," Jet p_{T} (GeV/c)","#frac{d #sigma}{T_{AA} dp_{T} d#eta} nb");
-  uPP_R2_Bayes->SetAxisRange(unfoldingCut, 299, "X");
+  uPP_R2_Bayes->SetAxisRange(60, 299, "X");
   uPP_R2_Bayes->SetAxisRange(1e-4, 1e14, "Y");
   uPP_R2_Bayes->GetYaxis()->SetMoreLogLabels(kFALSE);
   uPP_R2_Bayes->Draw();
@@ -191,7 +191,7 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
   mPP_R2->Scale(ScaleFactor[0]);
   mPP_R2->SetLineColor(kBlack);
   mPP_R2->SetAxisRange(unfoldingCut, 299, "X");
-  mPP_R2->Draw("same Lhist");
+  //mPP_R2->Draw("same Lhist");
   
   for(int i = 0; i<nbins_cent; ++i){
     uPbPb_R2_Bayes[i]->Scale(ScaleFactor[i+1]);
@@ -206,49 +206,49 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
     // mPbPb_R2[i]->Draw("same Lhist");
   }
 
-  TLegend * leg1_R2 = myLegend(0.15,0.1,0.25,0.2);
+  TLegend * leg1_R2 = myLegend(0.25,0.2,0.35,0.3);
   leg1_R2->AddEntry(uPP_R2_Bayes,"PP Data","pl");
-  leg1_R2->AddEntry(mPP_R2,"PYTHIA","pl");
+  //leg1_R2->AddEntry(mPP_R2,"PYTHIA","pl");
   leg1_R2->SetTextSize(0.02);
   leg1_R2->Draw();
 
 
-  TLegend * leg2_R2 = myLegend(0.75,0.8,0.85,0.9);
+  TLegend * leg2_R2 = myLegend(0.7,0.8,0.8,0.9);
   leg2_R2->AddEntry(uPbPb_R2_Bayes[0],"PbPb Data","pl");
   //leg2_R2->AddEntry(mPbPb_R2[0],"PYTHIA+HYDJET","pl");
   leg2_R2->SetTextSize(0.02);
   leg2_R2->Draw();
   
-  drawText("R=0.2, anti k_{T} PF Jets", 0.15,0.2,16);
-  drawText("R=0.2, anti k_{T} Pu PF Jets", 0.75,0.78,16);
-  drawText(Form("%s", etaLable),0.15,0.25,16);
+  drawText("R=0.2, anti k_{T} PF Jets", 0.25,0.2,16);
+  drawText("R=0.2, anti k_{T} Pu PF Jets", 0.67,0.8,16);
+  drawText(Form("%s", etaLable),0.4,0.23,16);
 
-  putCMSPrel();
-  putPbPbLumi();
-  putPPLumi();
+  putCMSPrel(0.25,0.94,0.025);
+  putPbPbLumi(0.65,0.9,0.02);
+  putPPLumi(0.25,0.3,0.02);
   
   //drawText("pp", 0.7,0.15,16);
-  drawText("0-5% x 10^{2}", 0.8,0.20,16);
-  drawText("5-10% x 10^{4}", 0.8,0.28,16);
-  drawText("10-30% x 10^{6}", 0.8,0.38,16);
-  drawText("30-50% x 10^{8}", 0.8,0.47,16);
-  drawText("50-70% x 10^{10}", 0.8,0.54,16);
-  drawText("70-90% x 10^{12}", 0.8,0.63,16);
+  drawText("0-5% x 10^{2}", 0.7,0.28,16);
+  drawText("5-10% x 10^{4}", 0.7,0.36,16);
+  drawText("10-30% x 10^{6}", 0.7,0.46,16);
+  drawText("30-50% x 10^{8}", 0.7,0.55,16);
+  drawText("50-70% x 10^{10}", 0.7,0.64,16);
+  drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R2->SaveAs(Form("May18/Final_paper_plots_spectra_akR2_%s_%d.pdf",etaWidth,date.GetDate()),"RECREATE");
+  cSpectra_R2->SaveAs(Form("May19/Final_paper_plots_spectra_akR2_%s_%d.pdf",etaWidth,date.GetDate()),"RECREATE");
 
   
   TCanvas * cSpectra_R3 = new TCanvas("cSpectra_R3","",1200,1000);
   //makeMultiPanelCanvas(cSpectra_R3,3,1,0.0,0.0,0.2,0.15,0.07);
   cSpectra_R3->SetLogy();
-  cSpectra_R3->SetGridy();
+  //cSpectra_R3->SetGridy();
   cSpectra_R3->SetLogx();
 
   uPP_R3_Bayes->Scale(ScaleFactor[0]);
   uPP_R3_Bayes->SetMarkerStyle(20);
   uPP_R3_Bayes->SetMarkerColor(kBlack);
   makeHistTitle(uPP_R3_Bayes," "," Jet p_{T} (GeV/c)","#frac{d #sigma}{T_{AA} dp_{T} d#eta} nb");
-  uPP_R3_Bayes->SetAxisRange(unfoldingCut, 299, "X");
+  uPP_R3_Bayes->SetAxisRange(60, 299, "X");
   uPP_R3_Bayes->SetAxisRange(1e-4, 1e14, "Y");
   uPP_R3_Bayes->GetYaxis()->SetMoreLogLabels(kFALSE);
   uPP_R3_Bayes->Draw();
@@ -257,7 +257,7 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
   mPP_R3->Scale(ScaleFactor[0]);
   mPP_R3->SetLineColor(kBlack);
   mPP_R3->SetAxisRange(unfoldingCut, 299, "X");
-  mPP_R3->Draw("same Lhist");
+  //mPP_R3->Draw("same Lhist");
   
   for(int i = 0; i<nbins_cent; ++i){
     uPbPb_R3_Bayes[i]->Scale(ScaleFactor[i+1]);
@@ -272,50 +272,50 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
     // mPbPb_R3[i]->Draw("same Lhist");
   }
 
-  TLegend * leg1_R3 = myLegend(0.15,0.1,0.25,0.2);
+  TLegend * leg1_R3 = myLegend(0.25,0.2,0.35,0.3);
   leg1_R3->AddEntry(uPP_R3_Bayes,"PP Data","pl");
-  leg1_R3->AddEntry(mPP_R3,"PYTHIA","pl");
+  //leg1_R3->AddEntry(mPP_R3,"PYTHIA","pl");
   leg1_R3->SetTextSize(0.02);
   leg1_R3->Draw();
 
 
-  TLegend * leg2_R3 = myLegend(0.75,0.8,0.85,0.9);
+  TLegend * leg2_R3 = myLegend(0.7,0.8,0.8,0.9);
   leg2_R3->AddEntry(uPbPb_R3_Bayes[0],"PbPb Data","pl");
-  // leg2_R3->AddEntry(mPbPb_R3[0],"PYTHIA+HYDJET","pl");
+  //leg2_R3->AddEntry(mPbPb_R3[0],"PYTHIA+HYDJET","pl");
   leg2_R3->SetTextSize(0.02);
   leg2_R3->Draw();
   
-  drawText("R=0.3, anti k_{T} PF Jets", 0.15,0.2,16);
-  drawText("R=0.3, anti k_{T} Pu PF Jets", 0.75,0.78,16);
-  drawText(Form("%s", etaLable),0.15,0.25,16);
+  drawText("R=0.3, anti k_{T} PF Jets", 0.25,0.2,16);
+  drawText("R=0.3, anti k_{T} Pu PF Jets", 0.67,0.8,16);
+  drawText(Form("%s", etaLable),0.4,0.23,16);
 
-  putCMSPrel();
-  putPbPbLumi();
-  putPPLumi();
+  putCMSPrel(0.25,0.94,0.025);
+  putPbPbLumi(0.65,0.9,0.02);
+  putPPLumi(0.25,0.3,0.02);
   
   //drawText("pp", 0.7,0.15,16);
-  drawText("0-5% x 10^{2}", 0.8,0.20,16);
-  drawText("5-10% x 10^{4}", 0.8,0.28,16);
-  drawText("10-30% x 10^{6}", 0.8,0.38,16);
-  drawText("30-50% x 10^{8}", 0.8,0.47,16);
-  drawText("50-70% x 10^{10}", 0.8,0.54,16);
-  drawText("70-90% x 10^{12}", 0.8,0.63,16);
+  drawText("0-5% x 10^{2}", 0.7,0.28,16);
+  drawText("5-10% x 10^{4}", 0.7,0.36,16);
+  drawText("10-30% x 10^{6}", 0.7,0.46,16);
+  drawText("30-50% x 10^{8}", 0.7,0.55,16);
+  drawText("50-70% x 10^{10}", 0.7,0.64,16);
+  drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R3->SaveAs(Form("May18/Final_paper_plots_spectra_akR3_%s_%d.pdf",etaWidth, date.GetDate()),"RECREATE");
+  cSpectra_R3->SaveAs(Form("May19/Final_paper_plots_spectra_akR3_%s_%d.pdf",etaWidth, date.GetDate()),"RECREATE");
 
 
   
   TCanvas * cSpectra_R4 = new TCanvas("cSpectra_R4","",1200,1000);
   //makeMultiPanelCanvas(cSpectra_R4,3,1,0.0,0.0,0.2,0.15,0.07);
   cSpectra_R4->SetLogy();
-  cSpectra_R4->SetGridy();
+  //cSpectra_R4->SetGridy();
   cSpectra_R4->SetLogx();
 
   uPP_R4_Bayes->Scale(ScaleFactor[0]);
   uPP_R4_Bayes->SetMarkerStyle(20);
   uPP_R4_Bayes->SetMarkerColor(kBlack);
   makeHistTitle(uPP_R4_Bayes," "," Jet p_{T} (GeV/c)","#frac{d #sigma}{T_{AA} dp_{T} d#eta} nb");
-  uPP_R4_Bayes->SetAxisRange(unfoldingCut, 299, "X");
+  uPP_R4_Bayes->SetAxisRange(60, 299, "X");
   uPP_R4_Bayes->SetAxisRange(1e-4, 1e14, "Y");
   uPP_R4_Bayes->GetYaxis()->SetMoreLogLabels(kFALSE);
   uPP_R4_Bayes->Draw();
@@ -324,13 +324,13 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
   mPP_R4->Scale(ScaleFactor[0]);
   mPP_R4->SetLineColor(kBlack);
   mPP_R4->SetAxisRange(unfoldingCut, 299, "X");
-  mPP_R4->Draw("same Lhist");
+  //mPP_R4->Draw("same Lhist");
   
   for(int i = 0; i<nbins_cent; ++i){
     uPbPb_R4_Bayes[i]->Scale(ScaleFactor[i+1]);
     uPbPb_R4_Bayes[i]->SetMarkerStyle(33);
     uPbPb_R4_Bayes[i]->SetMarkerColor(kRed);
-    uPbPb_R4_Bayes[i]->SetAxisRange(unfoldingCut, 299, "X");
+    uPbPb_R4_Bayes[i]->SetAxisRange(60, 299, "X");
     uPbPb_R4_Bayes[i]->Draw("same");
 
     // mPbPb_R4[i]->Scale(ScaleFactor[i+2]);
@@ -339,36 +339,36 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
     // mPbPb_R4[i]->Draw("same Lhist");
   }
 
-  TLegend * leg1_R4 = myLegend(0.15,0.1,0.25,0.2);
+  TLegend * leg1_R4 = myLegend(0.25,0.2,0.35,0.3);
   leg1_R4->AddEntry(uPP_R4_Bayes,"PP Data","pl");
-  leg1_R4->AddEntry(mPP_R4,"PYTHIA","pl");
+  //leg1_R4->AddEntry(mPP_R4,"PYTHIA","pl");
   leg1_R4->SetTextSize(0.02);
   leg1_R4->Draw();
 
 
-  TLegend * leg2_R4 = myLegend(0.75,0.8,0.85,0.9);
+  TLegend * leg2_R4 = myLegend(0.7,0.8,0.8,0.9);
   leg2_R4->AddEntry(uPbPb_R4_Bayes[0],"PbPb Data","pl");
-  // leg2_R4->AddEntry(mPbPb_R4[0],"PYTHIA+HYDJET","pl");
+  //leg2_R4->AddEntry(mPbPb_R4[0],"PYTHIA+HYDJET","pl");
   leg2_R4->SetTextSize(0.02);
   leg2_R4->Draw();
   
-  drawText("R=0.4, anti k_{T} PF Jets", 0.15,0.2,16);
-  drawText("R=0.4, anti k_{T} Pu PF Jets", 0.75,0.78,16);
-  drawText(Form("%s", etaLable),0.15,0.25,16);
-  
-  putCMSPrel();
-  putPbPbLumi();
-  putPPLumi();
+  drawText("R=0.4, anti k_{T} PF Jets", 0.25,0.2,16);
+  drawText("R=0.4, anti k_{T} Pu PF Jets", 0.67,0.8,16);
+  drawText(Form("%s", etaLable),0.4,0.23,16);
+
+  putCMSPrel(0.25,0.94,0.025);
+  putPbPbLumi(0.65,0.9,0.02);
+  putPPLumi(0.25,0.3,0.02);
   
   //drawText("pp", 0.7,0.15,16);
-  drawText("0-5% x 10^{2}", 0.8,0.20,16);
-  drawText("5-10% x 10^{4}", 0.8,0.28,16);
-  drawText("10-30% x 10^{6}", 0.8,0.38,16);
-  drawText("30-50% x 10^{8}", 0.8,0.47,16);
-  drawText("50-70% x 10^{10}", 0.8,0.54,16);
-  drawText("70-90% x 10^{12}", 0.8,0.63,16);
+  drawText("0-5% x 10^{2}", 0.7,0.28,16);
+  drawText("5-10% x 10^{4}", 0.7,0.36,16);
+  drawText("10-30% x 10^{6}", 0.7,0.46,16);
+  drawText("30-50% x 10^{8}", 0.7,0.55,16);
+  drawText("50-70% x 10^{10}", 0.7,0.64,16);
+  drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R4->SaveAs(Form("May18/Final_paper_plots_spectra_akR4_%s_%d.pdf",etaWidth, date.GetDate()),"RECREATE");
+  cSpectra_R4->SaveAs(Form("May19/Final_paper_plots_spectra_akR4_%s_%d.pdf",etaWidth, date.GetDate()),"RECREATE");
 
 
 }

@@ -30,7 +30,7 @@
 #include "TLine.h"
 
 
-#include "Headers/plot.h"
+#include "../Headers/plot.h"
 
 
 
@@ -60,10 +60,10 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 
 using namespace std;
 
-void RAA_plot_yetkinCutEfficiency_MCminbias(char* etaWidth = (char*)"10_eta_18",
-					  Int_t radius = 4,
-					  Int_t etaLow = 10,
-					  Int_t etaHigh = 18)
+void RAA_plot_yetkinCutEfficiency_MCminbias(char* etaWidth = (char*)"20_eta_20",
+					    Int_t radius = 2,
+					    Int_t etaLow = 20,
+					    Int_t etaHigh = 20)
 {
 
   Int_t unm=1;
@@ -91,13 +91,13 @@ void RAA_plot_yetkinCutEfficiency_MCminbias(char* etaWidth = (char*)"10_eta_18",
 
   TTree * Data_matched= (TTree*)fData->Get(Form("akPu%dJetAnalyzer/matchedJets",radius));
   TTree * Data_unmatched = (TTree*)fData->Get(Form("akPu%dJetAnalyzer/unmatchedPFJets",radius));
-  TFile *fcentin = TFile::Open("MinBiasHLTRatioWeightsVZ.root");
-  TH1F *hCentWeight = (TH1F*)fcentin->Get("hBinEvents");
+  TFile * fcentin = TFile::Open("MinBiasHLTRatioWeightsVZ.root");
+  TH1F * hCentWeight = (TH1F*)fcentin->Get("hBinEvents");
   
   // TTree * MC_matched = (TTree*)fMC->Get("matchedJets");
   // TTree * MC_unmatched = (TTree*)fMC->Get("unmatchedPFJets");
   
-// Vertex & centrality reweighting for PbPb
+  // Vertex & centrality reweighting for PbPb
   TF1 *fVz;
   fVz = new TF1("fVz","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
   fVz->SetParameters(9.86748e-01, -8.91367e-03, 5.35416e-04, 2.67665e-06, -2.01867e-06);
@@ -283,122 +283,125 @@ void RAA_plot_yetkinCutEfficiency_MCminbias(char* etaWidth = (char*)"10_eta_18",
   MC_unmatched->SetBranchAddress("jet55_prescl",&jet55_p_2);
 #endif
 
-  Float_t weight_cent = hCentWeight->GetBinContent(hCentWeight->FindBin(hiBin_1));
 
   // data loop
   long entries = Data_matched->GetEntries();
   //entries = 1000;
   cout<<"matched Data ntuple "<<endl;
-  Float_t weight_vz = fVz->Eval(vz_1);
-  
-  TRandom rnd; 
-  //Adding the centrality weighting 
-  //    Float_t prescl = 38.695;
-    Float_t prescl = weight_cent*weight_vz ;
-  //  Float_t prescl=1;
+  TRandom rnd;
+  Float_t prescl = 1; 
   if(mat==1)  for(long nentry = 0; nentry < entries; ++nentry ){
 
-    if(nentry%100000 == 0) cout<<" nentry = "<<nentry<<endl;
+      if(nentry%100000 == 0) cout<<" nentry = "<<nentry<<endl;
 
-    Data_matched->GetEntry(nentry);
-    Int_t cBin = findBin(hiBin_1);
-    if(cBin == -1 || cBin >= nbins_cent) continue;
+      Data_matched->GetEntry(nentry);
+      Int_t cBin = findBin(hiBin_1);
+      if(cBin == -1 || cBin >= nbins_cent) continue;
     
-    Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
+      Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
 
-    if(isSymm && TMath::Abs(eta_1) > (Float_t)etaHigh/10) continue;       
-    if(!isSymm && (TMath::Abs(eta_1) < (Float_t)etaLow/10 || TMath::Abs(eta_1) > (Float_t)etaHigh/10)) continue;
-       
-    if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
-    if(calopt_1/pfpt_1 > 0.85) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
-    if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
-   
-    //  if(jetMB_1 == 1 && jet80_1==0){// && jet55_1 == 0 && jet65_1 == 0 && jet80_1 == 0 ) {
-    //  if(jetMB_1 == 1 && jet55_1 == 0 && jet65_1 == 0 && jet80_1 == 0 ) {
-    if(jetMB_1 == 1){
-      //hData_Jet55_noCut->Fill(pfpt_1, jet55_p_1);
+      //Adding the centrality weighting 
+      //    Float_t prescl = 38.695;
+      Float_t weight_cent = hCentWeight->GetBinContent(hCentWeight->FindBin(hiBin_1));
+      Float_t weight_vz = fVz->Eval(vz_1);
+      prescl = weight_cent*weight_vz ;
       
-      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
-	//hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-	hpbpb_TrgObjComb[cBin]->Fill(pfpt_1, prescl);
-	hpbpb_JEC_TrgObjComb[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), prescl);
-	hpbpb_Smear_TrgObjComb[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), prescl);
-      }
-      if(calopt_1/pfpt_1 > 0.85){
-	//hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-	hpbpb_TrgObjComb[cBin]->Fill(pfpt_1, prescl);
-	hpbpb_JEC_TrgObjComb[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), prescl);
-	hpbpb_Smear_TrgObjComb[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), prescl);
-      }
-      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
-	//hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-	hpbpb_TrgObjComb[cBin]->Fill(pfpt_1, prescl);
-      	hpbpb_JEC_TrgObjComb[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), prescl);
-	hpbpb_Smear_TrgObjComb[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), prescl);
-      }
-      //if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
-      //if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
-    }
+      //  Float_t prescl=1;
 
-    if( jetMB_1 == 1&&jet80_1 == 1){
-      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
-	hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
+
+      if(isSymm && TMath::Abs(eta_1) > (Float_t)etaHigh/10) continue;       
+      if(!isSymm && (TMath::Abs(eta_1) < (Float_t)etaLow/10 || TMath::Abs(eta_1) > (Float_t)etaHigh/10)) continue;
+       
+      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
+      if(calopt_1/pfpt_1 > 0.85) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
+      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
+   
+      //  if(jetMB_1 == 1 && jet80_1==0){// && jet55_1 == 0 && jet65_1 == 0 && jet80_1 == 0 ) {
+      //  if(jetMB_1 == 1 && jet55_1 == 0 && jet65_1 == 0 && jet80_1 == 0 ) {
+      if(jetMB_1 == 1){
+	//hData_Jet55_noCut->Fill(pfpt_1, jet55_p_1);
+      
+	if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
+	  //hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
+	  hpbpb_TrgObjComb[cBin]->Fill(pfpt_1, prescl);
+	  hpbpb_JEC_TrgObjComb[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), prescl);
+	  hpbpb_Smear_TrgObjComb[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), prescl);
+	}
+	if(calopt_1/pfpt_1 > 0.85){
+	  //hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
+	  hpbpb_TrgObjComb[cBin]->Fill(pfpt_1, prescl);
+	  hpbpb_JEC_TrgObjComb[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), prescl);
+	  hpbpb_Smear_TrgObjComb[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), prescl);
+	}
+	if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
+	  //hData_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
+	  hpbpb_TrgObjComb[cBin]->Fill(pfpt_1, prescl);
+	  hpbpb_JEC_TrgObjComb[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), prescl);
+	  hpbpb_Smear_TrgObjComb[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), prescl);
+	}
+	//if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
+	//if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
       }
-      if(calopt_1/pfpt_1 > 0.85){
-	hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
+
+      if( jetMB_1 == 1 && jet80_1 == 0){
+	if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
+	  hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
+	}
+	if(calopt_1/pfpt_1 > 0.85){
+	  hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
+	}
+	if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
+	  hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
+	}
       }
-      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
-	hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
-      }
-    }
     
 
 
 
 #if 0
-    if(jet65_1 == 1 && jet80_1 == 0 ) {
+      if(jet65_1 == 1 && jet80_1 == 0 ) {
       
-      //hData_Jet65_noCut->Fill(pfpt_1);
+	//hData_Jet65_noCut->Fill(pfpt_1);
       
-      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)){
-	//hData_Jet65_CutA->Fill(pfpt_1);
-	hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
-      }
-      if(calopt_1/pfpt_1 > 0.85) {
-	//hData_Jet65_CutA->Fill(pfpt_1);
-	hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
-      }
-      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
-	//hData_Jet65_CutA->Fill(pfpt_1);
-	hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
-      }
-      //if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet65_CutA_rej->Fill(pfpt_1);
-      //if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet65_CutA_rej->Fill(pfpt_1);
+	if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)){
+	  //hData_Jet65_CutA->Fill(pfpt_1);
+	  hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
+	}
+	if(calopt_1/pfpt_1 > 0.85) {
+	  //hData_Jet65_CutA->Fill(pfpt_1);
+	  hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
+	}
+	if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
+	  //hData_Jet65_CutA->Fill(pfpt_1);
+	  hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
+	}
+	//if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet65_CutA_rej->Fill(pfpt_1);
+	//if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet65_CutA_rej->Fill(pfpt_1);
       
-    }
-    if(jet80_1 == 1) {
+      }
+      if(jet80_1 == 1) {
     
-      //hData_Jet80_noCut->Fill(pfpt_1);
+	//hData_Jet80_noCut->Fill(pfpt_1);
       
-      if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
-	//hData_Jet80_CutA->Fill(pfpt_1);
-	hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
-      }
-      if(calopt_1/pfpt_1 > 0.85){
-	//hData_Jet80_CutA->Fill(pfpt_1);
-	hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
-      }
-      if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05){
-	//hData_Jet80_CutA->Fill(pfpt_1);
-	hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
-      }
-      //if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet80_CutA_rej->Fill(pfpt_1);
-      //if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet80_CutA_rej->Fill(pfpt_1);
+	if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
+	  //hData_Jet80_CutA->Fill(pfpt_1);
+	  hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
+	}
+	if(calopt_1/pfpt_1 > 0.85){
+	  //hData_Jet80_CutA->Fill(pfpt_1);
+	  hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
+	}
+	if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05){
+	  //hData_Jet80_CutA->Fill(pfpt_1);
+	  hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
+	}
+	//if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand >= 0.05) hData_Jet80_CutA_rej->Fill(pfpt_1);
+	//if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) hData_Jet80_CutA_rej->Fill(pfpt_1);
       
-    }
+      }
 #endif
     
-  }// data ntuple loop
+    }// data ntuple loop
 
   // data unmatched loop:
   entries = Data_unmatched->GetEntries();
@@ -406,62 +409,63 @@ void RAA_plot_yetkinCutEfficiency_MCminbias(char* etaWidth = (char*)"10_eta_18",
   cout<<"Unmatched Data ntuple "<<endl;
   if(unm==1)  for(long nentry = 0; nentry < entries; ++nentry ){
 
-    if(nentry%100000 == 0) cout<<" nentry = "<<nentry<<endl;
-    Data_unmatched->GetEntry(nentry);
-    Int_t cBin = findBin(hiBin_1);
-    if(cBin == -1 || cBin >= nbins_cent) continue;
+      if(nentry%100000 == 0) cout<<" nentry = "<<nentry<<endl;
+      Data_unmatched->GetEntry(nentry);
+      Int_t cBin = findBin(hiBin_1);
+      if(cBin == -1 || cBin >= nbins_cent) continue;
 
 
 
     
-    Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
+      Float_t Sumcand = chSum_1 + phSum_1 + neSum_1 + muSum_1;
 
-    if(isSymm && TMath::Abs(eta_1) > (Float_t)etaHigh/10) continue;       
-    if(!isSymm && (TMath::Abs(eta_1) < (Float_t)etaLow/10 || TMath::Abs(eta_1) > (Float_t)etaHigh/10)) continue;   
-    if(eMax_1/Sumcand < 0.05 && unm==1) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
+      if(isSymm && TMath::Abs(eta_1) > (Float_t)etaHigh/10) continue;       
+      if(!isSymm && (TMath::Abs(eta_1) < (Float_t)etaLow/10 || TMath::Abs(eta_1) > (Float_t)etaHigh/10)) continue;   
+      if(eMax_1/Sumcand < 0.05 && unm==1) hpbpb_noTrg[cBin]->Fill(pfpt_1, prescl);
 
-    //    if(jet55_1 == 1 && jet65_1 == 0 && jet80_1 == 0 ) {
+      //    if(jet55_1 == 1 && jet65_1 == 0 && jet80_1 == 0 ) {
   
-    // if(jetMB_1 == 1 &&  jet80_1 == 0  ){// && jet55_1 == 0 && jet65_1 == 0 && jet80_1 == 0  ){
-    //    if(jetMB_1 == 1 && jet55_1 == 0 && jet65_1 == 0 && jet80_1 == 0 ) {
-    if(jetMB_1 == 1){
-      //hData_unmatched_Jet55_noCut->Fill(pfpt_1, jet55_p_1);
+      // if(jetMB_1 == 1 &&  jet80_1 == 0  ){// && jet55_1 == 0 && jet65_1 == 0 && jet80_1 == 0  ){
+      //    if(jetMB_1 == 1 && jet55_1 == 0 && jet65_1 == 0 && jet80_1 == 0 ) {
+      if(jetMB_1 == 1){
+	//hData_unmatched_Jet55_noCut->Fill(pfpt_1, jet55_p_1);
 
-      if(eMax_1/Sumcand < 0.05 && unm==1 ) {hpbpb_TrgObjComb[cBin]->Fill(pfpt_1, prescl);
-	hpbpb_JEC_TrgObjComb[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), prescl);
-	hpbpb_Smear_TrgObjComb[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), prescl);
-      }
+	if(eMax_1/Sumcand < 0.05 && unm==1 ) {
+	  hpbpb_TrgObjComb[cBin]->Fill(pfpt_1, prescl);
+	  hpbpb_JEC_TrgObjComb[cBin]->Fill(pfpt_1 * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), prescl);
+	  hpbpb_Smear_TrgObjComb[cBin]->Fill(pfpt_1 + rnd.Gaus(0,1), prescl);
+	}
 	//hData_unmatched_Jet55_CutA->Fill(pfpt_1, jet55_p_1);
-      //else hData_unmatched_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
+	//else hData_unmatched_Jet55_CutA_rej->Fill(pfpt_1, jet55_p_1);
       
-    }
+      }
   
 
-   if(  jetMB_1 == 1&&jet80_1 == 1){
-     if(eMax_1/Sumcand < 0.05 && unm==1 ) 
-	hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
-   }
+      if(  jetMB_1 == 1 && jet80_1 == 0){
+	if(eMax_1/Sumcand < 0.05) 
+	  hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
+      }
     
 
 
 #if 0
-    if(jet65_1 == 1 && jet80_1 == 0 ) {
-      //hData_unmatched_Jet65_noCut->Fill(pfpt_1);
-      if(eMax_1/Sumcand < 0.05  )hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
+      if(jet65_1 == 1 && jet80_1 == 0 ) {
+	//hData_unmatched_Jet65_noCut->Fill(pfpt_1);
+	if(eMax_1/Sumcand < 0.05  )hpbpb_TrgObj65[cBin]->Fill(pfpt_1);
 	//hData_unmatched_Jet65_CutA->Fill(pfpt_1);
-      //else hData_unmatched_Jet65_CutA_rej->Fill(pfpt_1);
+	//else hData_unmatched_Jet65_CutA_rej->Fill(pfpt_1);
       
-    }
-    if(jet80_1 == 1) {
+      }
+      if(jet80_1 == 1) {
     
-      //hData_unmatched_Jet80_noCut->Fill(pfpt_1);
-      if(eMax_1/Sumcand < 0.05  )hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
+	//hData_unmatched_Jet80_noCut->Fill(pfpt_1);
+	if(eMax_1/Sumcand < 0.05  )hpbpb_TrgObj80[cBin]->Fill(pfpt_1);
 	//hData_unmatched_Jet80_CutA->Fill(pfpt_1);
-      //else hData_unmatched_Jet80_CutA_rej->Fill(pfpt_1);
+	//else hData_unmatched_Jet80_CutA_rej->Fill(pfpt_1);
       
-    }
+      }
 #endif
-  }// data ntuple loop
+    }// data ntuple loop
 
 #if 0
  
@@ -651,7 +655,7 @@ void RAA_plot_yetkinCutEfficiency_MCminbias(char* etaWidth = (char*)"10_eta_18",
 	  hpbpb_mcclosure_Jet55_data[cBin]->Fill(pfpt_2, weight);
 	}
       }
-	//hMC_unmatched_Jet55_CutA->Fill(pfrefpt_2, jet55_p_2*weight);
+      //hMC_unmatched_Jet55_CutA->Fill(pfrefpt_2, jet55_p_2*weight);
       //else hMC_unmatched_Jet55_CutA_rej->Fill(pfpt_2, jet55_p_2*weight);
       
     }
@@ -671,7 +675,7 @@ void RAA_plot_yetkinCutEfficiency_MCminbias(char* etaWidth = (char*)"10_eta_18",
 	  hpbpb_mcclosure_Jet65_data[cBin]->Fill(pfpt_2, weight);
 	}
       }
-	//hMC_unmatched_Jet65_CutA->Fill(pfrefpt_2, weight);
+      //hMC_unmatched_Jet65_CutA->Fill(pfrefpt_2, weight);
       //else hMC_unmatched_Jet65_CutA_rej->Fill(pfpt_2);
       
     }
@@ -691,7 +695,7 @@ void RAA_plot_yetkinCutEfficiency_MCminbias(char* etaWidth = (char*)"10_eta_18",
 	  hpbpb_mcclosure_Jet80_data[cBin]->Fill(pfpt_2, weight);
 	}
       }
-	//hMC_unmatched_Jet80_CutA->Fill(pfrefpt_2, weight);
+      //hMC_unmatched_Jet80_CutA->Fill(pfrefpt_2, weight);
       //else hMC_unmatched_Jet80_CutA_rej->Fill(pfpt_2);
       
     }
@@ -763,7 +767,7 @@ void RAA_plot_yetkinCutEfficiency_MCminbias(char* etaWidth = (char*)"10_eta_18",
 
   fout.Close();
 
-  #if 0
+#if 0
   // add the unmatched histograms to the matched ones to get the final cut efficiency
   hData_Jet55_noCut->Add(hData_unmatched_Jet55_noCut);
   hData_Jet65_noCut->Add(hData_unmatched_Jet65_noCut);
@@ -1134,7 +1138,7 @@ void RAA_plot_yetkinCutEfficiency_MCminbias(char* etaWidth = (char*)"10_eta_18",
   hData_Jet55->Draw("same");
   //drawText()
   cTriggerCombination->SaveAs(Form("TriggerCombination_YetkinCuts_R0p%d.pdf",radius),"RECREATE");
-  #endif
+#endif
 
 
 }

@@ -77,16 +77,15 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   Float_t etaBoundary = 2.0; 
 
   TFile *fin_R2, *fin_R3, *fin_R4; 
-  fin_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150518.root",2,etaWidth,unfoldingCut,jet_type));
-  fin_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150518.root",3,etaWidth,unfoldingCut,jet_type));
-  fin_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150518.root",4,etaWidth,unfoldingCut,jet_type));
+  fin_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",2,etaWidth,30,jet_type));
+  fin_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",3,etaWidth,40,jet_type));
+  fin_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",4,etaWidth,50,jet_type));
 
   // // get the unfolded error correction files and histograms
   TFile * fError_R2, * fError_R3, * fError_R4;
-  fError_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s_20150518.root",2,2, etaWidth, unfoldingCut, jet_type));
-  fError_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s_20150518.root",3,3, etaWidth, unfoldingCut, jet_type));
-  fError_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s_20150518.root",4,4, etaWidth, unfoldingCut, jet_type));
-
+  fError_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s_20150518.root",2,2, etaWidth, 40, jet_type));
+  fError_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s_20150518.root",3,3, etaWidth, 40, jet_type));
+  fError_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s_20150518.root",4,4, etaWidth, 40, jet_type));
 
   TH1F * hPbPb_R2_ErrorFix[nbins_cent], * hPbPb_R3_ErrorFix[nbins_cent], * hPbPb_R4_ErrorFix[nbins_cent];
   TH1F * hPbPb_R2_measured[nbins_cent], * hPbPb_R3_measured[nbins_cent], * hPbPb_R4_measured[nbins_cent];
@@ -169,7 +168,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   prepareNcollUnc(nbins_pt, 300.);
   
   // get the necessary histograms
-  const int Iterations = 6; //for unfolding systematics. 
+  const int Iterations = 10; //for unfolding systematics. 
   const int BayesIter = 4;
   TH1F *uPbPb_BayesianIter_R2[nbins_cent+1][Iterations];
   TH1F *uPP_BayesianIter_R2[Iterations];
@@ -291,15 +290,42 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     hNumeratorPP_R4[j]->Divide(hDenominatorPP_R4);
   }  
 
+  // define the TLines for the JEC upper and lower bounds. 
+  TLine * bounds_up[nbins_cent], *bounds_low[nbins_cent];
+  bounds_up[0] = new TLine(65,1.12,299,1.12); 
+  bounds_up[1] = new TLine(65,1.10,299,1.10); 
+  bounds_up[2] = new TLine(65,1.08,299,1.08); 
+  bounds_up[3] = new TLine(65,1.05,299,1.05); 
+  bounds_up[4] = new TLine(65,1.03,299,1.03); 
+  bounds_up[5] = new TLine(65,1.02,299,1.02); 
+  
+  bounds_low[0] = new TLine(65,0.88,299,0.88); 
+  bounds_low[1] = new TLine(65,0.90,299,0.90); 
+  bounds_low[2] = new TLine(65,0.92,299,0.92); 
+  bounds_low[3] = new TLine(65,0.95,299,0.95); 
+  bounds_low[4] = new TLine(65,0.97,299,0.97); 
+  bounds_low[5] = new TLine(65,0.98,299,0.98); 
+  
+  for(int i = 0; i<nbins_cent; ++i){
+
+    bounds_up[i]->SetLineWidth(2);
+    bounds_up[i]->SetLineStyle(2);
+    bounds_up[i]->SetLineColor(kRed);
+    bounds_low[i]->SetLineWidth(2);
+    bounds_low[i]->SetLineStyle(2);
+    bounds_low[i]->SetLineColor(kRed);    
+
+  }
+  
   //make the canvas
   // line at 1
-  TLine *linePbPb_iter = new TLine(unfoldingCut,1,299,1);
+  TLine *linePbPb_iter = new TLine(65,1,299,1);
   linePbPb_iter->SetLineStyle(2);
   linePbPb_iter->SetLineWidth(2);
   
 
-  TCanvas * cPbPb_Its_R2 = new TCanvas("cPbPb_Its_R2","",1000,800);
-  makeMultiPanelCanvasWithGap(cPbPb_Its_R2,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cPbPb_Its_R2 = new TCanvas("cPbPb_Its_R2","",1000,1000);
+  makeMultiPanelCanvas(cPbPb_Its_R2,3,2,0.0,0.0,0.2,0.15,0.07);
   
   TLegend *PbPb_itersys_R2 = myLegend(0.53,0.65,0.85,0.9);
   
@@ -309,7 +335,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     for(int j = 1;j<Iterations;j++){
       hNumerator_R2[j][i]->SetMarkerStyle(33);
       hNumerator_R2[j][i]->SetMarkerColor(j+1);
-      hNumerator_R2[j][i]->SetAxisRange(unfoldingCut,299,"X");
+      hNumerator_R2[j][i]->SetAxisRange(65,299,"X");
       hNumerator_R2[j][i]->SetAxisRange(0,2,"Y");
 
       if(j==1){
@@ -335,12 +361,12 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, 2),0.2,0.23,20);
   drawText(Form("|#eta|< %2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
 
-  cPbPb_Its_R2->SaveAs(Form("May18/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPbPb_Its_R2->SaveAs(Form("May20/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
   
 
-  TCanvas * cPP_Its_R2 = new TCanvas("cPP_Its_R2","",600,400);
+  TCanvas * cPP_Its_R2 = new TCanvas("cPP_Its_R2","",800,800);
   // line at 1
-  TLine *linePP_iter_R2 = new TLine(unfoldingCut,1,299,1);
+  TLine *linePP_iter_R2 = new TLine(65,1,299,1);
   linePP_iter_R2->SetLineStyle(2);
   linePP_iter_R2->SetLineWidth(2);
   
@@ -349,7 +375,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   for(int j = 1;j<Iterations;j++){
     hNumeratorPP_R2[j]->SetMarkerStyle(33);
     hNumeratorPP_R2[j]->SetMarkerColor(j+1);
-    hNumeratorPP_R2[j]->SetAxisRange(unfoldingCut,299,"X");
+    hNumeratorPP_R2[j]->SetAxisRange(65,299,"X");
     hNumeratorPP_R2[j]->SetAxisRange(0,2,"Y");
 
     if(j==1){
@@ -371,65 +397,74 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type, 2),0.2,0.23,20);
   drawText(Form("|#eta|< %2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
 
-  cPP_Its_R2->SaveAs(Form("May18/PP_unfoldng_iteration_systematics_%dGeVCut_akR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPP_Its_R2->SaveAs(Form("May20/PP_unfoldng_iteration_systematics_%dGeVCut_akR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
 
   // define the Jet ID efficiency as a function of jet pT: taken from the above plots: 
-  TF1 * fPol = new TF1("fPol","[0]+[1]*x");
+  TF1 * fPol_x2 = new TF1("fPol_x2","1-[0]/pow(x,[1])");
+  TF1 * fPol_x1 = new TF1("fPol_x1","[0]+[1]*x");
   
   // plot for the JEC sys
 
-  TCanvas * cRAA_JEC_sys_R2 = new TCanvas("cRAA_JEC_sys_R2","",1000,800);
-  makeMultiPanelCanvasWithGap(cRAA_JEC_sys_R2,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
-  
+  TCanvas * cRAA_JEC_sys_R2 = new TCanvas("cRAA_JEC_sys_R2","",1000,1000);
+  makeMultiPanelCanvas(cRAA_JEC_sys_R2,3,2,0.0,0.0,0.2,0.15,0.07);
+
   for(int i = 0; i<nbins_cent; ++i){
     cRAA_JEC_sys_R2->cd(nbins_cent-i);
     RAA_JEC_bayesian_R2[i]->Divide(RAA_JEC_bayesian_R2[i], RAA_bayesian_R2[i], 1,1, "B");
     RAA_JEC_bayesian_R2[i]->SetAxisRange(0.61, 1.39, "Y");
     makeHistTitle(RAA_JEC_bayesian_R2[i], "", "Jet p_{T} (GeV/c)","Ratio",2);
-    RAA_JEC_bayesian_R2[i]->SetAxisRange(unfoldingCut, 299, "X");
-    RAA_JEC_bayesian_R2[i]->Fit("fPol","","",60,299);
+    RAA_JEC_bayesian_R2[i]->SetAxisRange(65, 299, "X");
+    //RAA_JEC_bayesian_R2[i]->Fit("fPol_x2","","",60,299);
+
 
     RAA_JEC_bayesian_R2[i]->Draw("p");
-    checkMaximumSys(systematics_R2.hSysJEC[i], functionHist(fPol, systematics_R2.hSysJEC[i], Form("hist_sysJEC_cent%d",i)));
+    //checkMaximumSys(systematics_R2.hSysJEC[i], functionHist(fPol_x2, systematics_R2.hSysJEC[i], Form("hist_sysJEC_cent%d",i)));
 
     linePbPb_iter->Draw();
+
+    bounds_up[i]->Draw();
+    //bounds_low[i]->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+
   }
 
   cRAA_JEC_sys_R2->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R0.2",algo, jet_type),0.2,0.23,20);
   drawText(Form("|#eta|< %2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cRAA_JEC_sys_R2->SaveAs(Form("May18/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cRAA_JEC_sys_R2->SaveAs(Form("May20/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
-    // plot for the Smear sys
+  // plot for the Smear sys
 
-  TCanvas * cRAA_Smear_sys_R2 = new TCanvas("cRAA_Smear_sys_R2","",1000,800);
-  makeMultiPanelCanvasWithGap(cRAA_Smear_sys_R2,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cRAA_Smear_sys_R2 = new TCanvas("cRAA_Smear_sys_R2","",1000,1000);
+  makeMultiPanelCanvas(cRAA_Smear_sys_R2,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
     cRAA_Smear_sys_R2->cd(nbins_cent-i);
     RAA_Smear_bayesian_R2[i]->Divide(RAA_Smear_bayesian_R2[i], RAA_bayesian_R2[i], 1,1, "B");
     RAA_Smear_bayesian_R2[i]->SetAxisRange(0.61, 1.39, "Y");
     makeHistTitle(RAA_Smear_bayesian_R2[i], "", "Jet p_{T} (GeV/c)","Ratio",2);
-    RAA_Smear_bayesian_R2[i]->SetAxisRange(unfoldingCut, 299, "X");
-    RAA_Smear_bayesian_R2[i]->Fit("fPol","","",60,299);
+    RAA_Smear_bayesian_R2[i]->SetAxisRange(65, 299, "X");
+    RAA_Smear_bayesian_R2[i]->Fit("fPol_x1","","",60,299);
     RAA_Smear_bayesian_R2[i]->Draw("p");
-    checkMaximumSys(systematics_R2.hSysSmear[i], functionHist(fPol, systematics_R2.hSysSmear[i], Form("hist_sysSmear_cent%d",i)));
+    checkMaximumSys(systematics_R2.hSysSmear[i], functionHist(fPol_x1, systematics_R2.hSysSmear[i], Form("hist_sysSmear_cent%d",i)));
 
     linePbPb_iter->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+
   }
 
   cRAA_Smear_sys_R2->cd(1);
   putCMSPrel();
-  drawText(Form("Anti-k_{T} %s %s Jets R2",algo, jet_type, radius),0.2,0.23,20);
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.2",algo, jet_type),0.2,0.23,20);
   if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
   if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cRAA_Smear_sys_R2->SaveAs(Form("May18/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
+  cRAA_Smear_sys_R2->SaveAs(Form("May20/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
 
 
   // draw the total systematics
-  TCanvas * cSys_R2 = new TCanvas("cSys_R2","Total Systematics",1200,800);
-  makeMultiPanelCanvasWithGap(cSys_R2,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cSys_R2 = new TCanvas("cSys_R2","Total Systematics",1200,1200);
+  makeMultiPanelCanvas(cSys_R2,3,2,0.0,0.0,0.2,0.15,0.07);
 
   for(int i = 0; i<nbins_cent; ++i){
 
@@ -439,20 +474,21 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     systematics_R2.DrawComponent(i);
 
     //drawPanelLabel(i);
-    TLegend *title_ = myLegend(0.18,0.8,0.48,0.9);
-    title_->AddEntry(RAA_bayesian_R2[i],Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),"");
-    title_->SetTextSize(0.06);
-    title_->Draw();
-  
+    //TLegend *title_ = myLegend(0.18,0.8,0.48,0.9);
+    //title_->AddEntry(RAA_bayesian_R2[i],Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),"");
+    //title_->SetTextSize(0.06);
+    //title_->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+
   }
   cSys_R2->cd(1);
   putCMSPrel();
   linePbPb_iter->Draw();
-  cSys_R2->SaveAs(Form("May18/RAA_total_systematics_unfoldingCut%dGeV_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cSys_R2->SaveAs(Form("May20/RAA_total_systematics_unfoldingCut%dGeV_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
 
-  TCanvas * cPbPb_Its_R3 = new TCanvas("cPbPb_Its_R3","",1000,800);
-  makeMultiPanelCanvasWithGap(cPbPb_Its_R3,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cPbPb_Its_R3 = new TCanvas("cPbPb_Its_R3","",1000,1000);
+  makeMultiPanelCanvas(cPbPb_Its_R3,3,2,0.0,0.0,0.2,0.15,0.07);
   
   TLegend *PbPb_itersys_R3 = myLegend(0.53,0.65,0.85,0.9);
   
@@ -462,7 +498,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     for(int j = 1;j<Iterations;j++){
       hNumerator_R3[j][i]->SetMarkerStyle(33);
       hNumerator_R3[j][i]->SetMarkerColor(j+1);
-      hNumerator_R3[j][i]->SetAxisRange(unfoldingCut,299,"X");
+      hNumerator_R3[j][i]->SetAxisRange(65,299,"X");
       hNumerator_R3[j][i]->SetAxisRange(0,2,"Y");
 
       if(j==1){
@@ -488,12 +524,12 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, 3),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
   
-  cPbPb_Its_R3->SaveAs(Form("May18/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPbPb_Its_R3->SaveAs(Form("May20/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
   
 
-  TCanvas * cPP_Its_R3 = new TCanvas("cPP_Its_R3","",600,400);
+  TCanvas * cPP_Its_R3 = new TCanvas("cPP_Its_R3","",800,800);
   // line at 1
-  TLine *linePP_iter_R3 = new TLine(unfoldingCut,1,299,1);
+  TLine *linePP_iter_R3 = new TLine(65,1,299,1);
   linePP_iter_R3->SetLineStyle(2);
   linePP_iter_R3->SetLineWidth(2);
   
@@ -502,7 +538,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   for(int j = 1;j<Iterations;j++){
     hNumeratorPP_R3[j]->SetMarkerStyle(33);
     hNumeratorPP_R3[j]->SetMarkerColor(j+1);
-    hNumeratorPP_R3[j]->SetAxisRange(unfoldingCut,299,"X");
+    hNumeratorPP_R3[j]->SetAxisRange(65,299,"X");
     hNumeratorPP_R3[j]->SetAxisRange(0,2,"Y");
 
     if(j==1){
@@ -524,61 +560,68 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type, 3),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
   
-  cPP_Its_R3->SaveAs(Form("May18/PP_unfoldng_iteration_systematics_%dGeVCut_akR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPP_Its_R3->SaveAs(Form("May20/PP_unfoldng_iteration_systematics_%dGeVCut_akR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
 
   // plot for the JEC sys
 
-  TCanvas * cRAA_JEC_sys_R3 = new TCanvas("cRAA_JEC_sys_R3","",1000,800);
-  makeMultiPanelCanvasWithGap(cRAA_JEC_sys_R3,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cRAA_JEC_sys_R3 = new TCanvas("cRAA_JEC_sys_R3","",1000,1000);
+  makeMultiPanelCanvas(cRAA_JEC_sys_R3,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
     cRAA_JEC_sys_R3->cd(nbins_cent-i);
     RAA_JEC_bayesian_R3[i]->Divide(RAA_JEC_bayesian_R3[i], RAA_bayesian_R3[i], 1,1, "B");
     RAA_JEC_bayesian_R3[i]->SetAxisRange(0.61, 1.39, "Y");
     makeHistTitle(RAA_JEC_bayesian_R3[i], "", "Jet p_{T} (GeV/c)","Ratio",2);
-    RAA_JEC_bayesian_R3[i]->SetAxisRange(unfoldingCut, 299, "X");
-    RAA_JEC_bayesian_R3[i]->Fit("fPol","","",60,299);
+    RAA_JEC_bayesian_R3[i]->SetAxisRange(65, 299, "X");
+    //RAA_JEC_bayesian_R3[i]->Fit("fPol_x2","","",60,299);
 
     RAA_JEC_bayesian_R3[i]->Draw("p");
-    checkMaximumSys(systematics_R3.hSysJEC[i], functionHist(fPol, systematics_R3.hSysJEC[i], Form("hist_sysJEC_cent%d",i)));
+    //checkMaximumSys(systematics_R3.hSysJEC[i], functionHist(fPol_x2, systematics_R3.hSysJEC[i], Form("hist_sysJEC_cent%d",i)));
 
     linePbPb_iter->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+
+    bounds_up[i]->Draw();
+    //bounds_low[i]->Draw();
+
   }
 
   cRAA_JEC_sys_R3->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.3",algo, jet_type),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cRAA_JEC_sys_R3->SaveAs(Form("May18/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cRAA_JEC_sys_R3->SaveAs(Form("May20/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
-    // plot for the Smear sys
+  // plot for the Smear sys
 
-  TCanvas * cRAA_Smear_sys_R3 = new TCanvas("cRAA_Smear_sys_R3","",1000,800);
-  makeMultiPanelCanvasWithGap(cRAA_Smear_sys_R3,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cRAA_Smear_sys_R3 = new TCanvas("cRAA_Smear_sys_R3","",1000,1000);
+  makeMultiPanelCanvas(cRAA_Smear_sys_R3,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
     cRAA_Smear_sys_R3->cd(nbins_cent-i);
     RAA_Smear_bayesian_R3[i]->Divide(RAA_Smear_bayesian_R3[i], RAA_bayesian_R3[i], 1,1, "B");
     RAA_Smear_bayesian_R3[i]->SetAxisRange(0.61, 1.39, "Y");
     makeHistTitle(RAA_Smear_bayesian_R3[i], "", "Jet p_{T} (GeV/c)","Ratio",2);
-    RAA_Smear_bayesian_R3[i]->SetAxisRange(unfoldingCut, 299, "X");
-    RAA_Smear_bayesian_R3[i]->Fit("fPol","","",60,299);
+    RAA_Smear_bayesian_R3[i]->SetAxisRange(65, 299, "X");
+    RAA_Smear_bayesian_R3[i]->Fit("fPol_x1","","",60,299);
     RAA_Smear_bayesian_R3[i]->Draw("p");
-    checkMaximumSys(systematics_R3.hSysSmear[i], functionHist(fPol, systematics_R3.hSysSmear[i], Form("hist_sysSmear_cent%d",i)));
+    checkMaximumSys(systematics_R3.hSysSmear[i], functionHist(fPol_x1, systematics_R3.hSysSmear[i], Form("hist_sysSmear_cent%d",i)));
 
     linePbPb_iter->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+
   }
 
   cRAA_Smear_sys_R3->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.3",algo, jet_type),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cRAA_Smear_sys_R3->SaveAs(Form("May18/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
+  cRAA_Smear_sys_R3->SaveAs(Form("May20/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
 
 
   // draw the total systematics
-  TCanvas * cSys_R3 = new TCanvas("cSys_R3","Total Systematics",1200,800);
-  makeMultiPanelCanvasWithGap(cSys_R3,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cSys_R3 = new TCanvas("cSys_R3","Total Systematics",1200,1200);
+  makeMultiPanelCanvas(cSys_R3,3,2,0.0,0.0,0.2,0.15,0.07);
 
   for(int i = 0; i<nbins_cent; ++i){
 
@@ -588,21 +631,22 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     systematics_R3.DrawComponent(i);
 
     //drawPanelLabel(i);
-    TLegend *title_ = myLegend(0.18,0.8,0.48,0.9);
-    title_->AddEntry(RAA_bayesian_R3[i],Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),"");
-    title_->SetTextSize(0.06);
-    title_->Draw();
-  
+    //TLegend *title_ = myLegend(0.18,0.8,0.48,0.9);
+    //title_->AddEntry(RAA_bayesian_R3[i],Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),"");
+    //title_->SetTextSize(0.06);
+    //title_->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+
   }
   cSys_R3->cd(1);
   putCMSPrel();
   linePbPb_iter->Draw();
-  cSys_R3->SaveAs(Form("May18/RAA_total_systematics_unfoldingCut%dGeV_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cSys_R3->SaveAs(Form("May20/RAA_total_systematics_unfoldingCut%dGeV_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
 
 
-  TCanvas * cPbPb_Its_R4 = new TCanvas("cPbPb_Its_R4","",1000,800);
-  makeMultiPanelCanvasWithGap(cPbPb_Its_R4,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cPbPb_Its_R4 = new TCanvas("cPbPb_Its_R4","",1000,1000);
+  makeMultiPanelCanvas(cPbPb_Its_R4,3,2,0.0,0.0,0.2,0.15,0.07);
   
   TLegend *PbPb_itersys_R4 = myLegend(0.53,0.65,0.85,0.9);
   
@@ -612,7 +656,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     for(int j = 1;j<Iterations;j++){
       hNumerator_R4[j][i]->SetMarkerStyle(33);
       hNumerator_R4[j][i]->SetMarkerColor(j+1);
-      hNumerator_R4[j][i]->SetAxisRange(unfoldingCut,299,"X");
+      hNumerator_R4[j][i]->SetAxisRange(65,299,"X");
       hNumerator_R4[j][i]->SetAxisRange(0,2,"Y");
 
       if(j==1){
@@ -637,12 +681,12 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, 4),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cPbPb_Its_R4->SaveAs(Form("May18/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPbPb_Its_R4->SaveAs(Form("May20/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
   
 
-  TCanvas * cPP_Its_R4 = new TCanvas("cPP_Its_R4","",600,400);
+  TCanvas * cPP_Its_R4 = new TCanvas("cPP_Its_R4","",800,800);
   // line at 1
-  TLine *linePP_iter_R4 = new TLine(unfoldingCut,1,299,1);
+  TLine *linePP_iter_R4 = new TLine(65,1,299,1);
   linePP_iter_R4->SetLineStyle(2);
   linePP_iter_R4->SetLineWidth(2);
   
@@ -651,7 +695,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   for(int j = 1;j<Iterations;j++){
     hNumeratorPP_R4[j]->SetMarkerStyle(33);
     hNumeratorPP_R4[j]->SetMarkerColor(j+1);
-    hNumeratorPP_R4[j]->SetAxisRange(unfoldingCut,299,"X");
+    hNumeratorPP_R4[j]->SetAxisRange(65,299,"X");
     hNumeratorPP_R4[j]->SetAxisRange(0,2,"Y");
 
     if(j==1){
@@ -672,61 +716,68 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type, 4),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cPP_Its_R4->SaveAs(Form("May18/PP_unfoldng_iteration_systematics_%dGeVCut_akR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPP_Its_R4->SaveAs(Form("May20/PP_unfoldng_iteration_systematics_%dGeVCut_akR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
 
   // plot for the JEC sys
 
-  TCanvas * cRAA_JEC_sys_R4 = new TCanvas("cRAA_JEC_sys_R4","",1000,800);
-  makeMultiPanelCanvasWithGap(cRAA_JEC_sys_R4,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cRAA_JEC_sys_R4 = new TCanvas("cRAA_JEC_sys_R4","",1000,1000);
+  makeMultiPanelCanvas(cRAA_JEC_sys_R4,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
     cRAA_JEC_sys_R4->cd(nbins_cent-i);
     RAA_JEC_bayesian_R4[i]->Divide(RAA_JEC_bayesian_R4[i], RAA_bayesian_R4[i], 1,1, "B");
     RAA_JEC_bayesian_R4[i]->SetAxisRange(0.61, 1.39, "Y");
     makeHistTitle(RAA_JEC_bayesian_R4[i], "", "Jet p_{T} (GeV/c)","Ratio",2);
-    RAA_JEC_bayesian_R4[i]->SetAxisRange(unfoldingCut, 299, "X");
-    RAA_JEC_bayesian_R4[i]->Fit("fPol","","",60,299);
+    RAA_JEC_bayesian_R4[i]->SetAxisRange(65, 299, "X");
+    //RAA_JEC_bayesian_R4[i]->Fit("fPol_x2","","",60,299);
 
     RAA_JEC_bayesian_R4[i]->Draw("p");
-    checkMaximumSys(systematics_R4.hSysJEC[i], functionHist(fPol, systematics_R4.hSysJEC[i], Form("hist_sysJEC_cent%d",i)));
+    //checkMaximumSys(systematics_R4.hSysJEC[i], functionHist(fPol_x2, systematics_R4.hSysJEC[i], Form("hist_sysJEC_cent%d",i)));
 
     linePbPb_iter->Draw();
+
+    bounds_up[i]->Draw();
+    //bounds_low[i]->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+
   }
 
   cRAA_JEC_sys_R4->cd(1);
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.4",algo, jet_type),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cRAA_JEC_sys_R4->SaveAs(Form("May18/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cRAA_JEC_sys_R4->SaveAs(Form("May20/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
-    // plot for the Smear sys
+  // plot for the Smear sys
 
-  TCanvas * cRAA_Smear_sys_R4 = new TCanvas("cRAA_Smear_sys_R4","",1000,800);
-  makeMultiPanelCanvasWithGap(cRAA_Smear_sys_R4,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cRAA_Smear_sys_R4 = new TCanvas("cRAA_Smear_sys_R4","",1000,1000);
+  makeMultiPanelCanvas(cRAA_Smear_sys_R4,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
     cRAA_Smear_sys_R4->cd(nbins_cent-i);
     RAA_Smear_bayesian_R4[i]->Divide(RAA_Smear_bayesian_R4[i], RAA_bayesian_R4[i], 1,1, "B");
     RAA_Smear_bayesian_R4[i]->SetAxisRange(0.61, 1.39, "Y");
     makeHistTitle(RAA_Smear_bayesian_R4[i], "", "Jet p_{T} (GeV/c)","Ratio",2);
-    RAA_Smear_bayesian_R4[i]->SetAxisRange(unfoldingCut, 299, "X");
-    RAA_Smear_bayesian_R4[i]->Fit("fPol","","",60,299);
+    RAA_Smear_bayesian_R4[i]->SetAxisRange(65, 299, "X");
+    RAA_Smear_bayesian_R4[i]->Fit("fPol_x1","","",60,299);
     RAA_Smear_bayesian_R4[i]->Draw("p");
-    checkMaximumSys(systematics_R4.hSysSmear[i], functionHist(fPol, systematics_R4.hSysSmear[i], Form("hist_sysSmear_cent%d",i)));
+    checkMaximumSys(systematics_R4.hSysSmear[i], functionHist(fPol_x1, systematics_R4.hSysSmear[i], Form("hist_sysSmear_cent%d",i)));
 
     linePbPb_iter->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+
   }
 
   cRAA_Smear_sys_R4->cd(1);
   putCMSPrel();
-  drawText(Form("Anti-k_{T} %s %s Jets R4",algo, jet_type, radius),0.2,0.23,20);
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.4",algo, jet_type),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cRAA_Smear_sys_R4->SaveAs(Form("May18/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
+  cRAA_Smear_sys_R4->SaveAs(Form("May20/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
 
 
   // draw the total systematics
-  TCanvas * cSys_R4 = new TCanvas("cSys_R4","Total Systematics",1200,800);
-  makeMultiPanelCanvasWithGap(cSys_R4,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cSys_R4 = new TCanvas("cSys_R4","Total Systematics",1200,1200);
+  makeMultiPanelCanvas(cSys_R4,3,2,0.0,0.0,0.2,0.15,0.07);
 
   for(int i = 0; i<nbins_cent; ++i){
 
@@ -736,16 +787,18 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     systematics_R4.DrawComponent(i);
 
     //drawPanelLabel(i);
-    TLegend *title_ = myLegend(0.18,0.8,0.48,0.9);
-    title_->AddEntry(RAA_bayesian_R4[i],Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),"");
-    title_->SetTextSize(0.06);
-    title_->Draw();
-  
+    //TLegend *title_ = myLegend(0.18,0.8,0.48,0.9);
+    //title_->AddEntry(RAA_bayesian_R4[i],Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),"");
+    //title_->SetTextSize(0.06);
+    //title_->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
+
   }
   cSys_R4->cd(1);
   putCMSPrel();
   linePbPb_iter->Draw();
-  cSys_R4->SaveAs(Form("May18/RAA_total_systematics_unfoldingCut%dGeV_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cSys_R4->SaveAs(Form("May20/RAA_total_systematics_unfoldingCut%dGeV_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+
 
   
   // im  plotting the raa vs npart plot here, since it needs the systematics
@@ -778,11 +831,12 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     hRAA_R4_npart->SetBinContent(hRAA_R4_npart->FindBin(npart[i])+3, RAA_R4_Bayes[i]->GetBinContent(RAA_R4_Bayes[i]->FindBin(100)));    
     hRAA_R4_npart->SetBinError(hRAA_R4_npart->FindBin(npart[i])+3, RAA_R4_Bayes[i]->GetBinError(RAA_R4_Bayes[i]->FindBin(100)));    
   }
-  TLine *lineRAA_R2 = new TLine(unfoldingCut+30,1,299,1);
-  lineRAA_R2->SetLineStyle(2);
-  lineRAA_R2->SetLineWidth(2);
 
-  TCanvas * cRAA_npart = new TCanvas("cRAA_npart","",600,400);
+  TLine *lineRAA_R2_npart = new TLine(0,1,450,1);
+  lineRAA_R2_npart->SetLineStyle(2);
+  lineRAA_R2_npart->SetLineWidth(2);
+
+  TCanvas * cRAA_npart = new TCanvas("cRAA_npart","",800,800);
   cRAA_npart->SetGridy();
   cRAA_npart->SetGridx();
 
@@ -804,11 +858,11 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   hRAA_R4_npart->Draw("same E1");
 
   drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
-  drawText(Form("|#eta|<%2.0f, |vz|<15, Jet ID Cut",etaBoundary),0.6,0.31,20);
-  drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
-  drawText("97 < Jet p_{T} < 114", 0.15,0.8,16);
+  drawText(Form("|#eta|<%2.0f, |vz|<15, Jet ID Cut",etaBoundary),0.5,0.25,16);
+  drawText("|vz|<15, HBHEfilter, pCES",0.25,0.2,16);
+  drawText("97 < Jet p_{T} < 114",0.25,0.25,16);
   
-  TLegend * npart1 = myLegend(0.7,0.7,0.9,0.9);
+  TLegend * npart1 = myLegend(0.6,0.7,0.8,0.9);
   npart1->AddEntry(hRAA_R2_npart,"R=0.2", "pl");
   npart1->AddEntry(hRAA_R3_npart,"R=0.3", "pl");
   npart1->AddEntry(hRAA_R4_npart,"R=0.4", "pl");
@@ -823,12 +877,12 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   hRAA_R2_npart->Draw("same E1");
   hRAA_R3_npart->Draw("same E1");
   hRAA_R4_npart->Draw("same E1");
-  lineRAA_R2->Draw();
-  putCMSPrel();
-  putPbPbLumi();
-  putPPLumi();
+  lineRAA_R2_npart->Draw();
+  putCMSPrel(0.2,0.85,0.025);
+  putPbPbLumi(0.2,0.8,0.025);
+  putPPLumi(0.2,0.75,0.025);
   
-  cRAA_npart->SaveAs(Form("May18/Final_paper_plots_RAA_npart_97_pT_114_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_npart->SaveAs(Form("May20/Final_paper_plots_RAA_npart_97_pT_114_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
 
   // plot npart raa for dufferent pt range around 130
   
@@ -852,7 +906,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   }
 
 
-  TCanvas * cRAA_npart2 = new TCanvas("cRAA_npart2","",600,400);
+  TCanvas * cRAA_npart2 = new TCanvas("cRAA_npart2","",800,800);
   cRAA_npart2->SetGridy();
   cRAA_npart2->SetGridx();
 
@@ -872,13 +926,14 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   hRAA_R4_npart2->SetLineColor(kBlue);
   hRAA_R4_npart2->SetMarkerStyle(20);
   hRAA_R4_npart2->Draw("same E1");
-  lineRAA_R2->Draw();
+  lineRAA_R2_npart->Draw();
+
   drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
-  drawText(Form("|#eta|<%2.0f, |vz|<15, Jet ID Cut",etaBoundary),0.6,0.31,20);
-  drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
-  drawText("133 < Jet p_{T} < 153", 0.15,0.8,16);
+  drawText(Form("|#eta|<%2.0f, |vz|<15, Jet ID Cut",etaBoundary),0.5,0.25,16);
+  drawText("|vz|<15, HBHEfilter, pCES",0.25,0.2,16);
+  drawText("133 < Jet p_{T} < 153", 0.25,0.25,16);
   
-  TLegend * npart2 = myLegend(0.7,0.7,0.9,0.9);
+  TLegend * npart2 = myLegend(0.6,0.7,0.8,0.9);
   npart2->AddEntry(hRAA_R2_npart2,"R=0.2", "pl");
   npart2->AddEntry(hRAA_R3_npart2,"R=0.3", "pl");
   npart2->AddEntry(hRAA_R4_npart2,"R=0.4", "pl");
@@ -893,24 +948,22 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   hRAA_R2_npart2->Draw("same E1");
   hRAA_R3_npart2->Draw("same E1");
   hRAA_R4_npart2->Draw("same E1");
+  putCMSPrel(0.2,0.85,0.025);
+  putPbPbLumi(0.2,0.8,0.025);
+  putPPLumi(0.2,0.75,0.025);
 
+  cRAA_npart2->SaveAs(Form("May20/Final_paper_plots_RAA_npart_133_pT_153_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
   
-  putCMSPrel();
-  putPbPbLumi();
-  putPPLumi();
-  
-  cRAA_npart2->SaveAs(Form("May18/Final_paper_plots_RAA_npart_133_pT_153_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
-
   // plot RAA vs Npart for a smaller pT : 74 - 84
-
-    // get the responsible histograms for this.
+  
+  // get the responsible histograms for this.
   TH1F * hRAA_R2_npart3 = new TH1F("hRAA_R2_npart3","",450, 0, 450);
   //hRAA_R2_npart3->LabelsOption(">","X");
   TH1F * hRAA_R3_npart3 = new TH1F("hRAA_R3_npart3","",450, 0, 450);
   //hRAA_R3_npart3->LabelsOption(">","X");
   TH1F * hRAA_R4_npart3 = new TH1F("hRAA_R4_npart3","",450, 0, 450);
   //hRAA_R4_npart3->LabelsOption(">","X");
-
+  
   for(int i = 0; i<nbins_cent; ++i){
     hRAA_R2_npart3->SetBinContent(hRAA_R2_npart3->FindBin(npart[i])-3, RAA_R2_Bayes[i]->GetBinContent(RAA_R2_Bayes[i]->FindBin(80)));
     hRAA_R2_npart3->SetBinError(hRAA_R2_npart3->FindBin(npart[i])-3, RAA_R2_Bayes[i]->GetBinError(RAA_R2_Bayes[i]->FindBin(80)));
@@ -923,7 +976,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   }
 
 
-  TCanvas * cRAA_npart3 = new TCanvas("cRAA_npart3","",600,400);
+  TCanvas * cRAA_npart3 = new TCanvas("cRAA_npart3","",800,800);
   cRAA_npart3->SetGridy();
   cRAA_npart3->SetGridx();
 
@@ -943,13 +996,14 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   hRAA_R4_npart3->SetLineColor(kBlue);
   hRAA_R4_npart3->SetMarkerStyle(20);
   hRAA_R4_npart3->Draw("same E1");
-  lineRAA_R2->Draw();
+  lineRAA_R2_npart->Draw();
+
   drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
-  drawText(Form("|#eta|<%2.0f, |vz|<15, Jet ID Cut",etaBoundary),0.6,0.31,20);
-  drawText("|vz|<15, HBHEfilter, pCES",0.15,0.2,16);
-  drawText("74 < Jet p_{T} < 84", 0.15,0.8,16);
+  drawText(Form("|#eta|<%2.0f, |vz|<15, Jet ID Cut",etaBoundary),0.5,0.25,16);
+  drawText("|vz|<15, HBHEfilter, pCES",0.25,0.2,16);
+  drawText("74 < Jet p_{T} < 84", 0.25,0.25,16);
   
-  TLegend * npart3 = myLegend(0.7,0.7,0.9,0.9);
+  TLegend * npart3 = myLegend(0.6,0.7,0.8,0.9);
   npart3->AddEntry(hRAA_R2_npart3,"R=0.2", "pl");
   npart3->AddEntry(hRAA_R3_npart3,"R=0.3", "pl");
   npart3->AddEntry(hRAA_R4_npart3,"R=0.4", "pl");
@@ -965,22 +1019,23 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   hRAA_R3_npart3->Draw("same E1");
   hRAA_R4_npart3->Draw("same E1");
 
-  
-  putCMSPrel();
-  putPbPbLumi();
-  putPPLumi();
-  
-  cRAA_npart3->SaveAs(Form("May18/Final_paper_plots_RAA_npart_74_pT_84_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  putCMSPrel(0.2,0.85,0.025);
+  putPbPbLumi(0.2,0.8,0.025);
+  putPPLumi(0.2,0.75,0.025);
 
+  cRAA_npart3->SaveAs(Form("May20/Final_paper_plots_RAA_npart_74_pT_84_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  
   
   
   // plot the RAA for each radii here along with the systematics shown in yellow, for measured, bayesian and bin by bin unfoldeding.
- TCanvas *cRAA_R2 = new TCanvas("cRAA_R2","RAA",1200,800);
-  makeMultiPanelCanvasWithGap(cRAA_R2,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
-
-  TLegend *tRAA_R2 = myLegend(0.45,0.75,0.85,0.9);
-
-    
+  TCanvas *cRAA_R2 = new TCanvas("cRAA_R2","RAA",1200,1200);
+  makeMultiPanelCanvas(cRAA_R2,3,2,0.0,0.0,0.2,0.15,0.07);
+  
+  TLegend *tRAA_R2 = myLegend(0.35,0.55,0.65,0.7);
+  TLine *lineRAA_R2 = new TLine(unfoldingCut+30,1,299,1);
+  lineRAA_R2->SetLineStyle(2);
+  lineRAA_R2->SetLineWidth(2);
+  
   for(int i = 0;i<nbins_cent;++i){
 
     cRAA_R2->cd(nbins_cent-i);
@@ -1019,7 +1074,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     RAA_R2_Meas[i]->SetMarkerColor(kBlack);
     RAA_R2_Meas[i]->SetMarkerStyle(24);
     makeHistTitle(RAA_R2_Meas[i],"","Jet p_{T} (GeV/c)","R_{AA}");
-    RAA_R2_Meas[i]->SetAxisRange(unfoldingCut+30,299,"X");
+    RAA_R2_Meas[i]->SetAxisRange(65,299,"X");
     RAA_R2_Meas[i]->SetAxisRange(0,2,"Y");
     RAA_R2_Meas[i]->Draw("E1");
 
@@ -1033,7 +1088,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
     lineRAA_R2->Draw();
     //lUnfoldingCut->Draw();
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.85,20);
 
     systematics_R2.calcTotalSys(i);
     systematics_R2.Draw(RAA_R2_Bayes[i],i,2);
@@ -1046,31 +1101,33 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     
   tRAA_R2->AddEntry(RAA_R2_Meas[0],"Measured","pl");
   tRAA_R2->AddEntry(RAA_R2_Bayes[0],"Bayesian","pl");
-  tRAA_R2->AddEntry(RAA_R2_BinByBin[0],"BinByBin","pl");
+  tRAA_R2->AddEntry(RAA_R2_BinByBin[0],"bin-by-bin","pl");
   tRAA_R2->SetTextSize(0.04);
 
   cRAA_R2->cd(1);
   tRAA_R2->Draw();
   cRAA_R2->cd(1);
   putCMSPrel();
+  cRAA_R2->cd(2);
   putPbPbLumi();
+  cRAA_R2->cd(3);
   putPPLumi();
-  drawText(Form("Anti-k_{T} %s R=0.2 %s Jets",algo,jet_type),0.2,0.23,16);
+  cRAA_R2->cd(1);
+  drawText(Form("Anti-k_{T} %s R=0.2 %s Jets",algo,jet_type),0.25,0.20,16);
   //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
   cRAA_R2->cd(2);
-  drawText(Form("|#eta|<%2.0f, |vz|<15, Jet ID Cut",etaBoundary),0.6,0.31,20);
-  drawText("|vz|<15, HBHEfilter, pCES",0.1,0.2,16);
+  drawText(Form("Jet ID cut, |#eta|<%2.0f",etaBoundary),0.1,0.2,16);
+  drawText("|vz|<15, HBHEfilter, pCES",0.1,0.1,16);
   cRAA_R2->cd(3);
-  drawText("Jet RAA dataset, trigger combined",0.1,0.3,16);
-  drawText("Pile up rejection cut applied",0.1,0.2,16);
-
-  cRAA_R2->SaveAs(Form("May18/Final_paper_plots_RAA_R2_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  drawText("Jet RAA dataset, trigger combined",0.1,0.2,16);
+  drawText("Pile up rejection cut applied",0.1,0.1,16);
+  cRAA_R2->SaveAs(Form("May20/Final_paper_plots_RAA_R2_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
     
   // draw it for R=0.3
-  TCanvas *cRAA_R3 = new TCanvas("cRAA_R3","RAA",1200,800);
-  makeMultiPanelCanvasWithGap(cRAA_R3,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas *cRAA_R3 = new TCanvas("cRAA_R3","RAA",1200,1200);
+  makeMultiPanelCanvas(cRAA_R3,3,2,0.0,0.0,0.2,0.15,0.07);
 
-  TLegend *tRAA_R3 = myLegend(0.45,0.75,0.85,0.9);
+  TLegend *tRAA_R3 = myLegend(0.35,0.55,0.65,0.7);
   TLine *lineRAA_R3 = new TLine(unfoldingCut+30,1,299,1);
   lineRAA_R3->SetLineStyle(2);
   lineRAA_R3->SetLineWidth(2);
@@ -1113,7 +1170,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     RAA_R3_Meas[i]->SetMarkerColor(kBlack);
     RAA_R3_Meas[i]->SetMarkerStyle(24);
     makeHistTitle(RAA_R3_Meas[i],"","Jet p_{T} (GeV/c)","R_{AA}");
-    RAA_R3_Meas[i]->SetAxisRange(unfoldingCut+30,299,"X");
+    RAA_R3_Meas[i]->SetAxisRange(65,299,"X");
     RAA_R3_Meas[i]->SetAxisRange(0,2,"Y");
     RAA_R3_Meas[i]->Draw("E1");
 
@@ -1127,7 +1184,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
     lineRAA_R3->Draw();
     //lUnfoldingCut->Draw();
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.85,20);
 
     systematics_R3.calcTotalSys(i);
     systematics_R3.Draw(RAA_R3_Bayes[i],i,2);
@@ -1140,33 +1197,35 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     
   tRAA_R3->AddEntry(RAA_R3_Meas[0],"Measured","pl");
   tRAA_R3->AddEntry(RAA_R3_Bayes[0],"Bayesian","pl");
-  tRAA_R3->AddEntry(RAA_R3_BinByBin[0],"BinByBin","pl");
+  tRAA_R3->AddEntry(RAA_R3_BinByBin[0],"bin-by-bin","pl");
   tRAA_R3->SetTextSize(0.04);
 
   cRAA_R3->cd(1);
   tRAA_R3->Draw();
   cRAA_R3->cd(1);
   putCMSPrel();
+  cRAA_R3->cd(2);
   putPbPbLumi();
+  cRAA_R3->cd(3);
   putPPLumi();
-  drawText(Form("Anti-k_{T} %s R=0.3 %s Jets",algo,jet_type),0.2,0.23,16);
+  cRAA_R3->cd(1);
+  drawText(Form("Anti-k_{T} %s R=0.3 %s Jets",algo,jet_type),0.25,0.20,16);
   //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
   cRAA_R3->cd(2);
-  drawText(Form("|#eta|<%2.0f, |vz|<15, Jet ID Cut",etaBoundary),0.6,0.31,20);
-
-  drawText("|vz|<15, HBHEfilter, pCES",0.1,0.2,16);
+  drawText(Form("Jet ID cut, |#eta|<%2.0f",etaBoundary),0.1,0.2,16);
+  drawText("|vz|<15, HBHEfilter, pCES",0.1,0.1,16);
   cRAA_R3->cd(3);
-  drawText("Jet RAA dataset, trigger combined",0.1,0.3,16);
-  drawText("Pile up rejection cut applied",0.1,0.2,16);
+  drawText("Jet RAA dataset, trigger combined",0.1,0.2,16);
+  drawText("Pile up rejection cut applied",0.1,0.1,16);
 
-  cRAA_R3->SaveAs(Form("May18/Final_paper_plots_RAA_R3_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_R3->SaveAs(Form("May20/Final_paper_plots_RAA_R3_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
 
   // plot it for R=0.4
-   TCanvas *cRAA_R4 = new TCanvas("cRAA_R4","RAA",1200,800);
-  makeMultiPanelCanvasWithGap(cRAA_R4,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas *cRAA_R4 = new TCanvas("cRAA_R4","RAA",1200,1200);
+  makeMultiPanelCanvas(cRAA_R4,3,2,0.0,0.0,0.2,0.15,0.07);
 
-  TLegend *tRAA_R4 = myLegend(0.45,0.75,0.85,0.9);
-  TLine *lineRAA_R4 = new TLine(unfoldingCut+30,1,299,1);
+  TLegend *tRAA_R4 = myLegend(0.35,0.55,0.65,0.7);
+  TLine *lineRAA_R4 = new TLine(65,1,299,1);
   lineRAA_R4->SetLineStyle(2);
   lineRAA_R4->SetLineWidth(2);
     
@@ -1208,7 +1267,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     RAA_R4_Meas[i]->SetMarkerColor(kBlack);
     RAA_R4_Meas[i]->SetMarkerStyle(24);
     makeHistTitle(RAA_R4_Meas[i],"","Jet p_{T} (GeV/c)","R_{AA}");
-    RAA_R4_Meas[i]->SetAxisRange(unfoldingCut+30,299,"X");
+    RAA_R4_Meas[i]->SetAxisRange(65,299,"X");
     RAA_R4_Meas[i]->SetAxisRange(0,2,"Y");
     RAA_R4_Meas[i]->Draw("E1");
 
@@ -1222,7 +1281,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
     lineRAA_R4->Draw();
     //lUnfoldingCut->Draw();
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.85,20);
 
     systematics_R4.calcTotalSys(i);
     systematics_R4.Draw(RAA_R4_Bayes[i],i,2);
@@ -1235,35 +1294,38 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     
   tRAA_R4->AddEntry(RAA_R4_Meas[0],"Measured","pl");
   tRAA_R4->AddEntry(RAA_R4_Bayes[0],"Bayesian","pl");
-  tRAA_R4->AddEntry(RAA_R4_BinByBin[0],"BinByBin","pl");
+  tRAA_R4->AddEntry(RAA_R4_BinByBin[0],"bin-by-bin","pl");
   tRAA_R4->SetTextSize(0.04);
 
   cRAA_R4->cd(1);
   tRAA_R4->Draw();
   cRAA_R4->cd(1);
   putCMSPrel();
+  cRAA_R4->cd(2);
   putPbPbLumi();
+  cRAA_R4->cd(3);
   putPPLumi();
-  drawText(Form("Anti-k_{T} %s R=0.4 %s Jets",algo,jet_type),0.2,0.23,16);
+  cRAA_R4->cd(1);
+  drawText(Form("Anti-k_{T} %s R=0.4 %s Jets",algo,jet_type),0.25,0.20,16);
   //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
   cRAA_R4->cd(2);
-  drawText(Form("|#eta|<%2.0f , Jet ID Cut",etaBoundary),0.6,0.31,20);
-  drawText("|vz|<15, HBHEfilter, pCES",0.1,0.2,16);
+  drawText(Form("Jet ID cut, |#eta|<%2.0f",etaBoundary),0.1,0.2,16);
+  drawText("|vz|<15, HBHEfilter, pCES",0.1,0.1,16);
   cRAA_R4->cd(3);
-  drawText("Jet RAA dataset, trigger combined",0.1,0.3,16);
-  drawText("Pile up rejection cut applied",0.1,0.2,16);
+  drawText("Jet RAA dataset, trigger combined",0.1,0.2,16);
+  drawText("Pile up rejection cut applied",0.1,0.1,16);
 
-  cRAA_R4->SaveAs(Form("May18/Final_paper_plots_RAA_R4_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_R4->SaveAs(Form("May20/Final_paper_plots_RAA_R4_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
   
   // plot 2 - Bayesian unfolded RAA as a function of pT for the different radii
   //        - regular 6 panel plot 
   
   // again this will be a 6 panel plot. showing measured, unfolded Bayesian, and unfolded Bin By Bin methods. 
-  TCanvas *cRAA = new TCanvas("cRAA","RAA",1200,800);
-  makeMultiPanelCanvasWithGap(cRAA,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas *cRAA = new TCanvas("cRAA","RAA",1400,1200);
+  makeMultiPanelCanvas(cRAA,3,2,0.0,0.0,0.2,0.15,0.07);
 
-  TLegend *tRAA = myLegend(0.45,0.75,0.85,0.9);
-  TLine *lineRAA = new TLine(unfoldingCut,1,299,1);
+  TLegend *tRAA = myLegend(0.35,0.55,0.65,0.7);
+  TLine *lineRAA = new TLine(65,1,299,1);
   lineRAA->SetLineStyle(2);
   lineRAA->SetLineWidth(2);
 
@@ -1309,7 +1371,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     RAA_R2_Bayes[i]->SetMarkerColor(kRed);
     RAA_R2_Bayes[i]->SetMarkerStyle(20);
     makeHistTitle(RAA_R2_Bayes[i],"","Jet p_{T} (GeV/c)","R_{AA}");
-    RAA_R2_Bayes[i]->SetAxisRange(unfoldingCut+30,299,"X");
+    RAA_R2_Bayes[i]->SetAxisRange(65,299,"X");
     RAA_R2_Bayes[i]->SetAxisRange(0,2,"Y");
     RAA_R2_Bayes[i]->Draw("E1");
 
@@ -1323,7 +1385,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
     lineRAA->Draw();
     //lUnfoldingCut->Draw();
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.85,20);
 
     systematics_R2.calcTotalSys(i);
     systematics_R2.Draw(RAA_R2_Bayes[i],i,2);
@@ -1347,18 +1409,21 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   tRAA->Draw();
   cRAA->cd(1);
   putCMSPrel();
+  cRAA->cd(2);
   putPbPbLumi();
+  cRAA->cd(3);
   putPPLumi();
-  drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.2,0.23,16);
+  cRAA->cd(1);
+  drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.25,0.20,16);
   //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
   cRAA->cd(2);
-  drawText(Form("Jet ID cut, |#eta|<2=%2.0f",etaBoundary),0.1,0.3,16);
-  drawText("|vz|<15, HBHEfilter, pCES",0.1,0.2,16);
+  drawText(Form("Jet ID cut, |#eta|<%2.0f",etaBoundary),0.1,0.2,16);
+  drawText("|vz|<15, HBHEfilter, pCES",0.1,0.1,16);
   cRAA->cd(3);
-  drawText("Jet RAA dataset, trigger combined",0.1,0.3,16);
-  drawText("Pile up rejection cut applied",0.1,0.2,16);
+  drawText("Jet RAA dataset, trigger combined",0.1,0.2,16);
+  drawText("Pile up rejection cut applied",0.1,0.1,16);
 
-  cRAA->SaveAs(Form("May18/Final_paper_plots_RAA_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA->SaveAs(Form("May20/Final_paper_plots_RAA_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
     
 
   
@@ -1415,7 +1480,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d29x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
   p8719_d29x1y1->GetYaxis()->SetTitle("R_{AA}");
 
-    // Plot: p8719_d30x1y1 30-40% 
+  // Plot: p8719_d30x1y1 30-40% 
   double p8719_d30x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5 };
   double p8719_d30x1y1_xerrminus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5 };
   double p8719_d30x1y1_xerrplus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5 };
@@ -1431,7 +1496,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d30x1y1->GetYaxis()->SetTitle("R_{AA}");
   p8719_d30x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
   
-    // Plot: p8719_d31x1y1 40-50% 
+  // Plot: p8719_d31x1y1 40-50% 
   double p8719_d31x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5 };
   double p8719_d31x1y1_xerrminus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5 };
   double p8719_d31x1y1_xerrplus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5 };
@@ -1447,7 +1512,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d31x1y1->GetYaxis()->SetTitle("R_{AA}");
   p8719_d31x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
 
-    // Plot: p8719_d32x1y1 50-60% 
+  // Plot: p8719_d32x1y1 50-60% 
   double p8719_d32x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5 };
   double p8719_d32x1y1_xerrminus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5 };
   double p8719_d32x1y1_xerrplus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5 };
@@ -1479,7 +1544,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d33x1y1->GetYaxis()->SetTitle("R_{AA}");
   p8719_d33x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
 
-    // Plot: p8719_d34x1y1 70-80% 
+  // Plot: p8719_d34x1y1 70-80% 
   double p8719_d34x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5 };
   double p8719_d34x1y1_xerrminus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5 };
   double p8719_d34x1y1_xerrplus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5 };
@@ -1495,15 +1560,15 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d34x1y1->GetYaxis()->SetTitle("R_{AA}");
   p8719_d34x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
 
-  TCanvas * cATLAS = new TCanvas("cATLAS","",800,600);
-  makeMultiPanelCanvasWithGap(cATLAS,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cATLAS = new TCanvas("cATLAS","",1000,1000);
+  makeMultiPanelCanvas(cATLAS,3,2,0.0,0.0,0.2,0.15,0.07);
   cATLAS->cd(6);
 
   // centrality bin - 0-10
   p8719_d27x1y1->SetMaximum(2);
   p8719_d27x1y1->SetMinimum(0);
   p8719_d27x1y1->SetMarkerStyle(33);
-  p8719_d27x1y1->GetXaxis()->SetLimits(50,299);
+  p8719_d27x1y1->GetXaxis()->SetLimits(65,299);
   p8719_d27x1y1->Draw("ap");
   systematics_R4.calcTotalSys(0);
   systematics_R4.Draw(RAA_R4_Bayes[0],0,4);
@@ -1534,7 +1599,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d28x1y1->SetMaximum(2);
   p8719_d28x1y1->SetMinimum(0);
   p8719_d28x1y1->SetMarkerStyle(33);
-  p8719_d28x1y1->GetXaxis()->SetLimits(50,299);
+  p8719_d28x1y1->GetXaxis()->SetLimits(65,299);
   p8719_d28x1y1->Draw("AP");
   RAA_R4_Bayes[2]->Draw("same E1");
   RAA_R4_Bayes[2]->SetMarkerStyle(24);
@@ -1561,7 +1626,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d30x1y1->SetMaximum(2);
   p8719_d30x1y1->SetMinimum(0);
   p8719_d30x1y1->SetMarkerStyle(33);
-  p8719_d30x1y1->GetXaxis()->SetLimits(50,299);
+  p8719_d30x1y1->GetXaxis()->SetLimits(65,299);
   p8719_d30x1y1->Draw("AP");
   RAA_R4_Bayes[3]->Draw("same E1");
   systematics_R4.calcTotalSys(3);
@@ -1585,7 +1650,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d32x1y1->SetMaximum(2);
   p8719_d32x1y1->SetMinimum(0);
   p8719_d32x1y1->SetMarkerStyle(33);
-  p8719_d32x1y1->GetXaxis()->SetLimits(50,299);
+  p8719_d32x1y1->GetXaxis()->SetLimits(65,299);
   p8719_d32x1y1->Draw("AP");
   RAA_R4_Bayes[4]->Draw("same E1");
   systematics_R4.calcTotalSys(4);
@@ -1608,7 +1673,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d34x1y1->SetMaximum(2);
   p8719_d34x1y1->SetMinimum(0);
   p8719_d34x1y1->SetMarkerStyle(33);
-  p8719_d34x1y1->GetXaxis()->SetLimits(50,299);
+  p8719_d34x1y1->GetXaxis()->SetLimits(65,299);
   p8719_d34x1y1->Draw("AP");
   RAA_R4_Bayes[5]->Draw("same E1");
   systematics_R4.calcTotalSys(5);
@@ -1623,7 +1688,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   leg5->Draw();
  
   
-  cATLAS->SaveAs(Form("May18/comparison_with_ATLAS_RAA_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cATLAS->SaveAs(Form("May20/comparison_with_ATLAS_RAA_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
 
 
 
@@ -1631,27 +1696,27 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   // ATLAS pp spectra: R=0.4
   // Plot: p8719_d2x1y1
   double p8719_d2x1y1_xval[] = { 35.0, 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 
-    283.5, 357.0, 449.5 };
+				 283.5, 357.0, 449.5 };
   double p8719_d2x1y1_xerrminus[] = { 4.0, 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 
-    32.5, 41.0, 51.5 };
+				      32.5, 41.0, 51.5 };
   double p8719_d2x1y1_xerrplus[] = { 4.0, 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 
-    32.5, 41.0, 51.5 };
+				     32.5, 41.0, 51.5 };
   double p8719_d2x1y1_yval[] = { 180.0, 55.7, 16.9, 4.85, 1.42, 0.364, 0.0882, 0.0197, 0.00406, 
-    7.35E-4, 1.14E-4, 1.41E-5 };
+				 7.35E-4, 1.14E-4, 1.41E-5 };
   double p8719_d2x1y1_yerrminus[] = { 29.95905205442923, 7.828376905208385, 2.6254355333925075, 0.627695686618922, 0.18780540141327137, 0.047724273069372145, 0.011038045881404914, 0.002292152355320213, 4.82252125345239E-4, 
-    8.981748117710716E-5, 1.442494214893079E-5, 1.9885499490835025E-6 };
+				      8.981748117710716E-5, 1.442494214893079E-5, 1.9885499490835025E-6 };
   double p8719_d2x1y1_yerrplus[] = { 29.95905205442923, 7.828376905208385, 2.6254355333925075, 0.627695686618922, 0.18780540141327137, 0.047724273069372145, 0.011038045881404914, 0.002292152355320213, 4.82252125345239E-4, 
-    8.981748117710716E-5, 1.442494214893079E-5, 1.9885499490835025E-6 };
+				     8.981748117710716E-5, 1.442494214893079E-5, 1.9885499490835025E-6 };
   double p8719_d2x1y1_ystatminus[] = { 1.9800000000000002, 0.6684, 0.16899999999999998, 0.048499999999999995, 0.01136, 0.00182, 5.292E-4, 1.773E-4, 5.2780000000000006E-5, 
-    1.6904999999999998E-5, 4.674E-6, 8.883E-7 };
+				       1.6904999999999998E-5, 4.674E-6, 8.883E-7 };
   double p8719_d2x1y1_ystatplus[] = { 1.9800000000000002, 0.6684, 0.16899999999999998, 0.048499999999999995, 0.01136, 0.00182, 5.292E-4, 1.773E-4, 5.2780000000000006E-5, 
-    1.6904999999999998E-5, 4.674E-6, 8.883E-7 };
+				      1.6904999999999998E-5, 4.674E-6, 8.883E-7 };
   int p8719_d2x1y1_numpoints = 12;
   TGraphAsymmErrors * p8719_d2x1y1 = new TGraphAsymmErrors(p8719_d2x1y1_numpoints, p8719_d2x1y1_xval, p8719_d2x1y1_yval, p8719_d2x1y1_xerrminus, p8719_d2x1y1_xerrplus, p8719_d2x1y1_yerrminus, p8719_d2x1y1_yerrplus);
   p8719_d2x1y1->SetName("/HepData/8719/d2x1y1");
   p8719_d2x1y1->SetTitle(" ");
 
-  TCanvas * cATLAS_pp = new TCanvas("cATLAS_pp","",800,600);
+  TCanvas * cATLAS_pp = new TCanvas("cATLAS_pp","",1000,1000);
   cATLAS_pp->SetLogy();
   p8719_d2x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
   p8719_d2x1y1->GetYaxis()->SetTitle("#frac{d^{2}#sigma}{dp_{T} d#eta} nb");  
@@ -1663,13 +1728,13 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   uPP_R4_Bayes->SetMarkerColor(kBlue);
   uPP_R4_Bayes->Draw("same E1");
 
-  TLegend *legpp_1 = getLegend(0.20,0.65,0.4,0.85);
+  TLegend *legpp_1 = getLegend(0.40,0.65,0.6,0.85);
   legpp_1->AddEntry(p8719_d2x1y1,"ATLAS pp","p");
   legpp_1->AddEntry(uPP_R4_Bayes,"CMS pp","p");
   legpp_1->SetTextSize(0.04);
   legpp_1->Draw();
   
-  cATLAS_pp->SaveAs(Form("May18/comparison_with_ATLAS_pp_spectra_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cATLAS_pp->SaveAs(Form("May20/comparison_with_ATLAS_pp_spectra_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
   
   
   // TAA for atlas plots:// which is in inverse milli barns 
@@ -1691,7 +1756,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d7x1y1->SetName("/HepData/8719/d7x1y1");
   p8719_d7x1y1->SetTitle("  ");
 
-    // Plot: p8719_d8x1y1, 10-20% 
+  // Plot: p8719_d8x1y1, 10-20% 
 
   double p8719_d8x1y1_xval[] = { 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5, 357.0 };
   double p8719_d8x1y1_xerrminus[] = { 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5, 41.0 };
@@ -1707,7 +1772,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d8x1y1->SetName("/HepData/8719/d8x1y1");
   p8719_d8x1y1->SetTitle("  ");
 
-    // Plot: p8719_d9x1y1, 20-30% 
+  // Plot: p8719_d9x1y1, 20-30% 
   double p8719_d9x1y1_xval[] = { 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5, 357.0 };
   double p8719_d9x1y1_xerrminus[] = { 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5, 41.0 };
   double p8719_d9x1y1_xerrplus[] = { 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5, 41.0 };
@@ -1722,30 +1787,30 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d9x1y1->SetName("/HepData/8719/d9x1y1");
   p8719_d9x1y1->SetTitle("  ");
 
-    // Plot: p8719_d10x1y1, 30-40% 
+  // Plot: p8719_d10x1y1, 30-40% 
   double p8719_d10x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5, 
-    357.0 };
+				  357.0 };
   double p8719_d10x1y1_xerrminus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5, 
-    41.0 };
+				       41.0 };
   double p8719_d10x1y1_xerrplus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5, 
-    41.0 };
+				      41.0 };
   double p8719_d10x1y1_yval[] = { 1.52E-4, 5.42E-5, 1.65E-5, 4.62E-6, 1.24E-6, 3.22E-7, 7.64E-8, 1.6E-8, 2.91E-9, 
-    4.65E-10 };
+				  4.65E-10 };
   double p8719_d10x1y1_yerrminus[] = { 2.361534145423267E-5, 9.526565496547013E-6, 3.137951242451036E-6, 8.184965991377117E-7, 2.0816124903545332E-7, 5.382410839020002E-8, 1.3172964125055529E-8, 2.8537021568481882E-9, 5.391437661700263E-10, 
-    8.978956147570829E-11 };
+				       8.978956147570829E-11 };
   double p8719_d10x1y1_yerrplus[] = { 2.361534145423267E-5, 9.526565496547013E-6, 3.137951242451036E-6, 8.184965991377117E-7, 2.0816124903545332E-7, 5.382410839020002E-8, 1.3172964125055529E-8, 2.8537021568481882E-9, 5.391437661700263E-10, 
-    8.978956147570829E-11 };
+				      8.978956147570829E-11 };
   double p8719_d10x1y1_ystatminus[] = { 2.28E-6, 7.588E-7, 2.31E-7, 5.082E-8, 1.488E-8, 4.83E-9, 1.7571999999999997E-9, 6.24E-10, 1.6878E-10, 
-    3.5805E-11 };
+					3.5805E-11 };
   double p8719_d10x1y1_ystatplus[] = { 2.28E-6, 7.588E-7, 2.31E-7, 5.082E-8, 1.488E-8, 4.83E-9, 1.7571999999999997E-9, 6.24E-10, 1.6878E-10, 
-    3.5805E-11 };
+				       3.5805E-11 };
   int p8719_d10x1y1_numpoints = 10;
   for(int i = 0; i<p8719_d10x1y1_numpoints; ++i) p8719_d10x1y1_yval[i] = p8719_d10x1y1_yval[i] * (1./TAA[3]) * 1e6;
   TGraphAsymmErrors * p8719_d10x1y1 = new TGraphAsymmErrors(p8719_d10x1y1_numpoints, p8719_d10x1y1_xval, p8719_d10x1y1_yval, p8719_d10x1y1_xerrminus, p8719_d10x1y1_xerrplus, p8719_d10x1y1_yerrminus, p8719_d10x1y1_yerrplus);
   p8719_d10x1y1->SetName("/HepData/8719/d10x1y1");
   p8719_d10x1y1->SetTitle("  ");
 
-    // Plot: p8719_d11x1y1, 40-50% 
+  // Plot: p8719_d11x1y1, 40-50% 
   double p8719_d11x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5 };
   double p8719_d11x1y1_xerrminus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5 };
   double p8719_d11x1y1_xerrplus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5 };
@@ -1760,7 +1825,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d11x1y1->SetName("/HepData/8719/d11x1y1");
   p8719_d11x1y1->SetTitle("  ");
 
-    // Plot: p8719_d12x1y1, 50-60% 
+  // Plot: p8719_d12x1y1, 50-60% 
   double p8719_d12x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5 };
   double p8719_d12x1y1_xerrminus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5 };
   double p8719_d12x1y1_xerrplus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5 };
@@ -1791,7 +1856,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d13x1y1->SetName("/HepData/8719/d13x1y1");
   p8719_d13x1y1->SetTitle("  ");
 
-    // Plot: p8719_d14x1y1, 70-80% 
+  // Plot: p8719_d14x1y1, 70-80% 
   double p8719_d14x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0 };
   double p8719_d14x1y1_xerrminus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0 };
   double p8719_d14x1y1_xerrplus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0 };
@@ -1820,7 +1885,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     uPbPb_Bayes[i] = (TH1F*)uPbPb_Bayes[i]->Rebin(nbins_pt,Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i),boundaries_pt);
     divideBinWidth(uPbPb_Bayes[i]);
     uPbPb_Bayes[i]->Write();
-   */
+  */
   // scale our PbPb spectra to 1/(Nevt = 2.1966046e+07) to get yield.
 
   // April 22 - update from Nevt calculation:
@@ -1835,20 +1900,20 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   // There total number of events = 21965900 * 1/0.00045 = 48813111111 = 4.88e+10
 
   //for(int i = 0; i<nbins_cent;++i){
-    // uPbPb_R4_Bayes[i]->Scale(145.156); //remove lumi scaling
-    // uPbPb_R4_Bayes[i]->Scale(7.46*1e6); // remove pp sigma
-    // uPbPb_R4_Bayes[i]->Scale((ncoll[i]*1e3)/(64./1e9)); // remove  ncoll and other pp related normalization
-    // uPbPb_R4_Bayes[i]->Scale(1./4.88e10); // apply scaling by no of events to get yield. 
-    // uPbPb_R4_Bayes[i]->Scale(1./1e5);
+  // uPbPb_R4_Bayes[i]->Scale(145.156); //remove lumi scaling
+  // uPbPb_R4_Bayes[i]->Scale(7.46*1e6); // remove pp sigma
+  // uPbPb_R4_Bayes[i]->Scale((ncoll[i]*1e3)/(64./1e9)); // remove  ncoll and other pp related normalization
+  // uPbPb_R4_Bayes[i]->Scale(1./4.88e10); // apply scaling by no of events to get yield. 
+  // uPbPb_R4_Bayes[i]->Scale(1./1e5);
   //}
 
-  TCanvas * cATLAS_pbpb = new TCanvas("cATLAS_pbpb","",800,600);
-  makeMultiPanelCanvasWithGap(cATLAS_pbpb,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cATLAS_pbpb = new TCanvas("cATLAS_pbpb","",1000,1000);
+  makeMultiPanelCanvas(cATLAS_pbpb,3,2,0.0,0.0,0.2,0.15,0.07);
 
   // centrality bin 0-10% 
   cATLAS_pbpb->cd(6);
   cATLAS_pbpb->cd(6)->SetLogy();
-  p8719_d7x1y1->GetXaxis()->SetLimits(50,299);
+  p8719_d7x1y1->GetXaxis()->SetLimits(65,299);
   p8719_d7x1y1->SetMaximum(1e2);
   p8719_d7x1y1->SetMinimum(1e-4);
   p8719_d7x1y1->SetMarkerStyle(33);
@@ -1871,7 +1936,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   // centrality bin 10-30% 
   cATLAS_pbpb->cd(5);
   cATLAS_pbpb->cd(5)->SetLogy();
-  p8719_d8x1y1->GetXaxis()->SetLimits(50,299);
+  p8719_d8x1y1->GetXaxis()->SetLimits(65,299);
   p8719_d8x1y1->SetMarkerStyle(33);
   p8719_d8x1y1->SetMaximum(1e2);
   p8719_d8x1y1->SetMinimum(1e-4);
@@ -1894,7 +1959,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   // centrality bin 30-50% 
   cATLAS_pbpb->cd(4);
   cATLAS_pbpb->cd(4)->SetLogy();
-  p8719_d10x1y1->GetXaxis()->SetLimits(50,299);
+  p8719_d10x1y1->GetXaxis()->SetLimits(65,299);
   p8719_d10x1y1->SetMarkerStyle(33);
   p8719_d10x1y1->SetMaximum(1e2);
   p8719_d10x1y1->SetMinimum(1e-4);
@@ -1917,7 +1982,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   // centrality bin 50-70% 
   cATLAS_pbpb->cd(3);
   cATLAS_pbpb->cd(3)->SetLogy();
-  p8719_d12x1y1->GetXaxis()->SetLimits(50,299);
+  p8719_d12x1y1->GetXaxis()->SetLimits(65,299);
   p8719_d12x1y1->SetMarkerStyle(33);
   p8719_d12x1y1->SetMaximum(1e2);
   p8719_d12x1y1->SetMinimum(1e-4);
@@ -1940,7 +2005,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   // centrality bin 70-90% 
   cATLAS_pbpb->cd(2);
   cATLAS_pbpb->cd(2)->SetLogy();
-  p8719_d14x1y1->GetXaxis()->SetLimits(50,299);
+  p8719_d14x1y1->GetXaxis()->SetLimits(65,299);
   p8719_d14x1y1->SetMarkerStyle(33);
   p8719_d14x1y1->SetMaximum(1e2);
   p8719_d14x1y1->SetMinimum(1e-4);
@@ -1956,7 +2021,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   legpbpb_5->SetTextSize(0.04);
   legpbpb_5->Draw();
 
-  cATLAS_pbpb->SaveAs(Form("May18/comparison_with_ATLAS_pbpb_spectra_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cATLAS_pbpb->SaveAs(Form("May20/comparison_with_ATLAS_pbpb_spectra_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
 
 
   // do the statistical error check
@@ -2011,8 +2076,8 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     
   }
  
-  TCanvas * cErrorFix_R2 = new TCanvas("cErrorFix_R2","",800,600);
-  makeMultiPanelCanvasWithGap(cErrorFix_R2,3,2,0.01,0.01,0.16,0.2,0.04,0.04);  
+  TCanvas * cErrorFix_R2 = new TCanvas("cErrorFix_R2","",1000,1000);
+  makeMultiPanelCanvas(cErrorFix_R2,3,2,0.0,0.0,0.2,0.15,0.07);  
   for(int i = 0; i<nbins_cent; ++i){
     
     cErrorFix_R2->cd(nbins_cent-i);
@@ -2041,10 +2106,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   err_R2->SetTextSize(0.04);
   err_R2->Draw();
   
-  cErrorFix_R2->SaveAs(Form("May18/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,2,date.GetDate()),"RECREATE");
+  cErrorFix_R2->SaveAs(Form("May20/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,2,date.GetDate()),"RECREATE");
 
-  TCanvas * cErrorFix_R3 = new TCanvas("cErrorFix_R3","",800,600);
-  makeMultiPanelCanvasWithGap(cErrorFix_R3,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cErrorFix_R3 = new TCanvas("cErrorFix_R3","",1000,1000);
+  makeMultiPanelCanvas(cErrorFix_R3,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
     
@@ -2075,10 +2140,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   err_R3->SetTextSize(0.04);
   err_R3->Draw();
   
-  cErrorFix_R3->SaveAs(Form("May18/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,3,date.GetDate()),"RECREATE");
+  cErrorFix_R3->SaveAs(Form("May20/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,3,date.GetDate()),"RECREATE");
 
-  TCanvas * cErrorFix_R4 = new TCanvas("cErrorFix_R4","",800,600);
-  makeMultiPanelCanvasWithGap(cErrorFix_R4,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+  TCanvas * cErrorFix_R4 = new TCanvas("cErrorFix_R4","",1000,1000);
+  makeMultiPanelCanvas(cErrorFix_R4,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
     
@@ -2109,7 +2174,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   err_R4->SetTextSize(0.04);
   err_R4->Draw();
   
-  cErrorFix_R4->SaveAs(Form("May18/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,4,date.GetDate()),"RECREATE");
+  cErrorFix_R4->SaveAs(Form("May20/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,4,date.GetDate()),"RECREATE");
   // make plot to compare the bayesian unfolded spectra with 4 iterations and with the data driven error corrections. 
 
   

@@ -43,7 +43,13 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_unfold_svd(int radius = 4, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "20_eta_20", double deltaEta = 4.0){
+void RAA_unfold_svd(int radius = 2,
+		    char* algo = (char*) "Pu",
+		    char *jet_type = (char*) "PF",
+		    int unfoldingCut = 40,
+		    char* etaWidth = (char*) "20_eta_20",
+		    double deltaEta = 4.0)
+{
 
   TStopwatch timer; 
   timer.Start();
@@ -57,16 +63,9 @@ void RAA_unfold_svd(int radius = 4, char* algo = (char*) "Pu", char *jet_type = 
   
   TDatime date;//this is just here to get them to run optimized. 
 
-  // Raghav's files: 
-  // TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuple_PbPb_data_MC_spectra_JetID_CutA_analysisbins_%s_R0p%d.root",etaWidth,radius));
-  //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_rebinned_eMaxSumcand_A_R0p%d.root",radius));
-  // no jet ID cut. 
-  // TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuple_PP_data_MC_spectra_residualFactor_analysisbins_%s_R0p%d.root",etaWidth,radius));
-  
   
   // Pawan's files:
   TFile * fPbPb_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
-//= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth, radius)); 
   TFile * fPP_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius));
 
 
@@ -92,7 +91,7 @@ void RAA_unfold_svd(int radius = 4, char* algo = (char*) "Pu", char *jet_type = 
   TH1F *uPbPb_SVD[nbins_cent];
   TH1F *uPbPb_MC_SVD[nbins_cent];
   
- TH1F *dPbPb_TrgComb[nbins_cent+1];
+  TH1F *dPbPb_TrgComb[nbins_cent+1];
   
   TH1F *mPbPb_Gen[nbins_cent+1], *mPbPb_Reco[nbins_cent+1];
   TH2F *mPbPb_Matrix[nbins_cent+1];
@@ -138,6 +137,8 @@ void RAA_unfold_svd(int radius = 4, char* algo = (char*) "Pu", char *jet_type = 
     dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt, Form("PbPb_data_minbiasSub_cent%d",i), boundaries_pt);
     divideBinWidth(dPbPb_TrgComb[i]);
 
+    dPbPb_TrgComb[i]->Scale(1./(145.156 * 1e3)); // scale it to milli barns which is the luminosity of the MC 
+
     mPbPb_Gen[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_anaBin_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i));
     mPbPb_Gen[i]->Print("base");
     mPbPb_Reco[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_anaBin_JetComb_reco_R%d_%s_cent%d",radius,etaWidth,i));
@@ -164,7 +165,8 @@ void RAA_unfold_svd(int radius = 4, char* algo = (char*) "Pu", char *jet_type = 
     }
   }
 
-  dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_anaBin_HLTComb_R%d_%s",radius,etaWidth));   
+  dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_anaBin_HLTComb_R%d_%s",radius,etaWidth));
+  dPP_Comb->Scale(1./(5.3 * 1e3)); // scale it to luminosity of the MC but there is something going wrong here.
   // get PP MC
   mPP_Gen = (TH1F*)fPP_in->Get(Form("hpp_anaBin_JetComb_gen_R%d_%s",radius,etaWidth));
   mPP_Gen->Print("base");
@@ -187,7 +189,7 @@ void RAA_unfold_svd(int radius = 4, char* algo = (char*) "Pu", char *jet_type = 
   
   Int_t nSVDIter = 1;
   
-  for(int j = 4; j<=6; ++j){
+  for(int j = 7; j<14; ++j){
     nSVDIter = j;
 
     for(int i = 0;i<nbins_cent;++i){
@@ -229,18 +231,21 @@ void RAA_unfold_svd(int radius = 4, char* algo = (char*) "Pu", char *jet_type = 
       dPbPb_TrgComb[i]->Write();
       uPbPb_SVD[i]->Write();
       mPbPb_Matrix[i]->Write();
+      mPbPb_Gen[i]->Write();
       mPbPb_mcclosure_data[i]->Write();
       uPbPb_MC_SVD[i]->Write();
       mPbPb_mcclosure_Matrix[i]->Write();
-  
+      mPbPb_mcclosure_gen[i]->Write();
     }
 
     uPP_SVD->Write();
     dPP_Comb->Write();
     mPP_Matrix->Write();
+    mPP_Gen->Write();
     mPP_mcclosure_data->Write();
     uPP_MC_SVD->Write();
     mPP_mcclosure_Matrix->Write();
+    mPP_mcclosure_gen->Write();
     
     fout.Close();
     

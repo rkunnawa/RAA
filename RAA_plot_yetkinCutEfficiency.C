@@ -58,10 +58,10 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 using namespace std;
 
 
-void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
+void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"20_eta_20",
 				  Int_t radius = 4,
-				  Int_t etaLow = 10,
-				  Int_t etaHigh = 10)
+				  Int_t etaLow = 20,
+				  Int_t etaHigh = 20)
 {
   
   TH1::SetDefaultSumw2();
@@ -283,7 +283,6 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
     hpbpb_mcclosure_Jet80_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_Jet80_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_mcclosure_Jet65_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_Jet65_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger 65 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_mcclosure_Jet55_gen[i] = new TH1F(Form("hpbpb_mcclosure_gen_Jet55_R%d_%s_cent%d",radius,etaWidth,i),Form("gen spectra for unfolding mc closure test trigger 55 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
-
     
     hpbpb_JetComb_gen[i] = new TH1F(Form("hpbpb_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i),Form("Gen refpt from HLT trigger combined R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_JetComb_reco[i] = new TH1F(Form("hpbpb_JetComb_reco_R%d_%s_cent%d",radius,etaWidth,i),Form("reco jtpt from HLT trigger combined R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
@@ -306,7 +305,6 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
     hpbpb_Jet55_GenSmear[i] = new TH1F(Form("hpbpb_Jet55_GenSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("GenSmear refpt from Jet55 && !Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_Jet55_gen2pSmear[i] = new TH1F(Form("hpbpb_Jet55_gen2pSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("gen2pSmear refpt from Jet55 && !Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_Jet55_RecoSmear[i] = new TH1F(Form("hpbpb_Jet55_RecoSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("RecoSmear jtpt from Jet55 && !Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
-
 
     hpbpb_JetComb_raw[i] = new TH1F(Form("hpbpb_JetComb_raw_R%d_%s_cent%d",radius,etaWidth,i),Form("raw jtpt from HLT trigger combined R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
     hpbpb_Jet80_raw[i] = new TH1F(Form("hpbpb_Jet80_raw_R%d_%s_cent%d",radius,etaWidth,i),Form("raw jtpt from Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),400,0,400);
@@ -464,6 +462,7 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
   TRandom rnd; 
   TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
 
+#if 0
   cout<<"matched Data ntuple "<<endl;
 
   for(long nentry = 0; nentry < entries; ++nentry ){
@@ -661,7 +660,8 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
     }
     
   }// data ntuple loop
-
+#endif
+  
   entries = MC_matched->GetEntries();
   //entries = 1000;
   // MC loop
@@ -672,7 +672,7 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
     MC_matched->GetEntry(nentry);
     
     Float_t Sumcand = chSum_2 + phSum_2 + neSum_2 + muSum_2;
-    if(subid_2 != 0) continue;
+    //if(subid_2 != 0) continue;
 
     Int_t cBin = findBin(hiBin_2);
     if(cBin == -1 || cBin >= nbins_cent) continue;    
@@ -1044,7 +1044,7 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
     
   }// mc unmatched  ntuple loop
 
-  TFile fout(Form("../../Output/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius),"RECREATE");
+  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_MC_subidNot0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius),"RECREATE");
   fout.cd();
   
   for(int i = 0;i<nbins_cent;++i){
@@ -1197,6 +1197,7 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
     
     hpbpb_matrix_HLT[i]->Write();
     hpbpb_matrix_HLT_GenSmear[i]->Write();
+    hpbpb_matrix_HLT_gen2pSmear[i]->Write();
     hpbpb_matrix_HLT_RecoSmear[i]->Write();
     hpbpb_matrix_HLT_BothSmear[i]->Write();
     hpbpb_anaBin_matrix_HLT[i]->Write();
@@ -1255,7 +1256,6 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
   }
 
 
-#if 0
   // add the unmatched histograms to the matched ones to get the final cut efficiency
   hData_Jet55_noCut->Add(hData_unmatched_Jet55_noCut);
   hData_Jet65_noCut->Add(hData_unmatched_Jet65_noCut);
@@ -1671,6 +1671,5 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"10_eta_10",
 
   cTriggerCombination->SaveAs(Form("TriggerCombination_YetkinCuts_R0p%d.pdf",radius),"RECREATE");
 
-#endif
 
 }

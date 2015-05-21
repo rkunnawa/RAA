@@ -74,7 +74,7 @@ void RAA_plot_JetID_CutEfficiency(){
   fIn = TFile::Open(Form("../../Output/PbPb_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
   fIn_PP = TFile::Open(Form("../../Output/Pp_withresiduals_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
 
-  /*
+  
   // get the histograms, the Cut Efficiency is plotted from the MC histograms 
   TH1F * hMC_noCut[3], * hMC_Cut[3], * hMC_unm_noCut[3], * hMC_unm_Cut[3]; 
 
@@ -126,7 +126,7 @@ void RAA_plot_JetID_CutEfficiency(){
   drawText(Form("%s",Coll), 0.6, 0.21, 20);
 
   cCutEff->SaveAs(Form("../../Plots/%s_Combined_CutEfficiency_R0p%d_%d.pdf",Coll,radius,date.GetDate()),"RECREATE");
-  */
+  
 
 
   // plot the curves for the different centrality classes. get the combined spectra and do the ratio 

@@ -81,10 +81,10 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 
 using namespace std;
 
-void RAA_plot_yetkinCutEfficiency_minbias(char* etaWidth = (char*)"10_eta_18",
-					  Int_t radius = 4,
-					  Int_t etaLow = 10,
-					  Int_t etaHigh = 18)
+void RAA_plot_yetkinCutEfficiency_minbias(char* etaWidth = (char*)"20_eta_20",
+					  Int_t radius = 3,
+					  Int_t etaLow = 20,
+					  Int_t etaHigh = 20)
 {
 
   Int_t unm=1;
@@ -242,7 +242,7 @@ void RAA_plot_yetkinCutEfficiency_minbias(char* etaWidth = (char*)"10_eta_18",
   Float_t eta_1, eta_2;
   Float_t pfrawpt_1, pfrawpt_2;
 Int_t run_1, evt_1, lumi_1;
-  
+ Float_t phi_1, phi_2;
   Data_matched->SetBranchAddress("calopt",&calopt_1);
   Data_matched->SetBranchAddress("pfpt",&pfpt_1);
   Data_matched->SetBranchAddress("eMax",&eMax_1);
@@ -261,6 +261,7 @@ Int_t run_1, evt_1, lumi_1;
   Data_matched->SetBranchAddress("jet65_prescl",&jet65_p_1);
   Data_matched->SetBranchAddress("jet80_prescl",&jet80_p_1);
   Data_matched->SetBranchAddress("pfeta",&eta_1);
+  Data_matched->SetBranchAddress("pfphi",&phi_1);
   Data_matched->SetBranchAddress("pfrawpt",&pfrawpt_1);
   Data_matched->SetBranchAddress("run_value",&run_1);
   Data_matched->SetBranchAddress("evt_value",&evt_1);
@@ -283,6 +284,7 @@ Int_t run_1, evt_1, lumi_1;
   Data_unmatched->SetBranchAddress("jet65_prescl",&jet65_p_1);
   Data_unmatched->SetBranchAddress("jet80_prescl",&jet80_p_1);
   Data_unmatched->SetBranchAddress("pfeta",&eta_1);
+  Data_unmatched->SetBranchAddress("pfphi",&phi_1);
   Data_unmatched->SetBranchAddress("pfrawpt",&pfrawpt_1);
   Data_unmatched->SetBranchAddress("run_value",&run_1);
   Data_unmatched->SetBranchAddress("evt_value",&evt_1);
@@ -336,7 +338,7 @@ Int_t run_1, evt_1, lumi_1;
   //  Float_t prescl=1;
   if(mat==1)  for(long nentry = 0; nentry < entries; ++nentry ){
 
-    if(nentry%100000 == 0) cout<<" nentry = "<<nentry<<endl;
+      //    if(nentry%100000 == 0) cout<<" nentry = "<<nentry<<endl;
 
     Data_matched->GetEntry(nentry);
     Int_t cBin = findBin(hiBin_1);
@@ -390,19 +392,24 @@ Int_t run_1, evt_1, lumi_1;
       if(calopt_1/pfpt_1 > 0.5 && calopt_1/pfpt_1 <= 0.85 && eMax_1/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1/pfpt_1 - (Float_t)9/7)) {
 	hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
 	if(pfpt_1>15 && calopt_1>15)	hcalopf_TrgObj80[cBin]->Fill(calopt_1,pfpt_1,prescl);
-	if(pfpt_1>50)cout<<"pt "<<pfpt_1<<"  run "<<run_1<<" event  "<<evt_1<<"   lumi  "<<lumi_1<<endl;
+	//	if(pfpt_1>30) cout<<"pt "<<pfpt_1<<"      "<<eta_1<<"  run "<<run_1<<" event  "<<evt_1<<"   lumi  "<<lumi_1<<endl;
+	if(pfpt_1>15) cout<<pfpt_1<<"      "<<eta_1<<"  "<<phi_1<<"   "<<run_1<<"  "<<evt_1<<"    "<<lumi_1<<endl;
       }
 
       if(calopt_1/pfpt_1 > 0.85){
 	hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
 	if(pfpt_1>15 && calopt_1>15)	hcalopf_TrgObj80[cBin]->Fill(calopt_1,pfpt_1,prescl);
-	if(pfpt_1>50)cout<<"pt "<<pfpt_1<<"  run "<<run_1<<" event  "<<evt_1<<"   lumi  "<<lumi_1<<endl;
+	//	if(pfpt_1>30) cout<<"pt "<<pfpt_1<<"      "<<eta_1<<"  run "<<run_1<<" event  "<<evt_1<<"   lumi  "<<lumi_1<<endl;
+	if(pfpt_1>15) cout<<pfpt_1<<"      "<<eta_1<<"  "<<phi_1<<"   "<<run_1<<"  "<<evt_1<<"    "<<lumi_1<<endl;
+
       }
 
       if(calopt_1/pfpt_1 <= 0.5 && eMax_1/Sumcand < 0.05) {
 	hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
 	if(pfpt_1>15 && calopt_1>15)	hcalopf_TrgObj80[cBin]->Fill(calopt_1,pfpt_1,prescl);
-	if(pfpt_1>50)cout<<"pt "<<pfpt_1<<"  run "<<run_1<<" event  "<<evt_1<<"   lumi  "<<lumi_1<<endl;
+	//	if(pfpt_1>30) cout<<pfpt_1<<"      "<<eta_1<<"  "<<run_1<<"  "<<evt_1<<"    "<<lumi_1<<endl;
+	if(pfpt_1>15) cout<<pfpt_1<<"      "<<eta_1<<"  "<<phi_1<<"   "<<run_1<<"  "<<evt_1<<"    "<<lumi_1<<endl;
+	//	if(pfpt_1>30) cout<<"pt "<<pfpt_1<<"      "<<eta_1<<"  run "<<run_1<<" event  "<<evt_1<<"   lumi  "<<lumi_1<<endl;
       }
     
     }
@@ -458,9 +465,9 @@ Int_t run_1, evt_1, lumi_1;
   entries = Data_unmatched->GetEntries();
   //entries = 1000;
   cout<<"Unmatched Data ntuple "<<endl;
-  if(unm==1)  for(long nentry = 0; nentry < entries; ++nentry ){
+     if(unm==1)  for(long nentry = 0; nentry < entries; ++nentry ){
 
-    if(nentry%100000 == 0) cout<<" nentry = "<<nentry<<endl;
+  //    if(nentry%100000 == 0) cout<<" nentry = "<<nentry<<endl;
     Data_unmatched->GetEntry(nentry);
     Int_t cBin = findBin(hiBin_1);
     if(cBin == -1 || cBin >= nbins_cent) continue;
@@ -495,8 +502,10 @@ Int_t run_1, evt_1, lumi_1;
 	hpbpb_TrgObj80[cBin]->Fill(pfpt_1, prescl);
 
 	if(pfpt_1>15 && calopt_1>15) hcalopf_TrgObj80[cBin]->Fill(calopt_1,pfpt_1,prescl);
-	
-	if(pfpt_1>50)cout<<"pt "<<pfpt_1<<"  run "<<run_1<<" event  "<<evt_1<<"   lumi  "<<lumi_1<<endl;
+	//  	if(pfpt_1>30) cout<<pfpt_1<<"      "<<eta_1<<"  "<<run_1<<"  "<<evt_1<<"    "<<lumi_1<<endl;    
+	if(pfpt_1>15) cout<<pfpt_1<<"      "<<eta_1<<"  "<<phi_1<<"   "<<run_1<<"  "<<evt_1<<"    "<<lumi_1<<endl;
+	//	if(pfpt_1>30) cout<<"pt "<<pfpt_1<<"      "<<eta_1<<"  run "<<run_1<<" event  "<<evt_1<<"   lumi  "<<lumi_1<<endl;
+
 
      /*   //  Adding the unmatched loop;
   // data unmatched loop:

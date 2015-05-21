@@ -46,7 +46,7 @@
 #include "TLine.h"
 
 
-#include "Headers/plot.h"
+#include "../Headers/plot.h"
 
 
 
@@ -119,7 +119,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 40){
+void RAA_plot(int radius = 2, char *algo = "Pu", char *jet_type = "PF", int unfoldingCut = 40){
 
   TStopwatch timer;
   timer.Start();
@@ -163,8 +163,8 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
   bool doPPDatavsMC = false;
   bool doPbPbNormRes = false;
   bool doPPNormRes = false;
-  bool doPbPbsigma = false;
-  bool doPPsigma = false;
+  bool doPbPbsigma = true;
+  bool doPPsigma = true;
   bool doGenSpectra = false;
   bool doPbPbTrgComb = false;
   bool doPbPb12003TrgComb = false;
@@ -193,9 +193,13 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
 
   char * etaWidth = (char*)"20_eta_20";
   Float_t etaBoundary = 2.0; 
-  
+
+  if(radius == 2) unfoldingCut = 30; 
+  if(radius == 3) unfoldingCut = 40;
+  if(radius == 4) unfoldingCut = 50;   
+
   //if(location=="MIT") PbPb_pp_calopfpt_ppNoJetidcut_R0p2_unfold_mcclosure_oppside_trgMC_n20_eta_p20_30GeVCut_akPF_20150417
-  fin= TFile::Open(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_%s_%dGeVCut_ak%s_20150506.root",radius,etaWidth,unfoldingCut,jet_type));
+  fin= TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",radius,etaWidth,unfoldingCut,jet_type));
   //fin= TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/PbPb_data_ak%s%s_testComb4_cut1_20141111.root",algo,jet_type));
   //if(location=="CERN")fin= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_pp_unfo_ak%s%d%s_20140911.root",algo,radius,jet_type));
   //if(location=="MPB") fin= TFile::Open(Form(""))
@@ -295,26 +299,27 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
   }
   
   
-  TFile * fPP_in = TFile::Open(Form("../../Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
-  TFile * fPP_in_trigger = TFile::Open(Form("../../Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d_for_trigger.root",radius));
-  fPP_in->Print();
+  // TFile * fPP_in = TFile::Open(Form("../../Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+  // TFile * fPP_in_trigger = TFile::Open(Form("../../Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d_for_trigger.root",radius));
+  // fPP_in->Print();
   
-  TH1F * dPPComb = (TH1F*)fPP_in->Get(Form("hpp_HLTComb_R%d_n20_eta_p20",radius)); 
+  // TH1F * dPPComb = (TH1F*)fPP_in->Get(Form("hpp_HLTComb_R%d_n20_eta_p20",radius)); 
   
-  TH1F * hPP_80Cont = (TH1F*)fPP_in_trigger->Get(Form("hpp_HLT80_R%d_n20_eta_p20",radius));
-  hPP_80Cont->Divide(dPPComb);
-  TH1F * hPP_60Cont = (TH1F*)fPP_in_trigger->Get(Form("hpp_HLT60_R%d_n20_eta_p20",radius));
-  hPP_60Cont->Divide(dPPComb);
-  TH1F * hPP_40Cont = (TH1F*)fPP_in_trigger->Get(Form("hpp_HLT40_R%d_n20_eta_p20",radius));
-  hPP_40Cont->Divide(dPPComb);
+  // TH1F * hPP_80Cont = (TH1F*)fPP_in_trigger->Get(Form("hpp_HLT80_R%d_n20_eta_p20",radius));
+  // hPP_80Cont->Divide(dPPComb);
+  // TH1F * hPP_60Cont = (TH1F*)fPP_in_trigger->Get(Form("hpp_HLT60_R%d_n20_eta_p20",radius));
+  // hPP_60Cont->Divide(dPPComb);
+  // TH1F * hPP_40Cont = (TH1F*)fPP_in_trigger->Get(Form("hpp_HLT40_R%d_n20_eta_p20",radius));
+  // hPP_40Cont->Divide(dPPComb);
   
-  hPP_80Cont = (TH1F*)hPP_80Cont->Rebin(nbins_pt, "hPP_80", boundaries_pt);
-  divideBinWidth(hPP_80Cont);
-  hPP_60Cont = (TH1F*)hPP_60Cont->Rebin(nbins_pt, "hPP_60", boundaries_pt);
-  divideBinWidth(hPP_60Cont);
-  hPP_40Cont = (TH1F*)hPP_40Cont->Rebin(nbins_pt, "hPP_40", boundaries_pt);
-  divideBinWidth(hPP_40Cont);  
+  // hPP_80Cont = (TH1F*)hPP_80Cont->Rebin(nbins_pt, "hPP_80", boundaries_pt);
+  // divideBinWidth(hPP_80Cont);
+  // hPP_60Cont = (TH1F*)hPP_60Cont->Rebin(nbins_pt, "hPP_60", boundaries_pt);
+  // divideBinWidth(hPP_60Cont);
+  // hPP_40Cont = (TH1F*)hPP_40Cont->Rebin(nbins_pt, "hPP_40", boundaries_pt);
+  // divideBinWidth(hPP_40Cont);  
 
+  
   /*
   // get histograms from the MC file. 
   TFile *fMCin = TFile::Open(Form("/Users/keraghav/WORK/RAA/Output/PbPb_mc_nocut_ak%s%s_20141210.root",algo,jet_type));
@@ -525,7 +530,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     Spectra->SetTextSize(0.04);
     Spectra->Draw();
   
-    cSpectra->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/Unfolded_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cSpectra->SaveAs(Form("May20/Unfolded_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
   
     //rescale the histograms which were scaled: 
@@ -589,7 +594,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, radius),0.2,0.23,20);
     drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
-    cIterSysPbPb->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%s%d%s_%d.pdf",unfoldingCut,algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cIterSysPbPb->SaveAs(Form("May20/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%s%d%s_%d.pdf",unfoldingCut,algo,radius,jet_type,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -629,7 +634,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type,radius),0.2,0.23,20);
     drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
-    cIterSysPP->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_iteration_systematics_%dGeVCut_ak%d%s_%d.pdf",unfoldingCut,radius,jet_type,date.GetDate()),"RECREATE");
+    cIterSysPP->SaveAs(Form("May20/PP_unfoldng_iteration_systematics_%dGeVCut_ak%d%s_%d.pdf",unfoldingCut,radius,jet_type,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -657,27 +662,28 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
       RAA_measured[i]->SetMarkerStyle(24);
       makeHistTitle(RAA_measured[i],"","Jet p_{T} (GeV/c)","R_{AA}");
 
-      if(i==0){
-	for(int j = RAA_measured[i]->FindBin(unfoldingCut); j<RAA_measured[i]->FindBin(100); ++j){
-	  RAA_measured[i]->SetBinContent(j,0);
-	  RAA_bayesian[i]->SetBinContent(j,0);
-	  RAA_binbybin[i]->SetBinContent(j,0);
-	}
-      }
-      if(i==5 || i==4 || i==3){
-	for(int j = RAA_measured[i]->FindBin(240); j<RAA_measured[i]->FindBin(300); ++j){
-	  RAA_measured[i]->SetBinContent(j,0);
-	  RAA_bayesian[i]->SetBinContent(j,0);
-	  RAA_binbybin[i]->SetBinContent(j,0);
-	}
-      }
-      if(i==1 || i==2){
-        for(int j = RAA_measured[i]->FindBin(unfoldingCut); j<RAA_measured[i]->FindBin(unfoldingCut+30); ++j){
-	  RAA_measured[i]->SetBinContent(j,0);
-	  RAA_bayesian[i]->SetBinContent(j,0);
-	  RAA_binbybin[i]->SetBinContent(j,0);
-	}
-      }
+      // if(i==0){
+      // 	for(int j = RAA_measured[i]->FindBin(unfoldingCut); j<RAA_measured[i]->FindBin(100); ++j){
+      // 	  RAA_measured[i]->SetBinContent(j,0);
+      // 	  RAA_bayesian[i]->SetBinContent(j,0);
+      // 	  RAA_binbybin[i]->SetBinContent(j,0);
+      // 	}
+      // }
+      // if(i==5 || i==4 || i==3){
+      // 	for(int j = RAA_measured[i]->FindBin(240); j<RAA_measured[i]->FindBin(300); ++j){
+      // 	  RAA_measured[i]->SetBinContent(j,0);
+      // 	  RAA_bayesian[i]->SetBinContent(j,0);
+      // 	  RAA_binbybin[i]->SetBinContent(j,0);
+      // 	}
+      // }
+      // if(i==1 || i==2){
+      //   for(int j = RAA_measured[i]->FindBin(unfoldingCut); j<RAA_measured[i]->FindBin(unfoldingCut+30); ++j){
+      // 	  RAA_measured[i]->SetBinContent(j,0);
+      // 	  RAA_bayesian[i]->SetBinContent(j,0);
+      // 	  RAA_binbybin[i]->SetBinContent(j,0);
+      // 	}
+      // }
+      
       RAA_measured[i]->SetAxisRange(unfoldingCut+30, 299, "X");
       RAA_measured[i]->SetAxisRange(0.2,1.8,"Y");
       RAA_measured[i]->Draw("E1");
@@ -714,7 +720,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("Jet RAA dataset Trigger Combined",0.1,0.3,16);
     drawText("Pile up rejection cut applied",0.1,0.2,16);
 
-    cRAA->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/RAA_ppnoJetID_%dGeVCut_ak%s%d%s_%d.pdf",unfoldingCut,algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cRAA->SaveAs(Form("May20/RAA_ppnoJetID_%dGeVCut_ak%s%d%s_%d.pdf",unfoldingCut,algo,radius,jet_type,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -778,14 +784,14 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     TLegend *pbpbmcclosure = myLegend(0.53,0.65,0.85,0.9);
     //pbpbmcclosure->AddEntry(hMCClosurePbPb_Meas[0],"PbPb no unfolding","pl");
     pbpbmcclosure->AddEntry(hMCClosurePbPb_Bayesian[0],"PbPb Bayesian 4 Iter","pl");
-    pbpbmcclosure->AddEntry(hMCClosurePbPb_BinByBin[0],"PbPb BinbyBin","pl");
+    pbpbmcclosure->AddEntry(hMCClosurePbPb_BinByBin[0],"PbPb bin-by-bin","pl");
     pbpbmcclosure->Draw();
     putCMSPrel();
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
     drawText("|#eta|<2, |vz|<15)",0.3,0.33,16);
     drawText("Data and gen, opp half statistics",0.3,0.13,16);
   
-    cPbPbMCclosure->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_unfoldng_mc_closure_opphalf_%dGeVCut_ak%s%d%s_%s_%d.pdf",unfoldingCut,algo,radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
+    cPbPbMCclosure->SaveAs(Form("May20/PbPb_unfoldng_mc_closure_opphalf_%dGeVCut_ak%s%d%s_%s_%d.pdf",unfoldingCut,algo,radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -844,16 +850,16 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     TLegend *ppmcclosure = myLegend(0.53,0.65,0.85,0.9);
     //ppmcclosure->AddEntry(hMCClosurePP_Meas,"pp no unfolding","pl");
     ppmcclosure->AddEntry(hMCClosurePP_Bayesian,"pp Bayesian","pl");
-    ppmcclosure->AddEntry(hMCClosurePP_BinbyBin,"pp BinbyBin","pl");
+    ppmcclosure->AddEntry(hMCClosurePP_BinbyBin,"pp bin-by-bin","pl");
     ppmcclosure->Draw();
 
     linePP_mcclosure->Draw();
 
-    putCMSPrel();
+    putCMSPrel(0.3,0.8,0.025);
     drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
     drawText("|#eta|<2, |vz|<15",0.6,0.31,22);
   
-    cPPMCclosure->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_unfoldng_mc_closure_test_%dGeVCut_ak%d%s_%s_%d.pdf",unfoldingCut,radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
+    cPPMCclosure->SaveAs(Form("May20/PP_unfoldng_mc_closure_test_%dGeVCut_ak%d%s_%s_%d.pdf",unfoldingCut,radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -910,7 +916,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.2,0.23,20);
     drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
-    cPbPb_data_vs_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_vs_mc_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cPbPb_data_vs_mc->SaveAs(Form("May20/PbPb_data_vs_mc_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -957,7 +963,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
     drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
 
-    cPP_data_vs_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_data_vs_mc_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+    cPP_data_vs_mc->SaveAs(Form("May20/PP_data_vs_mc_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -997,7 +1003,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.65,0.31,16);
     //drawText("chMax/jtpt>0.05",0.65,0.4,16);
     //drawText("opp-side statistics",0.2,0.6,16);
-    cPbPb_NormResMat->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_normalized_response_matrix_ak%s%d%s_%s_%d.pdf",algo,radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
+    cPbPb_NormResMat->SaveAs(Form("May20/PbPb_normalized_response_matrix_ak%s%d%s_%s_%d.pdf",algo,radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1034,7 +1040,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     putCMSPrel();
     drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
     drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-    cPP_NormResMat->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_normalized_response_matrix_ak%d%s_%s_%d.pdf",radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
+    cPP_NormResMat->SaveAs(Form("May20/PP_normalized_response_matrix_ak%d%s_%s_%d.pdf",radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1057,7 +1063,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
       dPbPb_TrgComb[i]->SetAxisRange(1e-6,100,"Y");
       //dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt,Form("rebin_measured_cent%d",i),boundaries_pt);
       //divideBinWidth(dPbPb_TrgComb[i]);
-      dPbPb_TrgComb[i]->SetAxisRange(50,500,"X");
+      dPbPb_TrgComb[i]->SetAxisRange(60,299,"X");
       dPbPb_TrgComb[i]->Draw();
     
       uPbPb_Bayes[i]->SetMarkerStyle(20);
@@ -1080,12 +1086,14 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     TLegend *PbPb_sigma = myLegend(0.33,0.3,0.5,0.5);
     PbPb_sigma->AddEntry(dPbPb_TrgComb[0],"No Unfolding","pl");
     PbPb_sigma->AddEntry(uPbPb_Bayes[0],"Bayesian 4 Iter","pl");
-    PbPb_sigma->AddEntry(uPbPb_BinByBin[0],"BinByBin","pl");
+    PbPb_sigma->AddEntry(uPbPb_BinByBin[0],"bin-by-bin","pl");
     PbPb_sigma->SetTextSize(0.04);
     PbPb_sigma->Draw();
 
     putCMSPrel();
+    cPbPb_sigma->cd(2);
     putPbPbLumi();
+    cPbPb_sigma->cd(1);
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.3,0.2,16);
     //drawText("Spectra with NJet(p_{T}>50) < 7",0.55,0.55,16);
 
@@ -1096,7 +1104,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     cPbPb_sigma->cd(3);
     //drawText("Marguerite file, ",0.1,0.2,16);
 
-    cPbPb_sigma->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_invariant_cross_section_combined_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cPbPb_sigma->SaveAs(Form("May20/PbPb_invariant_cross_section_combined_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1112,8 +1120,8 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     dPP_Comb->SetMarkerColor(kBlack);
     dPP_Comb->SetTitle(" ");
     dPP_Comb->SetXTitle("Jet p_{T} (GeV/c)");
-    dPP_Comb->SetYTitle("#frac{d^2 #sigma}{d#eta dp_{T}} nano barns");
-    dPP_Comb->SetAxisRange(40,300,"X");
+    dPP_Comb->SetYTitle("#frac{d^{2} #sigma}{d#eta dp_{T}} nano barns");
+    dPP_Comb->SetAxisRange(60,299,"X");
     dPP_Comb->Draw();
 
     uPP_Bayes->SetMarkerColor(kBlack);
@@ -1129,15 +1137,15 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     TLegend *PP_sigma = myLegend(0.53,0.65,0.85,0.9);
     PP_sigma->AddEntry(dPP_Comb,"No Unfolding","pl");
     PP_sigma->AddEntry(uPP_Bayes,"Bayesian 4 Iter","pl");
-    PP_sigma->AddEntry(uPP_BinByBin,"BinByBin","pl");
+    PP_sigma->AddEntry(uPP_BinByBin,"bin-by-bin","pl");
     PP_sigma->SetTextSize(0.04);
     PP_sigma->Draw();
 
-    putCMSPrel();
-    putPPLumi();
-    drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.15,0.23,16);
-    drawText("|#eta|<2, |vz|<15",0.15,0.33,16);
-    cPP_sigma->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_invariant_cross_section_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+    putCMSPrel(0.26,0.9,0.05);
+    putPPLumi(0.55,0.9,0.05);
+    drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.25,0.23,16);
+    drawText("|#eta|<2, |vz|<15",0.25,0.33,16);
+    cPP_sigma->SaveAs(Form("May20/PP_invariant_cross_section_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1222,7 +1230,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     // GenSpectra->Draw();
     // 
 
-    cGenSpectra->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/MC_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cGenSpectra->SaveAs(Form("May20/MC_spectra_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
  
     //unscale the gen and reco histograms: 
     for(int i = 0;i<=nbins_cent;i++){ 
@@ -1302,7 +1310,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     //drawText("cut5: #frac{neMax}{neMax + chMax + phMax}",0.22,0.73,15);
     //drawText("cut4: #frac{#sum #left(ch+nu+ph+mu+e#right)}{0.5*raw p_{T}}",0.22,0.83,15);
     //drawText("chMax/jtpt>0.02 && eMax/jtpt<0.6",0.15,0.11,16);
-    cDataMerge->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cDataMerge->SaveAs(Form("May20/PbPb_data_trigger_merging_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   }
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1371,7 +1379,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     //drawText("cut1: #frac{chMax}{jet p_{T}}",0.22,0.73,15);
     drawText("cut5: #frac{neMax}{neMax + chMax + phMax}",0.22,0.73,15);
     drawText("12003 Method",0.22,0.63,15);
-    cData12003Merge->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_trigger_merging_12003_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cData12003Merge->SaveAs(Form("May20/PbPb_data_trigger_merging_12003_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
   }
 
@@ -1430,7 +1438,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     //drawText("cut5: #frac{neMax}{neMax + chMax + phMax}",0.22,0.73,15);
     //drawText("cut4: #frac{#sum #left(ch+nu+ph+mu+e#right)}{0.5*raw p_{T}}",0.22,0.83,15);
     //drawText("chMax/jtpt>0.05",0.65,0.60,16);
-    cPPMerge->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_data_trigger_merging_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+    cPPMerge->SaveAs(Form("May20/PP_data_trigger_merging_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
 
   }
   
@@ -1488,7 +1496,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("|#eta|<2, |vz|<15",0.15,0.26,16);
     drawText("pCES, HBHE",0.15,0.21,16);
     
-    cPPTrgCont->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PP_data_trigger_contribution_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
+    cPPTrgCont->SaveAs(Form("May20/PP_data_trigger_contribution_ak%d%s_%d.pdf",radius,jet_type,date.GetDate()),"RECREATE");
 
   }
 
@@ -1569,7 +1577,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
 	drawText(Form("Anti-k_{T} %s %s",algo,jet_type),0.5,0.55,16);
 	drawText(Form("%s |vz|<15",etaWidth[j]),0.5,0.60,16);
       
-	cPbPb_MC_jtpu[j]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/bkg_energy_subtracted_%s_ak%s_%s_%d.pdf",etaWidth[j],algo,jet_type,date.GetDate()),"RECREATE");
+	cPbPb_MC_jtpu[j]->SaveAs(Form("May20/bkg_energy_subtracted_%s_ak%s_%s_%d.pdf",etaWidth[j],algo,jet_type,date.GetDate()),"RECREATE");
 
       }//eta bins loop for the canvas
 
@@ -1629,7 +1637,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     cSupernova_data->cd(1);
     putCMSPrel();
     drawText("Full dataset Jet55 or Jet65 or Jet80",0.3,0.85,16);
-    cSupernova_data->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cSupernova_data->SaveAs(Form("May20/PbPb_data_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   }
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1668,7 +1676,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     cSupernova_mc->cd(1);
     putCMSSim();
     drawText("Pythia + HYDJET",0.3,0.85,16);
-    cSupernova_mc->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_mc_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cSupernova_mc->SaveAs(Form("May20/PbPb_mc_supernova_events_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1708,7 +1716,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(" 0 - 0.5% central events",0.3,0.85,16);
     drawText("|vz|<15, pCES",0.55,0.65,16);
 
-    cSupernovaDataMC->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_DataMC_supernova_ultraCentral_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");    
+    cSupernovaDataMC->SaveAs(Form("May20/PbPb_DataMC_supernova_ultraCentral_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");    
     
   }
   
@@ -1850,7 +1858,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
 
       drawText("Jet Trigger Combined",0.5,0.65,16);
 
-      cpT_njet_gl7[i]->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_data_spectra_nJetcut_ak%s%d%s_cent%d_%d.pdf",algo,radius,jet_type,i,date.GetDate()),"RECREATE");
+      cpT_njet_gl7[i]->SaveAs(Form("May20/PbPb_data_spectra_nJetcut_ak%s%d%s_cent%d_%d.pdf",algo,radius,jet_type,i,date.GetDate()),"RECREATE");
 
     }//cent loop
   }
@@ -1909,7 +1917,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("|vz|<15, pCES",0.5,0.45,16);
     //drawText("hiNpix_1 > 38000 - 500*NJet",0.5,0.35,16);
     
-    cMC_njet_lg7->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_mc_spectra_nJetcut_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cMC_njet_lg7->SaveAs(Form("May20/PbPb_mc_spectra_nJetcut_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
   
   }
 
@@ -1960,7 +1968,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     hCentRatio->Fit("fCentralityWeight","LL","",0,200);
     hCentRatio->Draw();
     
-    cDataMCCent->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_datavsmc_centrality_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cDataMCCent->SaveAs(Form("May20/PbPb_datavsmc_centrality_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // TFile fout(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_DataMC_cent_ratio_%d.root",date.GetDate()),"RECREATE");
     // fout.cd();
@@ -2068,7 +2076,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     makeHistTitle(hVzRatio," ","Vz","Data/MC");
     hVzRatio->Draw();
     
-    cDataMCVertex->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_datavsmc_vertex_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cDataMCVertex->SaveAs(Form("May20/PbPb_datavsmc_vertex_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
  
   
   }
@@ -2396,7 +2404,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
 
-    cMaxVariables->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_Max_centFull_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cMaxVariables->SaveAs(Form("May20/PbPb_JetVariables_Max_centFull_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
       
     //
 
@@ -2480,7 +2488,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
 
-    cSumVariables->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_Sum_centFull_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cSumVariables->SaveAs(Form("May20/PbPb_JetVariables_Sum_centFull_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     //
     //
     //
@@ -2516,7 +2524,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
-    cchMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_chMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cchMax->SaveAs(Form("May20/PbPb_JetVariables_chMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     
     // make plot for chSum
     TCanvas *cchSum = new TCanvas("cchSum","",1000,800);
@@ -2549,7 +2557,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
-    cchSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_chSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cchSum->SaveAs(Form("May20/PbPb_JetVariables_chSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
 
         
@@ -2584,7 +2592,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
-    cphMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_phMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cphMax->SaveAs(Form("May20/PbPb_JetVariables_phMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for phSum
     TCanvas *cphSum = new TCanvas("cphSum","",1000,800);
@@ -2617,7 +2625,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
-    cphSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_phSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cphSum->SaveAs(Form("May20/PbPb_JetVariables_phSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
         
     // make plot for neMax
@@ -2651,7 +2659,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
-    cneMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_neMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cneMax->SaveAs(Form("May20/PbPb_JetVariables_neMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for neSum
     TCanvas *cneSum = new TCanvas("cneSum","",1000,800);
@@ -2684,7 +2692,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
-    cneSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_neSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cneSum->SaveAs(Form("May20/PbPb_JetVariables_neSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
 
         
@@ -2719,7 +2727,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
-    cmuMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_muMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cmuMax->SaveAs(Form("May20/PbPb_JetVariables_muMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for muSum
     TCanvas *cmuSum = new TCanvas("cmuSum","",1000,800);
@@ -2752,7 +2760,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
-    cmuSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_muSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cmuSum->SaveAs(Form("May20/PbPb_JetVariables_muSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
 
    // make plot for eMax
@@ -2786,7 +2794,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
-    ceMax->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_eMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    ceMax->SaveAs(Form("May20/PbPb_JetVariables_eMax_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     // make plot for eSum
     TCanvas *ceSum = new TCanvas("ceSum","",1000,800);
@@ -2819,7 +2827,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.4,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.5,0.33,16);
     drawText("pCES, HBHE(data)",0.5,0.43,16);
-    ceSum->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_eSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    ceSum->SaveAs(Form("May20/PbPb_JetVariables_eSum_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     
     /*
     // make plot for jtpu
@@ -2851,7 +2859,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type, radius),0.3,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
     drawText("pCES, HBHE",0.3,0.43,16);
-    cjtpu->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetVariables_jtpu_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cjtpu->SaveAs(Form("May20/PbPb_JetVariables_jtpu_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     */
 
 #endif 
@@ -2963,7 +2971,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
     drawText("pCES, HBHE",0.3,0.43,16);
 
-    cCut1->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut1_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cCut1->SaveAs(Form("May20/PbPb_JetID_cut1_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     TCanvas *cCut2 = new TCanvas("cCut2","",1200,800);
     makeMultiPanelCanvas(cCut2,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -2995,7 +3003,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
     drawText("pCES, HBHE",0.3,0.43,16);
 
-    cCut2->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut2_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cCut2->SaveAs(Form("May20/PbPb_JetID_cut2_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     TCanvas *cCut3 = new TCanvas("cCut3","",1200,800);
     makeMultiPanelCanvas(cCut3,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -3027,7 +3035,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
     drawText("pCES, HBHE",0.3,0.43,16);
 
-    cCut3->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut3_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cCut3->SaveAs(Form("May20/PbPb_JetID_cut3_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     TCanvas *cCut4 = new TCanvas("cCut4","",1200,800);
     makeMultiPanelCanvas(cCut4,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -3059,7 +3067,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
     drawText("pCES, HBHE",0.3,0.43,16);
 
-    cCut4->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut4_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cCut4->SaveAs(Form("May20/PbPb_JetID_cut4_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
     TCanvas *cCut5 = new TCanvas("cCut5","",1200,800);
     makeMultiPanelCanvas(cCut5,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -3091,7 +3099,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
     drawText("|#eta|<2, |vz|<15",0.3,0.33,16);
     drawText("pCES, HBHE",0.3,0.43,16);
 
-    cCut5->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut5_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+    cCut5->SaveAs(Form("May20/PbPb_JetID_cut5_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
 
   }//do jetID
 
@@ -3190,7 +3198,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
       cCut1_pt->cd(23);cCut1_pt->cd(23)->SetLogy();hCut1_pt[3][4]->Draw("colz");
       cCut1_pt->cd(24);cCut1_pt->cd(24)->SetLogy();hCut1_pt[3][5]->Draw("colz");
     
-      cCut1_pt->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut1_pt_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+      cCut1_pt->SaveAs(Form("May20/PbPb_JetID_cut1_pt_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     }
 
 
@@ -3265,7 +3273,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
       cCut2_pt->cd(23);cCut2_pt->cd(23)->SetLogy();hCut2_pt[3][4]->Draw("colz");
       cCut2_pt->cd(24);cCut2_pt->cd(24)->SetLogy();hCut2_pt[3][5]->Draw("colz");
     
-      cCut2_pt->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut2_pt_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+      cCut2_pt->SaveAs(Form("May20/PbPb_JetID_cut2_pt_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     }
     
     if(do2DCut3){
@@ -3339,7 +3347,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
       cCut3_pt->cd(23);cCut3_pt->cd(23)->SetLogy();hCut3_pt[3][4]->Draw("colz");
       cCut3_pt->cd(24);cCut3_pt->cd(24)->SetLogy();hCut3_pt[3][5]->Draw("colz");
     
-      cCut3_pt->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut3_pt_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+      cCut3_pt->SaveAs(Form("May20/PbPb_JetID_cut3_pt_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     }
 
     if(do2DCut4){
@@ -3413,7 +3421,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
       cCut4_pt->cd(23);cCut4_pt->cd(23)->SetLogy();hCut4_pt[3][4]->Draw("colz");
       cCut4_pt->cd(24);cCut4_pt->cd(24)->SetLogy();hCut4_pt[3][5]->Draw("colz");
     
-      cCut4_pt->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut4_pt_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+      cCut4_pt->SaveAs(Form("May20/PbPb_JetID_cut4_pt_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     }
 
     if(do2DCut5){
@@ -3487,7 +3495,7 @@ void RAA_plot(int radius = 4, char *algo = "Pu", char *jet_type = "PF", int unfo
       cCut5_pt->cd(23);cCut5_pt->cd(23)->SetLogy();hCut5_pt[3][4]->Draw("colz");
       cCut5_pt->cd(24);cCut5_pt->cd(24)->SetLogy();hCut5_pt[3][5]->Draw("colz");
     
-      cCut5_pt->SaveAs(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Plots/PbPb_JetID_cut5_pt_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
+      cCut5_pt->SaveAs(Form("May20/PbPb_JetID_cut5_pt_ak%s%d%s_%d.pdf",algo,radius,jet_type,date.GetDate()),"RECREATE");
     }
   }
 

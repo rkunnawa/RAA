@@ -36,7 +36,6 @@ double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
 double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 double npart[nbins_cent+1] = {389.84, 307.65, 223.95, 107.5, 41.65, 11.55, 112.9};
 
-
 const int nbins_pt = 30;
 const double boundaries_pt[nbins_pt+1] = {
   3, 4, 5, 7, 9, 12, 
@@ -88,6 +87,12 @@ class SysData
       hSysEff[i]->SetBinContent(j,1+effSys);
       hSysSmear[i]->SetBinContent(j,1.02);
       hSysJetID[i]->SetBinContent(j, 1+jetidSys);
+      if(i == 0) hSysJEC[i]->SetBinContent(j, 1.12);
+      if(i == 1) hSysJEC[i]->SetBinContent(j, 1.10);
+      if(i == 2) hSysJEC[i]->SetBinContent(j, 1.08);
+      if(i == 3) hSysJEC[i]->SetBinContent(j, 1.05);
+      if(i == 4) hSysJEC[i]->SetBinContent(j, 1.03);
+      if(i == 5) hSysJEC[i]->SetBinContent(j, 1.02);
       double JECSys = hSysJEC[i]->GetBinContent(j)-1;
       double SmearSys = hSysSmear[i]->GetBinContent(j)-1;
       double IterSys = hSysIter[i]->GetBinContent(j)-1; 
@@ -117,6 +122,12 @@ class SysData
       hSysEff[i]->SetBinContent(j,1+effSys);
       hSysSmear[i]->SetBinContent(j,1.02);
       hSysJetID[i]->SetBinContent(j, 1+jetidSys);
+      if(i == 0) hSysJEC[i]->SetBinContent(j, 1.12);
+      if(i == 1) hSysJEC[i]->SetBinContent(j, 1.10);
+      if(i == 2) hSysJEC[i]->SetBinContent(j, 1.08);
+      if(i == 3) hSysJEC[i]->SetBinContent(j, 1.05);
+      if(i == 4) hSysJEC[i]->SetBinContent(j, 1.03);
+      if(i == 5) hSysJEC[i]->SetBinContent(j, 1.02);
       double JECSys = hSysJEC[i]->GetBinContent(j)-1;
       double SmearSys = hSysSmear[i]->GetBinContent(j)-1;
       double NoiseSys = hSysNoise[i]->GetBinContent(j)-1; 
@@ -205,7 +216,7 @@ class SysData
     calcTotalSys(i);
     TH1D *h = new TH1D(Form("hSysTmp_cent%d",i),"",nbins_pt, boundaries_pt);
     makeHistTitle(h,"","Jet p_{T} (GeV/c)","Systematic uncertainty");
-    h->SetAxisRange(-0.25,0.4,"Y");
+    h->SetAxisRange(-0.4,0.4,"Y");
     h->SetAxisRange(60,299,"X");
     h->Draw();
     TH1F* sys = drawEnvelope(hSys[i],"same",hSys[i]->GetLineColor(),1001,hSys[i]->GetLineColor(),-1);
@@ -216,9 +227,9 @@ class SysData
     TH1F* sysEff = drawEnvelope(hSysEff[i],"same",hSysEff[i]->GetLineColor(),3002,hSysEff[i]->GetLineColor(),-1);
     TH1F* sysNoise = drawEnvelope(hSysNoise[i],"same",hSysNoise[i]->GetLineColor(),3001,hSysNoise[i]->GetLineColor(),-1);
     TLine *l = new TLine(h->GetBinLowEdge(1),0,h->GetBinLowEdge(h->GetNbinsX()+1),0);
-    l->Draw();
+    //l->Draw();
     TLine *l2 = new TLine(h->GetBinLowEdge(1),-0.25,h->GetBinLowEdge(1),0.4);
-    l2->Draw();
+    //l2->Draw();
     TLegend *leg = myLegend(0.52,0.6,0.95,0.93);
     leg->SetTextSize(0.043);
     leg->AddEntry(sys,"Total Systematics","f");

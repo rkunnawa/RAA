@@ -219,7 +219,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 2, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "20_eta_20", double deltaEta = 4.0, char * smear = (char*)"noSmear"){
+void RAA_analyze(int radius = 2, int param1 = 1, int param2 = 1, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "20_eta_20", double deltaEta = 4.0, char * smear = (char*)"noSmear"){
 
   TStopwatch timer; 
   timer.Start();
@@ -232,6 +232,30 @@ void RAA_analyze(int radius = 2, char* algo = (char*) "Pu", char *jet_type = (ch
   bool dofakeremove=true;
   // get the data and mc histograms from the output of the read macro. 
   
+  if(param1 == 1) {
+    etaWidth = "20_eta_20";
+    deltaEta = 4.0;
+  }
+  if(param1 == 2) {
+    etaWidth = "10_eta_10";
+    deltaEta = 2.0; 
+  }
+  if(param1 == 3) {
+    etaWidth = "10_eta_18";
+    deltaEta = 1.6;
+  }
+
+  if(param2 == 1) smear = "noSmear";
+  if(param2 == 2) smear = "GenSmear";
+  if(param2 == 3) smear = "RecoSmear";
+  if(param2 == 4) smear = "BothSmear";
+  if(param2 == 5) smear = "gen2pSmear";
+
+  if(radius == 2) unfoldingCut = 30;
+  if(radius == 3) unfoldingCut = 40;
+  if(radius == 4) unfoldingCut = 50;
+  
+
   TDatime date;//this is just here to get them to run optimized. 
 
   // Pawan's files:
@@ -446,7 +470,7 @@ void RAA_analyze(int radius = 2, char* algo = (char*) "Pu", char *jet_type = (ch
     // 5) 2% JEC effect on Gen pT 
     // take the ratio of the RAA with all of them and plot it for a systematics, we can also take the ratio of the unfolded spectra with each one of the above and take the envelope. 
     
-    if(smaer == "noSmear"){
+    if(smear == "noSmear"){
       mPbPb_Gen[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i));
       mPbPb_Gen[i]->Print("base");
       mPbPb_Reco[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_JetComb_reco_R%d_%s_cent%d",radius,etaWidth,i));
@@ -491,13 +515,13 @@ void RAA_analyze(int radius = 2, char* algo = (char*) "Pu", char *jet_type = (ch
       mPbPb_Matrix[i]->Print("base");
     }
     
-    mPbPb_mcclosure_data[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hrec_c_pbpb_akPu%d_1_%d",radius, radius, i));
+    mPbPb_mcclosure_data[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hrec_c_f_pbpb_akPu%d_1_%d",radius, radius, i));
     mPbPb_mcclosure_data[i]->Print("base");
-    mPbPb_mcclosure_gen[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hgen_pbpb_akPu%d_1_%d",radius, radius, i));
+    mPbPb_mcclosure_gen[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hgen_f_pbpb_akPu%d_1_%d",radius, radius, i));
     mPbPb_mcclosure_gen[i]->Print("base");
 
     
-    mPbPb_mcclosure_Matrix[i] = (TH2F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hmatrix_pbpb_akPu%d_1_%d",radius, radius, i));
+    mPbPb_mcclosure_Matrix[i] = (TH2F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hmatrix_f_pbpb_akPu%d_1_%d",radius, radius, i));
     mPbPb_mcclosure_Matrix[i]->Print("base");
 
     if(etaWidth == "10_eta_10"){
@@ -1140,10 +1164,9 @@ void RAA_analyze(int radius = 2, char* algo = (char*) "Pu", char *jet_type = (ch
 
   
   // first correct for the error bars got from the RAA_dataDrivenUnfoldingErrorCheck.C macro
-  
   // get the root file which has the unfolded error correction.
-  //  TFile * ferrorin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_noFakeWeight_data_driven_correction_akPu%s_20150506.root",radius, radius, etaWidth, unfoldingCut, jet_type));
-  TFile * ferrorin = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s_20150518.root",radius, radius, etaWidth, unfoldingCut, jet_type));
+  
+  TFile * ferrorin = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s_20150518.root",radius, radius, etaWidth, 40, jet_type)); // need to add unfolding cut and smear variable 
 
   // get histograms for each centrality and pp
   TH1F * hPbPb_BayesCorrected[nbins_cent];
