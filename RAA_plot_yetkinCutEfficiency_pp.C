@@ -32,14 +32,16 @@
 #include "Headers/plot.h"
 
 
-static const int nbins_pt = 30;
-static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
+// static const int nbins_pt = 30;
+// static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
 
+static const int nbins_pt = 29;
+static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638,790,967};
 
 using namespace std;
 
 void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"20_eta_20", 
-				     Int_t radius = 4, 
+				     Int_t radius = 3, 
 				     Int_t etaLow = 20, 
 				     Int_t etaHigh = 20){
 
@@ -792,7 +794,7 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"20_eta_20",
     
   }// mc unmatched  ntuple loop
 
-  TFile fout(Form("../../Output/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius),"RECREATE");
+  TFile fout(Form("../../Output/Pawan_ntuple_PP_data_MC_spectra_residualFactor_nlobins_%s_R0p%d.root",etaWidth, radius),"RECREATE");
   fout.cd();
   
   hpp_TrgObjComb->Add(hpp_TrgObj80);

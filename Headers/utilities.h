@@ -144,7 +144,7 @@ class SysData
   
   void Draw(TH1F *h,int i, int color) {
 
-    Int_t beginning = h->FindBin(60); Int_t end = h->FindBin(299);
+    Int_t beginning = h->FindBin(65); Int_t end = h->FindBin(299);
 
     //if(i==0){ beginning = h->FindBin(100); }
     //if(i==5 || i==4 || i==3) { end = h->FindBin(240);}
@@ -217,7 +217,7 @@ class SysData
     TH1D *h = new TH1D(Form("hSysTmp_cent%d",i),"",nbins_pt, boundaries_pt);
     makeHistTitle(h,"","Jet p_{T} (GeV/c)","Systematic uncertainty");
     h->SetAxisRange(-0.4,0.4,"Y");
-    h->SetAxisRange(60,299,"X");
+    h->SetAxisRange(65,299,"X");
     h->Draw();
     TH1F* sys = drawEnvelope(hSys[i],"same",hSys[i]->GetLineColor(),1001,hSys[i]->GetLineColor(),-1);
     TH1F* sysIter = drawEnvelope(hSysIter[i],"same",hSysIter[i]->GetLineColor(),3004,hSysIter[i]->GetLineColor(),-1);

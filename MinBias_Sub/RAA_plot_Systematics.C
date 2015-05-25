@@ -17,6 +17,7 @@
 #include <TH2F.h>
 #include <TFile.h>
 #include <TTree.h>
+#include <TColor.h>
 #include <TF1.h>
 #include <TCanvas.h>
 #include <TLegend.h>
@@ -78,15 +79,21 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
 
   TFile *fin_R2, *fin_R3, *fin_R4; 
   fin_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150521.root",2,etaWidth,30,jet_type));
+  //fin_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilNewMBSubtraction_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150522.root",3,etaWidth,40,jet_type));
   fin_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150521.root",3,etaWidth,40,jet_type));
   fin_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150521.root",4,etaWidth,50,jet_type));
 
   // // get the unfolded error correction files and histograms
   TFile * fError_R2, * fError_R3, * fError_R4;
-  fError_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s.root",2,2, etaWidth, 40, jet_type));
-  fError_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s.root",3,3, etaWidth, 40, jet_type));
-  fError_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s.root",4,4, etaWidth, 40, jet_type));
+  // fError_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s.root",2,2, etaWidth, 40, jet_type));
+  // fError_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s.root",3,3, etaWidth, 40, jet_type));
+  // fError_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s.root",4,4, etaWidth, 40, jet_type));
 
+  fError_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_nofakeCut_data_driven_correction_akPu%s.root",2,2, etaWidth, 40, jet_type));
+  //fError_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_bin_%s_unfoldingCut_%d_SevilfakeCut_data_driven_correction_akPu%s.root",3,3, etaWidth, 40, jet_type));
+  fError_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_nofakeCut_data_driven_correction_akPu%s.root",3,3, etaWidth, 40, jet_type));
+  fError_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_nofakeCut_data_driven_correction_akPu%s.root",4,4, etaWidth, 40, jet_type));
+  
   TH1F * hPbPb_R2_ErrorFix[nbins_cent], * hPbPb_R3_ErrorFix[nbins_cent], * hPbPb_R4_ErrorFix[nbins_cent];
   TH1F * hPbPb_R2_measured[nbins_cent], * hPbPb_R3_measured[nbins_cent], * hPbPb_R4_measured[nbins_cent];
   
@@ -121,11 +128,11 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     hPbPb_R4_ErrorFix[i] = (TH1F*)fError_R4->Get(Form("PbPb_BayesianUnfolded_cent%d",i));
     hPbPb_R4_ErrorFix[i]->Print("base");
 
-    hPbPb_R2_measured[i] = (TH1F*)fError_R2->Get(Form("PbPb_measured_cent%d",i));
+    hPbPb_R2_measured[i] = (TH1F*)fError_R2->Get(Form("PbPb_data_minbiasSub_cent%d",i));
     hPbPb_R2_measured[i]->Print("base");
-    hPbPb_R3_measured[i] = (TH1F*)fError_R3->Get(Form("PbPb_measured_cent%d",i));
+    hPbPb_R3_measured[i] = (TH1F*)fError_R3->Get(Form("PbPb_data_minbiasSub_cent%d",i));
     hPbPb_R3_measured[i]->Print("base");
-    hPbPb_R4_measured[i] = (TH1F*)fError_R4->Get(Form("PbPb_measured_cent%d",i));
+    hPbPb_R4_measured[i] = (TH1F*)fError_R4->Get(Form("PbPb_data_minbiasSub_cent%d",i));
     hPbPb_R4_measured[i]->Print("base");
 
     uPbPb_R2_Bayes[i] = (TH1F*)fin_R2->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
@@ -168,7 +175,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   prepareNcollUnc(nbins_pt, 300.);
   
   // get the necessary histograms
-  const int Iterations = 10; //for unfolding systematics. 
+  const int Iterations = 6; //for unfolding systematics. 
   const int BayesIter = 4;
   TH1F *uPbPb_BayesianIter_R2[nbins_cent+1][Iterations];
   TH1F *uPP_BayesianIter_R2[Iterations];
@@ -324,7 +331,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   linePbPb_iter->SetLineWidth(2);
   
 
-  TCanvas * cPbPb_Its_R2 = new TCanvas("cPbPb_Its_R2","",1000,1000);
+  TCanvas * cPbPb_Its_R2 = new TCanvas("cPbPb_Its_R2","",1200,1000);
   makeMultiPanelCanvas(cPbPb_Its_R2,3,2,0.0,0.0,0.2,0.15,0.07);
   
   TLegend *PbPb_itersys_R2 = myLegend(0.53,0.65,0.85,0.9);
@@ -361,10 +368,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, 2),0.2,0.23,20);
   drawText(Form("|#eta|< %2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
 
-  cPbPb_Its_R2->SaveAs(Form("May21/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPbPb_Its_R2->SaveAs(Form("May22/PbPb_unfoldng_iterations_%d_systematics_%dGeVCut_ak%sR2%s_%d_%s_pawan_ntuple.pdf",Iterations, unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
   
 
-  TCanvas * cPP_Its_R2 = new TCanvas("cPP_Its_R2","",800,800);
+  TCanvas * cPP_Its_R2 = new TCanvas("cPP_Its_R2","",800,600);
   // line at 1
   TLine *linePP_iter_R2 = new TLine(65,1,299,1);
   linePP_iter_R2->SetLineStyle(2);
@@ -397,7 +404,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type, 2),0.2,0.23,20);
   drawText(Form("|#eta|< %2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
 
-  cPP_Its_R2->SaveAs(Form("May21/PP_unfoldng_iteration_systematics_%dGeVCut_akR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPP_Its_R2->SaveAs(Form("May22/PP_unfoldng_iterations_%d_systematics_%dGeVCut_akR2%s_%d_%s_pawan_ntuple.pdf",Iterations, unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
 
   // define the Jet ID efficiency as a function of jet pT: taken from the above plots: 
   TF1 * fPol_x2 = new TF1("fPol_x2","1-[0]/pow(x,[1])");
@@ -405,7 +412,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   
   // plot for the JEC sys
 
-  TCanvas * cRAA_JEC_sys_R2 = new TCanvas("cRAA_JEC_sys_R2","",1000,1000);
+  TCanvas * cRAA_JEC_sys_R2 = new TCanvas("cRAA_JEC_sys_R2","",1200,1000);
   makeMultiPanelCanvas(cRAA_JEC_sys_R2,3,2,0.0,0.0,0.2,0.15,0.07);
 
   for(int i = 0; i<nbins_cent; ++i){
@@ -432,11 +439,11 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R0.2",algo, jet_type),0.2,0.23,20);
   drawText(Form("|#eta|< %2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cRAA_JEC_sys_R2->SaveAs(Form("May21/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cRAA_JEC_sys_R2->SaveAs(Form("May22/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
   // plot for the Smear sys
 
-  TCanvas * cRAA_Smear_sys_R2 = new TCanvas("cRAA_Smear_sys_R2","",1000,1000);
+  TCanvas * cRAA_Smear_sys_R2 = new TCanvas("cRAA_Smear_sys_R2","",1200,1000);
   makeMultiPanelCanvas(cRAA_Smear_sys_R2,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
@@ -459,7 +466,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s %s Jets R=0.2",algo, jet_type),0.2,0.23,20);
   if(etaWidth=="n16_eta_p16")drawText("|#eta|<1.6, |vz|<15",0.6,0.31,20);
   if(etaWidth=="n20_eta_p20")drawText("|#eta|<2, |vz|<15",0.6,0.31,20);
-  cRAA_Smear_sys_R2->SaveAs(Form("May21/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
+  cRAA_Smear_sys_R2->SaveAs(Form("May22/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
 
 
   // draw the total systematics
@@ -484,10 +491,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cSys_R2->cd(1);
   putCMSPrel();
   linePbPb_iter->Draw();
-  cSys_R2->SaveAs(Form("May21/RAA_total_systematics_unfoldingCut%dGeV_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cSys_R2->SaveAs(Form("May22/RAA_total_systematics_unfoldingCut%dGeV_ak%sR2%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
 
-  TCanvas * cPbPb_Its_R3 = new TCanvas("cPbPb_Its_R3","",1000,1000);
+  TCanvas * cPbPb_Its_R3 = new TCanvas("cPbPb_Its_R3","",1200,1000);
   makeMultiPanelCanvas(cPbPb_Its_R3,3,2,0.0,0.0,0.2,0.15,0.07);
   
   TLegend *PbPb_itersys_R3 = myLegend(0.53,0.65,0.85,0.9);
@@ -524,10 +531,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, 3),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
   
-  cPbPb_Its_R3->SaveAs(Form("May21/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPbPb_Its_R3->SaveAs(Form("May22/PbPb_unfoldng_iterations_%d_systematics_%dGeVCut_ak%sR3%s_%d_%s_pawan_ntuple.pdf",Iterations, unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
   
 
-  TCanvas * cPP_Its_R3 = new TCanvas("cPP_Its_R3","",800,800);
+  TCanvas * cPP_Its_R3 = new TCanvas("cPP_Its_R3","",800,600);
   // line at 1
   TLine *linePP_iter_R3 = new TLine(65,1,299,1);
   linePP_iter_R3->SetLineStyle(2);
@@ -560,11 +567,11 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type, 3),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
   
-  cPP_Its_R3->SaveAs(Form("May21/PP_unfoldng_iteration_systematics_%dGeVCut_akR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPP_Its_R3->SaveAs(Form("May22/PP_unfoldng_iterations_%d_systematics_%dGeVCut_akR3%s_%d_%s_pawan_ntuple.pdf",Iterations, unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
 
   // plot for the JEC sys
 
-  TCanvas * cRAA_JEC_sys_R3 = new TCanvas("cRAA_JEC_sys_R3","",1000,1000);
+  TCanvas * cRAA_JEC_sys_R3 = new TCanvas("cRAA_JEC_sys_R3","",1200,1000);
   makeMultiPanelCanvas(cRAA_JEC_sys_R3,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
@@ -590,11 +597,11 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.3",algo, jet_type),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cRAA_JEC_sys_R3->SaveAs(Form("May21/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cRAA_JEC_sys_R3->SaveAs(Form("May22/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
   // plot for the Smear sys
 
-  TCanvas * cRAA_Smear_sys_R3 = new TCanvas("cRAA_Smear_sys_R3","",1000,1000);
+  TCanvas * cRAA_Smear_sys_R3 = new TCanvas("cRAA_Smear_sys_R3","",1200,1000);
   makeMultiPanelCanvas(cRAA_Smear_sys_R3,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
@@ -616,7 +623,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.3",algo, jet_type),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cRAA_Smear_sys_R3->SaveAs(Form("May21/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
+  cRAA_Smear_sys_R3->SaveAs(Form("May22/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
 
 
   // draw the total systematics
@@ -641,11 +648,11 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cSys_R3->cd(1);
   putCMSPrel();
   linePbPb_iter->Draw();
-  cSys_R3->SaveAs(Form("May21/RAA_total_systematics_unfoldingCut%dGeV_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cSys_R3->SaveAs(Form("May22/RAA_total_systematics_unfoldingCut%dGeV_ak%sR3%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
 
 
-  TCanvas * cPbPb_Its_R4 = new TCanvas("cPbPb_Its_R4","",1000,1000);
+  TCanvas * cPbPb_Its_R4 = new TCanvas("cPbPb_Its_R4","",1200,1000);
   makeMultiPanelCanvas(cPbPb_Its_R4,3,2,0.0,0.0,0.2,0.15,0.07);
   
   TLegend *PbPb_itersys_R4 = myLegend(0.53,0.65,0.85,0.9);
@@ -681,10 +688,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo, jet_type, 4),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cPbPb_Its_R4->SaveAs(Form("May21/PbPb_unfoldng_iteration_systematics_%dGeVCut_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPbPb_Its_R4->SaveAs(Form("May22/PbPb_unfoldng_iterations_%d_systematics_%dGeVCut_ak%sR4%s_%d_%s_pawan_ntuple.pdf",Iterations, unfoldingCut,algo,jet_type,date.GetDate(),etaWidth),"RECREATE");
   
 
-  TCanvas * cPP_Its_R4 = new TCanvas("cPP_Its_R4","",800,800);
+  TCanvas * cPP_Its_R4 = new TCanvas("cPP_Its_R4","",800,600);
   // line at 1
   TLine *linePP_iter_R4 = new TLine(65,1,299,1);
   linePP_iter_R4->SetLineStyle(2);
@@ -716,11 +723,11 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s Jets R=0.%d", jet_type, 4),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cPP_Its_R4->SaveAs(Form("May21/PP_unfoldng_iteration_systematics_%dGeVCut_akR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
+  cPP_Its_R4->SaveAs(Form("May22/PP_unfoldng_iterations_%d_systematics_%dGeVCut_akR4%s_%d_%s_pawan_ntuple.pdf",Iterations, unfoldingCut,jet_type,date.GetDate(),etaWidth),"RECREATE");
 
   // plot for the JEC sys
 
-  TCanvas * cRAA_JEC_sys_R4 = new TCanvas("cRAA_JEC_sys_R4","",1000,1000);
+  TCanvas * cRAA_JEC_sys_R4 = new TCanvas("cRAA_JEC_sys_R4","",1200,1000);
   makeMultiPanelCanvas(cRAA_JEC_sys_R4,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
@@ -746,11 +753,11 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.4",algo, jet_type),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cRAA_JEC_sys_R4->SaveAs(Form("May21/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cRAA_JEC_sys_R4->SaveAs(Form("May22/RAA_JEC_systematics_unfoldingCut%dGeV_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
   // plot for the Smear sys
 
-  TCanvas * cRAA_Smear_sys_R4 = new TCanvas("cRAA_Smear_sys_R4","",1000,1000);
+  TCanvas * cRAA_Smear_sys_R4 = new TCanvas("cRAA_Smear_sys_R4","",1200,1000);
   makeMultiPanelCanvas(cRAA_Smear_sys_R4,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
@@ -772,7 +779,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putCMSPrel();
   drawText(Form("Anti-k_{T} %s %s Jets R=0.4",algo, jet_type),0.2,0.23,20);
   drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.6,0.31,20);
-  cRAA_Smear_sys_R4->SaveAs(Form("May21/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
+  cRAA_Smear_sys_R4->SaveAs(Form("May22/RAA_Smear_systematics_unfoldingCut%dGeV_ak%s_R4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth));
 
 
   // draw the total systematics
@@ -797,7 +804,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cSys_R4->cd(1);
   putCMSPrel();
   linePbPb_iter->Draw();
-  cSys_R4->SaveAs(Form("May21/RAA_total_systematics_unfoldingCut%dGeV_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
+  cSys_R4->SaveAs(Form("May22/RAA_total_systematics_unfoldingCut%dGeV_ak%sR4%s_%d_%s_pawan_ntuple.pdf",unfoldingCut, algo, jet_type, date.GetDate(),etaWidth),"RECREATE");
 
 
   
@@ -836,9 +843,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   lineRAA_R2_npart->SetLineStyle(2);
   lineRAA_R2_npart->SetLineWidth(2);
 
-  TCanvas * cRAA_npart = new TCanvas("cRAA_npart","",800,800);
-  cRAA_npart->SetGridy();
-  cRAA_npart->SetGridx();
+  TCanvas * cRAA_npart = new TCanvas("cRAA_npart","",800,600);
+  //cRAA_npart->SetGridy();
+  //cRAA_npart->SetGridx();
 
   hRAA_R2_npart->SetTitle(" ");
   hRAA_R2_npart->SetXTitle(" N_{part} ");
@@ -882,7 +889,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putPbPbLumi(0.2,0.8,0.025);
   putPPLumi(0.2,0.75,0.025);
   
-  cRAA_npart->SaveAs(Form("May21/Final_paper_plots_RAA_npart_97_pT_114_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_npart->SaveAs(Form("May22/Final_paper_plots_RAA_npart_97_pT_114_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
 
   // plot npart raa for dufferent pt range around 130
   
@@ -906,9 +913,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   }
 
 
-  TCanvas * cRAA_npart2 = new TCanvas("cRAA_npart2","",800,800);
-  cRAA_npart2->SetGridy();
-  cRAA_npart2->SetGridx();
+  TCanvas * cRAA_npart2 = new TCanvas("cRAA_npart2","",800,600);
+  //cRAA_npart2->SetGridy();
+  //cRAA_npart2->SetGridx();
 
   hRAA_R2_npart2->SetTitle(" ");
   hRAA_R2_npart2->SetXTitle(" N_{part} ");
@@ -929,8 +936,8 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   lineRAA_R2_npart->Draw();
 
   drawText(Form("Anti-k_{T} %s %s Jets",algo,jet_type),0.6,0.2,16);
-  drawText(Form("|#eta|<%2.0f, |vz|<15, Jet ID Cut",etaBoundary),0.5,0.25,16);
-  drawText("|vz|<15, HBHEfilter, pCES",0.25,0.2,16);
+  drawText(Form("|#eta|<%2.0f",etaBoundary),0.5,0.25,16);
+  //drawText("|vz|<15, HBHEfilter, pCES",0.25,0.2,16);
   drawText("133 < Jet p_{T} < 153", 0.25,0.25,16);
   
   TLegend * npart2 = myLegend(0.6,0.7,0.8,0.9);
@@ -952,7 +959,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putPbPbLumi(0.2,0.8,0.025);
   putPPLumi(0.2,0.75,0.025);
 
-  cRAA_npart2->SaveAs(Form("May21/Final_paper_plots_RAA_npart_133_pT_153_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_npart2->SaveAs(Form("May22/Final_paper_plots_RAA_npart_133_pT_153_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
   
   // plot RAA vs Npart for a smaller pT : 74 - 84
   
@@ -976,9 +983,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   }
 
 
-  TCanvas * cRAA_npart3 = new TCanvas("cRAA_npart3","",800,800);
-  cRAA_npart3->SetGridy();
-  cRAA_npart3->SetGridx();
+  TCanvas * cRAA_npart3 = new TCanvas("cRAA_npart3","",800,600);
+  //cRAA_npart3->SetGridy();
+  //cRAA_npart3->SetGridx();
 
   hRAA_R2_npart3->SetTitle(" ");
   hRAA_R2_npart3->SetXTitle(" N_{part} ");
@@ -1023,12 +1030,12 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   putPbPbLumi(0.2,0.8,0.025);
   putPPLumi(0.2,0.75,0.025);
 
-  cRAA_npart3->SaveAs(Form("May21/Final_paper_plots_RAA_npart_74_pT_84_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_npart3->SaveAs(Form("May22/Final_paper_plots_RAA_npart_74_pT_84_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
   
   
   
   // plot the RAA for each radii here along with the systematics shown in yellow, for measured, bayesian and bin by bin unfoldeding.
-  TCanvas *cRAA_R2 = new TCanvas("cRAA_R2","RAA",1200,1200);
+  TCanvas *cRAA_R2 = new TCanvas("cRAA_R2","RAA",1400,1200);
   makeMultiPanelCanvas(cRAA_R2,3,2,0.0,0.0,0.2,0.15,0.07);
   
   TLegend *tRAA_R2 = myLegend(0.35,0.55,0.65,0.7);
@@ -1121,10 +1128,1019 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   cRAA_R2->cd(3);
   drawText("Jet RAA dataset, trigger combined",0.1,0.2,16);
   drawText("Pile up rejection cut applied",0.1,0.1,16);
-  cRAA_R2->SaveAs(Form("May21/Final_paper_plots_RAA_R2_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_R2->SaveAs(Form("May22/Final_paper_plots_RAA_R2_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+
+
+  // draw it for R=0.3
+  TCanvas *cRAA_onlyB_R3 = new TCanvas("cRAA_onlyB_R3","RAA",1400,1200);
+  makeMultiPanelCanvas(cRAA_onlyB_R3,3,2,0.0,0.0,0.2,0.15,0.07);
+
+  TLegend *tRAA_onlyB_R3 = myLegend(0.35,0.55,0.65,0.7);
+  TLine *lineRAA_onlyB_R3 = new TLine(unfoldingCut+30,1,299,1);
+  lineRAA_onlyB_R3->SetLineStyle(2);
+  lineRAA_onlyB_R3->SetLineWidth(2);
+  
+  for(int i = 0;i<nbins_cent;++i){
+
+    cRAA_onlyB_R3->cd(nbins_cent-i);
+
+    // if(i==0){
+    //   for(int j = RAA_R3_Bayes[i]->FindBin(unfoldingCut); j<RAA_R3_Bayes[i]->FindBin(100); ++j){
+    // 	RAA_R3_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R3_Meas[i]->SetBinError(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
+    // if(i==5 || i==4 || i==3){
+    //   for(int j = RAA_R3_Bayes[i]->FindBin(240); j<RAA_R3_Bayes[i]->FindBin(300); ++j){
+    // 	RAA_R3_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R3_Meas[i]->SetBinError(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
+    // if(i==1 || i==2){
+    //   for(int j = RAA_R3_Bayes[i]->FindBin(unfoldingCut); j<RAA_R3_Bayes[i]->FindBin(unfoldingCut+30); ++j){
+    // 	RAA_R3_Meas[i]->SetBinContent(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinContent(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinContent(j,0);
+    // 	RAA_R3_Meas[i]->SetBinError(j,0);
+    // 	RAA_R3_Bayes[i]->SetBinError(j,0);
+    // 	RAA_R3_BinByBin[i]->SetBinError(j,0);
+    //   }
+    // }
+
+    RAA_R3_Bayes[i]->SetMarkerColor(kBlack);
+    RAA_R3_Bayes[i]->SetMarkerStyle(24);
+    makeHistTitle(RAA_R3_Bayes[i],"","Jet p_{T} (GeV/c)","R_{AA}");
+    RAA_R3_Bayes[i]->SetAxisRange(65,299,"X");
+    RAA_R3_Bayes[i]->SetAxisRange(0,2,"Y");
+    RAA_R3_Bayes[i]->Draw("E1");
+
+    // RAA_R3_Bayes[i]->SetMarkerColor(kBlack);
+    // RAA_R3_Bayes[i]->SetMarkerStyle(20);
+    // RAA_R3_Bayes[i]->Draw("same E1");
+
+    // RAA_R3_BinByBin[i]->SetMarkerStyle(33);
+    // RAA_R3_BinByBin[i]->SetMarkerColor(kRed);
+    // RAA_R3_BinByBin[i]->Draw("same E1");
+
+    lineRAA_onlyB_R3->Draw();
+    //lUnfoldingCut->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.85,20);
+
+    systematics_R3.calcTotalSys(i);
+    systematics_R3.Draw(RAA_R3_Bayes[i],i,2);
+    
+    //RAA_R3_Meas[i]->Draw("same E1");
+    //RAA_R3_BinByBin[i]->Draw("same E1");
+    RAA_R3_Bayes[i]->Draw("same E1");
+
+  }
+    
+  //tRAA_onlyB_R3->AddEntry(RAA_R3_Meas[0],"Measured","pl");
+  tRAA_onlyB_R3->AddEntry(RAA_R3_Bayes[0],"Bayesian","pl");
+  //tRAA_R3->AddEntry(RAA_R3_BinByBin[0],"bin-by-bin","pl");
+  tRAA_onlyB_R3->SetTextSize(0.04);
+
+  cRAA_onlyB_R3->cd(1);
+  tRAA_onlyB_R3->Draw();
+  cRAA_onlyB_R3->cd(1);
+  putCMSPrel();
+  cRAA_onlyB_R3->cd(2);
+  putPbPbLumi();
+  cRAA_onlyB_R3->cd(3);
+  putPPLumi();
+  cRAA_onlyB_R3->cd(1);
+  drawText(Form("Anti-k_{T} %s R=0.3 %s Jets",algo,jet_type),0.25,0.20,16);
+  //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
+  cRAA_onlyB_R3->cd(2);
+  drawText(Form("|#eta|<%2.0f",etaBoundary),0.1,0.2,16);
+  //drawText("|vz|<15, HBHEfilter, pCES",0.1,0.1,16);
+  //cRAA_onlyB_R3->cd(3);
+  //drawText("Jet RAA dataset, trigger combined",0.1,0.2,16);
+  //drawText("Pile up rejection cut applied",0.1,0.1,16);
+
+  cRAA_onlyB_R3->SaveAs(Form("May22/Final_paper_plots_RAA_R3_Bayes_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_onlyB_R3->SaveAs(Form("May22/Final_paper_plots_RAA_R3_Bayes_%d_%s_pawan_ntuple.C",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_onlyB_R3->SaveAs(Form("May22/Final_paper_plots_RAA_R3_Bayes_%d_%s_pawan_ntuple.root",date.GetDate(),etaWidth),"RECREATE");
+
+
+  ///
+  // Plot the comparison with the PAS here with the systematic boxes 
+  
+  TH1F *PASRAA_bayesian[3][nbins_cent];
+
+  Double_t xAxis2[12] = {100, 110, 120, 130, 140, 150, 160, 170, 180, 200, 240, 300}; 
+
+  PASRAA_bayesian[1][5] = new TH1F("PASRAA_bayesian_R3_cent5","",11,xAxis2);
+  PASRAA_bayesian[1][5]->SetBinContent(0,0.7225377);
+  PASRAA_bayesian[1][5]->SetBinContent(1,0.8600517);
+  PASRAA_bayesian[1][5]->SetBinContent(2,0.8100158);
+  PASRAA_bayesian[1][5]->SetBinContent(3,0.749716);
+  PASRAA_bayesian[1][5]->SetBinContent(4,0.728152);
+  PASRAA_bayesian[1][5]->SetBinContent(5,0.8079244);
+  PASRAA_bayesian[1][5]->SetBinContent(6,1.045846);
+  PASRAA_bayesian[1][5]->SetBinContent(7,0.99492);
+  PASRAA_bayesian[1][5]->SetBinContent(8,0.8501027);
+  PASRAA_bayesian[1][5]->SetBinContent(9,0.7283186);
+  PASRAA_bayesian[1][5]->SetBinContent(10,0.8501291);
+  PASRAA_bayesian[1][5]->SetBinContent(11,0.8562201);
+  PASRAA_bayesian[1][5]->SetBinContent(12,2.485746);
+
+  PASRAA_bayesian[1][5]->SetBinError(0,0.006807087);
+  PASRAA_bayesian[1][5]->SetBinError(1,0.03660645);
+  PASRAA_bayesian[1][5]->SetBinError(2,0.04424438);
+  PASRAA_bayesian[1][5]->SetBinError(3,0.05483107);
+  PASRAA_bayesian[1][5]->SetBinError(4,0.06882145);
+  PASRAA_bayesian[1][5]->SetBinError(5,0.100899);
+  PASRAA_bayesian[1][5]->SetBinError(6,0.1601293);
+  PASRAA_bayesian[1][5]->SetBinError(7,0.181309);
+  PASRAA_bayesian[1][5]->SetBinError(8,0.1830885);
+  PASRAA_bayesian[1][5]->SetBinError(9,0.1512963);
+  PASRAA_bayesian[1][5]->SetBinError(10,0.1969083);
+  PASRAA_bayesian[1][5]->SetBinError(11,0.3481827);
+  PASRAA_bayesian[1][5]->SetBinError(12,0.7989296);
+   
+  // PASRAA_bayesian[1][5]->SetBinError(0,0.006807087);
+  // PASRAA_bayesian[1][5]->SetBinError(1,0.01931266);
+  // PASRAA_bayesian[1][5]->SetBinError(2,0.02226945);
+  // PASRAA_bayesian[1][5]->SetBinError(3,0.02646403);
+  // PASRAA_bayesian[1][5]->SetBinError(4,0.03199702);
+  // PASRAA_bayesian[1][5]->SetBinError(5,0.04537526);
+  // PASRAA_bayesian[1][5]->SetBinError(6,0.06991723);
+  // PASRAA_bayesian[1][5]->SetBinError(7,0.07712956);
+  // PASRAA_bayesian[1][5]->SetBinError(8,0.07612922);
+  // PASRAA_bayesian[1][5]->SetBinError(9,0.06113506);
+  // PASRAA_bayesian[1][5]->SetBinError(10,0.07653623);
+  // PASRAA_bayesian[1][5]->SetBinError(11,0.1332746);
+  // PASRAA_bayesian[1][5]->SetBinError(12,0.7989296);
+  PASRAA_bayesian[1][5]->SetMinimum(0);
+  PASRAA_bayesian[1][5]->SetMaximum(2);
+  PASRAA_bayesian[1][5]->SetEntries(1770.971);
+  
+  PASRAA_bayesian[1][4] = new TH1F("PASRAA_bayesian_R3_cent4","",11,xAxis2);
+  PASRAA_bayesian[1][4]->SetBinContent(0,0.7299647);
+  PASRAA_bayesian[1][4]->SetBinContent(1,0.7481229);
+  PASRAA_bayesian[1][4]->SetBinContent(2,0.7609972);
+  PASRAA_bayesian[1][4]->SetBinContent(3,0.7759888);
+  PASRAA_bayesian[1][4]->SetBinContent(4,0.7765765);
+  PASRAA_bayesian[1][4]->SetBinContent(5,0.7793122);
+  PASRAA_bayesian[1][4]->SetBinContent(6,0.7750514);
+  PASRAA_bayesian[1][4]->SetBinContent(7,0.8105651);
+  PASRAA_bayesian[1][4]->SetBinContent(8,0.778167);
+  PASRAA_bayesian[1][4]->SetBinContent(9,0.6663016);
+  PASRAA_bayesian[1][4]->SetBinContent(10,0.736169);
+  PASRAA_bayesian[1][4]->SetBinContent(11,0.8040183);
+  PASRAA_bayesian[1][4]->SetBinContent(12,0.9631981);
+
+  PASRAA_bayesian[1][4]->SetBinError(0,0.003463908);
+  PASRAA_bayesian[1][4]->SetBinError(1,0.01638808);
+  PASRAA_bayesian[1][4]->SetBinError(2,0.02150757);
+  PASRAA_bayesian[1][4]->SetBinError(3,0.02926648);
+  PASRAA_bayesian[1][4]->SetBinError(4,0.0388617);
+  PASRAA_bayesian[1][4]->SetBinError(5,0.05095474);
+  PASRAA_bayesian[1][4]->SetBinError(6,0.0616764);
+  PASRAA_bayesian[1][4]->SetBinError(7,0.07817987);
+  PASRAA_bayesian[1][4]->SetBinError(8,0.09560783);
+  PASRAA_bayesian[1][4]->SetBinError(9,0.07394511);
+  PASRAA_bayesian[1][4]->SetBinError(10,0.09310688);
+  PASRAA_bayesian[1][4]->SetBinError(11,0.1812772);
+  PASRAA_bayesian[1][4]->SetBinError(12,0.2031483);
+   
+  // PASRAA_bayesian[1][4]->SetBinError(0,0.003463908);
+  // PASRAA_bayesian[1][4]->SetBinError(1,0.008645942);
+  // PASRAA_bayesian[1][4]->SetBinError(2,0.01082537);
+  // PASRAA_bayesian[1][4]->SetBinError(3,0.01412537);
+  // PASRAA_bayesian[1][4]->SetBinError(4,0.01806789);
+  // PASRAA_bayesian[1][4]->SetBinError(5,0.02291484);
+  // PASRAA_bayesian[1][4]->SetBinError(6,0.02692976);
+  // PASRAA_bayesian[1][4]->SetBinError(7,0.03325802);
+  // PASRAA_bayesian[1][4]->SetBinError(8,0.03975427);
+  // PASRAA_bayesian[1][4]->SetBinError(9,0.02987937);
+  // PASRAA_bayesian[1][4]->SetBinError(10,0.03618969);
+  // PASRAA_bayesian[1][4]->SetBinError(11,0.06938782);
+  // PASRAA_bayesian[1][4]->SetBinError(12,0.2031483);
+  PASRAA_bayesian[1][4]->SetMinimum(0);
+  PASRAA_bayesian[1][4]->SetMaximum(2);
+  PASRAA_bayesian[1][4]->SetEntries(6061.544);
+
+  PASRAA_bayesian[1][3] = new TH1F("PASRAA_bayesian_R3_cent3","",11,xAxis2);
+  PASRAA_bayesian[1][3]->SetBinContent(0,0.7279794);
+  PASRAA_bayesian[1][3]->SetBinContent(1,0.6681795);
+  PASRAA_bayesian[1][3]->SetBinContent(2,0.6799733);
+  PASRAA_bayesian[1][3]->SetBinContent(3,0.6649472);
+  PASRAA_bayesian[1][3]->SetBinContent(4,0.6252716);
+  PASRAA_bayesian[1][3]->SetBinContent(5,0.6117619);
+  PASRAA_bayesian[1][3]->SetBinContent(6,0.6540294);
+  PASRAA_bayesian[1][3]->SetBinContent(7,0.7157548);
+  PASRAA_bayesian[1][3]->SetBinContent(8,0.6989863);
+  PASRAA_bayesian[1][3]->SetBinContent(9,0.5692854);
+  PASRAA_bayesian[1][3]->SetBinContent(10,0.6007913);
+  PASRAA_bayesian[1][3]->SetBinContent(11,0.8094043);
+  PASRAA_bayesian[1][3]->SetBinContent(12,2.021915);
+
+  PASRAA_bayesian[1][3]->SetBinError(0,0.002593759);
+  PASRAA_bayesian[1][3]->SetBinError(1,0.01113931);
+  PASRAA_bayesian[1][3]->SetBinError(2,0.01478439);
+  PASRAA_bayesian[1][3]->SetBinError(3,0.0194451);
+  PASRAA_bayesian[1][3]->SetBinError(4,0.02369379);
+  PASRAA_bayesian[1][3]->SetBinError(5,0.03078356);
+  PASRAA_bayesian[1][3]->SetBinError(6,0.03982553);
+  PASRAA_bayesian[1][3]->SetBinError(7,0.05365841);
+  PASRAA_bayesian[1][3]->SetBinError(8,0.0640314);
+  PASRAA_bayesian[1][3]->SetBinError(9,0.04796186);
+  PASRAA_bayesian[1][3]->SetBinError(10,0.05829843);
+  PASRAA_bayesian[1][3]->SetBinError(11,0.1392753);
+  PASRAA_bayesian[1][3]->SetBinError(12,0.2970788);
+
+  // PASRAA_bayesian[1][3]->SetBinError(0,0.002593759);
+  // PASRAA_bayesian[1][3]->SetBinError(1,0.005876821);
+  // PASRAA_bayesian[1][3]->SetBinError(2,0.007441405);
+  // PASRAA_bayesian[1][3]->SetBinError(3,0.009385111);
+  // PASRAA_bayesian[1][3]->SetBinError(4,0.01101591);
+  // PASRAA_bayesian[1][3]->SetBinError(5,0.01384366);
+  // PASRAA_bayesian[1][3]->SetBinError(6,0.01738902);
+  // PASRAA_bayesian[1][3]->SetBinError(7,0.0228265);
+  // PASRAA_bayesian[1][3]->SetBinError(8,0.02662461);
+  // PASRAA_bayesian[1][3]->SetBinError(9,0.01938019);
+  // PASRAA_bayesian[1][3]->SetBinError(10,0.02266);
+  // PASRAA_bayesian[1][3]->SetBinError(11,0.05331068);
+  // PASRAA_bayesian[1][3]->SetBinError(12,0.2970788);
+  PASRAA_bayesian[1][3]->SetMinimum(0);
+  PASRAA_bayesian[1][3]->SetMaximum(2);
+  PASRAA_bayesian[1][3]->SetEntries(9256.671);
+
+  PASRAA_bayesian[1][2] = new TH1F("PASRAA_bayesian_R3_cent2","",11,xAxis2);
+  PASRAA_bayesian[1][2]->SetBinContent(0,0.8238835);
+  PASRAA_bayesian[1][2]->SetBinContent(1,0.5604139);
+  PASRAA_bayesian[1][2]->SetBinContent(2,0.5365105);
+  PASRAA_bayesian[1][2]->SetBinContent(3,0.5556849);
+  PASRAA_bayesian[1][2]->SetBinContent(4,0.5274078);
+  PASRAA_bayesian[1][2]->SetBinContent(5,0.5573406);
+  PASRAA_bayesian[1][2]->SetBinContent(6,0.6040812);
+  PASRAA_bayesian[1][2]->SetBinContent(7,0.6451674);
+  PASRAA_bayesian[1][2]->SetBinContent(8,0.5992499);
+  PASRAA_bayesian[1][2]->SetBinContent(9,0.4717564);
+  PASRAA_bayesian[1][2]->SetBinContent(10,0.4812902);
+  PASRAA_bayesian[1][2]->SetBinContent(11,0.6858578);
+  PASRAA_bayesian[1][2]->SetBinContent(12,1.051401);
+
+  PASRAA_bayesian[1][2]->SetBinError(0,0.002676996);
+  PASRAA_bayesian[1][2]->SetBinError(1,0.008546944);
+  PASRAA_bayesian[1][2]->SetBinError(2,0.01060751);
+  PASRAA_bayesian[1][2]->SetBinError(3,0.01473257);
+  PASRAA_bayesian[1][2]->SetBinError(4,0.01825233);
+  PASRAA_bayesian[1][2]->SetBinError(5,0.02542376);
+  PASRAA_bayesian[1][2]->SetBinError(6,0.03367376);
+  PASRAA_bayesian[1][2]->SetBinError(7,0.04421273);
+  PASRAA_bayesian[1][2]->SetBinError(8,0.04964768);
+  PASRAA_bayesian[1][2]->SetBinError(9,0.03594492);
+  PASRAA_bayesian[1][2]->SetBinError(10,0.04249006);
+  PASRAA_bayesian[1][2]->SetBinError(11,0.1093235);
+  PASRAA_bayesian[1][2]->SetBinError(12,0.1496494);
+  
+  // PASRAA_bayesian[1][2]->SetBinError(0,0.002676996);
+  // PASRAA_bayesian[1][2]->SetBinError(1,0.004509155);
+  // PASRAA_bayesian[1][2]->SetBinError(2,0.005339063);
+  // PASRAA_bayesian[1][2]->SetBinError(3,0.007110624);
+  // PASRAA_bayesian[1][2]->SetBinError(4,0.008486022);
+  // PASRAA_bayesian[1][2]->SetBinError(5,0.01143331);
+  // PASRAA_bayesian[1][2]->SetBinError(6,0.01470297);
+  // PASRAA_bayesian[1][2]->SetBinError(7,0.01880827);
+  // PASRAA_bayesian[1][2]->SetBinError(8,0.02064378);
+  // PASRAA_bayesian[1][2]->SetBinError(9,0.01452445);
+  // PASRAA_bayesian[1][2]->SetBinError(10,0.01651545);
+  // PASRAA_bayesian[1][2]->SetBinError(11,0.04184596);
+  // PASRAA_bayesian[1][2]->SetBinError(12,0.1496494);
+  PASRAA_bayesian[1][2]->SetMinimum(0);
+  PASRAA_bayesian[1][2]->SetMaximum(2);
+  PASRAA_bayesian[1][2]->SetEntries(10967.25);
+
+  PASRAA_bayesian[1][1] = new TH1F("PASRAA_bayesian_R3_cent1","",11,xAxis2);
+  PASRAA_bayesian[1][1]->SetBinContent(0,1.031868);
+  PASRAA_bayesian[1][1]->SetBinContent(1,0.4557194);
+  PASRAA_bayesian[1][1]->SetBinContent(2,0.480005);
+  PASRAA_bayesian[1][1]->SetBinContent(3,0.4997296);
+  PASRAA_bayesian[1][1]->SetBinContent(4,0.444041);
+  PASRAA_bayesian[1][1]->SetBinContent(5,0.4247413);
+  PASRAA_bayesian[1][1]->SetBinContent(6,0.4454679);
+  PASRAA_bayesian[1][1]->SetBinContent(7,0.4785669);
+  PASRAA_bayesian[1][1]->SetBinContent(8,0.4834603);
+  PASRAA_bayesian[1][1]->SetBinContent(9,0.4274004);
+  PASRAA_bayesian[1][1]->SetBinContent(10,0.4192492);
+  PASRAA_bayesian[1][1]->SetBinContent(11,0.5767608);
+  PASRAA_bayesian[1][1]->SetBinContent(12,1.223037);
+
+  PASRAA_bayesian[1][1]->SetBinError(0,0.003550127);
+  PASRAA_bayesian[1][1]->SetBinError(1,0.007539356);
+  PASRAA_bayesian[1][1]->SetBinError(2,0.01035939);
+  PASRAA_bayesian[1][1]->SetBinError(3,0.01458809);
+  PASRAA_bayesian[1][1]->SetBinError(4,0.01679069);
+  PASRAA_bayesian[1][1]->SetBinError(5,0.02080943);
+  PASRAA_bayesian[1][1]->SetBinError(6,0.02718877);
+  PASRAA_bayesian[1][1]->SetBinError(7,0.03569299);
+  PASRAA_bayesian[1][1]->SetBinError(8,0.04427906);
+  PASRAA_bayesian[1][1]->SetBinError(9,0.03604142);
+  PASRAA_bayesian[1][1]->SetBinError(10,0.0406791);
+  PASRAA_bayesian[1][1]->SetBinError(11,0.09958546);
+  PASRAA_bayesian[1][1]->SetBinError(12,0.1827313);
+  
+  // PASRAA_bayesian[1][1]->SetBinError(0,0.003550127);
+  // PASRAA_bayesian[1][1]->SetBinError(1,0.003977577);
+  // PASRAA_bayesian[1][1]->SetBinError(2,0.005214178);
+  // PASRAA_bayesian[1][1]->SetBinError(3,0.00704089);
+  // PASRAA_bayesian[1][1]->SetBinError(4,0.007806462);
+  // PASRAA_bayesian[1][1]->SetBinError(5,0.0093582);
+  // PASRAA_bayesian[1][1]->SetBinError(6,0.01187143);
+  // PASRAA_bayesian[1][1]->SetBinError(7,0.01518394);
+  // PASRAA_bayesian[1][1]->SetBinError(8,0.01841148);
+  // PASRAA_bayesian[1][1]->SetBinError(9,0.01456344);
+  // PASRAA_bayesian[1][1]->SetBinError(10,0.01581155);
+  // PASRAA_bayesian[1][1]->SetBinError(11,0.03811852);
+  // PASRAA_bayesian[1][1]->SetBinError(12,0.1827313);
+  PASRAA_bayesian[1][1]->SetMinimum(0);
+  PASRAA_bayesian[1][1]->SetMaximum(2);
+  PASRAA_bayesian[1][1]->SetEntries(9198.666);
+
+  PASRAA_bayesian[1][0] = new TH1F("PASRAA_bayesian_R3_cent0","",11,xAxis2);
+  PASRAA_bayesian[1][0]->SetBinContent(0,1.418427);
+  PASRAA_bayesian[1][0]->SetBinContent(1,0.4702078);
+  PASRAA_bayesian[1][0]->SetBinContent(2,0.4736779);
+  PASRAA_bayesian[1][0]->SetBinContent(3,0.4640111);
+  PASRAA_bayesian[1][0]->SetBinContent(4,0.4361698);
+  PASRAA_bayesian[1][0]->SetBinContent(5,0.4342382);
+  PASRAA_bayesian[1][0]->SetBinContent(6,0.4725478);
+  PASRAA_bayesian[1][0]->SetBinContent(7,0.5191602);
+  PASRAA_bayesian[1][0]->SetBinContent(8,0.5139099);
+  PASRAA_bayesian[1][0]->SetBinContent(9,0.4391448);
+  PASRAA_bayesian[1][0]->SetBinContent(10,0.4229113);
+  PASRAA_bayesian[1][0]->SetBinContent(11,0.5843745);
+  PASRAA_bayesian[1][0]->SetBinContent(12,0.7831888);
+
+  PASRAA_bayesian[1][0]->SetBinError(0,0.004730243);
+  PASRAA_bayesian[1][0]->SetBinError(1,0.007550343);
+  PASRAA_bayesian[1][0]->SetBinError(2,0.009840934);
+  PASRAA_bayesian[1][0]->SetBinError(3,0.01303877);
+  PASRAA_bayesian[1][0]->SetBinError(4,0.01589791);
+  PASRAA_bayesian[1][0]->SetBinError(5,0.02094939);
+  PASRAA_bayesian[1][0]->SetBinError(6,0.02765753);
+  PASRAA_bayesian[1][0]->SetBinError(7,0.03752524);
+  PASRAA_bayesian[1][0]->SetBinError(8,0.04478431);
+  PASRAA_bayesian[1][0]->SetBinError(9,0.03525832);
+  PASRAA_bayesian[1][0]->SetBinError(10,0.03945337);
+  PASRAA_bayesian[1][0]->SetBinError(11,0.09843785);
+  PASRAA_bayesian[1][0]->SetBinError(12,0.1174314);
+  
+  // PASRAA_bayesian[1][0]->SetBinError(0,0.004730243);
+  // PASRAA_bayesian[1][0]->SetBinError(1,0.003983373);
+  // PASRAA_bayesian[1][0]->SetBinError(2,0.004953222);
+  // PASRAA_bayesian[1][0]->SetBinError(3,0.006293119);
+  // PASRAA_bayesian[1][0]->SetBinError(4,0.007391385);
+  // PASRAA_bayesian[1][0]->SetBinError(5,0.009421142);
+  // PASRAA_bayesian[1][0]->SetBinError(6,0.0120761);
+  // PASRAA_bayesian[1][0]->SetBinError(7,0.01596338);
+  // PASRAA_bayesian[1][0]->SetBinError(8,0.01862156);
+  // PASRAA_bayesian[1][0]->SetBinError(9,0.01424701);
+  // PASRAA_bayesian[1][0]->SetBinError(10,0.01533512);
+  // PASRAA_bayesian[1][0]->SetBinError(11,0.03767925);
+  // PASRAA_bayesian[1][0]->SetBinError(12,0.1174314);
+  PASRAA_bayesian[1][0]->SetMinimum(0);
+  PASRAA_bayesian[1][0]->SetMaximum(2);
+  PASRAA_bayesian[1][0]->SetEntries(9671.122);
+
+  //now that we have taken the necessary histogram, lets start to make plots:
+
+  //plot1 - 6 panel plot of RAA, at R=0.3, in the old PAS and now.
+  TCanvas *cRAA_PASComp = new TCanvas("cRAA_PASComp","RAA",1200,800);
+  makeMultiPanelCanvasWithGap(cRAA_PASComp,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
+
+  TLegend *tRAA_PASComp = myLegend(0.15,0.75,0.85,0.9);
+  TLine *lineRAA = new TLine(65,1,299,1);
+  lineRAA->SetLineStyle(2);
+  lineRAA->SetLineWidth(2);
+
+  int ci;
+  TBox *box;
+  for(int i = 0;i<nbins_cent;i++){
+
+    cRAA_PASComp->cd(nbins_cent-i);
+
+    RAA_R3_Bayes[i]->SetMarkerColor(kBlack);
+    RAA_R3_Bayes[i]->SetMarkerStyle(20);
+    makeHistTitle( RAA_R3_Bayes[i],"","Jet p_{T} (GeV/c)","R_{AA}");
+    RAA_R3_Bayes[i]->SetAxisRange(60,299,"X");
+    RAA_R3_Bayes[i]->SetAxisRange(0,2,"Y");
+    RAA_R3_Bayes[i]->Draw("E0");
+
+    PASRAA_bayesian[1][i]->SetMarkerColor(kRed);
+    PASRAA_bayesian[1][i]->SetMarkerStyle(33);
+    PASRAA_bayesian[1][i]->Draw("same E0");
+
+    //RAA_binbybin[1][i]->SetMarkerStyle(29);
+    //RAA_binbybin[1][i]->SetMarkerColor(kBlue);
+    //RAA_binbybin[1][i]->Draw("same");
+
+    lineRAA->Draw();
+    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
+
+    switch ( i ) {
+	
+    case 0:
+      box = new TBox(100,0.3992887,110,0.5411268);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(110,0.4004558,120,0.5469);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(120,0.3797207,130,0.5483015);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(130,0.3460133,140,0.5263263);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(140,0.3479742,150,0.5205022);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(150,0.3878594,160,0.5572361);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(160,0.4375477,170,0.6007726);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(170,0.432544,180,0.5952758);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(180,0.3688692,200,0.5094203);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(200,0.3537775,240,0.492045);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(240,0.485418,300,0.6833309);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+	
+      break;
+
+    case 1:
+      box = new TBox(100,0.3922236,110,0.5192152);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(110,0.4114913,120,0.5485187);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(120,0.4142097,130,0.5852495);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(130,0.3565539,140,0.5315281);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(140,0.3448709,150,0.5046117);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(150,0.3711734,160,0.5197624);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(160,0.4105411,170,0.5465928);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(170,0.4144865,180,0.5524341);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(180,0.3660878,200,0.4887129);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(200,0.3584384,240,0.4800599);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(240,0.4915343,300,0.6619874);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      break;
+
+    case 2:
+      box = new TBox(100,0.4885437,110,0.6322841);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(110,0.4659843,120,0.6070368);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(120,0.4659718,130,0.6453979);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(130,0.4280813,140,0.6267344);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(140,0.4578278,150,0.6568533);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(150,0.5101032,160,0.6980592);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(160,0.5623943,170,0.7279404);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(170,0.5223327,180,0.6761671);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(180,0.4111619,200,0.5323508);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(200,0.4193837,240,0.5431968);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(240,0.5974073,300,0.7743082);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+
+      break;
+
+    case 3:
+
+      box = new TBox(100,0.5888569,110,0.7475021);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(110,0.5972088,120,0.7627378);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(120,0.5630347,130,0.7668597);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(130,0.5120569,140,0.7384863);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(140,0.507423,150,0.7161008);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(150,0.5585642,160,0.7494945);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(160,0.6327194,170,0.7987902);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(170,0.6181627,180,0.7798098);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(180,0.5037794,200,0.6347914);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(200,0.532314,240,0.6692686);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(240,0.7185097,300,0.9002989);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+	
+      break;
+
+    case 4:
+      box = new TBox(100,0.6653466,110,0.8308992);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(110,0.6746653,120,0.8473291);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(120,0.662311,130,0.8896665);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(130,0.6405509,140,0.9126022);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(140,0.651443,150,0.9071814);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(150,0.6679778,160,0.882125);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(160,0.7248008,170,0.8963293);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(170,0.6962772,180,0.8600568);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(180,0.596691,200,0.7359122);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(200,0.6601083,240,0.8122298);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(240,0.7215662,300,0.8864704);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+
+      break;
+
+    case 5:
+      box = new TBox(100,0.7705583,110,0.9495451);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(110,0.7227901,120,0.8972415);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(120,0.6428426,130,0.8565895);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(130,0.602727,140,0.853577);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(140,0.6775657,150,0.9382831);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(150,0.9043127,160,1.187379);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(160,0.8928045,170,1.097036);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(170,0.762919,180,0.9372863);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(180,0.6536744,200,0.8029628);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(200,0.762955,240,0.9373031);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+      box = new TBox(240,0.7678421,300,0.9445981);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetFillColor(ci);
+
+      ci = TColor::GetColor("#cccccc");
+      box->SetLineColor(ci);
+      box->Draw();
+		
+      break;
+	
+    }// switch
+
+
+    RAA_R3_Bayes[i]->Draw("same E1");
+    systematics_R3.Draw(RAA_R3_Bayes[i],i,1);
+
+    PASRAA_bayesian[1][i]->Draw("same E1");
+
+  }// centrality loop
+
+  tRAA_PASComp->AddEntry( RAA_R3_Bayes[0],"13-005, New JetID Cut,","pl");
+  tRAA_PASComp->AddEntry(PASRAA_bayesian[1][0],"12-004, trkMax/jtpt > 0.01","pl");
+  tRAA_PASComp->SetTextSize(0.04);
+
+  cRAA_PASComp->cd(1);
+  tRAA_PASComp->Draw();
+  drawText("Bayesian Unfolding, 4 iterations",0.2,0.7,16);
+  cRAA_PASComp->cd(1);
+  putCMSPrel();
+  drawText(Form("Anti-k_{T} %s %s Jets R=0.3",algo,jet_type),0.2,0.23,16);
+  //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
+  cRAA_PASComp->cd(2);
+  drawText("|#eta|<2",0.1,0.3,16);
+  //drawText("|vz|<15, HBHEfilter, pCES",0.1,0.2,16);
+  //cRAA_PASComp->cd(3);
+  //drawText("Trig Combined with MinBias&&!Jet80 subtracted",0.06,0.2,16);
+
+  cRAA_PASComp->SaveAs(Form("May22/RAA_newComparingwithPAS_ak%s3%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
+  
+  
+
+
+  ///
+
+
     
   // draw it for R=0.3
-  TCanvas *cRAA_R3 = new TCanvas("cRAA_R3","RAA",1200,1200);
+  TCanvas *cRAA_R3 = new TCanvas("cRAA_R3","RAA",1400,1200);
   makeMultiPanelCanvas(cRAA_R3,3,2,0.0,0.0,0.2,0.15,0.07);
 
   TLegend *tRAA_R3 = myLegend(0.35,0.55,0.65,0.7);
@@ -1218,10 +2234,10 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText("Jet RAA dataset, trigger combined",0.1,0.2,16);
   drawText("Pile up rejection cut applied",0.1,0.1,16);
 
-  cRAA_R3->SaveAs(Form("May21/Final_paper_plots_RAA_R3_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_R3->SaveAs(Form("May22/Final_paper_plots_RAA_R3_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
 
   // plot it for R=0.4
-  TCanvas *cRAA_R4 = new TCanvas("cRAA_R4","RAA",1200,1200);
+  TCanvas *cRAA_R4 = new TCanvas("cRAA_R4","RAA",1400,1200);
   makeMultiPanelCanvas(cRAA_R4,3,2,0.0,0.0,0.2,0.15,0.07);
 
   TLegend *tRAA_R4 = myLegend(0.35,0.55,0.65,0.7);
@@ -1315,7 +2331,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText("Jet RAA dataset, trigger combined",0.1,0.2,16);
   drawText("Pile up rejection cut applied",0.1,0.1,16);
 
-  cRAA_R4->SaveAs(Form("May21/Final_paper_plots_RAA_R4_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA_R4->SaveAs(Form("May22/Final_paper_plots_RAA_R4_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
   
   // plot 2 - Bayesian unfolded RAA as a function of pT for the different radii
   //        - regular 6 panel plot 
@@ -1325,7 +2341,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   makeMultiPanelCanvas(cRAA,3,2,0.0,0.0,0.2,0.15,0.07);
 
   TLegend *tRAA = myLegend(0.35,0.55,0.65,0.7);
-  TLine *lineRAA = new TLine(65,1,299,1);
+  //TLine *lineRAA = new TLine(65,1,299,1);
   lineRAA->SetLineStyle(2);
   lineRAA->SetLineWidth(2);
 
@@ -1423,7 +2439,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   drawText("Jet RAA dataset, trigger combined",0.1,0.2,16);
   drawText("Pile up rejection cut applied",0.1,0.1,16);
 
-  cRAA->SaveAs(Form("May21/Final_paper_plots_RAA_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cRAA->SaveAs(Form("May22/Final_paper_plots_RAA_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
     
 
   
@@ -1560,7 +2576,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d34x1y1->GetYaxis()->SetTitle("R_{AA}");
   p8719_d34x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
 
-  TCanvas * cATLAS = new TCanvas("cATLAS","",1000,1000);
+  TCanvas * cATLAS = new TCanvas("cATLAS","",1200,1000);
   makeMultiPanelCanvas(cATLAS,3,2,0.0,0.0,0.2,0.15,0.07);
   cATLAS->cd(6);
 
@@ -1688,7 +2704,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   leg5->Draw();
  
   
-  cATLAS->SaveAs(Form("May21/comparison_with_ATLAS_RAA_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cATLAS->SaveAs(Form("May22/comparison_with_ATLAS_RAA_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
 
 
 
@@ -1716,7 +2732,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   p8719_d2x1y1->SetName("/HepData/8719/d2x1y1");
   p8719_d2x1y1->SetTitle(" ");
 
-  TCanvas * cATLAS_pp = new TCanvas("cATLAS_pp","",1000,1000);
+  TCanvas * cATLAS_pp = new TCanvas("cATLAS_pp","",1200,1000);
   cATLAS_pp->SetLogy();
   p8719_d2x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
   p8719_d2x1y1->GetYaxis()->SetTitle("#frac{d^{2}#sigma}{dp_{T} d#eta} nb");  
@@ -1734,7 +2750,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   legpp_1->SetTextSize(0.04);
   legpp_1->Draw();
   
-  cATLAS_pp->SaveAs(Form("May21/comparison_with_ATLAS_pp_spectra_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cATLAS_pp->SaveAs(Form("May22/comparison_with_ATLAS_pp_spectra_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
   
   
   // TAA for atlas plots:// which is in inverse milli barns 
@@ -1907,7 +2923,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   // uPbPb_R4_Bayes[i]->Scale(1./1e5);
   //}
 
-  TCanvas * cATLAS_pbpb = new TCanvas("cATLAS_pbpb","",1000,1000);
+  TCanvas * cATLAS_pbpb = new TCanvas("cATLAS_pbpb","",1200,1000);
   makeMultiPanelCanvas(cATLAS_pbpb,3,2,0.0,0.0,0.2,0.15,0.07);
 
   // centrality bin 0-10% 
@@ -2021,7 +3037,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   legpbpb_5->SetTextSize(0.04);
   legpbpb_5->Draw();
 
-  cATLAS_pbpb->SaveAs(Form("May21/comparison_with_ATLAS_pbpb_spectra_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
+  cATLAS_pbpb->SaveAs(Form("May22/comparison_with_ATLAS_pbpb_spectra_%d_%s_pawan_ntuple.pdf",date.GetDate(),etaWidth),"RECREATE");
 
 
   // do the statistical error check
@@ -2076,7 +3092,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     
   }
  
-  TCanvas * cErrorFix_R2 = new TCanvas("cErrorFix_R2","",1000,1000);
+  TCanvas * cErrorFix_R2 = new TCanvas("cErrorFix_R2","",1200,1000);
   makeMultiPanelCanvas(cErrorFix_R2,3,2,0.0,0.0,0.2,0.15,0.07);  
   for(int i = 0; i<nbins_cent; ++i){
     
@@ -2106,9 +3122,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   err_R2->SetTextSize(0.04);
   err_R2->Draw();
   
-  cErrorFix_R2->SaveAs(Form("May21/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,2,date.GetDate()),"RECREATE");
+  cErrorFix_R2->SaveAs(Form("May22/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,2,date.GetDate()),"RECREATE");
 
-  TCanvas * cErrorFix_R3 = new TCanvas("cErrorFix_R3","",1000,1000);
+  TCanvas * cErrorFix_R3 = new TCanvas("cErrorFix_R3","",1200,1000);
   makeMultiPanelCanvas(cErrorFix_R3,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
@@ -2129,7 +3145,6 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
     hError_R3_Fixed[i]->Draw("psame");
     drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
 
-    
   }
   TLegend * err_R3 = myLegend(0.55,0.55,0.75,0.75);
   cErrorFix_R3->cd(1);
@@ -2140,9 +3155,9 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   err_R3->SetTextSize(0.04);
   err_R3->Draw();
   
-  cErrorFix_R3->SaveAs(Form("May21/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,3,date.GetDate()),"RECREATE");
+  cErrorFix_R3->SaveAs(Form("May22/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,3,date.GetDate()),"RECREATE");
 
-  TCanvas * cErrorFix_R4 = new TCanvas("cErrorFix_R4","",1000,1000);
+  TCanvas * cErrorFix_R4 = new TCanvas("cErrorFix_R4","",1200,1000);
   makeMultiPanelCanvas(cErrorFix_R4,3,2,0.0,0.0,0.2,0.15,0.07);
   
   for(int i = 0; i<nbins_cent; ++i){
@@ -2174,7 +3189,7 @@ void RAA_plot_Systematics(int radius = 2, char *algo = "Pu", char *jet_type = "P
   err_R4->SetTextSize(0.04);
   err_R4->Draw();
   
-  cErrorFix_R4->SaveAs(Form("May21/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,4,date.GetDate()),"RECREATE");
+  cErrorFix_R4->SaveAs(Form("May22/UnfoldingErrorFix_PbPb_%s_R%d_%d_pawan_ntuple.pdf",etaWidth,4,date.GetDate()),"RECREATE");
   // make plot to compare the bayesian unfolded spectra with 4 iterations and with the data driven error corrections. 
 
   

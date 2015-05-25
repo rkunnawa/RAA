@@ -60,6 +60,7 @@
 ./RAA_plot_Systematics_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/include/TClass.h
 ./RAA_plot_Systematics_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/include/TObjString.h
 ./RAA_plot_Systematics_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/include/TVirtualTreePlayer.h
+./RAA_plot_Systematics_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/include/TColor.h
 ./RAA_plot_Systematics_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/include/TF1.h
 ./RAA_plot_Systematics_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/include/TFormula.h
 ./RAA_plot_Systematics_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/include/TBits.h

@@ -678,7 +678,7 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, int param1 = 1, int param
   // Now that we have all the response matrix for the 6 centralities in PbPb and one pp spectra lets start doing the steps:
   // we have 39 pt bins, so we need 1000 gaussian functions for each pt bin.
   
-  Int_t unfoldingTrials = 100;
+  Int_t unfoldingTrials = 1000;
   Double_t meanMeasPbPb[nbins_pt][nbins_cent], sigmaMeasPbPb[nbins_pt][nbins_cent];
   Double_t meanMeasPP[nbins_pt], sigmaMeasPP[nbins_pt];
   Double_t meanUnfoldPbPb[nbins_pt][nbins_cent][unfoldingTrials], sigmaUnfoldPbPb[nbins_pt][nbins_cent][unfoldingTrials];

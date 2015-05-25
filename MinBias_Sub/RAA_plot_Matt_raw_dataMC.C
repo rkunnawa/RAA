@@ -94,7 +94,9 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
     etaLow = 0.0;
     etaHigh = 1.0;
   }
-
+  
+  double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
+  
   int unfoldingCut = 40; 
 
   if(radius == 2) unfoldingCut = 30;
@@ -104,7 +106,7 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
   // Make Matt's requested plots about the unfolding prior distributions.
   // need to make ratio histograms for RAA, and PbPb spectra
 
-  TFile * fNoSmear = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_akPF_20150519.root",radius,etaWidth,unfoldingCut));
+  TFile * fNoSmear = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_akPF_20150521.root",radius,etaWidth,unfoldingCut));
   TFile * fGenSmear = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_GenSmear_%s_%dGeVCut_akPF_20150519.root",radius,etaWidth,unfoldingCut));
   TFile * fgen2pSmear = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_gen2pSmear_%s_%dGeVCut_akPF_20150519.root",radius,etaWidth,unfoldingCut));
   TFile * fRecoSmear = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_RecoSmear_%s_%dGeVCut_akPF_20150519.root",radius,etaWidth,unfoldingCut));
@@ -120,8 +122,8 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
   TFile * fin = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
 
   // get the histograms
-  TH1F * hData[nbins_cent], * hMC[nbins_cent];
-  TH1F * hRatio[nbins_cent];
+  TH1F * hData[nbins_cent], * hData_unf[nbins_cent], * hMC[nbins_cent], * hMC_gen[nbins_cent];
+  TH1F * hRatio[nbins_cent], * hRatio_unf[nbins_cent], * hRatio_gen[nbins_cent], * hRatio_unf_gen[nbins_cent];
 
   for(int i = 0; i<nbins_cent; ++i){
 
@@ -165,14 +167,38 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
     hPbPb_Sys_BothSmear[i] = (TH1F*)hPbPb_Bayesian_BothSmear[i]->Clone(Form("hPbPb_Sys_BothSmear_cent%d",i));
     hPbPb_Sys_BothSmear[i]->Divide(hPbPb_Bayesian[i]);
     
-    hData[i] = (TH1F*)fin->Get(Form("hpbpb_raw_HLTComb_R%d_%s_cent%d",radius, etaWidth, i));
+    hData[i] = (TH1F*)fNoSmear->Get(Form("PbPb_measured_spectra_combined_cent%d",i));
     hData[i]->Print("base");
-    hMC[i] = (TH1F*)fin->Get(Form("hpbpb_JetComb_raw_R%d_%s_cent%d",radius, etaWidth, i));
+    hData[i]->Scale((0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
+    hData[i]->Scale(ncoll[i]/(64.*1e3));
+
+    hData_unf[i] = (TH1F*)fNoSmear->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
+    hData_unf[i]->Print("base");
+    hData_unf[i]->Scale((0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
+    hData_unf[i]->Scale(ncoll[i]/(64.*1e3));
+    
+    hMC[i] = (TH1F*)fNoSmear->Get(Form("PbPb_Reco_spectra_jtpt_cent%d",i));
     hMC[i]->Print("base");
-    hRatio[i] = (TH1F*)hData[i]->Clone(Form("Data_MC_rawpT_ratio_cent%d",i));
+
+    hMC_gen[i] = (TH1F*)fNoSmear->Get(Form("PbPb_Gen_spectra_refpt_cent%d",i));
+    hMC_gen[i]->Print("base");
+    
+    hRatio[i] = (TH1F*)hData[i]->Clone(Form("Data_MC_jtpT_ratio_cent%d",i));
     hRatio[i]->Divide(hMC[i]);
     hRatio[i]->Print("base");
 
+    hRatio_unf[i] = (TH1F*)hData_unf[i]->Clone(Form("Data_unf_MC_jtpT_ratio_cent%d",i));
+    hRatio_unf[i]->Divide(hMC[i]);
+    hRatio_unf[i]->Print("base");
+
+    hRatio_gen[i] = (TH1F*)hData[i]->Clone(Form("Data_MC_refpT_ratio_cent%d",i));
+    hRatio_gen[i]->Divide(hMC_gen[i]);
+    hRatio_gen[i]->Print("base");
+
+    hRatio_unf_gen[i] = (TH1F*)hData_unf[i]->Clone(Form("Data_unf_MC_refpT_ratio_cent%d",i));
+    hRatio_unf_gen[i]->Divide(hMC_gen[i]);
+    hRatio_unf_gen[i]->Print("base");
+    
     for(int j = 1; j<hPbPb_Sys_GenSmear[i]->GetNbinsX(); ++j){
 
       RAA_Sys_BothSmear[i]->SetBinError(j,0);
@@ -191,7 +217,7 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
   TLine * line = new TLine(65,1,299,1);
   line->SetLineStyle(2);
   line->SetLineWidth(2);
-  
+#if 0
   // make the bayesian unfolding prior systematics plot
   TCanvas * cRAA_Sys = new TCanvas("cRAA_Sys","",1000,1000);
   makeMultiPanelCanvas(cRAA_Sys,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -241,7 +267,7 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
   drawText(Form("ak Pu R = 0.%d PF jets, %2.0f < |eta| < %2.0f",radius, etaLow, etaHigh), 0.25,0.2,15);
 
   cRAA_Sys->SaveAs(Form("May19/RAA_bayesian_unfolded_prior_smear_shift_systematics_%s_R%d_%d.pdf",etaWidth,radius,date.GetDate()),"RECREATE");
-
+#endif
 #if 0
   // plot for spectra
   TCanvas * chPbPb_Sys = new TCanvas("chPbPb_Sys","",1000,800);
@@ -299,22 +325,49 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
     cDataMC_raw->cd(nbins_cent-i);
     cDataMC_raw->cd(nbins_cent-i)->SetLogy();
 
-    hRatio[i]->SetMarkerStyle(20);
+    hRatio[i]->SetMarkerStyle(33);
     hRatio[i]->SetMarkerColor(kBlack);
-    makeHistTitle(hRatio[i]," ","Raw Jet p_{T} (GeV/c)","Data/MC arbitraty scale");
-    hRatio[i] = (TH1F*)hRatio[i]->Rebin(nbins_pt, Form("Data_MC_rawpT_ratio_cent%d",i), boundaries_pt);
+    makeHistTitle(hRatio[i]," ","Jet p_{T} (GeV/c)","Data/MC arbitraty scale");
+    hRatio[i] = (TH1F*)hRatio[i]->Rebin(nbins_pt, Form("Data_MC_jtpT_ratio_cent%d",i), boundaries_pt);
     divideBinWidth(hRatio[i]);
+    hRatio_unf[i] = (TH1F*)hRatio_unf[i]->Rebin(nbins_pt, Form("Data_unf_MC_jtpT_ratio_cent%d",i), boundaries_pt);
+    divideBinWidth(hRatio_unf[i]);
+    hRatio_gen[i] = (TH1F*)hRatio_gen[i]->Rebin(nbins_pt, Form("Data_MC_refpT_ratio_cent%d",i), boundaries_pt);
+    divideBinWidth(hRatio_gen[i]);
+    hRatio_unf_gen[i] = (TH1F*)hRatio_unf_gen[i]->Rebin(nbins_pt, Form("Data_unf_MC_refpT_ratio_cent%d",i), boundaries_pt);
+    divideBinWidth(hRatio_unf_gen[i]);
     hRatio[i]->SetAxisRange(30,299,"X");
-    hRatio[i]->GetYaxis()->SetNdivisions(2,kFALSE);
-    hRatio[i]->Draw();
+    //hRatio[i]->GetYaxis()->SetNdivisions(2,kFALSE);
+    hRatio[i]->Draw(" p");
+
+    hRatio_gen[i]->SetMarkerStyle(33);
+    hRatio_gen[i]->SetMarkerColor(kRed);
+    hRatio_gen[i]->Draw("same p");
+      
+    hRatio_unf[i]->SetMarkerStyle(33);
+    hRatio_unf[i]->SetMarkerColor(kGreen);
+    hRatio_unf[i]->Draw("same p");
+    
+    hRatio_unf_gen[i]->SetMarkerStyle(33);
+    hRatio_unf_gen[i]->SetMarkerColor(kBlue);
+    hRatio_unf_gen[i]->Draw("same p");
+    
     drawText(Form("%2.0f-%.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.85,20);    
 
   }
   cDataMC_raw->cd(1);
   putCMSPrel();
-  drawText(Form("ak Pu R = 0.%d PF jets, %2.0f < |eta| < %2.0f",radius, etaLow, etaHigh), 0.2,0.2,15);
+  drawText(Form("ak Pu R = 0.%d PF jets, %2.0f < |eta| < %2.0f",radius, etaLow, etaHigh), 0.2,0.13,15);
 
-  cDataMC_raw->SaveAs(Form("May19/PbPb_DataMC_rawpT_%s_R%d_%d.pdf",etaWidth,radius,date.GetDate()),"RECREATE");
+  TLegend * leg = myLegend(0.2,0.2,0.4,0.4);
+  leg->AddEntry(hRatio[0],"Data Raw / MC Reco","pl");
+  leg->AddEntry(hRatio_unf[0],"Data Unfo / MC Reco","pl");
+  leg->AddEntry(hRatio_gen[0],"Data Raw / MC Gen","pl");
+  leg->AddEntry(hRatio_unf_gen[0],"Data Unfo / MC Gen","pl");
+  leg->SetTextSize(0.04);
+  leg->Draw();
+  
+  cDataMC_raw->SaveAs(Form("May22/PbPb_DataMC_ratio_%s_R%d_%d.pdf",etaWidth,radius,date.GetDate()),"RECREATE");
 
 
   

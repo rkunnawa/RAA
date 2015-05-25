@@ -1077,6 +1077,7 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
 
   //now that we have taken the necessary histogram, lets start to make plots:
 
+#if 0
   //plot1 - 6 panel plot of RAA, at R=0.3, in the old PAS and now.
   TCanvas *cRAA = new TCanvas("cRAA","RAA",1200,800);
   makeMultiPanelCanvasWithGap(cRAA,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
@@ -1689,7 +1690,7 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   drawText("Trig Combined with MinBias&&!Jet80 subtracted",0.06,0.2,16);
 
   cRAA->SaveAs(Form("May21/RAA_newComparingwithPAS_ak%s3%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
-  
+#endif
   
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

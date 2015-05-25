@@ -66,9 +66,9 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
   Float_t deltaEta = 2.0; 
 
   TFile *fin_R2, *fin_R3, *fin_R4; 
-  fin_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",2,etaWidth,30,jet_type));
-  fin_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",3,etaWidth,40,jet_type));
-  fin_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",4,etaWidth,50,jet_type));
+  fin_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150521.root",2,etaWidth,30,jet_type));
+  fin_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150521.root",3,etaWidth,40,jet_type));
+  fin_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150521.root",4,etaWidth,50,jet_type));
 
   // get the histograms.
   TH1F * uPbPb_R2_Bayes[nbins_cent], * uPP_R2_Bayes, * uPbPb_R3_Bayes[nbins_cent], * uPP_R3_Bayes, * uPbPb_R4_Bayes[nbins_cent], * uPP_R4_Bayes;
@@ -235,7 +235,7 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
   drawText("50-70% x 10^{10}", 0.7,0.64,16);
   drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R2->SaveAs(Form("May19/Final_paper_plots_spectra_akR2_%s_%d.pdf",etaWidth,date.GetDate()),"RECREATE");
+  cSpectra_R2->SaveAs(Form("May21/Final_paper_plots_spectra_akR2_%s_%d.pdf",etaWidth,date.GetDate()),"RECREATE");
 
   
   TCanvas * cSpectra_R3 = new TCanvas("cSpectra_R3","",1200,1000);
@@ -301,7 +301,7 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
   drawText("50-70% x 10^{10}", 0.7,0.64,16);
   drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R3->SaveAs(Form("May19/Final_paper_plots_spectra_akR3_%s_%d.pdf",etaWidth, date.GetDate()),"RECREATE");
+  cSpectra_R3->SaveAs(Form("May21/Final_paper_plots_spectra_akR3_%s_%d.pdf",etaWidth, date.GetDate()),"RECREATE");
 
 
   
@@ -368,7 +368,7 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
   drawText("50-70% x 10^{10}", 0.7,0.64,16);
   drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R4->SaveAs(Form("May19/Final_paper_plots_spectra_akR4_%s_%d.pdf",etaWidth, date.GetDate()),"RECREATE");
+  cSpectra_R4->SaveAs(Form("May21/Final_paper_plots_spectra_akR4_%s_%d.pdf",etaWidth, date.GetDate()),"RECREATE");
 
 
 }

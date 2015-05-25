@@ -108,6 +108,10 @@ static const int nbins_pt_fine = 400;
 static const int nbins_pt = 30;
 static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
 
+static const int nbins_pt_nlo = 29;
+static const double boundaries_pt_nlo[nbins_pt_nlo+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638,790,967};
+
+
 //static const int nbins_pt = 17;
 //static const double boundaries_pt[nbins_pt+1] = {  3, 5, 9, 15, 21, 28, 37, 49, 64, 84, 114, 153, 196, 245, 300, 330, 362, 395};
 
@@ -219,7 +223,7 @@ void divideBinWidth(TH1 *h)
 }
 
 
-void RAA_analyze(int radius = 2, int param1 = 1, int param2 = 1, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "20_eta_20", double deltaEta = 4.0, char * smear = (char*)"noSmear"){
+void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "20_eta_20", double deltaEta = 4.0, char * smear = (char*)"noSmear"){
 
   TStopwatch timer; 
   timer.Start();
@@ -266,7 +270,7 @@ void RAA_analyze(int radius = 2, int param1 = 1, int param2 = 1, char* algo = (c
   // we also need to get the files for the MC closure histograms.
   TFile * fMCClosure = TFile::Open("Histogram_pp_PbPb_unfoldMatrix.root");
   
-  TFile * fMinBias = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,radius)); //MinBias File 
+  TFile * fMinBias = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedAllMB_%s_R0p%d.root",etaWidth,radius)); //MinBias File 
 
   cout<<"after input file declaration"<<endl;
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
@@ -339,6 +343,22 @@ void RAA_analyze(int radius = 2, int param1 = 1, int param2 = 1, char* algo = (c
 
    //Lets do the subtraction here _Sevil 
     if(dofakeremove){
+
+      float cutarray[6]={65,60,50,40,40,40};
+	
+      Float_t bincon=cutarray[i]; 
+      Int_t bincut= hMinBias[i]->FindBin(bincon); 
+
+      for(int k = bincut;k<=400;k++) 
+	{ // cout<<"cent_ "<<i<<" pt "<< hMinBias[i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+	  hMinBias[i]->SetBinContent(k,0); 
+	  hMinBias[i]->SetBinError(k,0);
+	} 
+
+      for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< hMinBias[i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+	hMinBias[i]->SetBinContent(k,0); 
+	hMinBias[i]->SetBinError(k,0);
+      }
 
       Float_t   bin_no = dPbPb_TrgComb[i]->FindBin(15);
       Float_t bin_end=dPbPb_TrgComb[i]->FindBin(25);
@@ -1166,7 +1186,8 @@ void RAA_analyze(int radius = 2, int param1 = 1, int param2 = 1, char* algo = (c
   // first correct for the error bars got from the RAA_dataDrivenUnfoldingErrorCheck.C macro
   // get the root file which has the unfolded error correction.
   
-  TFile * ferrorin = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s.root",radius, radius, etaWidth, 40, jet_type)); // need to add unfolding cut and smear variable 
+  //TFile * ferrorin = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_MinBiasFakeCut_NoJet80_data_driven_correction_akPu%s.root",radius, radius, etaWidth, 40, jet_type)); // need to add unfolding cut and smear variable 
+  TFile * ferrorin = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_bin_%s_unfoldingCut_%d_SevilfakeCut_data_driven_correction_akPu%s.root",radius, radius, etaWidth, 40, jet_type)); // need to add unfolding cut and smear variable 
 
   // get histograms for each centrality and pp
   TH1F * hPbPb_BayesCorrected[nbins_cent];
@@ -1457,7 +1478,7 @@ void RAA_analyze(int radius = 2, int param1 = 1, int param2 = 1, char* algo = (c
   cout<<"writing to output file"<<endl;
   
 
-  TFile fout(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_%s_%s_%dGeVCut_ak%s_%d.root", radius, smear, etaWidth, unfoldingCut, jet_type, date.GetDate()),"RECREATE");
+  TFile fout(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilNewMBSubtraction_unfold_mcclosure_oppside_trgMC_%s_%s_%dGeVCut_ak%s_%d.root", radius, smear, etaWidth, unfoldingCut, jet_type, date.GetDate()),"RECREATE");
   fout.cd();
 
   for(int i = 0;i<nbins_cent;++i){
@@ -1669,7 +1690,7 @@ void RAA_analyze(int radius = 2, int param1 = 1, int param2 = 1, char* algo = (c
     uPP_MC_BayesianIter[i-1]->Write();
   }
   
-  uPP_Bayes = (TH1F*)uPP_Bayes->Rebin(nbins_pt,"PP_bayesian_unfolded_spectra",boundaries_pt);
+  uPP_Bayes = (TH1F*)uPP_Bayes->Rebin(nbins_pt_nlo,"PP_bayesian_unfolded_spectra",boundaries_pt_nlo);
   divideBinWidth(uPP_Bayes);
   uPP_BinByBin = (TH1F*)uPP_BinByBin->Rebin(nbins_pt,"PP_BinByBin_unfolded_spectra",boundaries_pt);
   divideBinWidth(uPP_BinByBin); 
