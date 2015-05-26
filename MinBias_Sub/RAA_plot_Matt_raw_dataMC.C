@@ -66,7 +66,7 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 using namespace std;
 
 
-void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius = 2){
+void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius = 3){
 
   
   TH1::SetDefaultSumw2();
@@ -106,7 +106,7 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
   // Make Matt's requested plots about the unfolding prior distributions.
   // need to make ratio histograms for RAA, and PbPb spectra
 
-  TFile * fNoSmear = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_akPF_20150521.root",radius,etaWidth,unfoldingCut));
+  TFile * fNoSmear = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilNewMBSubtraction_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_akPF_20150522.root",radius,etaWidth,unfoldingCut));
   TFile * fGenSmear = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_GenSmear_%s_%dGeVCut_akPF_20150519.root",radius,etaWidth,unfoldingCut));
   TFile * fgen2pSmear = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_gen2pSmear_%s_%dGeVCut_akPF_20150519.root",radius,etaWidth,unfoldingCut));
   TFile * fRecoSmear = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_RecoSmear_%s_%dGeVCut_akPF_20150519.root",radius,etaWidth,unfoldingCut));
@@ -125,6 +125,9 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
   TH1F * hData[nbins_cent], * hData_unf[nbins_cent], * hMC[nbins_cent], * hMC_gen[nbins_cent];
   TH1F * hRatio[nbins_cent], * hRatio_unf[nbins_cent], * hRatio_gen[nbins_cent], * hRatio_unf_gen[nbins_cent];
 
+  TF1 * fRatio[nbins_cent], *fRatio_unf[nbins_cent], * fRatio_gen[nbins_cent], * fRatio_unf_gen[nbins_cent];
+  
+  
   for(int i = 0; i<nbins_cent; ++i){
 
     RAA_Bayesian[i] = (TH1F*)fNoSmear->Get(Form("RAA_bayesian_cent%d",i));
@@ -169,13 +172,17 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
     
     hData[i] = (TH1F*)fNoSmear->Get(Form("PbPb_measured_spectra_combined_cent%d",i));
     hData[i]->Print("base");
-    hData[i]->Scale((0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    hData[i]->Scale(ncoll[i]/(64.*1e3));
-
     hData_unf[i] = (TH1F*)fNoSmear->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
     hData_unf[i]->Print("base");
-    hData_unf[i]->Scale((0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
-    hData_unf[i]->Scale(ncoll[i]/(64.*1e3));
+
+    // first unscale them back to counts.
+    hData[i]->Scale((0.025*(boundaries_cent[i+1] - boundaries_cent[i])*145.156 * 7.65 * 1e6 * ncoll[i]*1e3)/(64.*1e9));
+    hData_unf[i]->Scale((0.025*(boundaries_cent[i+1] - boundaries_cent[i])*145.156 * 7.65 * 1e6 * ncoll[i]*1e3)/(64.*1e9));
+    // now data is in counts.
+    // normalizing with lumi now. 
+    hData[i]->Scale(1./(145.156 * 1e3));
+    hData_unf[i]->Scale(1./(145.156 * 1e3));
+    
     
     hMC[i] = (TH1F*)fNoSmear->Get(Form("PbPb_Reco_spectra_jtpt_cent%d",i));
     hMC[i]->Print("base");
@@ -183,21 +190,34 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
     hMC_gen[i] = (TH1F*)fNoSmear->Get(Form("PbPb_Gen_spectra_refpt_cent%d",i));
     hMC_gen[i]->Print("base");
     
+    fRatio[i] = new TF1(Form("fRatio_cent%d",i),"[0]",100,240);
+    fRatio_unf[i] = new TF1(Form("fRatio_unf_cent%d",i),"[0]",100,240);
+    fRatio_gen[i] = new TF1(Form("fRatio_gen_cent%d",i),"[0]",100,240);
+    fRatio_unf_gen[i] = new TF1(Form("fRatio_unf_gen_cent%d",i),"[0]",100,240);
+    
     hRatio[i] = (TH1F*)hData[i]->Clone(Form("Data_MC_jtpT_ratio_cent%d",i));
     hRatio[i]->Divide(hMC[i]);
     hRatio[i]->Print("base");
+    //hRatio[i]->Fit(Form("fRatio_cent%d",i));
+    //cout<<Form("fRatio_cent%d parameter  = %f",i,fRatio[i]->GetParameter(0))<<endl;
 
     hRatio_unf[i] = (TH1F*)hData_unf[i]->Clone(Form("Data_unf_MC_jtpT_ratio_cent%d",i));
     hRatio_unf[i]->Divide(hMC[i]);
     hRatio_unf[i]->Print("base");
-
+    //hRatio_unf[i]->Fit(Form("fRatio_unf_cent%d",i));
+    //cout<<Form("fRatio_unf_cent%d parameter  = %f",i,fRatio_unf[i]->GetParameter(0))<<endl;
+    
     hRatio_gen[i] = (TH1F*)hData[i]->Clone(Form("Data_MC_refpT_ratio_cent%d",i));
     hRatio_gen[i]->Divide(hMC_gen[i]);
     hRatio_gen[i]->Print("base");
-
+    //hRatio_gen[i]->Fit(Form("fRatio_gen_cent%d",i));
+    //cout<<Form("fRatio_gen_cent%d parameter  = %f",i,fRatio_gen[i]->GetParameter(0))<<endl;
+    
     hRatio_unf_gen[i] = (TH1F*)hData_unf[i]->Clone(Form("Data_unf_MC_refpT_ratio_cent%d",i));
     hRatio_unf_gen[i]->Divide(hMC_gen[i]);
     hRatio_unf_gen[i]->Print("base");
+    //hRatio_unf_gen[i]->Fit(Form("fRatio_unf_gen_cent%d",i));
+    //cout<<Form("fRatio_unf_gen_cent%d parameter  = %f",i,fRatio_unf_gen[i]->GetParameter(0))<<endl;
     
     for(int j = 1; j<hPbPb_Sys_GenSmear[i]->GetNbinsX(); ++j){
 
@@ -317,33 +337,35 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"20_eta_20", Int_t radius 
 
 #endif
   // make the plots - 3x2 plots.
-  TCanvas * cDataMC_raw = new TCanvas("cDataMC_raw","",1000,800);
-  makeMultiPanelCanvas(cDataMC_raw,3,2,0.0,0.0,0.2,0.15,0.07);
-
+  TCanvas * cDataMC_raw = new TCanvas("cDataMC_raw","",1400,800);
+  //makeMultiPanelCanvas(cDataMC_raw,3,2,0.0,0.0,0.2,0.15,0.07);
+  cDataMC_raw->Divide(3,2);
+  
   for(int i = 0; i<nbins_cent; ++i){
 
     cDataMC_raw->cd(nbins_cent-i);
-    cDataMC_raw->cd(nbins_cent-i)->SetLogy();
-
+    //cDataMC_raw->cd(nbins_cent-i)->SetLogy();
+    
     hRatio[i]->SetMarkerStyle(33);
     hRatio[i]->SetMarkerColor(kBlack);
-    makeHistTitle(hRatio[i]," ","Jet p_{T} (GeV/c)","Data/MC arbitraty scale");
-    hRatio[i] = (TH1F*)hRatio[i]->Rebin(nbins_pt, Form("Data_MC_jtpT_ratio_cent%d",i), boundaries_pt);
-    divideBinWidth(hRatio[i]);
-    hRatio_unf[i] = (TH1F*)hRatio_unf[i]->Rebin(nbins_pt, Form("Data_unf_MC_jtpT_ratio_cent%d",i), boundaries_pt);
-    divideBinWidth(hRatio_unf[i]);
-    hRatio_gen[i] = (TH1F*)hRatio_gen[i]->Rebin(nbins_pt, Form("Data_MC_refpT_ratio_cent%d",i), boundaries_pt);
-    divideBinWidth(hRatio_gen[i]);
-    hRatio_unf_gen[i] = (TH1F*)hRatio_unf_gen[i]->Rebin(nbins_pt, Form("Data_unf_MC_refpT_ratio_cent%d",i), boundaries_pt);
-    divideBinWidth(hRatio_unf_gen[i]);
+    makeHistTitle(hRatio[i]," ","Jet p_{T} (GeV/c)","Data/MC");
+    // hRatio[i] = (TH1F*)hRatio[i]->Rebin(nbins_pt, Form("Data_MC_jtpT_ratio_cent%d",i), boundaries_pt);
+    // divideBinWidth(hRatio[i]);
+    // hRatio_unf[i] = (TH1F*)hRatio_unf[i]->Rebin(nbins_pt, Form("Data_unf_MC_jtpT_ratio_cent%d",i), boundaries_pt);
+    // divideBinWidth(hRatio_unf[i]);
+    // hRatio_gen[i] = (TH1F*)hRatio_gen[i]->Rebin(nbins_pt, Form("Data_MC_refpT_ratio_cent%d",i), boundaries_pt);
+    // divideBinWidth(hRatio_gen[i]);
+    // hRatio_unf_gen[i] = (TH1F*)hRatio_unf_gen[i]->Rebin(nbins_pt, Form("Data_unf_MC_refpT_ratio_cent%d",i), boundaries_pt);
+    // divideBinWidth(hRatio_unf_gen[i]);
     hRatio[i]->SetAxisRange(30,299,"X");
+    //hRatio[i]->SetAxisRange(1e-,1e2,"Y");
     //hRatio[i]->GetYaxis()->SetNdivisions(2,kFALSE);
     hRatio[i]->Draw(" p");
-
+    
     hRatio_gen[i]->SetMarkerStyle(33);
     hRatio_gen[i]->SetMarkerColor(kRed);
     hRatio_gen[i]->Draw("same p");
-      
+    
     hRatio_unf[i]->SetMarkerStyle(33);
     hRatio_unf[i]->SetMarkerColor(kGreen);
     hRatio_unf[i]->Draw("same p");

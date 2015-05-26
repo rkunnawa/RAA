@@ -58,26 +58,22 @@ static const double boundaries_pt[nbins_pt+1] = {
 };
 
 
-static const int nbins_eta = 5;
+static const int nbins_eta = 1;
 static const double boundaries_eta[nbins_eta][2] = {
-  {0.0,0.5},
-  {0.5,1.0},
-  {1.0,1.5},
-  {1.5,2.0},
-  {2.0,2.5},
+  {0.0,2.0}
 };
 
 static const double delta_eta[nbins_eta] = {
-  1.0,1.0,1.0,1.0,1.0
+  4.0
 };
 
 static const char etaWidth [nbins_eta][256] = {
-  "0_absEta_05", "05_absEta_10", "10_absEta_15", "15_absEta_20", "20_absEta_25" 
+ "20_eta_20" 
 };
 
 
-static const int no_radius = 4;//testing purposes 
-static const int list_radius[no_radius] = {2,3,4,5};
+static const int no_radius = 3;//testing purposes 
+static const int list_radius[no_radius] = {2,3,4};
 
 // divide by bin width
 void divideBinWidth(TH1 *h){
@@ -586,20 +582,20 @@ void RAA_read_mc_pp(int startfile = 9, int endfile = 10, char *jet_type="PF"){
 	    }
 #endif
 
-	    hchMax[k][j]->Fill(dataPP[k][h]->chargedMax[g],scalepp*weight_vz);
-	    hphMax[k][j]->Fill(dataPP[k][h]->photonMax[g],scalepp*weight_vz);
-	    hneMax[k][j]->Fill(dataPP[k][h]->neutralMax[g],scalepp*weight_vz);
-	    heMax[k][j]->Fill(dataPP[k][h]->eMax[g],scalepp*weight_vz);
-	    hmuMax[k][j]->Fill(dataPP[k][h]->muMax[g],scalepp*weight_vz);
+	    // hchMax[k][j]->Fill(dataPP[k][h]->chargedMax[g],scalepp*weight_vz);
+	    // hphMax[k][j]->Fill(dataPP[k][h]->photonMax[g],scalepp*weight_vz);
+	    // hneMax[k][j]->Fill(dataPP[k][h]->neutralMax[g],scalepp*weight_vz);
+	    // heMax[k][j]->Fill(dataPP[k][h]->eMax[g],scalepp*weight_vz);
+	    // hmuMax[k][j]->Fill(dataPP[k][h]->muMax[g],scalepp*weight_vz);
 
-	    hchSum[k][j]->Fill(dataPP[k][h]->chargedSum[g],scalepp*weight_vz);
-	    hphSum[k][j]->Fill(dataPP[k][h]->photonSum[g],scalepp*weight_vz);
-	    hneSum[k][j]->Fill(dataPP[k][h]->neutralSum[g],scalepp*weight_vz);
-	    heSum[k][j]->Fill(dataPP[k][h]->eSum[g],scalepp*weight_vz);
-	    hmuSum[k][j]->Fill(dataPP[k][h]->muSum[g],scalepp*weight_vz);
+	    // hchSum[k][j]->Fill(dataPP[k][h]->chargedSum[g],scalepp*weight_vz);
+	    // hphSum[k][j]->Fill(dataPP[k][h]->photonSum[g],scalepp*weight_vz);
+	    // hneSum[k][j]->Fill(dataPP[k][h]->neutralSum[g],scalepp*weight_vz);
+	    // heSum[k][j]->Fill(dataPP[k][h]->eSum[g],scalepp*weight_vz);
+	    // hmuSum[k][j]->Fill(dataPP[k][h]->muSum[g],scalepp*weight_vz);
 	    
-	    //if(dataPP[k][h]->chargedMax[g]/dataPP[k][h]->jtpt[g]<0.02 || dataPP[k][h]->eMax[g]/dataPP[k][h]->jtpt[g]>0.6 ) continue;
-	    if(dataPP[k][h]->eMax[g]/(dataPP[k][h]->chargedMax[g]+dataPP[k][h]->photonMax[g]+dataPP[k][h]->neutralMax[g]+dataPP[k][h]->muMax[g]) > 0.8) continue;
+	    // //if(dataPP[k][h]->chargedMax[g]/dataPP[k][h]->jtpt[g]<0.02 || dataPP[k][h]->eMax[g]/dataPP[k][h]->jtpt[g]>0.6 ) continue;
+	    // if(dataPP[k][h]->eMax[g]/(dataPP[k][h]->chargedMax[g]+dataPP[k][h]->photonMax[g]+dataPP[k][h]->neutralMax[g]+dataPP[k][h]->muMax[g]) > 0.8) continue;
 	    
             //hpp_response->Fill(dataPP[k][h]->jtpt[k],dataPP[k][h]->refpt[k],scalepp*weight_vz);
             hpp_matrix[k][j]->Fill(dataPP[k][h]->refpt[g],dataPP[k][h]->jtpt[g],scalepp*weight_vz);
@@ -644,17 +640,17 @@ void RAA_read_mc_pp(int startfile = 9, int endfile = 10, char *jet_type="PF"){
     
     for(int j=0;j<nbins_eta;j++){
 
-      hchMax[k][j]->Write();
-      hphMax[k][j]->Write();
-      hneMax[k][j]->Write();
-      heMax[k][j]->Write();
-      hmuMax[k][j]->Write();
+      // hchMax[k][j]->Write();
+      // hphMax[k][j]->Write();
+      // hneMax[k][j]->Write();
+      // heMax[k][j]->Write();
+      // hmuMax[k][j]->Write();
 
-      hchSum[k][j]->Write();
-      hphSum[k][j]->Write();
-      hneSum[k][j]->Write();
-      heSum[k][j]->Write();
-      hmuSum[k][j]->Write();
+      // hchSum[k][j]->Write();
+      // hphSum[k][j]->Write();
+      // hneSum[k][j]->Write();
+      // heSum[k][j]->Write();
+      // hmuSum[k][j]->Write();
 
       divideBinWidth(hpp_gen[k][j]);
       divideBinWidth(hpp_reco[k][j]);

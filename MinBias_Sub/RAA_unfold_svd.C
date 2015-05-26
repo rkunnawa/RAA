@@ -43,7 +43,7 @@ void divideBinWidth(TH1 *h)
 
 using namespace std;
 
-void RAA_unfold_svd(int radius = 2,
+void RAA_unfold_svd(int radius = 3,
 		    char* algo = (char*) "Pu",
 		    char *jet_type = (char*) "PF",
 		    int unfoldingCut = 40,
@@ -65,16 +65,15 @@ void RAA_unfold_svd(int radius = 2,
 
   
   // Pawan's files:
-  TFile * fPbPb_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
+  TFile * fPbPb_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
   TFile * fPP_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius));
 
 
   // we also need to get the files for the MC closure histograms.
   TFile * fMCClosure = TFile::Open("Histogram_pp_PbPb_unfoldMatrix.root");
   
-  TFile * fMinBias = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedwithout80_%s_R0p%d.root",etaWidth,radius)); //MinBias File 
+  TFile * fMinBias = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedAllMB_%s_R0p%d.root",etaWidth,radius)); //MinBias File 
 
-  
   cout<<"after input file declaration"<<endl;
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
   // for the above condition, i might have to play with the date stamp. 
@@ -113,6 +112,10 @@ void RAA_unfold_svd(int radius = 2,
   
   TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
   Int_t unfoldingCutBin = htest->FindBin(unfoldingCut);
+
+  Float_t scaleFactor_dataMC[nbins_cent] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  //Float_t scaleFactor_dataMC[nbins_cent] = {1./145.156/1e5, 0.0, 0.0, 0.0, 0.0, 0.0};
+  Float_t scaleFactor_dataMC_pp = 0.0;
   
   // get PbPb data
   for(int i = 0;i<nbins_cent;++i){
@@ -124,9 +127,25 @@ void RAA_unfold_svd(int radius = 2,
     // //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
     dPbPb_TrgComb[i]->Print("base");
 
+    float cutarray[6]={65,60,50,40,40,40};
+	
+    Float_t bincon=cutarray[i]; 
+    Int_t bincut= hMinBias[i]->FindBin(bincon); 
+
+    for(int k = bincut;k<=400;k++) 
+      { // cout<<"cent_ "<<i<<" pt "<< hMinBias[i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+	hMinBias[i]->SetBinContent(k,0); 
+	hMinBias[i]->SetBinError(k,0);
+      } 
+
+    for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< hMinBias[i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+      hMinBias[i]->SetBinContent(k,0); 
+      hMinBias[i]->SetBinError(k,0);
+    }
+
     Float_t   bin_no = dPbPb_TrgComb[i]->FindBin(15);
     Float_t bin_end=dPbPb_TrgComb[i]->FindBin(25);
-    
+      
     Float_t   bin_nomb = hMinBias[i]->FindBin(15);
     Float_t bin_endmb=hMinBias[i]->FindBin(25);
     
@@ -137,7 +156,7 @@ void RAA_unfold_svd(int radius = 2,
     dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt, Form("PbPb_data_minbiasSub_cent%d",i), boundaries_pt);
     divideBinWidth(dPbPb_TrgComb[i]);
 
-    dPbPb_TrgComb[i]->Scale(1./(145.156 * 1e3)); // scale it to milli barns which is the luminosity of the MC 
+    //dPbPb_TrgComb[i]->Scale(1./(145.156 * 1e3)); // scale it to milli barns which is the luminosity of the MC 
 
     mPbPb_Gen[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_anaBin_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i));
     mPbPb_Gen[i]->Print("base");
@@ -146,6 +165,12 @@ void RAA_unfold_svd(int radius = 2,
     mPbPb_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_anaBin_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
     mPbPb_Matrix[i]->Print("base");
 
+    scaleFactor_dataMC[i] = (Float_t) mPbPb_Gen[i]->GetBinContent(mPbPb_Gen[i]->FindBin(120)) / dPbPb_TrgComb[i]->GetBinContent(dPbPb_TrgComb[i]->FindBin(120));
+    // dPbPb_TrgComb[i]->Scale(scaleFactor_dataMC[i]);
+    // mPbPb_Gen[i]->Scale(1./scaleFactor_dataMC[i]);
+    // mPbPb_Reco[i]->Scale(1./scaleFactor_dataMC[i]);
+    // mPbPb_Matrix[i]->Scale(1./scaleFactor_dataMC[i]);
+      
     mPbPb_mcclosure_data[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hrec_c_pbpb_akPu%d_1_%d",radius, radius, i));
     mPbPb_mcclosure_data[i]->Print("base");
     mPbPb_mcclosure_gen[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hgen_pbpb_akPu%d_1_%d",radius, radius, i));
@@ -153,20 +178,24 @@ void RAA_unfold_svd(int radius = 2,
     mPbPb_mcclosure_Matrix[i] = (TH2F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hmatrix_pbpb_akPu%d_1_%d",radius, radius, i));
     mPbPb_mcclosure_Matrix[i]->Print("base");
     
-    for(int k = 1;k<=unfoldingCutBin;k++){
-      dPbPb_TrgComb[i]->SetBinContent(k,0);
-      mPbPb_Gen[i]->SetBinContent(k,0);
-      mPbPb_Reco[i]->SetBinContent(k,0);
-      for(int l = 1;l<=nbins_pt;l++){
-	mPbPb_Matrix[i]->SetBinContent(k,l,0);
-	mPbPb_Matrix[i]->SetBinContent(l,k,0);
-	
-      }
-    }
+    // for(int k = 1;k<=unfoldingCutBin;k++){
+    //   dPbPb_TrgComb[i]->SetBinContent(k,0);
+    //   mPbPb_Gen[i]->SetBinContent(k,0);
+    //   mPbPb_Reco[i]->SetBinContent(k,0);
+    //   dPbPb_TrgComb[i]->SetBinError(k,0);
+    //   mPbPb_Gen[i]->SetBinError(k,0);
+    //   mPbPb_Reco[i]->SetBinError(k,0);
+    //   for(int l = 1;l<=nbins_pt;l++){
+    // 	mPbPb_Matrix[i]->SetBinContent(k,l,0);
+    // 	mPbPb_Matrix[i]->SetBinContent(l,k,0);
+    // 	mPbPb_Matrix[i]->SetBinError(k,l,0);
+    // 	mPbPb_Matrix[i]->SetBinError(l,k,0);	
+    //   }
+    // }
   }
 
   dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_anaBin_HLTComb_R%d_%s",radius,etaWidth));
-  dPP_Comb->Scale(1./(5.3 * 1e3)); // scale it to luminosity of the MC but there is something going wrong here.
+  // dPP_Comb->Scale(1./(5.3 * 1e3)); // scale it to luminosity of the MC but there is something going wrong here.
   // get PP MC
   mPP_Gen = (TH1F*)fPP_in->Get(Form("hpp_anaBin_JetComb_gen_R%d_%s",radius,etaWidth));
   mPP_Gen->Print("base");
@@ -175,6 +204,12 @@ void RAA_unfold_svd(int radius = 2,
   mPP_Matrix = (TH2F*)fPP_in->Get(Form("hpp_anaBin_matrix_HLT_R%d_%s",radius,etaWidth));
   mPP_Matrix->Print("base");
 
+  scaleFactor_dataMC_pp = (Float_t)mPP_Gen->GetBinContent(mPP_Gen->FindBin(120))/dPP_Comb->GetBinContent(dPP_Comb->FindBin(120));
+  // dPP_Comb->Scale(scaleFactor_dataMC_pp);
+  // mPP_Gen->Scale(1./scaleFactor_dataMC_pp);
+  // mPP_Reco->Scale(1./scaleFactor_dataMC_pp);
+  // mPP_Matrix->Scale(1./scaleFactor_dataMC_pp);
+  
   // get the mc closure test histograms
   mPP_mcclosure_data = (TH1F*)fMCClosure->Get(Form("ak%dJetAnalyzer/hrec_c_pp_ak%d_0_7",radius,radius));
   mPP_mcclosure_data->Print("base");
@@ -189,14 +224,14 @@ void RAA_unfold_svd(int radius = 2,
   
   Int_t nSVDIter = 1;
   
-  for(int j = 7; j<14; ++j){
+  for(int j = 5; j<6; ++j){
     nSVDIter = j;
 
     for(int i = 0;i<nbins_cent;++i){
       // rebin histograms before we send it to unfolding 
       // histograms are already binned
       // need to scale the Data to be in the same units as the prior. MC is in mb and data was in counts. 
-      
+      cout<<"cent = "<<i<<endl;
       //since SVD is very straight forward, lets do it rignt here:
       //get the SVD response matrix:
       RooUnfoldResponse ruResponse(mPbPb_Matrix[i]->ProjectionY(),mPbPb_Matrix[i]->ProjectionX(), mPbPb_Matrix[i],"","");
@@ -205,47 +240,52 @@ void RAA_unfold_svd(int radius = 2,
       uPbPb_SVD[i] = (TH1F*)unfoldSvd.Hreco();
       uPbPb_SVD[i]->SetName(Form("PbPb_SVD_unfolding_cent%d",i));
 
-      RooUnfoldResponse ruResponseMC(mPbPb_mcclosure_Matrix[i]->ProjectionY(),mPbPb_mcclosure_Matrix[i]->ProjectionX(), mPbPb_mcclosure_Matrix[i],"","");
-      // //regularization parameter definition: 
-      RooUnfoldSvd unfoldSvdMC(&ruResponseMC, mPbPb_mcclosure_data[i], nSVDIter);
-      uPbPb_MC_SVD[i] = (TH1F*)unfoldSvdMC.Hreco();
-      uPbPb_MC_SVD[i]->SetName(Form("PbPb_MC_SVD_unfolding_cent%d",i));
+      // RooUnfoldResponse ruResponseMC(mPbPb_mcclosure_Matrix[i]->ProjectionY(),mPbPb_mcclosure_Matrix[i]->ProjectionX(), mPbPb_mcclosure_Matrix[i],"","");
+      // // //regularization parameter definition: 
+      // RooUnfoldSvd unfoldSvdMC(&ruResponseMC, mPbPb_mcclosure_data[i], nSVDIter);
+      // uPbPb_MC_SVD[i] = (TH1F*)unfoldSvdMC.Hreco();
+      // uPbPb_MC_SVD[i]->SetName(Form("PbPb_MC_SVD_unfolding_cent%d",i));
       
     }// centrality bin loop
 
     RooUnfoldResponse ruResponseMCPP(mPP_mcclosure_Matrix->ProjectionY(),mPP_mcclosure_Matrix->ProjectionX(), mPP_mcclosure_Matrix,"","");
     // //regularization parameter definition: 
-    RooUnfoldSvd unfoldSvdMCPP(&ruResponseMCPP, mPP_mcclosure_data, nSVDIter);
-    uPP_MC_SVD = (TH1F*)unfoldSvdMCPP.Hreco();
-    uPP_MC_SVD->SetName("PP_MC_SVD_unfolding");
+    // RooUnfoldSvd unfoldSvdMCPP(&ruResponseMCPP, mPP_mcclosure_data, nSVDIter);
+    // uPP_MC_SVD = (TH1F*)unfoldSvdMCPP.Hreco();
+    // uPP_MC_SVD->SetName("PP_MC_SVD_unfolding");
     
     RooUnfoldResponse ruResponsePP(mPP_Matrix->ProjectionY(),mPP_Matrix->ProjectionX(), mPP_Matrix,"","");
-    //regularization parameter definition: 
+    // //regularization parameter definition: 
     RooUnfoldSvd unfoldSvdPP(&ruResponsePP, dPP_Comb, nSVDIter);
     uPP_SVD = (TH1F*)unfoldSvdPP.Hreco();
     uPP_SVD->SetName("PP_SVD_unfolding");
   
     TFile fout(Form("svd_unfolding_matrix_param%d_%s_R%d_%d.root",nSVDIter,etaWidth,radius,date.GetDate()),"RECREATE");
+
     for(int i = 0; i<nbins_cent;i++){
 
+      //dPbPb_TrgComb[i]->Scale(1./scaleFactor_dataMC[i]);
+      //uPbPb_SVD[i]->Scale(1./scaleFactor_dataMC[i]);
       dPbPb_TrgComb[i]->Write();
       uPbPb_SVD[i]->Write();
       mPbPb_Matrix[i]->Write();
       mPbPb_Gen[i]->Write();
-      mPbPb_mcclosure_data[i]->Write();
-      uPbPb_MC_SVD[i]->Write();
-      mPbPb_mcclosure_Matrix[i]->Write();
-      mPbPb_mcclosure_gen[i]->Write();
+      // mPbPb_mcclosure_data[i]->Write();
+      // uPbPb_MC_SVD[i]->Write();
+      // mPbPb_mcclosure_Matrix[i]->Write();
+      // mPbPb_mcclosure_gen[i]->Write();
     }
 
+    //uPP_SVD->Scale(1./scaleFactor_dataMC_pp);
+    //dPP_Comb->Scale(1./scaleFactor_dataMC_pp);
     uPP_SVD->Write();
     dPP_Comb->Write();
     mPP_Matrix->Write();
     mPP_Gen->Write();
-    mPP_mcclosure_data->Write();
-    uPP_MC_SVD->Write();
-    mPP_mcclosure_Matrix->Write();
-    mPP_mcclosure_gen->Write();
+    // mPP_mcclosure_data->Write();
+    // uPP_MC_SVD->Write();
+    // mPP_mcclosure_Matrix->Write();
+    // mPP_mcclosure_gen->Write();
     
     fout.Close();
     

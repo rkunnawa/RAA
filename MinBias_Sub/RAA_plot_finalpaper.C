@@ -60,7 +60,7 @@ void RAA_plot_finalpaper(Int_t unfoldingCut = 40 , char *algo = "Pu", char *jet_
   TH2::SetDefaultSumw2();
 
   char * etaWidth = (char*) "20_eta_20";
-  char * etaLable = (char*) "0.0 < |eta| < 2.0";
+  char * etaLable = (char*) "0.0 < |#eta| < 2.0";
   Float_t etaLow = 0;
   Float_t etaHigh = 1.0;
   Float_t deltaEta = 2.0; 

@@ -69,6 +69,7 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"20_eta_20",
 
   // char * etaWidth = (char*)Form("%d_eta_%d",etaLow, etaHigh);
   cout<<"etaWidth = "<<etaWidth<<endl;
+  cout<<"Radius = "<<radius<<endl;
 
   bool isSymm = false;
   if(etaLow == etaHigh) isSymm = true;
@@ -462,7 +463,6 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"20_eta_20",
   TRandom rnd; 
   TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
 
-#if 0
   cout<<"matched Data ntuple "<<endl;
 
   for(long nentry = 0; nentry < entries; ++nentry ){
@@ -660,7 +660,6 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"20_eta_20",
     }
     
   }// data ntuple loop
-#endif
   
   entries = MC_matched->GetEntries();
   //entries = 1000;
@@ -672,13 +671,15 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"20_eta_20",
     MC_matched->GetEntry(nentry);
     
     Float_t Sumcand = chSum_2 + phSum_2 + neSum_2 + muSum_2;
-    //if(subid_2 != 0) continue;
+    if(subid_2 != 0) continue;
 
     Int_t cBin = findBin(hiBin_2);
     if(cBin == -1 || cBin >= nbins_cent) continue;    
     
     if(isSymm && TMath::Abs(eta_2) > (Float_t)etaHigh/10) continue;       
     if(!isSymm && (TMath::Abs(eta_2) < (Float_t)etaLow/10 || TMath::Abs(eta_2) > (Float_t)etaHigh/10)) continue;
+
+    weight = (Float_t)weight * 1e-5;
     
     if(calopt_2/pfpt_2 > 0.5 && calopt_2/pfpt_2 <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2/pfpt_2 - (Float_t)9/7)){
       hpbpb_gen[cBin]->Fill(pfrefpt_2, weight);
@@ -948,7 +949,8 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"20_eta_20",
 
     if(isSymm && TMath::Abs(eta_2) > (Float_t)etaHigh/10) continue;       
     if(!isSymm && (TMath::Abs(eta_2) < (Float_t)etaLow/10 || TMath::Abs(eta_2) > (Float_t)etaHigh/10)) continue;
-    
+
+    weight = (Float_t)weight * 1e-5;
 
     if(eMax_2/Sumcand < 0.05  ){
       hpbpb_gen[cBin]->Fill(pfrefpt_2, weight);
@@ -1044,7 +1046,7 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"20_eta_20",
     
   }// mc unmatched  ntuple loop
 
-  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_MC_subidNot0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius),"RECREATE");
+  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius),"RECREATE");
   fout.cd();
   
   for(int i = 0;i<nbins_cent;++i){
