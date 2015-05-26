@@ -166,7 +166,7 @@ void RAA_unfold_svd(int radius = 3,
     mPbPb_Matrix[i]->Print("base");
 
     scaleFactor_dataMC[i] = (Float_t) mPbPb_Gen[i]->GetBinContent(mPbPb_Gen[i]->FindBin(120)) / dPbPb_TrgComb[i]->GetBinContent(dPbPb_TrgComb[i]->FindBin(120));
-    // dPbPb_TrgComb[i]->Scale(scaleFactor_dataMC[i]);
+    dPbPb_TrgComb[i]->Scale(scaleFactor_dataMC[i]);
     // mPbPb_Gen[i]->Scale(1./scaleFactor_dataMC[i]);
     // mPbPb_Reco[i]->Scale(1./scaleFactor_dataMC[i]);
     // mPbPb_Matrix[i]->Scale(1./scaleFactor_dataMC[i]);
@@ -205,7 +205,7 @@ void RAA_unfold_svd(int radius = 3,
   mPP_Matrix->Print("base");
 
   scaleFactor_dataMC_pp = (Float_t)mPP_Gen->GetBinContent(mPP_Gen->FindBin(120))/dPP_Comb->GetBinContent(dPP_Comb->FindBin(120));
-  // dPP_Comb->Scale(scaleFactor_dataMC_pp);
+  dPP_Comb->Scale(scaleFactor_dataMC_pp);
   // mPP_Gen->Scale(1./scaleFactor_dataMC_pp);
   // mPP_Reco->Scale(1./scaleFactor_dataMC_pp);
   // mPP_Matrix->Scale(1./scaleFactor_dataMC_pp);
