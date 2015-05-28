@@ -74,7 +74,7 @@ TH1D *make1DplotHIforest(TFile *fileIN, const char* file, const char* xVar, int&
 //--------------------------------------------------------------
 void drawPatch(float x1, float y1, float x2, float y2); 
 //---------------------------------------------------------------------
-
+#if 0
 ///////////////////////////////////////////////////////////////////////
 //         TOOL BOX
 //////////////////////////////////////////////////////////////////////
@@ -148,7 +148,7 @@ void makeMultiPanelCanvas(TCanvas*& canv,
     }
   }
 }
-/*
+
 void rescaleBins(TH1& h){
   for (int i =1; i<=h.GetNbinsX(); i++){//Skip bin=0 since it it is the underflow bin
     double oldBin = h.GetBinContent(i);
@@ -160,24 +160,24 @@ void rescaleBins(TH1& h){
   return;
 
 }
-*/
 
-// divide by bin width
-void divideBinWidth(TH1 *h)
-{
-	h->Sumw2();
-	for (int i=0;i<=h->GetNbinsX();i++)
-	{
-		Float_t val = h->GetBinContent(i);
-		Float_t valErr = h->GetBinError(i);
-		val/=h->GetBinWidth(i);
-		valErr/=h->GetBinWidth(i);
-		h->SetBinContent(i,val);
-		h->SetBinError(i,valErr);
-	}
-	h->GetXaxis()->CenterTitle();
-	h->GetYaxis()->CenterTitle();
-}
+
+// // divide by bin width
+// void divideBinWidth(TH1 *h)
+// {
+// 	h->Sumw2();
+// 	for (int i=0;i<=h->GetNbinsX();i++)
+// 	{
+// 		Float_t val = h->GetBinContent(i);
+// 		Float_t valErr = h->GetBinError(i);
+// 		val/=h->GetBinWidth(i);
+// 		valErr/=h->GetBinWidth(i);
+// 		h->SetBinContent(i,val);
+// 		h->SetBinError(i,valErr);
+// 	}
+// 	h->GetXaxis()->CenterTitle();
+// 	h->GetYaxis()->CenterTitle();
+// }
 
 void drawText(const char *text, float xp, float yp){
   TLatex *tex = new TLatex(xp,yp,text);
@@ -189,7 +189,7 @@ void drawText(const char *text, float xp, float yp){
   tex->SetNDC();
   tex->Draw();
 }
-
+#endif
 void format1Dhisto(TH1& h1, double Ymax, double Ymin, double& col, double& Mstyle, double& fill, double& style, const char* titx, const char* tity ){
   //void format1Dhisto(TH1& h1, string& xTitle, double Ymax, double Ymin){
 
@@ -319,10 +319,10 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_HYDJET.root"));
     // TFile *ak5MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_HYDJET.root"));
 
-    TFile *ak2MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu2PF_20150320.root"));
-    TFile *ak3MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu3PF_20150320.root"));
-    TFile *ak4MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu4PF_20150320.root"));
-    //TFile *ak5MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu5PF_20150206.root"));
+    TFile *ak2MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_MC_akPu2PF_20150527.root"));
+    TFile *ak3MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_MC_akPu3PF_20150527.root"));
+    TFile *ak4MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_MC_akPu4PF_20150527.root"));
+    //TFile *ak5MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_MC_akPu5PF_20150206.root"));
     
     akTreeMC[0]   = (TTree*)ak2MCFile->Get("nt");
     akTreeMC[1]   = (TTree*)ak3MCFile->Get("nt");
@@ -334,10 +334,10 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_DATA.root"));
     // TFile *ak5dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_DATA.root"));
 
-    TFile *ak2dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu2PF_20150320.root"));
-    TFile *ak3dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu3PF_20150320.root"));
-    TFile *ak4dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu4PF_20150320.root"));
-    //TFile *ak5dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu5PF_20150206.root"));
+    TFile *ak2dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_data_akPu2PF_20150527.root"));
+    TFile *ak3dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_data_akPu3PF_20150527.root"));
+    TFile *ak4dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_data_akPu4PF_20150527.root"));
+    //TFile *ak5dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_data_akPu5PF_20150206.root"));
 
     akTreeData[0]   = (TTree*)ak2dataFile->Get("nt");
     akTreeData[1]   = (TTree*)ak3dataFile->Get("nt");

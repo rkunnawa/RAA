@@ -46,7 +46,7 @@ using namespace std;
 void RAA_unfold_svd(int radius = 3,
 		    char* algo = (char*) "Pu",
 		    char *jet_type = (char*) "PF",
-		    int unfoldingCut = 40,
+		    int unfoldingCut = 60,
 		    char* etaWidth = (char*) "20_eta_20",
 		    double deltaEta = 4.0)
 {
@@ -150,6 +150,11 @@ void RAA_unfold_svd(int radius = 3,
     Float_t bin_endmb=hMinBias[i]->FindBin(25);
     
     float scalerangeweight=dPbPb_TrgComb[i]->Integral(bin_no,bin_end)/hMinBias[i]->Integral(bin_nomb,bin_endmb);
+
+    // correct for the minbias error before subtraction and scaling. 
+    for(int j = 0; j<hMinBias[i]->GetNbinsX(); ++j)
+      hMinBias[i]->SetBinError(j+1, (Float_t)hMinBias[i]->GetBinError(j+1)/scalerangeweight);
+
     hMinBias[i]->Scale(scalerangeweight);
     dPbPb_TrgComb[i]->Add(hMinBias[i], -1);
     
@@ -165,12 +170,19 @@ void RAA_unfold_svd(int radius = 3,
     mPbPb_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_anaBin_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
     mPbPb_Matrix[i]->Print("base");
 
-    scaleFactor_dataMC[i] = (Float_t) mPbPb_Gen[i]->GetBinContent(mPbPb_Gen[i]->FindBin(120)) / dPbPb_TrgComb[i]->GetBinContent(dPbPb_TrgComb[i]->FindBin(120));
-    dPbPb_TrgComb[i]->Scale(scaleFactor_dataMC[i]);
-    // mPbPb_Gen[i]->Scale(1./scaleFactor_dataMC[i]);
-    // mPbPb_Reco[i]->Scale(1./scaleFactor_dataMC[i]);
-    // mPbPb_Matrix[i]->Scale(1./scaleFactor_dataMC[i]);
-      
+    cout<<"matrix bin content 100 before scaling = "<<mPbPb_Matrix[i]->GetBinContent(22,22)<<endl;
+    cout<<"matrix bin Error   100 before scaling = "<<mPbPb_Matrix[i]->GetBinError(22,22)<<endl;
+    
+    scaleFactor_dataMC[i] = (Float_t) mPbPb_Reco[i]->GetBinContent(mPbPb_Reco[i]->FindBin(120)) / dPbPb_TrgComb[i]->GetBinContent(dPbPb_TrgComb[i]->FindBin(120));
+    cout<<"scale factor for cent "<<i<<" = "<<scaleFactor_dataMC[i]<<endl;
+    // dPbPb_TrgComb[i]->Scale(scaleFactor_dataMC[i]);
+    mPbPb_Gen[i]->Scale(1./scaleFactor_dataMC[i]);
+    mPbPb_Reco[i]->Scale(1./scaleFactor_dataMC[i]);
+    mPbPb_Matrix[i]->Scale(1./scaleFactor_dataMC[i]);
+
+    cout<<"matrix bin content 100 after scaling = "<<mPbPb_Matrix[i]->GetBinContent(22,22)<<endl;
+    cout<<"matrix bin Error   100 after scaling = "<<mPbPb_Matrix[i]->GetBinError(22,22)<<endl;
+    
     mPbPb_mcclosure_data[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hrec_c_pbpb_akPu%d_1_%d",radius, radius, i));
     mPbPb_mcclosure_data[i]->Print("base");
     mPbPb_mcclosure_gen[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hgen_pbpb_akPu%d_1_%d",radius, radius, i));
@@ -178,20 +190,35 @@ void RAA_unfold_svd(int radius = 3,
     mPbPb_mcclosure_Matrix[i] = (TH2F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hmatrix_pbpb_akPu%d_1_%d",radius, radius, i));
     mPbPb_mcclosure_Matrix[i]->Print("base");
     
-    // for(int k = 1;k<=unfoldingCutBin;k++){
-    //   dPbPb_TrgComb[i]->SetBinContent(k,0);
-    //   mPbPb_Gen[i]->SetBinContent(k,0);
-    //   mPbPb_Reco[i]->SetBinContent(k,0);
-    //   dPbPb_TrgComb[i]->SetBinError(k,0);
-    //   mPbPb_Gen[i]->SetBinError(k,0);
-    //   mPbPb_Reco[i]->SetBinError(k,0);
-    //   for(int l = 1;l<=nbins_pt;l++){
-    // 	mPbPb_Matrix[i]->SetBinContent(k,l,0);
-    // 	mPbPb_Matrix[i]->SetBinContent(l,k,0);
-    // 	mPbPb_Matrix[i]->SetBinError(k,l,0);
-    // 	mPbPb_Matrix[i]->SetBinError(l,k,0);	
-    //   }
-    // }
+    for(int k = 1;k<=unfoldingCutBin;k++){
+      dPbPb_TrgComb[i]->SetBinContent(k,0);
+      mPbPb_Gen[i]->SetBinContent(k,0);
+      mPbPb_Reco[i]->SetBinContent(k,0);
+      dPbPb_TrgComb[i]->SetBinError(k,0);
+      mPbPb_Gen[i]->SetBinError(k,0);
+      mPbPb_Reco[i]->SetBinError(k,0);
+      for(int l = 1;l<=nbins_pt;l++){
+    	mPbPb_Matrix[i]->SetBinContent(k,l,0);
+    	mPbPb_Matrix[i]->SetBinContent(l,k,0);
+    	mPbPb_Matrix[i]->SetBinError(k,l,0);
+    	mPbPb_Matrix[i]->SetBinError(l,k,0);	
+      }
+    }
+
+    for(int k = 28;k<=nbins_pt;k++){
+      dPbPb_TrgComb[i]->SetBinContent(k,0);
+      mPbPb_Gen[i]->SetBinContent(k,0);
+      mPbPb_Reco[i]->SetBinContent(k,0);
+      dPbPb_TrgComb[i]->SetBinError(k,0);
+      mPbPb_Gen[i]->SetBinError(k,0);
+      mPbPb_Reco[i]->SetBinError(k,0);
+      for(int l = 1;l<=nbins_pt;l++){
+    	mPbPb_Matrix[i]->SetBinContent(k,l,0);
+    	mPbPb_Matrix[i]->SetBinContent(l,k,0);
+    	mPbPb_Matrix[i]->SetBinError(k,l,0);
+    	mPbPb_Matrix[i]->SetBinError(l,k,0);	
+      }
+    }
   }
 
   dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_anaBin_HLTComb_R%d_%s",radius,etaWidth));
@@ -204,11 +231,11 @@ void RAA_unfold_svd(int radius = 3,
   mPP_Matrix = (TH2F*)fPP_in->Get(Form("hpp_anaBin_matrix_HLT_R%d_%s",radius,etaWidth));
   mPP_Matrix->Print("base");
 
-  scaleFactor_dataMC_pp = (Float_t)mPP_Gen->GetBinContent(mPP_Gen->FindBin(120))/dPP_Comb->GetBinContent(dPP_Comb->FindBin(120));
-  dPP_Comb->Scale(scaleFactor_dataMC_pp);
-  // mPP_Gen->Scale(1./scaleFactor_dataMC_pp);
-  // mPP_Reco->Scale(1./scaleFactor_dataMC_pp);
-  // mPP_Matrix->Scale(1./scaleFactor_dataMC_pp);
+  scaleFactor_dataMC_pp = (Float_t)mPP_Reco->GetBinContent(mPP_Reco->FindBin(120))/dPP_Comb->GetBinContent(dPP_Comb->FindBin(120));
+  // dPP_Comb->Scale(scaleFactor_dataMC_pp);
+  mPP_Gen->Scale(1./scaleFactor_dataMC_pp);
+  mPP_Reco->Scale(1./scaleFactor_dataMC_pp);
+  mPP_Matrix->Scale(1./scaleFactor_dataMC_pp);
   
   // get the mc closure test histograms
   mPP_mcclosure_data = (TH1F*)fMCClosure->Get(Form("ak%dJetAnalyzer/hrec_c_pp_ak%d_0_7",radius,radius));
@@ -222,11 +249,11 @@ void RAA_unfold_svd(int radius = 3,
   // would be better to read in the histograms and rebin them. come to think of it, it would be better to have them already rebinned (and properly scaled - to the level of differential cross section in what ever barns (inverse micro barns) but keep it consistent) from the read macro. 
 
   
-  Int_t nSVDIter = 1;
+  Int_t nSVDIter = 1.0;
   
-  for(int j = 5; j<6; ++j){
+  for(int j = 2; j<21; ++j){
     nSVDIter = j;
-
+    
     for(int i = 0;i<nbins_cent;++i){
       // rebin histograms before we send it to unfolding 
       // histograms are already binned
@@ -234,7 +261,7 @@ void RAA_unfold_svd(int radius = 3,
       cout<<"cent = "<<i<<endl;
       //since SVD is very straight forward, lets do it rignt here:
       //get the SVD response matrix:
-      RooUnfoldResponse ruResponse(mPbPb_Matrix[i]->ProjectionY(),mPbPb_Matrix[i]->ProjectionX(), mPbPb_Matrix[i],"","");
+      RooUnfoldResponse ruResponse(mPbPb_Reco[i],mPbPb_Gen[i], mPbPb_Matrix[i],"","");
       //regularization parameter definition: 
       RooUnfoldSvd unfoldSvd(&ruResponse, dPbPb_TrgComb[i], nSVDIter);
       uPbPb_SVD[i] = (TH1F*)unfoldSvd.Hreco();
@@ -248,19 +275,19 @@ void RAA_unfold_svd(int radius = 3,
       
     }// centrality bin loop
 
-    RooUnfoldResponse ruResponseMCPP(mPP_mcclosure_Matrix->ProjectionY(),mPP_mcclosure_Matrix->ProjectionX(), mPP_mcclosure_Matrix,"","");
+    // RooUnfoldResponse ruResponseMCPP(mPP_Reco, mPP_Gen, mPP_mcclosure_Matrix,"","");
     // //regularization parameter definition: 
     // RooUnfoldSvd unfoldSvdMCPP(&ruResponseMCPP, mPP_mcclosure_data, nSVDIter);
     // uPP_MC_SVD = (TH1F*)unfoldSvdMCPP.Hreco();
     // uPP_MC_SVD->SetName("PP_MC_SVD_unfolding");
     
-    RooUnfoldResponse ruResponsePP(mPP_Matrix->ProjectionY(),mPP_Matrix->ProjectionX(), mPP_Matrix,"","");
+    RooUnfoldResponse ruResponsePP(mPP_Reco, mPP_Gen, mPP_Matrix,"","");
     // //regularization parameter definition: 
     RooUnfoldSvd unfoldSvdPP(&ruResponsePP, dPP_Comb, nSVDIter);
     uPP_SVD = (TH1F*)unfoldSvdPP.Hreco();
     uPP_SVD->SetName("PP_SVD_unfolding");
   
-    TFile fout(Form("svd_unfolding_matrix_param%d_%s_R%d_%d.root",nSVDIter,etaWidth,radius,date.GetDate()),"RECREATE");
+    TFile fout(Form("svd_unfolding_matrix_param%d_%s_%dGeVCut_R%d_%d.root",j,etaWidth,unfoldingCut,radius,date.GetDate()),"RECREATE");
 
     for(int i = 0; i<nbins_cent;i++){
 
