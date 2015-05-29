@@ -41,7 +41,7 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 using namespace std;
 
 void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"20_eta_20", 
-				     Int_t radius = 3, 
+				     Int_t radius = 4, 
 				     Int_t etaLow = 20, 
 				     Int_t etaHigh = 20){
 
@@ -54,23 +54,39 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"20_eta_20",
 
   bool isSymm = false;
   if(etaLow == etaHigh) isSymm = true;
+  char * ntuple = (char*)"Raghav"; //  or "Pawan"
+
   
   // the cut is a 3 step cut based on the different value of the calopt/pfpt - copy the following lines into your loop (with the corresponding branch address set)
   // if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) hGood->Fill();
   // if(calopt/pfpt > 0.5 && calopt/pfpt <= 0.85 && eMax/Sumcand < (18/7 *(Float_t)calopt_1/pfpt_1 - 9/7)) ) hGood->Fill();
   // if(calopt/pfpt > 0.85 & eMax/Sumcand > 0.9) hGood->Fill();
 
-  TFile * fData, * fMC; 
+  TFile * fData, * fMC;
+  TTree * Data_matched, * Data_unmatched, * MC_matched, * MC_unmatched; 
 
-  fData = TFile::Open("/mnt/hadoop/cms/store/user/pawan/ntuples/JetRaa_ak234_pp_Data.root");
-  fMC = TFile::Open("/mnt/hadoop/cms/store/user/pawan/ntuples/JetRaa_ak234_pp_MC.root");
+  if(ntuple == "Pawan"){
+    fData = TFile::Open("/mnt/hadoop/cms/store/user/pawan/ntuples/JetRaa_ak234_pp_Data.root");
+    fMC = TFile::Open("/mnt/hadoop/cms/store/user/pawan/ntuples/JetRaa_ak234_pp_MC.root");
 
-  TTree * Data_matched= (TTree*)fData->Get(Form("ak%dJetAnalyzer/matchedJets",radius));
-  TTree * Data_unmatched = (TTree*)fData->Get(Form("ak%dJetAnalyzer/unmatchedPFJets",radius));
+    Data_matched= (TTree*)fData->Get(Form("ak%dJetAnalyzer/matchedJets",radius));
+    Data_unmatched = (TTree*)fData->Get(Form("ak%dJetAnalyzer/unmatchedPFJets",radius));
 
-  TTree * MC_matched = (TTree*)fMC->Get(Form("ak%dJetAnalyzer/matchedJets",radius));
-  TTree * MC_unmatched = (TTree*)fMC->Get(Form("ak%dJetAnalyzer/unmatchedPFJets",radius));
+    MC_matched = (TTree*)fMC->Get(Form("ak%dJetAnalyzer/matchedJets",radius));
+    MC_unmatched = (TTree*)fMC->Get(Form("ak%dJetAnalyzer/unmatchedPFJets",radius));
+  }
+  if(ntuple == "Raghav"){
+    // Raghav's ntuples - running to find the difference in spectra between Pawan's and mine.
+    fData = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_Data_calo_pf_jet_correlation_deltaR_0p2_ak%d_20150331.root",radius));
+    fMC = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/pp_MC_calo_pf_jet_correlation_deltaR_0p2_ak%d_20150331.root",radius));
 
+    Data_matched= (TTree*)fData->Get("matchedJets");
+    Data_unmatched = (TTree*)fData->Get("unmatchedPFJets");
+
+    MC_matched = (TTree*)fMC->Get("matchedJets");
+    MC_unmatched = (TTree*)fMC->Get("unmatchedPFJets");
+  }
+  
   // setup the residual correction factors 
   // TF1 = 1 - [0]/pow(x,[1]), in the pt range till 180. after 180, all the factors are 1. 
 
@@ -332,8 +348,8 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"20_eta_20",
   MC_matched->SetBranchAddress("phSum",&phSum_2);
   MC_matched->SetBranchAddress("neSum",&neSum_2);
   MC_matched->SetBranchAddress("muSum",&muSum_2);
-  MC_matched->SetBranchAddress("refpt",&pfrefpt_2);
-  MC_matched->SetBranchAddress("jet40",&jet40_2);
+  if(ntuple == "Pawan")  MC_matched->SetBranchAddress("refpt",&pfrefpt_2);
+  if(ntuple == "Raghav") MC_matched->SetBranchAddress("pfrefpt",&pfrefpt_2);  MC_matched->SetBranchAddress("jet40",&jet40_2);
   MC_matched->SetBranchAddress("jet60",&jet60_2);
   MC_matched->SetBranchAddress("jet80",&jet80_2);
   MC_matched->SetBranchAddress("weight", &weight);
@@ -348,7 +364,8 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"20_eta_20",
   MC_unmatched->SetBranchAddress("phSum",&phSum_2);
   MC_unmatched->SetBranchAddress("neSum",&neSum_2);
   MC_unmatched->SetBranchAddress("muSum",&muSum_2);
-  MC_unmatched->SetBranchAddress("refpt",&pfrefpt_2);
+  if(ntuple == "Pawan")  MC_matched->SetBranchAddress("refpt",&pfrefpt_2);
+  if(ntuple == "Raghav") MC_matched->SetBranchAddress("pfrefpt",&pfrefpt_2);
   MC_unmatched->SetBranchAddress("jet40",&jet40_2);
   MC_unmatched->SetBranchAddress("jet60",&jet60_2);
   MC_unmatched->SetBranchAddress("jet80",&jet80_2);
@@ -825,7 +842,7 @@ void RAA_plot_yetkinCutEfficiency_pp(char * etaWidth = (char*)"20_eta_20",
     
   }// mc unmatched  ntuple loop
 
-  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius),"RECREATE");
+  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",ntuple, etaWidth, radius),"RECREATE");
   fout.cd();
   
   hpp_TrgObjComb->Add(hpp_TrgObj80);

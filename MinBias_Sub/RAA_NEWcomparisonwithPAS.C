@@ -109,9 +109,9 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   
   // load in the necessary files:
-  TFile *f_unfold_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",2,etaWidth,30,jet_type));
-  TFile *f_unfold_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",3,etaWidth,40,jet_type));
-  TFile *f_unfold_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_without80FakeRemoval_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150519.root",4,etaWidth,50,jet_type));
+  TFile *f_unfold_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150528.root",2,etaWidth,30,jet_type));
+  TFile *f_unfold_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150528.root",3,etaWidth,40,jet_type));
+  TFile *f_unfold_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150528.root",4,etaWidth,50,jet_type));
 
   TFile *fPbPb_data_R2 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,2));
   TFile *fPP_data_R2 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, 2));
@@ -122,9 +122,9 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   TFile *fPbPb_data_R4 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,4));
   TFile *fPP_data_R4 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, 4));
 
-  TFile * fMinBias_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedwithout80_%s_R0p%d.root",etaWidth,2)); //MinBias File
-  TFile * fMinBias_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedwithout80_%s_R0p%d.root",etaWidth,3)); //MinBias File
-  TFile * fMinBias_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedwithout80_%s_R0p%d.root",etaWidth,4)); //MinBias File 
+  TFile * fMinBias_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,2)); //MinBias File
+  TFile * fMinBias_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,3)); //MinBias File
+  TFile * fMinBias_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,4)); //MinBias File 
 
   cout<<"loaded the files "<<endl;
 
@@ -148,7 +148,11 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   Float_t bin_nomb = 1;
   Float_t bin_endmb = 1;
   
-  Float_t scalerangeweight = 1; 
+  Float_t scalerangeweight = 1;
+  float cutarray_R2[nbins_cent] = {55,50,40,30,30,30};
+  float cutarray_R3[nbins_cent] = {65,60,50,40,40,40};
+  float cutarray_R4[nbins_cent] = {75,70,60,50,50,50};
+
   
   for(int i = 0;i<nbins_cent;i++){
 
@@ -178,6 +182,48 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
     PbPb_measured_fine[2][i] = (TH1F*)fPbPb_data_R4->Get(Form("hpbpb_HLTComb_R4_20_eta_20_cent%d",i));
     //divideBinWidth(PbPb_measured_fine[2][i]);
 
+    Float_t bincon_R2=cutarray_R2[i]; 
+    Int_t bincut_R2= PbPb_MBSub[0][i]->FindBin(bincon_R2); 
+    
+    for(int k = bincut_R2;k<=400;k++) 
+      { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+	PbPb_MBSub[0][i]->SetBinContent(k,0); 
+	PbPb_MBSub[0][i]->SetBinError(k,0);
+      } 
+    
+    for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+      PbPb_MBSub[0][i]->SetBinContent(k,0); 
+      PbPb_MBSub[0][i]->SetBinError(k,0);
+    }
+
+    Float_t bincon_R3=cutarray_R3[i]; 
+    Int_t bincut_R3= PbPb_MBSub[2][i]->FindBin(bincon_R3); 
+    
+    for(int k = bincut_R3;k<=400;k++) 
+      { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+	PbPb_MBSub[1][i]->SetBinContent(k,0); 
+	PbPb_MBSub[1][i]->SetBinError(k,0);
+      } 
+    
+    for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+      PbPb_MBSub[1][i]->SetBinContent(k,0); 
+      PbPb_MBSub[1][i]->SetBinError(k,0);
+    }
+
+    Float_t bincon_R4=cutarray_R4[i]; 
+    Int_t bincut_R4= PbPb_MBSub[2][i]->FindBin(bincon_R4); 
+    
+    for(int k = bincut_R4;k<=400;k++) 
+      { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+	PbPb_MBSub[2][i]->SetBinContent(k,0); 
+	PbPb_MBSub[2][i]->SetBinError(k,0);
+      } 
+    
+    for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+      PbPb_MBSub[2][i]->SetBinContent(k,0); 
+      PbPb_MBSub[2][i]->SetBinError(k,0);
+    }
+    
     bin_no    = PbPb_measured_fine[0][i]->FindBin(15);
     bin_end   = PbPb_measured_fine[0][i]->FindBin(25);
     
@@ -1689,7 +1735,7 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   cRAA->cd(3);
   drawText("Trig Combined with MinBias&&!Jet80 subtracted",0.06,0.2,16);
 
-  cRAA->SaveAs(Form("May21/RAA_newComparingwithPAS_ak%s3%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
+  cRAA->SaveAs(Form("May28_MBnoJet80Cut/RAA_newComparingwithPAS_ak%s3%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
 #endif
   
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1739,9 +1785,11 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   drawText("|vz|<15, pCES, HBHE",0.15,0.25,16);
   //drawText("hiNpix_1 > 38000 - 500*NJet",0.15,0.15,16);
   //cPbPb_sigma->cd(3);
-  drawText("Trig Combined with MinBias&&!Jet80 subtracted",0.11,0.15,16);
+  drawText("Trig Combined with MinBias subtracted",0.11,0.15,16);
 
-  cPbPb_sigma->SaveAs(Form("May21/PbPb_spectra_newComparingwithPAS_ak%s3%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
+  cPbPb_sigma->SaveAs(Form("May28_MBnoJet80Cut/PbPb_spectra_newComparingwithPAS_ak%s3%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
+  cPbPb_sigma->SaveAs(Form("May28_MBnoJet80Cut/PbPb_spectra_newComparingwithPAS_ak%s3%s_%d.C",algo,jet_type,date.GetDate()),"RECREATE");
+  cPbPb_sigma->SaveAs(Form("May28_MBnoJet80Cut/PbPb_spectra_newComparingwithPAS_ak%s3%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1776,7 +1824,9 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   drawText("|#eta|<2, |vz|<15",0.2,0.30,16);
   drawText("measured spectra",0.2,0.16,16);
   
-  cPP_sigma->SaveAs(Form("May21/PP_spectra_newComparingwithPAS_ak3%s_%d.pdf",jet_type,date.GetDate()),"RECREATE");
+  cPP_sigma->SaveAs(Form("May28_MBnoJet80Cut/PP_spectra_newComparingwithPAS_ak3%s_%d.pdf",jet_type,date.GetDate()),"RECREATE");
+  cPP_sigma->SaveAs(Form("May28_MBnoJet80Cut/PP_spectra_newComparingwithPAS_ak3%s_%d.C",jet_type,date.GetDate()),"RECREATE");
+  cPP_sigma->SaveAs(Form("May28_MBnoJet80Cut/PP_spectra_newComparingwithPAS_ak3%s_%d.root",jet_type,date.GetDate()),"RECREATE");
 
   //
   timer.Stop();

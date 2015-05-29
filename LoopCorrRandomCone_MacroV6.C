@@ -498,13 +498,17 @@ void LoopCorrRandomCone_MacroV6(){
     double color  [nAlgos] = {1,2,4};//,2,4};
     double fill   [nAlgos] = {0,0,0};//,0,0};
     double meanMC[nCent][nAlgos];
+    double RMSMC[nCent][nAlgos];
     double meanErrMC[nCent][nAlgos]; 
     double meanData[nCent][nAlgos];
+    double RMSData[nCent][nAlgos];
     double meanErrData[nCent][nAlgos];
 
     double meanMC2[nCent][nAlgos];
+    double RMSMC2[nCent][nAlgos];
     double meanErrMC2[nCent][nAlgos]; 
     double meanData2[nCent][nAlgos];
+    double TMSData2[nCent][nAlgos];
     double meanErrData2[nCent][nAlgos];
    
     const char* xTitle = "Random Cone sumPF E_{T}";
@@ -570,6 +574,7 @@ void LoopCorrRandomCone_MacroV6(){
 	//cout<<" relative Error: "<<(ranConeMC[i][ir]->GetBinError(i))/(ranConeMC[i][ir]->GetBinContent(7))<<endl;
 	
 	meanMC[i][ir] = ranConeMC[i][ir]->GetMean();
+	RMSMC[i][ir] = ranConeMC[i][ir]->GetRMS();
 	meanErrMC[i][ir] = ranConeMC[i][ir]->GetMeanError();
 	format1Dhisto(*ranConeMC[i][ir],-1,-1,color[ir],marker[0],color[ir],fill[ir],xTitle,yTitle);
 	//ranConeMC[i][ir]->SetMaximum(1);
@@ -601,6 +606,7 @@ void LoopCorrRandomCone_MacroV6(){
 	//cout<<" relative Error: "<<(ranConeData[i][ir]->GetBinError(i))/(ranConeData[i][ir]->GetBinContent(7))<<endl;
 
 	meanData[i][ir] = ranConeData[i][ir]->GetMean();
+	RMSData[i][ir] = ranConeData[i][ir]->GetRMS();
 	meanErrData[i][ir] = ranConeData[i][ir]->GetMeanError();
 	format1Dhisto(*ranConeData[i][ir],-1,-1,color[ir],marker[1],color[ir],fill[ir],xTitle,yTitle);
 	//ranConeData[i][ir]->SetMaximum(1);
@@ -623,7 +629,7 @@ void LoopCorrRandomCone_MacroV6(){
 	//if (ir==0)
 	  //leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");	  
 	
-	leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [%5.2f #pm %5.2f]",varLabel[ir],hType[0],meanMC[i][ir],meanErrMC[i][ir]),"lp");
+	leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [%5.2f #pm %5.2f]",varLabel[ir],hType[0],RMSMC[i][ir],meanErrMC[i][ir]),"lp");
 	leg1[i]->Draw();	      
 	drawText(cent[i], 0.83, 0.95,20);
 	
@@ -649,7 +655,7 @@ void LoopCorrRandomCone_MacroV6(){
 	
 	//f2->Draw("same");
 	
-	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s [%5.2f #pm %5.2f ]",hType[1],meanData[i][ir],meanErrData[i][ir]),"lp");
+	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s [%5.2f #pm %5.2f ]",hType[1],RMSData[i][ir],meanErrData[i][ir]),"lp");
 	leg1[i]->Draw();	      
 	//drawText(cent[i], 0.83, 0.23);
 	 
