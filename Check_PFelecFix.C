@@ -117,15 +117,15 @@ void Check_PFelecFix(int radius = 3,
     drawText(Form("%s %2.0f-%2.0f%",fileType,2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.2,0.2,14);
 
     ceMax_vs_jtpt->cd(k+1);
-    heMax_vs_jtpt[k][cent]->Draw();
+    heMax_vs_jtpt[k][cent]->Draw("colz");
     drawText(Form("%s %2.0f-%2.0f%",fileType,2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.2,0.2,14);
 
     ceMaxJtpt_vs_jtpt->cd(k+1);
-    heMaxJtpt_vs_jtpt[k][cent]->Draw();
+    heMaxJtpt_vs_jtpt[k][cent]->Draw("colz");
     drawText(Form("%s %2.0f-%2.0f%",fileType,2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.2,0.2,14);
 
     ceMaxSumcand_vs_jtpt->cd(k+1);
-    heMax_vs_jtpt[k][cent]->Draw();
+    heMax_vs_jtpt[k][cent]->Draw("colz");
     drawText(Form("%s %2.0f-%2.0f%",fileType,2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.2,0.2,14);
 
   }
