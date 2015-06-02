@@ -1760,7 +1760,7 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
     
     //PASPbPb_measured[i]->Scale(1./4);
     PASPbPb_measured[i]->SetMarkerStyle(33);
-    PASPbPb_measured[i]->SetMarkerColor(kGreen);
+    PASPbPb_measured[i]->SetMarkerColor(kRed);
     PASPbPb_measured[i]->Draw("same");
 
     drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.75,0.8,20);
@@ -1808,13 +1808,13 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   PP_measured_fine[1]->Draw();
 
   PASPP_measured->Scale(5300./212.);
-  PASPP_measured->SetMarkerColor(kGreen);
+  PASPP_measured->SetMarkerColor(kRed);
   PASPP_measured->SetMarkerStyle(33);
   PASPP_measured->Draw("same");
 
   TLegend *PP_sigma = myLegend(0.4,0.7,0.75,0.9);
   PP_sigma->AddEntry(PP_measured_fine[1]," latest pp 2013","pl");
-  PP_sigma->AddEntry(PASPP_measured,"2012 PAS (trxMax/jtpt > 0.1)* (5300/212)","pl");
+  PP_sigma->AddEntry(PASPP_measured,"2012 PAS (trxMax/jtpt > 0.01)* (5300/212)","pl");
   PP_sigma->SetTextSize(0.03);
   PP_sigma->Draw();
 

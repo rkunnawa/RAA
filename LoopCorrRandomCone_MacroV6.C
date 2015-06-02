@@ -537,7 +537,7 @@ void LoopCorrRandomCone_MacroV6(){
     //Loop over the 6 centrality sections
     for (int i=0; i<nCent; i++){
       cout<<"centrality = "<<i<<endl;
-      leg1[i] = myLegend(0.50,0.70,0.80,0.90);//top right
+      leg1[i] = myLegend(0.35,0.70,0.65,0.90);//top right
       //leg1[i]->SetFillColor(0);
       leg1[i]->SetTextSize(0.03);
       //leg1[i]->SetBorderSize(0);
@@ -629,7 +629,8 @@ void LoopCorrRandomCone_MacroV6(){
 	//if (ir==0)
 	  //leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");	  
 	
-	leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [%5.2f #pm %5.2f]",varLabel[ir],hType[0],RMSMC[i][ir],meanErrMC[i][ir]),"lp");
+	leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s[%5.2f, RMS: %5.2f]",varLabel[ir],hType[0],meanMC[i][ir],RMSMC[i][ir]),"lp");
+	leg1[i]->SetTextSize(0.04);
 	leg1[i]->Draw();	      
 	drawText(cent[i], 0.83, 0.95,20);
 	
@@ -655,7 +656,7 @@ void LoopCorrRandomCone_MacroV6(){
 	
 	//f2->Draw("same");
 	
-	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s [%5.2f #pm %5.2f ]",hType[1],RMSData[i][ir],meanErrData[i][ir]),"lp");
+	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s[%5.2f, RMS: %5.2f ]",hType[1],meanData[i][ir],RMSData[i][ir]),"lp");
 	leg1[i]->Draw();	      
 	//drawText(cent[i], 0.83, 0.23);
 	 
