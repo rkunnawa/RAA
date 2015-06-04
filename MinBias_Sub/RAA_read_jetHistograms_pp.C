@@ -693,7 +693,6 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
 	hMC_Jet80_noCut->Fill(pfrefpt_2[g], weight);
 	hpp_MC_Jet80_noCut->Fill(pfrefpt_2[g], weight);
 
-
 	//if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) {
 	hMC_Jet80_CutA->Fill(pfrefpt_2[g], weight);
 	hpp_Jet80_gen->Fill(pfrefpt_2[g], weight);
@@ -744,9 +743,9 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
 	// if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2/Sumcand >= 0.05) hMC_Jet80_CutA_rej->Fill(pfrefpt_2[g], weight[g]);
 	// if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) hMC_Jet80_CutA_rej->Fill(pfrefpt_2[g], weight[g]);
 
-      }
+      }//jet80 selection
 
-    }
+    }//jet loop
     
     
   }// mc ntuple loop

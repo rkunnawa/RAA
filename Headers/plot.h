@@ -82,7 +82,7 @@ void putCMSPrel(double x=0.2, double y=0.95, double size=0.05){
 
 void putPbPbLumi(double x=0.2, double y=0.95, double size=0.05){
   TLatex *tex=0;
-  tex = new TLatex(x,y,"PbPb #int L dt = 145 #mu b^{-1}");
+  tex = new TLatex(x,y,"PbPb #int L dt = 160 #mu b^{-1}");
   tex->SetTextSize(size);
   tex->SetLineWidth(2);
   tex->SetNDC();

@@ -36,16 +36,20 @@ double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
 double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 double npart[nbins_cent+1] = {389.84, 307.65, 223.95, 107.5, 41.65, 11.55, 112.9};
 
-const int nbins_pt = 30;
-const double boundaries_pt[nbins_pt+1] = {
-  3, 4, 5, 7, 9, 12, 
-  15, 18, 21, 24, 28,
-  32, 37, 43, 49, 56,
-  64, 74, 84, 97, 114,
-  133, 153, 174, 196,
-  220, 245, 300, 
-  330, 362, 395 
-};
+/* const int nbins_pt = 30; */
+/* const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300,   330, 362, 395 }; */
+
+// this is the cms full analysis pT bins 
+const int nbins_pt = 32; 
+const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300,   330, 362, 395, 501 }; 
+
+// this is the atlas pT binning for the spectra. 
+/* static const int nbins_pt = 12; */
+/* static const double boundaries_pt[nbins_pt+1] = {31., 39., 50., 63., 79., 100., 125., 158., 199., 251., 316., 398., 501}; */
+
+// this is the atlas pT binning for the Rcp plots. 
+/* static const int nbins_pt = 12;  */
+/* static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};  */
 
 class SysData
 {
