@@ -35,6 +35,7 @@
 static const int nbins_cent = 6;
 static const Double_t boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};// multiply by 2.5 to get your actual centrality % (old 2011 data) 
 //now we have to multiply by 5, since centrality goes from 0-200. 
+const double kdelrcut=0.3;
 
 int findBin(int bin)
 {
@@ -59,7 +60,7 @@ using namespace std;
 
 
 void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
-				  Int_t radius = 2,
+				  Int_t radius = 3,
 				  Int_t etaLow = 20,
 				  Int_t etaHigh = 20)
 {
@@ -358,11 +359,15 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   Int_t jet55_p_1, jet65_p_1, jet80_p_1;
   Int_t jet55_2, jet65_2, jet80_2;
   Int_t jet55_p_2;
+  Float_t pthat_2;
   Double_t weight;
   Int_t subid_2[1000];
   Int_t hiBin_1, hiBin_2;
   Float_t eta_1[1000], eta_2[1000];
   Float_t pfrawpt_1[1000], pfrawpt_2[1000]; 
+  Int_t nref_2;
+  Int_t pfrefidx_2[1000]; //! REF -> PF match index
+  Float_t refdrjt_2[1000];
 
   if(ntuple == "Pawan"){
     Data_matched->SetBranchAddress("npf", &npf_1);
@@ -426,6 +431,10 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 #endif
 
   MC_matched->SetBranchAddress("npf", &npf_2);
+  MC_matched->SetBranchAddress("nref", &nref_2);
+  MC_matched->SetBranchAddress("pfrefidx",&pfrefidx_2);
+  MC_matched->SetBranchAddress("refdrjt",&refdrjt_2);
+  MC_matched->SetBranchAddress("pthat", &pthat_2);
   MC_matched->SetBranchAddress("isCaloMatch", &isCaloMatch_2);
   MC_matched->SetBranchAddress("calopt",&calopt_2);
   MC_matched->SetBranchAddress("pfpt",&pfpt_2);
@@ -511,6 +520,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   TRandom rnd; 
   TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
 
+#if 0
   cout<<"matched Data ntuple "<<endl;
 
   for(long nentry = 0; nentry < entries; ++nentry ){
@@ -700,6 +710,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     
   }// data ntuple loop
   
+#endif
 #if 0
   if(ntuple == "Raghav"){
     // data unmatched loop:
@@ -781,7 +792,8 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   
   entries = MC_matched->GetEntries();
   //entries = 1000;
-  // MC loop
+  // MC loop      
+
   cout<<" looking at matched MC ntuple "<<endl;
   for(long nentry = 0; nentry < entries; ++nentry){
 
@@ -794,257 +806,261 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     for(int g = 0; g<npf_2; ++g){
     
       Float_t Sumcand = chSum_2[g] + phSum_2[g] + neSum_2[g] + muSum_2[g];
+      int refid = -1; 
       
-      if(subid_2[g] != 0) continue;
-
+      if(pfpt_2[g] > 2 * pthat_2) continue;
+      refid = pfrefidx_2[g];
+      if(subid_2[refid] != 0 || fabs(refdrjt_2[refid]) > kdelrcut) continue;
+      if(refid < 0) continue;
+      
       if(isSymm && TMath::Abs(eta_2[g]) > (Float_t)etaHigh/10) continue;       
       if(!isSymm && (TMath::Abs(eta_2[g]) < (Float_t)etaLow/10 || TMath::Abs(eta_2[g]) > (Float_t)etaHigh/10)) continue;
 
       if(isCaloMatch_2[g] == 1){
     
 	if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)){
-	  hpbpb_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	  hpbpb_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	  hpbpb_reco[cBin]->Fill(pfpt_2[g], weight);
-	  hpbpb_matrix[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	  hpbpb_matrix[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	
 	}
 	if(calopt_2[g]/pfpt_2[g] > 0.85) {
-	  hpbpb_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	  hpbpb_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	  hpbpb_reco[cBin]->Fill(pfpt_2[g], weight);
-	  hpbpb_matrix[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	  hpbpb_matrix[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	
 	}
 	if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand < 0.05) {
-	  hpbpb_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	  hpbpb_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	  hpbpb_reco[cBin]->Fill(pfpt_2[g], weight);
-	  hpbpb_matrix[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	  hpbpb_matrix[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	
 	}
 
-	hpbpb_MC_noCut[cBin]->Fill(pfrefpt_2[g], weight);
+	hpbpb_MC_noCut[cBin]->Fill(pfrefpt_2[refid], weight);
     
 	if(jet55_2 == 1 && jet65_2==0 && jet80_2 == 0){
       
-	  hMC_Jet55_noCut->Fill(pfrefpt_2[g], weight);
-	  hpbpb_MC_Jet55_noCut[cBin]->Fill(pfrefpt_2[g],weight);
+	  hMC_Jet55_noCut->Fill(pfrefpt_2[refid], weight);
+	  hpbpb_MC_Jet55_noCut[cBin]->Fill(pfrefpt_2[refid],weight);
 
 	  if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)){
-	    hMC_Jet55_CutA->Fill(pfrefpt_2[g], weight);
+	    hMC_Jet55_CutA->Fill(pfrefpt_2[refid], weight);
 
-	    hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet55_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet55_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
 	    hpbpb_Jet55_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet55_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet55_raw[cBin]->Fill(pfrawpt_2[g], weight);
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 	
-	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet55_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	  }
 	  if(calopt_2[g]/pfpt_2[g] > 0.85) {
-	    hMC_Jet55_CutA->Fill(pfrefpt_2[g], weight);
+	    hMC_Jet55_CutA->Fill(pfrefpt_2[refid], weight);
 	
-	    hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet55_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet55_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet55_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet55_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet55_raw[cBin]->Fill(pfrawpt_2[g], weight);
-	    hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 
-	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet55_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 
 	
 	  }
 	  if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand < 0.05) {
-	    hMC_Jet55_CutA->Fill(pfrefpt_2[g], weight);
+	    hMC_Jet55_CutA->Fill(pfrefpt_2[refid], weight);
 
-	    hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet55_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet55_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet55_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet55_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet55_raw[cBin]->Fill(pfrawpt_2[g], weight);
-	    hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 
-	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet55_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 
 	
 	  }
-	  if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand >= 0.05) hMC_Jet55_CutA_rej->Fill(pfrefpt_2[g], weight);
-	  if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) hMC_Jet55_CutA_rej->Fill(pfrefpt_2[g], weight);
+	  if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand >= 0.05) hMC_Jet55_CutA_rej->Fill(pfrefpt_2[refid], weight);
+	  if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) hMC_Jet55_CutA_rej->Fill(pfrefpt_2[refid], weight);
       
 	}
     
 	if(jet65_2 == 1 && jet80_2 == 0){
 
-	  hMC_Jet65_noCut->Fill(pfrefpt_2[g], weight);
-	  hpbpb_MC_Jet65_noCut[cBin]->Fill(pfrefpt_2[g],weight);
+	  hMC_Jet65_noCut->Fill(pfrefpt_2[refid], weight);
+	  hpbpb_MC_Jet65_noCut[cBin]->Fill(pfrefpt_2[refid],weight);
 
 	  if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) {
-	    hMC_Jet65_CutA->Fill(pfrefpt_2[g], weight);
+	    hMC_Jet65_CutA->Fill(pfrefpt_2[refid], weight);
 
-	    hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet65_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet65_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet65_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet65_raw[cBin]->Fill(pfrawpt_2[g], weight);
-	    hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 	
-	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	
 	  }
 	  if(calopt_2[g]/pfpt_2[g] > 0.85) {
-	    hMC_Jet65_CutA->Fill(pfrefpt_2[g], weight);
+	    hMC_Jet65_CutA->Fill(pfrefpt_2[refid], weight);
 
-	    hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet65_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet65_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet65_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet65_raw[cBin]->Fill(pfrawpt_2[g], weight);
-	    hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 	
-	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	
 	  }
 	  if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand < 0.05) {
-	    hMC_Jet65_CutA->Fill(pfrefpt_2[g], weight);
+	    hMC_Jet65_CutA->Fill(pfrefpt_2[refid], weight);
 
-	    hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet65_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet65_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet65_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet65_raw[cBin]->Fill(pfrawpt_2[g], weight);
-	    hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 	
-	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	
 	  }
 
-	  if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand >= 0.05) hMC_Jet65_CutA_rej->Fill(pfrefpt_2[g], weight);
-	  if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) hMC_Jet65_CutA_rej->Fill(pfrefpt_2[g], weight);
+	  if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand >= 0.05) hMC_Jet65_CutA_rej->Fill(pfrefpt_2[refid], weight);
+	  if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) hMC_Jet65_CutA_rej->Fill(pfrefpt_2[refid], weight);
 
 	}
 
     
 	if(jet80_2 == 1){
 
-	  hMC_Jet80_noCut->Fill(pfrefpt_2[g], weight);
-	  hpbpb_MC_Jet80_noCut[cBin]->Fill(pfrefpt_2[g],weight);
+	  hMC_Jet80_noCut->Fill(pfrefpt_2[refid], weight);
+	  hpbpb_MC_Jet80_noCut[cBin]->Fill(pfrefpt_2[refid],weight);
  
 	  if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) {
-	    hMC_Jet80_CutA->Fill(pfrefpt_2[g], weight);
+	    hMC_Jet80_CutA->Fill(pfrefpt_2[refid], weight);
 
-	    hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet80_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet80_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet80_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet80_raw[cBin]->Fill(pfrawpt_2[g], weight);
-	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 	
-	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	
 	  }
 	  if(calopt_2[g]/pfpt_2[g] > 0.85) {
-	    hMC_Jet80_CutA->Fill(pfrefpt_2[g], weight);
+	    hMC_Jet80_CutA->Fill(pfrefpt_2[refid], weight);
 
-	    hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet80_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet80_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet80_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet80_raw[cBin]->Fill(pfrawpt_2[g], weight);
 
-	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 	
-	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 
 	  }
 	  if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand < 0.05) {
-	    hMC_Jet80_CutA->Fill(pfrefpt_2[g], weight);
+	    hMC_Jet80_CutA->Fill(pfrefpt_2[refid], weight);
 
-	    hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet80_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet80_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet80_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet80_raw[cBin]->Fill(pfrawpt_2[g], weight);
 
-	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 	
-	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 
 	  }
       
-	  if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand >= 0.05) hMC_Jet80_CutA_rej->Fill(pfrefpt_2[g], weight);
-	  if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) hMC_Jet80_CutA_rej->Fill(pfrefpt_2[g], weight);
+	  if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand >= 0.05) hMC_Jet80_CutA_rej->Fill(pfrefpt_2[refid], weight);
+	  if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) hMC_Jet80_CutA_rej->Fill(pfrefpt_2[refid], weight);
 
 	}// jet 80 selection
     
@@ -1053,93 +1069,93 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
       if(isCaloMatch_2[g] == 0){
 	
 	if(eMax_2[g]/Sumcand < 0.05  ){
-	  hpbpb_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	  hpbpb_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	  hpbpb_reco[cBin]->Fill(pfpt_2[g], weight);
-	  hpbpb_matrix[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	  hpbpb_matrix[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 
 	}
 
-	hpbpb_MC_noCut[cBin]->Fill(pfrefpt_2[g], weight);
+	hpbpb_MC_noCut[cBin]->Fill(pfrefpt_2[refid], weight);
 
 	if(jet55_2 == 1 && jet65_2==0 && jet80_2 == 0){
-	  hpbpb_MC_Jet55_noCut[cBin]->Fill(pfrefpt_2[g],weight);
-	  hMC_unmatched_Jet55_noCut->Fill(pfrefpt_2[g], weight);
+	  hpbpb_MC_Jet55_noCut[cBin]->Fill(pfrefpt_2[refid],weight);
+	  hMC_unmatched_Jet55_noCut->Fill(pfrefpt_2[refid], weight);
 	  if(eMax_2[g]/Sumcand < 0.05  ){
 
-	    hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet55_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet55_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet55_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet55_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet55_raw[cBin]->Fill(pfrawpt_2[g], weight);
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hMC_unmatched_Jet55_CutA->Fill(pfrefpt_2[g], weight);
-	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hMC_unmatched_Jet55_CutA->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet55_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 
 	  }
-	  else hMC_unmatched_Jet55_CutA_rej->Fill(pfrefpt_2[g], weight);
+	  else hMC_unmatched_Jet55_CutA_rej->Fill(pfrefpt_2[refid], weight);
       
 	}
 
     
 	if(jet65_2 == 1 && jet80_2 == 0){
-	  hpbpb_MC_Jet65_noCut[cBin]->Fill(pfrefpt_2[g],weight);
-	  hMC_unmatched_Jet65_noCut->Fill(pfrefpt_2[g], weight);
+	  hpbpb_MC_Jet65_noCut[cBin]->Fill(pfrefpt_2[refid],weight);
+	  hMC_unmatched_Jet65_noCut->Fill(pfrefpt_2[refid], weight);
 	  if(eMax_2[g]/Sumcand < 0.05  ){
 
-	    hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet65_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet65_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet65_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet65_raw[cBin]->Fill(pfrawpt_2[g], weight);
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hMC_unmatched_Jet65_CutA->Fill(pfrefpt_2[g], weight);
-	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hMC_unmatched_Jet65_CutA->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 
 	  }
-	  else hMC_unmatched_Jet65_CutA_rej->Fill(pfrefpt_2[g]);
+	  else hMC_unmatched_Jet65_CutA_rej->Fill(pfrefpt_2[refid]);
       
 	}
 
     
 	if(jet80_2 == 1){
-	  hpbpb_MC_Jet80_noCut[cBin]->Fill(pfrefpt_2[g],weight);
-	  hMC_unmatched_Jet80_noCut->Fill(pfrefpt_2[g], weight);
+	  hpbpb_MC_Jet80_noCut[cBin]->Fill(pfrefpt_2[refid],weight);
+	  hMC_unmatched_Jet80_noCut->Fill(pfrefpt_2[refid], weight);
 	  if(eMax_2[g]/Sumcand < 0.05  ){
 
-	    hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2[g], weight);
-	    hpbpb_Jet80_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_Jet80_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_Jet80_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet80_raw[cBin]->Fill(pfrawpt_2[g], weight);
-	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g], weight);
-	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[g], pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[g] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
-	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
-	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
+	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
-	    hMC_unmatched_Jet80_CutA->Fill(pfrefpt_2[g], weight);
-	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[g], weight);
+	    hMC_unmatched_Jet80_CutA->Fill(pfrefpt_2[refid], weight);
+	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
-	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[g], pfpt_2[g], weight);
+	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 
-	  }else hMC_unmatched_Jet80_CutA_rej->Fill(pfrefpt_2[g], weight);
+	  }else hMC_unmatched_Jet80_CutA_rej->Fill(pfrefpt_2[refid], weight);
       
 	}
     
@@ -1270,7 +1286,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   }
 #endif
 
-  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",ntuple,etaWidth,radius),"RECREATE");
+  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PbPb_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",ntuple,etaWidth,radius),"RECREATE");
   fout.cd();
   
   for(int i = 0;i<nbins_cent;++i){

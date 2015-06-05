@@ -63,7 +63,7 @@ static const double boundaries_atlas_rcp[nbins_atlas_rcp+1] = {38.36, 44.21, 50.
 using namespace std;
 
 void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"20_eta_20",
-				  Int_t radius = 2,
+				  Int_t radius = 3,
 				  Int_t etaLow = 20,
 				  Int_t etaHigh = 20)
 {
@@ -790,7 +790,6 @@ void RAA_plot_yetkinCutEfficiency(char* etaWidth = (char*)"20_eta_20",
 	hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2, weight);
 	hpbpb_anaBin_Jet55_reco[cBin]->Fill(pfpt_2, weight);
 	hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2, pfpt_2, weight);
-
 	
       }
       if(calopt_2/pfpt_2 <= 0.5 && eMax_2/Sumcand >= 0.05) hMC_Jet55_CutA_rej->Fill(pfrefpt_2, weight);
