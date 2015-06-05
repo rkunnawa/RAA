@@ -49,6 +49,7 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 // the following bins is the atlas Rcp pt binning
 // static const int nbins_pt = 12;
 // static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};
+const double kdelrcut=0.3;
 
 using namespace std;
 
@@ -301,6 +302,7 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
   // 1 - Data, 2 - MC
   Float_t pfpt_1[1000], pfpt_2[1000];
   Float_t pfrefpt_2[1000];
+  Float_t pthat_2;
   Float_t calopt_1[1000], calopt_2[1000];
   Int_t npf_1, npf_2;
   Float_t eMax_1[1000], eMax_2[1000];
@@ -969,7 +971,7 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
 
   hpp_reco->Write();
   hpp_gen->Write();
-  hpp_Matrix->Write();
+  hpp_matrix->Write();
   
   hpp_TrgObjComb->Write();
   hpp_TrgObj80->Write();
