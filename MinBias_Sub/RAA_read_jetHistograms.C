@@ -52,8 +52,8 @@ int findBin(int bin)
   return ibin;
 }
 
-static const int nbins_pt = 32;
-static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300, 330, 362, 395, 501};
+// static const int nbins_pt = 32;
+// static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300, 330, 362, 395, 501};
 
 // static const int nbins_pt = 30;
 // static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
@@ -63,8 +63,8 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 // static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638,790,967};
 
 // the following bins is the atlas spectra pt binning
-// static const int nbins_pt = 12;
-// static const double boundaries_pt[nbins_pt+1] = {31., 39., 50., 63., 79., 100., 125., 158., 199., 251., 316., 398., 501};
+static const int nbins_pt = 12;
+static const double boundaries_pt[nbins_pt+1] = {31., 39., 50., 63., 79., 100., 125., 158., 199., 251., 316., 398., 501};
 
 // the following bins is the atlas Rcp pt binning
 // static const int nbins_pt = 12;
@@ -75,7 +75,7 @@ using namespace std;
 
 
 void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
-				  Int_t radius = 4,
+				  Int_t radius = 3,
 				  Int_t etaLow = 20,
 				  Int_t etaHigh = 20)
 {
@@ -535,6 +535,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   TRandom rnd; 
   TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
 
+#if 0
   cout<<"matched Data ntuple "<<endl;
 
   for(long nentry = 0; nentry < entries; ++nentry ){
@@ -723,6 +724,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     
     
   }// data ntuple loop
+#endif
   
 #if 0
   if(ntuple == "Raghav"){
@@ -1299,11 +1301,11 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   }
 #endif
 
-  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",ntuple,etaWidth,radius),"RECREATE");
+  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PbPb_MC_subid0_spectra_JetID_CutA_atlasPtbins_%s_R0p%d.root",ntuple,etaWidth,radius),"RECREATE");
   fout.cd();
   
   for(int i = 0;i<nbins_cent;++i){
-
+    
     hpbpb_MC_Comb_noCut[i]->Add(hpbpb_MC_Jet80_noCut[i]);
     hpbpb_MC_Comb_noCut[i]->Add(hpbpb_MC_Jet65_noCut[i]);
     hpbpb_MC_Comb_noCut[i]->Add(hpbpb_MC_Jet55_noCut[i]);

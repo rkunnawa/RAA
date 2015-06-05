@@ -103,13 +103,13 @@
 //static const int nbins_pt = 29;
 //static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
 
-static const int nbins_pt_fine = 400;
+static const int nbins_pt_fine = 501;
 
-// static const int nbins_pt = 32;
-// static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300, 330, 362, 395, 501};
+static const int nbins_pt = 32; 
+static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300, 330, 362, 395, 501};
 
-static const int nbins_pt = 30;
-static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
+// static const int nbins_pt = 30;
+// static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
 
 // the following bins is the cms pp nlo pt bins
 // static const int nbins_pt = 29;
@@ -273,9 +273,9 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   TDatime date;//this is just here to get them to run optimized. 
 
   // Pawan's files:
-  TFile * fPbPb_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
+  TFile * fPbPb_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_TTree_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
 //= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth, radius)); 
-  TFile * fPP_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius));
+  TFile * fPP_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_TTree_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius));
 
   // we also need to get the files for the MC closure histograms.
   TFile * fMCClosure = TFile::Open("Histogram_pp_PbPb_unfoldMatrix.root");
@@ -324,7 +324,7 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
 
   // would be better to read in the histograms and rebin them. come to think of it, it would be better to have them already rebinned (and properly scaled - to the level of differential cross section in what ever barns (inverse micro barns) but keep it consistent) from the read macro. 
 
-  TH1F * htest = new TH1F("htest","",400,0,400);
+  TH1F * htest = new TH1F("htest","",501,0,501);
   Int_t unfoldingCutBin = htest->FindBin(unfoldingCut);
 
   // float cutarray[nbins_cent] = {0.0,0.0,0.0,0.0,0.0,0.0};
@@ -411,21 +411,25 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
       float scalerangeweight=dPbPb_TrgComb[i]->Integral(bin_no,bin_end)/hMinBias[i]->Integral(bin_nomb,bin_endmb);
 
       // this is just to adjust for the atlas pt bins. 
-      // TH1F * hMinBias_test = new TH1F("hMinBias_test","",501,0,501);
-      // for(int j = 0; j<hMinBias[i]->GetNbinsX();++j){
-      // 	hMinBias_test->SetBinContent(j+1, hMinBias[i]->GetBinContent(j+1));
-      // 	hMinBias_test->SetBinError(j+1, hMinBias[i]->GetBinError(j+1));
-      // }
-      // hMinBias_test->Print("base");
-      // hMinBias[i]->Print("base");
-      //hMinBias_test->Scale(scalerangeweight);
-      
-      hMinBias[i]->Scale(scalerangeweight);
-      dPbPb_TrgComb[i]->Add(hMinBias[i], -1);
-      dPbPb_JEC_TrgComb[i]->Add(hMinBias[i], -1);
-      dPbPb_Smear_TrgComb[i]->Add(hMinBias[i], -1);
+      TH1F * hMinBias_test = new TH1F("hMinBias_test","",501,0,501);
+      for(int j = 0; j<hMinBias[i]->GetNbinsX();++j){
+       	hMinBias_test->SetBinContent(j+1, hMinBias[i]->GetBinContent(j+1));
+       	hMinBias_test->SetBinError(j+1, hMinBias[i]->GetBinError(j+1));
+      }
+      hMinBias_test->Print("base");
+      hMinBias[i]->Print("base");
 
-      //delete hMinBias_test;
+      for(int j = 0; j<hMinBias_test->GetNbinsX(); ++j)
+	hMinBias_test->SetBinError(j+1,hMinBias_test->GetBinError(j+1)/scalerangeweight);
+
+      hMinBias_test->Scale(scalerangeweight);
+
+      hMinBias[i]->Scale(scalerangeweight);
+      dPbPb_TrgComb[i]->Add(hMinBias_test, -1);
+      dPbPb_JEC_TrgComb[i]->Add(hMinBias_test, -1);
+      dPbPb_Smear_TrgComb[i]->Add(hMinBias_test, -1);
+
+      delete hMinBias_test;
 
     }
 
@@ -533,7 +537,8 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
       dPbPb_Trg80[i]->SetBinError(k,0);
       dPbPb_Trg65[i]->SetBinError(k,0);
       dPbPb_Trg55[i]->SetBinError(k,0);
-      //dPbPb_MinBias[i]->SetBinContent(k,0);
+      hMinBias[i]->SetBinContent(k,0);
+      hMinBias[i]->SetBinError(k,0);
     }
     
   }
@@ -546,8 +551,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   TH1F * mPbPb_Gen_test[nbins_cent], * mPbPb_Reco_test[nbins_cent], mPbPb_Martix[nbins_cent];
 
   for(int i = 0;i<nbins_cent;++i){
-
-    mPbPb_Gen[i] = new TH1F("")
     
     // the MC there are 4 options here:
     // 1) no smearing applied to Reco or Gen
@@ -558,19 +561,23 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
     // take the ratio of the RAA with all of them and plot it for a systematics, we can also take the ratio of the unfolded spectra with each one of the above and take the envelope. 
 
     if(smear == "noSmear"){
-      // mPbPb_Gen[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i));
-      // mPbPb_Gen[i]->Print("base");
-      // mPbPb_Reco[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_JetComb_reco_R%d_%s_cent%d",radius,etaWidth,i));
-      // mPbPb_Reco[i]->Print("base");
-      // mPbPb_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
-      // mPbPb_Matrix[i]->Print("base");
-
-      mPbPb_Gen[i] = (TH1F*)fCrossCheck->Get(Form("PbPb_Gen_spectra_refpt_cent%d",i));
+      mPbPb_Gen[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i));
       mPbPb_Gen[i]->Print("base");
-      mPbPb_Reco[i] = (TH1F*)fCrossCheck->Get(Form("PbPb_Reco_spectra_jtpt_cent%d",i));
+      mPbPb_Reco[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_JetComb_reco_R%d_%s_cent%d",radius,etaWidth,i));
       mPbPb_Reco[i]->Print("base");
-      mPbPb_Matrix[i] = (TH2F*)fCrossCheck->Get(Form("hpbpb_matrix_HLT_R3_20_eta_20_cent%d",i));
+      mPbPb_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
       mPbPb_Matrix[i]->Print("base");
+
+      //mPbPb_Gen[i]->Scale(1e6);
+      //mPbPb_Reco[i]->Scale(1e6);
+      //mPbPb_Matrix[i]->Scale(1e6);
+
+      // mPbPb_Gen[i] = (TH1F*)fCrossCheck->Get(Form("PbPb_Gen_spectra_refpt_cent%d",i));
+      // mPbPb_Gen[i]->Print("base");
+      // mPbPb_Reco[i] = (TH1F*)fCrossCheck->Get(Form("PbPb_Reco_spectra_jtpt_cent%d",i));
+      // mPbPb_Reco[i]->Print("base");
+      // mPbPb_Matrix[i] = (TH2F*)fCrossCheck->Get(Form("hpbpb_matrix_HLT_R3_20_eta_20_cent%d",i));
+      // mPbPb_Matrix[i]->Print("base");
     }
 
     if(smear == "GenSmear"){
@@ -1265,7 +1272,7 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   // first correct for the error bars got from the RAA_dataDrivenUnfoldingErrorCheck.C macro
   // get the root file which has the unfolded error correction.
   // file name: Pawan_ntuple_PbPb_R4_pp_R4_noJetID_atlasbin_20_eta_20_unfoldingCut_40_SevilFakeMBnoJet80Cut_data_driven_correction_akPuPF.root
-  TFile * ferrorin = TFile::Open(Form("Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_bin_%s_unfoldingCut_%d_SevilFakeMBnoJet80Cut_data_driven_correction_akPu%s.root",radius, radius, etaWidth, 40, jet_type)); // need to add unfolding cut and smear variable 
+  TFile * ferrorin = TFile::Open(Form("Pawan_TTree_PbPb_R%d_pp_R%d_noJetID_fullfinebin_%s_unfoldingCut_%d_SevilFakeMBnoJet80Cut_data_driven_correction_akPu%s.root",radius, radius, etaWidth, 40, jet_type)); // need to add unfolding cut and smear variable 
 
   // get histograms for each centrality and pp
   TH1F * hPbPb_BayesCorrected[nbins_cent];
@@ -1613,7 +1620,7 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   cout<<"writing to output file"<<endl;
   
 
-  TFile fout(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_doFakeRemove_unfold_mcclosure_oppside_trgMC_analysisbins_%s_%s_%dGeVCut_ak%s_%d.root", radius, smear, etaWidth, unfoldingCut, jet_type, date.GetDate()),"RECREATE");
+  TFile fout(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_analysisbins_%s_%s_%dGeVCut_ak%s_%d.root", radius, smear, etaWidth, unfoldingCut, jet_type, date.GetDate()),"RECREATE");
   fout.cd();
 
   for(int i = 0;i<nbins_cent;++i){
