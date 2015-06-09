@@ -9,6 +9,11 @@
 //
 
 
+//
+// May27, need to remove the leading and subleading jets to make the data and MC match in the most central regions
+//
+
+
 
 #include <TROOT.h>
 #include <iostream>
@@ -24,13 +29,23 @@
 #include <TRandom3.h>
 
 //#include "hiForest.h"
-//#define PI 3.14159;
+#define pi 3.14159265
 
 //#define nRan 100;
 
+double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
+{
+  float deta = eta1 - eta2;
+  float dphi = fabs(phi1 - phi2);
+  if(dphi > pi)dphi -= 2*pi;
+  double dr = sqrt(pow(deta,2) + pow(dphi,2));
+  return dr;
+}
+
+
 using namespace std;
 
-void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",const char *type="MC"){
+void RAA_randomcone(int rad=4, const char* jet_type="PF", const char *algo="Pu",const char *type="data"){
   
   TDatime date;
 
@@ -40,7 +55,7 @@ void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",
   else if(type=="MC")
     FileA = TFile::Open("/mnt/hadoop/cms/store/user/dgulhan/HIMC/MB/Track8_Jet26_STARTHI53_LV1/merged2/HiForest_HYDJET_Track8_Jet26_STARTHI53_LV1_merged_forest_0.root");
   
-  TFile* outf = new TFile(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
+  TFile* outf = new TFile(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_%s_ak%s%d%s_%d.root",type,algo,rad,jet_type,date.GetDate()),"recreate"); 
   
   //TFile *FileA = TFile::Open(Form("/net/hisrv0001/home/icali/hadoop/HIMinBiasUPC_skimmed/MinBias-reTracking-merged/MinBias_Merged_tracking_all.root"));
   //TString outname = "dataAKSkimNtupleRandomConeRings_v4_TkpTCut0_ak3dataMB.root"; 
@@ -64,6 +79,7 @@ void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",
   Float_t Tower_TRACKPTCUT = 0.0; //
   Float_t Tower_TRACKETACUT = 2.0; //eta acceptance
   //bool debug = true;
+  bool removeLeadandSubLeadjets = true; 
   double LOW_dR[] = {   0, 0.05, 0.10, 0.15, 0.20, 0.25};
   double HI_dR[]  = {0.05, 0.10, 0.15, 0.20, 0.25, 0.30};
   const int nRings = 6;      // rings for JetShapes 
@@ -779,6 +795,7 @@ void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",
 	// nRanTks_ring5[qq] = 0;
       }
       
+
       
       //----------------------------------------------------------------------
       //  Now loop over the Jets
@@ -910,7 +927,8 @@ void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",
 	      {
 		if (PF_pt[iPF] < PF_TRACKPTCUT) continue;
 		if ( fabs(PF_eta[iPF] ) >= PF_TRACKETACUT ) continue;
-		double dRhitJetPF = sqrt(((PF_eta[iPF]-jteta[iJet])*(PF_eta[iPF]-jteta[iJet])) + ((PF_phi[iPF]-jtphi[iJet])*(PF_phi[iPF]-jtphi[iJet])));  
+		double dRhitJetPF = Calc_deltaR(PF_eta[iPF], PF_phi[iPF], jteta[iJet], jtphi[iJet]);
+		// double dRhitJetPF = sqrt(((PF_eta[iPF]-jteta[iJet])*(PF_eta[iPF]-jteta[iJet])) + ((PF_phi[iPF]-jtphi[iJet])*(PF_phi[iPF]-jtphi[iJet])));  
 		if (dRhitJetPF<=JETRADIUS)
 		  {
 		    sumEtPF += PF_pt[iPF];
@@ -1067,6 +1085,14 @@ void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",
 	  
 	}
 
+      // get the lead and sublead eta and phi information, to later check if the candidates belong in that region.
+      Float_t LeadJet_eta    = jteta[0];
+      Float_t LeadJet_phi    = jtphi[0];
+      Float_t LeadJet_pt     = jtpt[0];
+      Float_t SubLeadJet_eta = jteta[1];
+      Float_t SubLeadJet_phi = jtphi[1];
+      Float_t SubLeadJet_pt  = jtpt[1];
+
       
       //----------------------------------------------------------------------
       //----------------------------------------------------------------------
@@ -1079,7 +1105,6 @@ void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",
       //----------------------------------------------------------------------
       //----------------------------------------------------------------------
       //----------------------------------------------------------------------  
-
     
       for (int iRan =0 ; iRan<nRandom; iRan++ )
 	{
@@ -1089,7 +1114,6 @@ void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",
 	  //cout<<"ranEta = "<<ranEta<<", ranPhi = "<<ranPhi<<endl;
 
 	  /*
-
 	  //----------------------------------------------------------------------
 	  //  Now loop over the tracks, and get the ones inside random cones
 	  //----------------------------------------------------------------------
@@ -1156,9 +1180,22 @@ void RAA_randomcone(int rad=2, const char* jet_type="PF", const char *algo="Pu",
 	    Int_t ranRingCounterCh[nRings] ={0,0,0,0,0,0};
 	    for(int iPF = 0; iPF<PF_n; iPF++)
 	      {
+		bool removeFlag = false; 
 		if (PF_pt[iPF] < PF_TRACKPTCUT) continue;
 		if (fabs(PF_eta[iPF]) > PF_TRACKETACUT ) continue;
-		double dR12 = sqrt(((PF_eta[iPF]-ranEta)*(PF_eta[iPF]-ranEta)) + (((PF_phi[iPF]-ranPhi)*(PF_phi[iPF]-ranPhi))));	  
+
+		// check if they belong to the lead or sublead jets.
+		if(removeLeadandSubLeadjets){
+		  double delR_lead = Calc_deltaR(PF_eta[iPF], PF_phi[iPF], LeadJet_eta, LeadJet_phi);
+		  double delR_sublead = Calc_deltaR(PF_eta[iPF], PF_phi[iPF], SubLeadJet_eta, SubLeadJet_phi);
+
+		  if(delR_lead <= JETRADIUS || delR_sublead <= JETRADIUS)
+		    removeFlag = true; 
+		}
+		
+		if(removeFlag) continue;
+		double dR12 = Calc_deltaR(PF_eta[iPF], PF_phi[iPF], ranEta, ranPhi);
+		// double dR12 = sqrt(((PF_eta[iPF]-ranEta)*(PF_eta[iPF]-ranEta)) + (((PF_phi[iPF]-ranPhi)*(PF_phi[iPF]-ranPhi))));	  
 		if (dR12<=JETRADIUS)
 		  {
 		    ranSumEtPF += PF_pt[iPF];

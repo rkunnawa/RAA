@@ -80,25 +80,22 @@ static const double boundaries_pt[nbins_pt+1] = {
   638, 686, 1000 
 };
 
-static const int nbins_eta = 5;
+static const int nbins_eta = 1;
 static const double boundaries_eta[nbins_eta][2] = {
-  {0.0,0.5},
-  {0.5,1.0},
-  {1.0,1.5},
-  {1.5,2.0},
-  {2.0,2.5},
+  {0.0,2.0}
 };
 
 static const double delta_eta[nbins_eta] = {
-  1.0,1.0,1.0,1.0,1.0
+  4.0
 };
 
 static const char etaWidth [nbins_eta][256] = {
-  "0_absEta_05", "05_absEta_10", "10_absEta_15", "15_absEta_20", "20_absEta_25" 
+ "20_eta_20" 
 };
 
-static const int no_radius = 2;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {3,5};
+
+static const int no_radius = 3;//testing purposes 
+static const int list_radius[no_radius] = {2,3,4};
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 7; 
@@ -216,40 +213,19 @@ void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
   for(int k = 0;k<no_radius;k++){
 
     for(int j = 0;j<nbins_eta;j++){
-
-      hpp_Trg80[k][j] = new TH1F(Form("hpp_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_Trg60[k][j] = new TH1F(Form("hpp_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_Trg40[k][j] = new TH1F(Form("hpp_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_TrgComb[k][j] = new TH1F(Form("hpp_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-
-      hpp_chMaxcut_Trg80[k][j] = new TH1F(Form("hpp_chMaxcut_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_chMaxcut_Trg60[k][j] = new TH1F(Form("hpp_chMaxcut_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_chMaxcut_Trg40[k][j] = new TH1F(Form("hpp_chMaxcut_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_chMaxcut_TrgComb[k][j] = new TH1F(Form("hpp_chMaxcut_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-
-      hpp_eMaxcut_Trg80[k][j] = new TH1F(Form("hpp_eMaxcut_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_eMaxcut_Trg60[k][j] = new TH1F(Form("hpp_eMaxcut_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_eMaxcut_Trg40[k][j] = new TH1F(Form("hpp_eMaxcut_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_eMaxcut_TrgComb[k][j] = new TH1F(Form("hpp_eMaxcut_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      
+      hpp_residual_Trg80[k][j] = new TH1F(Form("hpp_residual_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),400,0,400);
+      hpp_residual_Trg60[k][j] = new TH1F(Form("hpp_residual_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),400,0,400);
+      hpp_residual_Trg40[k][j] = new TH1F(Form("hpp_residual_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),400,0,400);
+      hpp_residual_TrgComb[k][j] = new TH1F(Form("hpp_residual_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),400,0,400);
 
       
-      hpp_residual_Trg80[k][j] = new TH1F(Form("hpp_residual_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_residual_Trg60[k][j] = new TH1F(Form("hpp_residual_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_residual_Trg40[k][j] = new TH1F(Form("hpp_residual_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
-      hpp_residual_TrgComb[k][j] = new TH1F(Form("hpp_residual_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),1000,0,1000);
+      hpp_residual_effecprescl_Trg80[k][j] = new TH1F(Form("hpp_residual_effecprescl_Trg80_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 80 for R%d and %s",list_radius[k],etaWidth[j]),400,0,400);
+      hpp_residual_effecprescl_Trg60[k][j] = new TH1F(Form("hpp_residual_effecprescl_Trg60_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 60 for R%d and %s",list_radius[k],etaWidth[j]),400,0,400);
+      hpp_residual_effecprescl_Trg40[k][j] = new TH1F(Form("hpp_residual_effecprescl_Trg40_R%d_%s",list_radius[k],etaWidth[j]),Form("Spectra from Jet Trigger 40 for R%d and %s",list_radius[k],etaWidth[j]),400,0,400);
+      hpp_residual_effecprescl_TrgComb[k][j] = new TH1F(Form("hpp_residual_effecprescl_TrgComb_R%d_%s",list_radius[k],etaWidth[j]),Form("Combined Spectra from Jet Triggers for R%d and %s",list_radius[k],etaWidth[j]),400,0,400);
       
-      hchMax[k][j] = new TH1F(Form("chMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
-      hphMax[k][j] = new TH1F(Form("phMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
-      hneMax[k][j] = new TH1F(Form("neMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
-      heMax[k][j] = new TH1F(Form("eMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
-      hmuMax[k][j] = new TH1F(Form("muMax_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
-
-      hchSum[k][j] = new TH1F(Form("chSum_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
-      hphSum[k][j] = new TH1F(Form("phSum_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
-      hneSum[k][j] = new TH1F(Form("neSum_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
-      heSum[k][j] = new TH1F(Form("eSum_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
-      hmuSum[k][j] = new TH1F(Form("muSum_R%d_%s",list_radius[k],etaWidth[j]),"",500,0,500);
-            
+      
       
     }// eta bin loop
     
@@ -396,7 +372,8 @@ void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
   TF1 * fResidual_1p566_eta_2p043 = new TF1("fResidual_1p566_eta_2p043","1 - [0]/pow(x,[1])");
   fResidual_1p566_eta_2p043->SetParameter(0, -0.3569359074);
   fResidual_1p566_eta_2p043->SetParameter(1, 0.4675646337);
-  
+
+  Float_t effecPrescl = 9.275;
   
   for(int k = 0;k<no_radius;k++){
 
@@ -430,100 +407,11 @@ void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
 
 	  if(fabs(eta_1[g]) < boundaries_eta[j][0] || fabs(eta_1[g])>boundaries_eta[j][1]) continue;
 
-#if 0
-	  arrayValues[0] = raw_1[g];
-	  arrayValues[1] = pt_1[g];
-	  arrayValues[2] = jet40_1;
-	  arrayValues[3] = jet40_p_1;
-	  arrayValues[4] = jet60_1;
-	  arrayValues[5] = jet60_p_1;
-	  arrayValues[6] = jet80_1;
-	  arrayValues[7] = jet80_p_1;
-	  arrayValues[8] = trgObj_pt_1;
-	  arrayValues[9] = chMax_1[g];
-	  arrayValues[10] = chSum_1[g];
-	  arrayValues[11] = phMax_1[g];
-	  arrayValues[12] = phSum_1[g];
-	  arrayValues[13] = neMax_1[g];
-	  arrayValues[14] = neSum_1[g];
-	  arrayValues[15] = muMax_1[g];
-	  arrayValues[16] = muSum_1[g];
-	  arrayValues[17] = eMax_1[g];
-	  arrayValues[18] = eSum_1[g];
-	  arrayValues[19] = trkMax_1[g];
-	  arrayValues[20] = trkSum_1[g];
+	  if(fabs(eta_1[g]) < 0.522) pt_1[g] = pt_1[g] * fResidual_0_eta_0p522->Eval(pt_1[g]);
+	  if(fabs(eta_1[g]) >= 0.522 && fabs(eta_1[g])< 1.044) pt_1[g] = pt_1[g] * fResidual_0p522_eta_1p044->Eval(pt_1[g]);
+	  if(fabs(eta_1[g]) >= 1.044 && fabs(eta_1[g])< 1.566) pt_1[g] = pt_1[g] * fResidual_1p044_eta_1p566->Eval(pt_1[g]);
+	  if(fabs(eta_1[g]) >= 1.566 && fabs(eta_1[g])< 2.043) pt_1[g] = pt_1[g] * fResidual_1p566_eta_2p043->Eval(pt_1[g]);
 
-	  jets_ID[k]->Fill(arrayValues);
-#endif
-
-	  //if(raw_1[g] < 30) continue;
-	  //if((neMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (phMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/pt_1[g]>0.05) && (muMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9) && (chMax_1[g]/(chMax_1[g]+neMax_1[g]+phMax_1[g])<0.9)){
-	  //if(eSum_1[g]/(chSum_1[g]+neSum_1[g]+phSum_1[g]+muSum_1[g])<0.7){
-
-#if 0
-	  hchMax[k][j]->Fill(chMax_1[g]);
-	  hphMax[k][j]->Fill(phMax_1[g]);
-	  hneMax[k][j]->Fill(neMax_1[g]);
-	  heMax[k][j]->Fill(eMax_1[g]);
-	  hmuMax[k][j]->Fill(muMax_1[g]);
-	  
-	  hchSum[k][j]->Fill(chSum_1[g]);
-	  hphSum[k][j]->Fill(phSum_1[g]);
-	  hneSum[k][j]->Fill(neSum_1[g]);
-	  heSum[k][j]->Fill(eSum_1[g]);
-	  hmuSum[k][j]->Fill(muSum_1[g]);
-
-	  if(jet80_1 && trgObj_pt_1>=80){
-	    hpp_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
-	  }
-	  if(jet60_1==1 && trgObj_pt_1>=60 && trgObj_pt_1<80){
-	    hpp_Trg60[k][j]->Fill(pt_1[g],jet60_p_1);
-	  }
-	  if(jet40_1==1 && trgObj_pt_1>=40 && trgObj_pt_1<60){
-	    hpp_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
-	  }
-	  
-	  
-	  if(chMax_1[g]/pt_1[g]>0.02){
-	  //if(1>0){
-
-	    if(jet80_1 && trgObj_pt_1>=80){
-	      hpp_chMaxcut_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
-	    }
-	    if(jet60_1==1 && trgObj_pt_1>=60 && trgObj_pt_1<80){
-	      hpp_chMaxcut_Trg60[k][j]->Fill(pt_1[g],jet60_p_1);
-	    }
-	    if(jet40_1==1 && trgObj_pt_1>=40 && trgObj_pt_1<60){
-	      hpp_chMaxcut_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
-	    }
-	    
-	  }// qa condition
-
-	  if(eMax_1[g]/pt_1[g]<0.6){
-	  //if(1>0){
-
-	    if(jet80_1 && trgObj_pt_1>=80){
-	      hpp_eMaxcut_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
-	    }
-	    if(jet60_1==1 && trgObj_pt_1>=60 && trgObj_pt_1<80){
-	      hpp_eMaxcut_Trg60[k][j]->Fill(pt_1[g],jet60_p_1);
-	    }
-	    if(jet40_1==1 && trgObj_pt_1>=40 && trgObj_pt_1<60){
-	      hpp_eMaxcut_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
-	    }
-	    
-	  }// qa condition
-
-
-	  if(eta_1[g] >= -0.522 && eta_1[g] < 0.522) pt_1[g] = pt_1[g] * fResidual_0_eta_0p522->Eval(pt_1[g]);
-	  if((eta_1[g] >= -1.044 && eta_1[g] < -0.522) || (eta_1[g] <= 1.044 && eta_1[g] > 0.522)) pt_1[g] = pt_1[g] * fResidual_0p522_eta_1p044->Eval(pt_1[g]);
-	  if((eta_1[g] >= -1.566 && eta_1[g] < -1.044) || (eta_1[g] <= 1.566 && eta_1[g] > 1.044)) pt_1[g] = pt_1[g] * fResidual_1p044_eta_1p566->Eval(pt_1[g]);
-	  if((eta_1[g] >= -2.043 && eta_1[g] < -1.566) || (eta_1[g] <= 2.043 && eta_1[g] > 1.566)) pt_1[g] = pt_1[g] * fResidual_1p566_eta_2p043->Eval(pt_1[g]);
-
-#endif
-
-	  if(eMax_1[g]/pt_1[g]> 0.6 || chMax_1[g]/pt_1[g]<0.02) continue;
-	  
 	  if(jet80_1 && trgObj_pt_1>=80){
 	    hpp_residual_Trg80[k][j]->Fill(pt_1[g],jet80_p_1);
 	  }
@@ -532,6 +420,16 @@ void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
 	  }
 	  if(jet40_1==1 && trgObj_pt_1>=40 && trgObj_pt_1<60){
 	    hpp_residual_Trg40[k][j]->Fill(pt_1[g],jet40_p_1);
+	  }
+
+	  if(jet80_1==1){
+	    hpp_residual_effecprescl_Trg80[k][j]->Fill(pt_1[g]);
+	  }
+	  if(jet60_1==1 && jet80_1==0){
+	    hpp_residual_effecprescl_Trg60[k][j]->Fill(pt_1[g]);
+	  }
+	  if(jet40_1==1 && jet60_1==0 && jet80_1==0){
+	    hpp_residual_effecprescl_Trg40[k][j]->Fill(pt_1[g],effecPrescl);
 	  }
 	  
 	}// jet loop
@@ -544,7 +442,7 @@ void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
 
   TDatime date;
 
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_trgObj_chMaxjtpt0p02_eMaxjtpt0p6_ak35%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
+  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/pp_data_spectra_noJetIDCut_ak%s_%d_%d.root",jet_type,date.GetDate(),endfile),"RECREATE");
   f.cd();
 
   hEvents_HLT80->Write();
@@ -566,58 +464,19 @@ void RAA_read_data_pp(int startfile = 1,int endfile = 2,char *jet_type = "PF"){
       // divideBinWidth(hpp_Trg80[k][j]);// divide by delta pt. 
       // divideBinWidth(hpp_Trg60[k][j]);
       // divideBinWidth(hpp_Trg40[k][j]);
-#if 0
-      hchMax[k][j]->Write();
-      hphMax[k][j]->Write();
-      hneMax[k][j]->Write();
-      heMax[k][j]->Write();
-      hmuMax[k][j]->Write();
 
-      hchSum[k][j]->Write();
-      hphSum[k][j]->Write();
-      hneSum[k][j]->Write();
-      heSum[k][j]->Write();
-      hmuSum[k][j]->Write();
+      hpp_residual_effecprescl_TrgComb[k][j]->Add(hpp_residual_effecprescl_Trg80[k][j]);
+      hpp_residual_effecprescl_TrgComb[k][j]->Add(hpp_residual_effecprescl_Trg60[k][j]);
+      hpp_residual_effecprescl_TrgComb[k][j]->Add(hpp_residual_effecprescl_Trg40[k][j]);
 
-      hpp_TrgComb[k][j]->Add(hpp_Trg80[k][j]);
-      hpp_TrgComb[k][j]->Add(hpp_Trg60[k][j]);
-      hpp_TrgComb[k][j]->Add(hpp_Trg40[k][j]);
-
-      hpp_Trg80[k][j]->Write();
-      if(printDebug)hpp_Trg80[k][j]->Print();
-      hpp_Trg60[k][j]->Write();
-      if(printDebug)hpp_Trg60[k][j]->Print();
-      hpp_Trg40[k][j]->Write();
-      if(printDebug)hpp_Trg40[k][j]->Print();
-      hpp_TrgComb[k][j]->Write();
-      if(printDebug)hpp_TrgComb[k][j]->Print();
-
-      hpp_chMaxcut_TrgComb[k][j]->Add(hpp_chMaxcut_Trg80[k][j]);
-      hpp_chMaxcut_TrgComb[k][j]->Add(hpp_chMaxcut_Trg60[k][j]);
-      hpp_chMaxcut_TrgComb[k][j]->Add(hpp_chMaxcut_Trg40[k][j]);
-
-      hpp_chMaxcut_Trg80[k][j]->Write();
-      if(printDebug)hpp_chMaxcut_Trg80[k][j]->Print();
-      hpp_chMaxcut_Trg60[k][j]->Write();
-      if(printDebug)hpp_chMaxcut_Trg60[k][j]->Print();
-      hpp_chMaxcut_Trg40[k][j]->Write();
-      if(printDebug)hpp_chMaxcut_Trg40[k][j]->Print();
-      hpp_chMaxcut_TrgComb[k][j]->Write();
-      if(printDebug)hpp_chMaxcut_TrgComb[k][j]->Print();
-
-      hpp_eMaxcut_TrgComb[k][j]->Add(hpp_eMaxcut_Trg80[k][j]);
-      hpp_eMaxcut_TrgComb[k][j]->Add(hpp_eMaxcut_Trg60[k][j]);
-      hpp_eMaxcut_TrgComb[k][j]->Add(hpp_eMaxcut_Trg40[k][j]);
-
-      hpp_eMaxcut_Trg80[k][j]->Write();
-      if(printDebug)hpp_eMaxcut_Trg80[k][j]->Print();
-      hpp_eMaxcut_Trg60[k][j]->Write();
-      if(printDebug)hpp_eMaxcut_Trg60[k][j]->Print();
-      hpp_eMaxcut_Trg40[k][j]->Write();
-      if(printDebug)hpp_eMaxcut_Trg40[k][j]->Print();
-      hpp_eMaxcut_TrgComb[k][j]->Write();
-      if(printDebug)hpp_eMaxcut_TrgComb[k][j]->Print();
-#endif
+      hpp_residual_effecprescl_Trg80[k][j]->Write();
+      if(printDebug)hpp_residual_effecprescl_Trg80[k][j]->Print();
+      hpp_residual_effecprescl_Trg60[k][j]->Write();
+      if(printDebug)hpp_residual_effecprescl_Trg60[k][j]->Print();
+      hpp_residual_effecprescl_Trg40[k][j]->Write();
+      if(printDebug)hpp_residual_effecprescl_Trg40[k][j]->Print();
+      hpp_residual_effecprescl_TrgComb[k][j]->Write();
+      if(printDebug)hpp_residual_effecprescl_TrgComb[k][j]->Print();
 
       hpp_residual_TrgComb[k][j]->Add(hpp_residual_Trg80[k][j]);
       hpp_residual_TrgComb[k][j]->Add(hpp_residual_Trg60[k][j]);

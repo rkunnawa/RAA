@@ -36,17 +36,20 @@ double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
 double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 double npart[nbins_cent+1] = {389.84, 307.65, 223.95, 107.5, 41.65, 11.55, 112.9};
 
+/* const int nbins_pt = 30; */
+/* const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300,   330, 362, 395 }; */
 
-const int nbins_pt = 30;
-const double boundaries_pt[nbins_pt+1] = {
-  3, 4, 5, 7, 9, 12, 
-  15, 18, 21, 24, 28,
-  32, 37, 43, 49, 56,
-  64, 74, 84, 97, 114,
-  133, 153, 174, 196,
-  220, 245, 300, 
-  330, 362, 395 
-};
+// this is the cms full analysis pT bins 
+const int nbins_pt = 32; 
+const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300,   330, 362, 395, 501 }; 
+
+// this is the atlas pT binning for the spectra. 
+/* static const int nbins_pt = 12; */
+/* static const double boundaries_pt[nbins_pt+1] = {31., 39., 50., 63., 79., 100., 125., 158., 199., 251., 316., 398., 501}; */
+
+// this is the atlas pT binning for the Rcp plots. 
+/* static const int nbins_pt = 12;  */
+/* static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};  */
 
 class SysData
 {
@@ -88,6 +91,12 @@ class SysData
       hSysEff[i]->SetBinContent(j,1+effSys);
       hSysSmear[i]->SetBinContent(j,1.02);
       hSysJetID[i]->SetBinContent(j, 1+jetidSys);
+      if(i == 0) hSysJEC[i]->SetBinContent(j, 1.12);
+      if(i == 1) hSysJEC[i]->SetBinContent(j, 1.10);
+      if(i == 2) hSysJEC[i]->SetBinContent(j, 1.08);
+      if(i == 3) hSysJEC[i]->SetBinContent(j, 1.05);
+      if(i == 4) hSysJEC[i]->SetBinContent(j, 1.03);
+      if(i == 5) hSysJEC[i]->SetBinContent(j, 1.02);
       double JECSys = hSysJEC[i]->GetBinContent(j)-1;
       double SmearSys = hSysSmear[i]->GetBinContent(j)-1;
       double IterSys = hSysIter[i]->GetBinContent(j)-1; 
@@ -117,6 +126,12 @@ class SysData
       hSysEff[i]->SetBinContent(j,1+effSys);
       hSysSmear[i]->SetBinContent(j,1.02);
       hSysJetID[i]->SetBinContent(j, 1+jetidSys);
+      if(i == 0) hSysJEC[i]->SetBinContent(j, 1.12);
+      if(i == 1) hSysJEC[i]->SetBinContent(j, 1.10);
+      if(i == 2) hSysJEC[i]->SetBinContent(j, 1.08);
+      if(i == 3) hSysJEC[i]->SetBinContent(j, 1.05);
+      if(i == 4) hSysJEC[i]->SetBinContent(j, 1.03);
+      if(i == 5) hSysJEC[i]->SetBinContent(j, 1.02);
       double JECSys = hSysJEC[i]->GetBinContent(j)-1;
       double SmearSys = hSysSmear[i]->GetBinContent(j)-1;
       double NoiseSys = hSysNoise[i]->GetBinContent(j)-1; 
@@ -133,7 +148,7 @@ class SysData
   
   void Draw(TH1F *h,int i, int color) {
 
-    Int_t beginning = h->FindBin(60); Int_t end = h->FindBin(299);
+    Int_t beginning = h->FindBin(65); Int_t end = h->FindBin(299);
 
     //if(i==0){ beginning = h->FindBin(100); }
     //if(i==5 || i==4 || i==3) { end = h->FindBin(240);}
@@ -205,8 +220,8 @@ class SysData
     calcTotalSys(i);
     TH1D *h = new TH1D(Form("hSysTmp_cent%d",i),"",nbins_pt, boundaries_pt);
     makeHistTitle(h,"","Jet p_{T} (GeV/c)","Systematic uncertainty");
-    h->SetAxisRange(-0.25,0.4,"Y");
-    h->SetAxisRange(60,299,"X");
+    h->SetAxisRange(-0.4,0.4,"Y");
+    h->SetAxisRange(65,299,"X");
     h->Draw();
     TH1F* sys = drawEnvelope(hSys[i],"same",hSys[i]->GetLineColor(),1001,hSys[i]->GetLineColor(),-1);
     TH1F* sysIter = drawEnvelope(hSysIter[i],"same",hSysIter[i]->GetLineColor(),3004,hSysIter[i]->GetLineColor(),-1);
@@ -216,9 +231,9 @@ class SysData
     TH1F* sysEff = drawEnvelope(hSysEff[i],"same",hSysEff[i]->GetLineColor(),3002,hSysEff[i]->GetLineColor(),-1);
     TH1F* sysNoise = drawEnvelope(hSysNoise[i],"same",hSysNoise[i]->GetLineColor(),3001,hSysNoise[i]->GetLineColor(),-1);
     TLine *l = new TLine(h->GetBinLowEdge(1),0,h->GetBinLowEdge(h->GetNbinsX()+1),0);
-    l->Draw();
+    //l->Draw();
     TLine *l2 = new TLine(h->GetBinLowEdge(1),-0.25,h->GetBinLowEdge(1),0.4);
-    l2->Draw();
+    //l2->Draw();
     TLegend *leg = myLegend(0.52,0.6,0.95,0.93);
     leg->SetTextSize(0.043);
     leg->AddEntry(sys,"Total Systematics","f");

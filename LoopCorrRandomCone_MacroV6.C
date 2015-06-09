@@ -74,7 +74,7 @@ TH1D *make1DplotHIforest(TFile *fileIN, const char* file, const char* xVar, int&
 //--------------------------------------------------------------
 void drawPatch(float x1, float y1, float x2, float y2); 
 //---------------------------------------------------------------------
-
+#if 0
 ///////////////////////////////////////////////////////////////////////
 //         TOOL BOX
 //////////////////////////////////////////////////////////////////////
@@ -148,7 +148,7 @@ void makeMultiPanelCanvas(TCanvas*& canv,
     }
   }
 }
-/*
+
 void rescaleBins(TH1& h){
   for (int i =1; i<=h.GetNbinsX(); i++){//Skip bin=0 since it it is the underflow bin
     double oldBin = h.GetBinContent(i);
@@ -160,24 +160,24 @@ void rescaleBins(TH1& h){
   return;
 
 }
-*/
 
-// divide by bin width
-void divideBinWidth(TH1 *h)
-{
-	h->Sumw2();
-	for (int i=0;i<=h->GetNbinsX();i++)
-	{
-		Float_t val = h->GetBinContent(i);
-		Float_t valErr = h->GetBinError(i);
-		val/=h->GetBinWidth(i);
-		valErr/=h->GetBinWidth(i);
-		h->SetBinContent(i,val);
-		h->SetBinError(i,valErr);
-	}
-	h->GetXaxis()->CenterTitle();
-	h->GetYaxis()->CenterTitle();
-}
+
+// // divide by bin width
+// void divideBinWidth(TH1 *h)
+// {
+// 	h->Sumw2();
+// 	for (int i=0;i<=h->GetNbinsX();i++)
+// 	{
+// 		Float_t val = h->GetBinContent(i);
+// 		Float_t valErr = h->GetBinError(i);
+// 		val/=h->GetBinWidth(i);
+// 		valErr/=h->GetBinWidth(i);
+// 		h->SetBinContent(i,val);
+// 		h->SetBinError(i,valErr);
+// 	}
+// 	h->GetXaxis()->CenterTitle();
+// 	h->GetYaxis()->CenterTitle();
+// }
 
 void drawText(const char *text, float xp, float yp){
   TLatex *tex = new TLatex(xp,yp,text);
@@ -189,7 +189,7 @@ void drawText(const char *text, float xp, float yp){
   tex->SetNDC();
   tex->Draw();
 }
-
+#endif
 void format1Dhisto(TH1& h1, double Ymax, double Ymin, double& col, double& Mstyle, double& fill, double& style, const char* titx, const char* tity ){
   //void format1Dhisto(TH1& h1, string& xTitle, double Ymax, double Ymin){
 
@@ -319,10 +319,10 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_HYDJET.root"));
     // TFile *ak5MCFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_HYDJET.root"));
 
-    TFile *ak2MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu2PF_20150320.root"));
-    TFile *ak3MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu3PF_20150320.root"));
-    TFile *ak4MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu4PF_20150320.root"));
-    //TFile *ak5MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_MC_akPu5PF_20150206.root"));
+    TFile *ak2MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_MC_akPu2PF_20150527.root"));
+    TFile *ak3MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_MC_akPu3PF_20150527.root"));
+    TFile *ak4MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_MC_akPu4PF_20150527.root"));
+    //TFile *ak5MCFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_MC_akPu5PF_20150206.root"));
     
     akTreeMC[0]   = (TTree*)ak2MCFile->Get("nt");
     akTreeMC[1]   = (TTree*)ak3MCFile->Get("nt");
@@ -334,10 +334,10 @@ void LoopCorrRandomCone_MacroV6(){
     // TFile *ak4dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak4_pA_DATA.root"));
     // TFile *ak5dataFile = TFile::Open(Form("/mnt/hadoop/cms/store/user/jrobles/PAanalysis/randomCone/v3/randomCones_TkpTCut0_ak5_pA_DATA.root"));
 
-    TFile *ak2dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu2PF_20150320.root"));
-    TFile *ak3dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu3PF_20150320.root"));
-    TFile *ak4dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu4PF_20150320.root"));
-    //TFile *ak5dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_forward_eta_data_akPu5PF_20150206.root"));
+    TFile *ak2dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_data_akPu2PF_20150527.root"));
+    TFile *ak3dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_data_akPu3PF_20150527.root"));
+    TFile *ak4dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_data_akPu4PF_20150527.root"));
+    //TFile *ak5dataFile = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/test_randomcone_mideta_noleadSubleadjets_data_akPu5PF_20150206.root"));
 
     akTreeData[0]   = (TTree*)ak2dataFile->Get("nt");
     akTreeData[1]   = (TTree*)ak3dataFile->Get("nt");
@@ -498,13 +498,17 @@ void LoopCorrRandomCone_MacroV6(){
     double color  [nAlgos] = {1,2,4};//,2,4};
     double fill   [nAlgos] = {0,0,0};//,0,0};
     double meanMC[nCent][nAlgos];
+    double RMSMC[nCent][nAlgos];
     double meanErrMC[nCent][nAlgos]; 
     double meanData[nCent][nAlgos];
+    double RMSData[nCent][nAlgos];
     double meanErrData[nCent][nAlgos];
 
     double meanMC2[nCent][nAlgos];
+    double RMSMC2[nCent][nAlgos];
     double meanErrMC2[nCent][nAlgos]; 
     double meanData2[nCent][nAlgos];
+    double TMSData2[nCent][nAlgos];
     double meanErrData2[nCent][nAlgos];
    
     const char* xTitle = "Random Cone sumPF E_{T}";
@@ -533,7 +537,7 @@ void LoopCorrRandomCone_MacroV6(){
     //Loop over the 6 centrality sections
     for (int i=0; i<nCent; i++){
       cout<<"centrality = "<<i<<endl;
-      leg1[i] = myLegend(0.50,0.70,0.80,0.90);//top right
+      leg1[i] = myLegend(0.35,0.70,0.65,0.90);//top right
       //leg1[i]->SetFillColor(0);
       leg1[i]->SetTextSize(0.03);
       //leg1[i]->SetBorderSize(0);
@@ -570,6 +574,7 @@ void LoopCorrRandomCone_MacroV6(){
 	//cout<<" relative Error: "<<(ranConeMC[i][ir]->GetBinError(i))/(ranConeMC[i][ir]->GetBinContent(7))<<endl;
 	
 	meanMC[i][ir] = ranConeMC[i][ir]->GetMean();
+	RMSMC[i][ir] = ranConeMC[i][ir]->GetRMS();
 	meanErrMC[i][ir] = ranConeMC[i][ir]->GetMeanError();
 	format1Dhisto(*ranConeMC[i][ir],-1,-1,color[ir],marker[0],color[ir],fill[ir],xTitle,yTitle);
 	//ranConeMC[i][ir]->SetMaximum(1);
@@ -601,6 +606,7 @@ void LoopCorrRandomCone_MacroV6(){
 	//cout<<" relative Error: "<<(ranConeData[i][ir]->GetBinError(i))/(ranConeData[i][ir]->GetBinContent(7))<<endl;
 
 	meanData[i][ir] = ranConeData[i][ir]->GetMean();
+	RMSData[i][ir] = ranConeData[i][ir]->GetRMS();
 	meanErrData[i][ir] = ranConeData[i][ir]->GetMeanError();
 	format1Dhisto(*ranConeData[i][ir],-1,-1,color[ir],marker[1],color[ir],fill[ir],xTitle,yTitle);
 	//ranConeData[i][ir]->SetMaximum(1);
@@ -623,7 +629,8 @@ void LoopCorrRandomCone_MacroV6(){
 	//if (ir==0)
 	  //leg1[i]->AddEntry("",Form("min track pT cut: %2.1f",trkPtCut),"");	  
 	
-	leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s [%5.2f #pm %5.2f]",varLabel[ir],hType[0],meanMC[i][ir],meanErrMC[i][ir]),"lp");
+	leg1[i]->AddEntry(ranConeMC[i][ir],Form("%s %s[%5.2f, RMS: %5.2f]",varLabel[ir],hType[0],meanMC[i][ir],RMSMC[i][ir]),"lp");
+	leg1[i]->SetTextSize(0.04);
 	leg1[i]->Draw();	      
 	drawText(cent[i], 0.83, 0.95,20);
 	
@@ -649,7 +656,7 @@ void LoopCorrRandomCone_MacroV6(){
 	
 	//f2->Draw("same");
 	
-	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s [%5.2f #pm %5.2f ]",hType[1],meanData[i][ir],meanErrData[i][ir]),"lp");
+	leg1[i]->AddEntry(ranConeData[i][ir],Form("%s[%5.2f, RMS: %5.2f ]",hType[1],meanData[i][ir],RMSData[i][ir]),"lp");
 	leg1[i]->Draw();	      
 	//drawText(cent[i], 0.83, 0.23);
 	 

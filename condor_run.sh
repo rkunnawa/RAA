@@ -28,8 +28,8 @@ process=$4
 
 echo "Processing..."
 
-root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
-mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_vz_cent_akPuPF_20150506_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/data/.
+#root -b -q RAA_read_data_pbpb.C\+\($startfile,$endfile\)
+#mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_vz_cent_akPuPF_20150506_$endfile.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/data/.
 
 #root -b -q RAA_fragBiasCheck.C\+\($startfile,$endfile\)
 #root -b -q RAA_fragBiasCheck_pp_data.C\+\($startfile,$endfile\)
@@ -37,7 +37,7 @@ mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_vz_ce
 #root -b -q RAA_read_MinBias.C\+\($startfile,$endfile\)
 #mv /net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_MinBiasUPC_ntuple_SuperNovaRejected_akPuCalo_20150311_1.root /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/PbPb/2011/.
 
-#root -b -q RAA_read_mc_pp.C\+\($startfile,$endfile\)
+root -b -q RAA_read_mc_pp.C\+\($startfile,$endfile\)
 
 #root -b -q RAA_read_mc.C\+\($startfile,$endfile\)
 

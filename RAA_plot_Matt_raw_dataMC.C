@@ -100,14 +100,15 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
 
   TFile * fNoSmear = TFile::Open(Form("../../Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_%s_40GeVCut_akPF_20150506.root",radius,etaWidth));
   TFile * fGenSmear = TFile::Open(Form("../../Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_GenSmear_%s_40GeVCut_akPF_20150507.root",radius,etaWidth));
+  TFile * fgen2pSmear = TFile::Open(Form("../../Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_gen2pSmear_%s_40GeVCut_akPF_20150507.root",radius,etaWidth));
   TFile * fRecoSmear = TFile::Open(Form("../../Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_RecoSmear_%s_40GeVCut_akPF_20150507.root",radius,etaWidth));
   TFile * fBothSmear = TFile::Open(Form("../../Output/Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_noFakeWeight_unfold_mcclosure_oppside_trgMC_BothSmear_%s_40GeVCut_akPF_20150507.root",radius,etaWidth));
   
-  TH1F * RAA_Bayesian[nbins_cent], * RAA_Bayesian_GenSmear[nbins_cent], * RAA_Bayesian_RecoSmear[nbins_cent], * RAA_Bayesian_BothSmear[nbins_cent];
-  TH1F * hPbPb_Bayesian[nbins_cent], * hPbPb_Bayesian_GenSmear[nbins_cent], * hPbPb_Bayesian_RecoSmear[nbins_cent], * hPbPb_Bayesian_BothSmear[nbins_cent];
+  TH1F * RAA_Bayesian[nbins_cent], * RAA_Bayesian_gen2pSmear[nbins_cent], * RAA_Bayesian_GenSmear[nbins_cent], * RAA_Bayesian_RecoSmear[nbins_cent], * RAA_Bayesian_BothSmear[nbins_cent];
+  TH1F * hPbPb_Bayesian[nbins_cent], * hPbPb_Bayesian_gen2pSmear[nbins_cent], * hPbPb_Bayesian_GenSmear[nbins_cent], * hPbPb_Bayesian_RecoSmear[nbins_cent], * hPbPb_Bayesian_BothSmear[nbins_cent];
 
-  TH1F * RAA_Sys_GenSmear[nbins_cent], * RAA_Sys_RecoSmear[nbins_cent],* RAA_Sys_BothSmear[nbins_cent];
-  TH1F * hPbPb_Sys_GenSmear[nbins_cent], * hPbPb_Sys_RecoSmear[nbins_cent],* hPbPb_Sys_BothSmear[nbins_cent];
+  TH1F * RAA_Sys_GenSmear[nbins_cent], * RAA_Sys_gen2pSmear[nbins_cent], * RAA_Sys_RecoSmear[nbins_cent],* RAA_Sys_BothSmear[nbins_cent];
+  TH1F * hPbPb_Sys_GenSmear[nbins_cent], * hPbPb_Sys_gen2pSmear[nbins_cent], * hPbPb_Sys_RecoSmear[nbins_cent],* hPbPb_Sys_BothSmear[nbins_cent];
   
   // get the input files:
   TFile * fin = TFile::Open(Form("../../Output/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
@@ -120,6 +121,8 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
 
     RAA_Bayesian[i] = (TH1F*)fNoSmear->Get(Form("RAA_bayesian_cent%d",i));
     RAA_Bayesian[i]->Print("base");
+    RAA_Bayesian_gen2pSmear[i] = (TH1F*)fgen2pSmear->Get(Form("RAA_bayesian_cent%d",i));
+    RAA_Bayesian_gen2pSmear[i]->Print("base");
     RAA_Bayesian_GenSmear[i] = (TH1F*)fGenSmear->Get(Form("RAA_bayesian_cent%d",i));
     RAA_Bayesian_GenSmear[i]->Print("base");
     RAA_Bayesian_RecoSmear[i] = (TH1F*)fRecoSmear->Get(Form("RAA_bayesian_cent%d",i));
@@ -129,6 +132,8 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
 
     RAA_Sys_GenSmear[i] = (TH1F*)RAA_Bayesian_GenSmear[i]->Clone(Form("RAA_Sys_GenSmear_cent%d",i));
     RAA_Sys_GenSmear[i]->Divide(RAA_Bayesian[i]);
+    RAA_Sys_gen2pSmear[i] = (TH1F*)RAA_Bayesian_gen2pSmear[i]->Clone(Form("RAA_Sys_gen2pSmear_cent%d",i));
+    RAA_Sys_gen2pSmear[i]->Divide(RAA_Bayesian[i]);
     RAA_Sys_RecoSmear[i] = (TH1F*)RAA_Bayesian_RecoSmear[i]->Clone(Form("RAA_Sys_RecoSmear_cent%d",i));
     RAA_Sys_RecoSmear[i]->Divide(RAA_Bayesian[i]);
     RAA_Sys_BothSmear[i] = (TH1F*)RAA_Bayesian_BothSmear[i]->Clone(Form("RAA_Sys_BothSmear_cent%d",i));
@@ -138,6 +143,8 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
     hPbPb_Bayesian[i]->Print("base");
     hPbPb_Bayesian_GenSmear[i] = (TH1F*)fGenSmear->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
     hPbPb_Bayesian_GenSmear[i]->Print("base");
+    hPbPb_Bayesian_gen2pSmear[i] = (TH1F*)fgen2pSmear->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
+    hPbPb_Bayesian_gen2pSmear[i]->Print("base");
     hPbPb_Bayesian_RecoSmear[i] = (TH1F*)fRecoSmear->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
     hPbPb_Bayesian_RecoSmear[i]->Print("base");
     hPbPb_Bayesian_BothSmear[i] = (TH1F*)fBothSmear->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
@@ -145,6 +152,8 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
 
     hPbPb_Sys_GenSmear[i] = (TH1F*)hPbPb_Bayesian_GenSmear[i]->Clone(Form("hPbPb_Sys_GenSmear_cent%d",i));
     hPbPb_Sys_GenSmear[i]->Divide(hPbPb_Bayesian[i]);
+    hPbPb_Sys_gen2pSmear[i] = (TH1F*)hPbPb_Bayesian_gen2pSmear[i]->Clone(Form("hPbPb_Sys_gen2pSmear_cent%d",i));
+    hPbPb_Sys_gen2pSmear[i]->Divide(hPbPb_Bayesian[i]);
     hPbPb_Sys_RecoSmear[i] = (TH1F*)hPbPb_Bayesian_RecoSmear[i]->Clone(Form("hPbPb_Sys_RecoSmear_cent%d",i));
     hPbPb_Sys_RecoSmear[i]->Divide(hPbPb_Bayesian[i]);
     hPbPb_Sys_BothSmear[i] = (TH1F*)hPbPb_Bayesian_BothSmear[i]->Clone(Form("hPbPb_Sys_BothSmear_cent%d",i));
@@ -184,6 +193,10 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
     RAA_Sys_RecoSmear[i]->SetMarkerColor(kBlue);
     RAA_Sys_RecoSmear[i]->Draw("same");
 
+    RAA_Sys_gen2pSmear[i]->SetMarkerStyle(33);
+    RAA_Sys_gen2pSmear[i]->SetMarkerColor(kPink);
+    RAA_Sys_gen2pSmear[i]->Draw("same");
+
     RAA_Sys_BothSmear[i]->SetMarkerStyle(33);
     RAA_Sys_BothSmear[i]->SetMarkerColor(kGreen);
     RAA_Sys_BothSmear[i]->Draw("same");
@@ -197,6 +210,7 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
   putCMSPrel();
   
   lRAA_Sys->AddEntry(RAA_Sys_GenSmear[0],"Gen pT smeared","pl");
+  lRAA_Sys->AddEntry(RAA_Sys_gen2pSmear[0],"Gen pT 2% resolution smear","pl");
   lRAA_Sys->AddEntry(RAA_Sys_RecoSmear[0],"Reco pT smeared","pl");
   lRAA_Sys->AddEntry(RAA_Sys_BothSmear[0],"Gen and Reco pT smeared","pl");
   lRAA_Sys->SetTextSize(0.04);
@@ -225,6 +239,10 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
     hPbPb_Sys_RecoSmear[i]->SetMarkerColor(kBlue);
     hPbPb_Sys_RecoSmear[i]->Draw("same");
 
+    hPbPb_Sys_gen2pSmear[i]->SetMarkerStyle(33);
+    hPbPb_Sys_gen2pSmear[i]->SetMarkerColor(kPink);
+    hPbPb_Sys_gen2pSmear[i]->Draw("same");
+
     hPbPb_Sys_BothSmear[i]->SetMarkerStyle(33);
     hPbPb_Sys_BothSmear[i]->SetMarkerColor(kGreen);
     hPbPb_Sys_BothSmear[i]->Draw("same");
@@ -238,6 +256,7 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
   putCMSPrel();
   
   lhPbPb_Sys->AddEntry(hPbPb_Sys_GenSmear[0],"Gen pT smeared","pl");
+  lhPbPb_Sys->AddEntry(hPbPb_Sys_genp2pSmear[0],"Gen pT 2% resolution smear","pl");
   lhPbPb_Sys->AddEntry(hPbPb_Sys_RecoSmear[0],"Reco pT smeared","pl");
   lhPbPb_Sys->AddEntry(hPbPb_Sys_BothSmear[0],"Gen and Reco pT smeared","pl");
   lhPbPb_Sys->SetTextSize(0.04);
@@ -272,10 +291,6 @@ void RAA_plot_Matt_raw_dataMC(char* etaWidth = (char*)"10_eta_18", Int_t radius 
   drawText(Form("ak Pu R = 0.%d PF jets, %2.0f < |eta| < %2.0f",radius, etaLow, etaHigh), 0.2,0.2,15);
 
   cDataMC_raw->SaveAs(Form("../../Plots/PbPb_DataMC_rawpT_%s_R%d_%d.pdf",etaWidth,radius,date.GetDate()),"RECREATE");
-
-
-  
-
 
 
   

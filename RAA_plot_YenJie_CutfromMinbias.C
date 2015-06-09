@@ -65,11 +65,13 @@ void RAA_plot_YenJie_CutfromMinBias(char* etaWidth = (char*)"10_eta_18", Int_t r
 {
 
   TStopwatch timer;
-  
+  gStyle->SetOptStat(0);
   TH1::SetDefaultSumw2();
 
   cout<<"etaWidth = "<<etaWidth<<endl;
   bool isAnalysisBin = false; 
+
+  TDatime date;
   
   TFile * fMinBias, * fJetTrig;
 
@@ -123,7 +125,7 @@ void RAA_plot_YenJie_CutfromMinBias(char* etaWidth = (char*)"10_eta_18", Int_t r
   for(int i = 0; i<nbins_cent; ++i){
 
     cFakeSub->cd(nbins_cent-i);
-    cFakeSub->cd(nbins_cent-i)->SetLog();
+    cFakeSub->cd(nbins_cent-i)->SetLogy();
 
     hJetTrigComb[i]->SetMarkerStyle(24);    
     hJetTrigComb[i]->SetMarkerColor(kBlack);
@@ -146,9 +148,9 @@ void RAA_plot_YenJie_CutfromMinBias(char* etaWidth = (char*)"10_eta_18", Int_t r
   cFakeSub->cd(1);
   putCMSPrel();
   
-  lSub->AddEntry(hJetTrigComb[i],"Jet Triggered Data","pl");
-  lSub->AddEntry(hMinBias[i],"MinBias data","pl");
-  lSub->AddEntry(hSubtracted[i],"Jet Triggered - MinBias","pl");
+  lSub->AddEntry(hJetTrigComb[0],"Jet Triggered Data","pl");
+  lSub->AddEntry(hMinBias[0],"MinBias data","pl");
+  lSub->AddEntry(hSubtracted[0],"Jet Triggered - MinBias","pl");
   lSub->SetTextSize(0.04);
   lSub->Draw();
   
