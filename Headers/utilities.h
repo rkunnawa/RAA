@@ -22,6 +22,27 @@
 #include "TLegend.h"
 #include "TLine.h"
 #include "TLatex.h"
+#include <stdio.h>
+#include <TColor.h>
+#include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TH3.h>
+#include <TStopwatch.h>
+#include <TRandom3.h>
+#include <TChain.h>
+#include <TProfile.h>
+#include <TStopwatch.h>
+#include <TCut.h>
+#include <cstdlib>
+#include <cmath>
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldResponse.h"
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBayes.h"
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldSvd.h"
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBinByBin.h"
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/prior.h"
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/bayesianUnfold.h"
 
 using namespace std;
 
@@ -36,8 +57,19 @@ double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
 double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
 double npart[nbins_cent+1] = {389.84, 307.65, 223.95, 107.5, 41.65, 11.55, 112.9};
 
+const int unfoldingCut_R2 = 40;
+const int unfoldingCut_R3 = 40;
+const int unfoldingCut_R4 = 40;
+
 /* const int nbins_pt = 30; */
 /* const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300,   330, 362, 395 }; */
+
+
+const char * algo = (char*) "Pu";
+const char *jet_type = (char*) "PF";
+char* etaWidth = (char*) "20_eta_20";
+double deltaEta = 4.0;
+const char * ptbins = (char*)"finebins"; /* atlaspTbins, atlasRcpbins */
 
 // this is the cms full analysis pT bins 
 const int nbins_pt = 32; 
@@ -221,7 +253,7 @@ class SysData
     TH1D *h = new TH1D(Form("hSysTmp_cent%d",i),"",nbins_pt, boundaries_pt);
     makeHistTitle(h,"","Jet p_{T} (GeV/c)","Systematic uncertainty");
     h->SetAxisRange(-0.4,0.4,"Y");
-    h->SetAxisRange(65,299,"X");
+    h->SetAxisRange(65,501,"X");
     h->Draw();
     TH1F* sys = drawEnvelope(hSys[i],"same",hSys[i]->GetLineColor(),1001,hSys[i]->GetLineColor(),-1);
     TH1F* sysIter = drawEnvelope(hSysIter[i],"same",hSysIter[i]->GetLineColor(),3004,hSysIter[i]->GetLineColor(),-1);
