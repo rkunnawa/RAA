@@ -30,16 +30,33 @@
 
 //static const int nbins_pt = 400;
 
-static const int nbins_pt = 30;
-static const double boundaries_pt[nbins_pt+1] = {
-  3, 4, 5, 7, 9, 12, 
-  15, 18, 21, 24, 28,
-  32, 37, 43, 49, 56,
-  64, 74, 84, 97, 114,
-  133, 153, 174, 196,
-  220, 245, 300, 
-  330, 362, 395
-};
+// static const int nbins_yaxian_large = 29;
+// static const double boundaries_yaxian_large[nbins_yaxian_large+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638,790,967};
+
+
+// static const int nbins_pt = 30;
+// static const double boundaries_pt[nbins_pt+1] = {
+//   3, 4, 5, 7, 9, 12, 
+//   15, 18, 21, 24, 28,
+//   32, 37, 43, 49, 56,
+//   64, 74, 84, 97, 114,
+//   133, 153, 174, 196,
+//   220, 245, 300, 
+//   330, 362, 395
+// };
+
+// atlas spectra bins 
+//static const int nbins_pt = 12;
+//static const double boundaries_pt[nbins_pt+1] = {31., 39., 50., 63., 79., 100., 125., 158., 199., 251., 316., 398., 501};
+
+// atlas Rcp bins 
+// static const int nbins_pt = 12;
+// static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};
+
+// analysis full pt bins
+static const int nbins_pt = 32;
+static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300, 330, 362, 395, 501};
+
 
 // Remove bins with error > central value
 void cleanup(TH1F *h){
@@ -106,7 +123,7 @@ void divideBinWidth(TH1 *h)
   h->GetYaxis()->CenterTitle();
 }
 
-void RAA_dataDrivenUnfoldingErrorCheck(int radius = 2, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "10_eta_18", double deltaEta = 1.6){
+void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "20_eta_20", double deltaEta = 4.0){
 
   TStopwatch timer; 
   timer.Start();
@@ -115,7 +132,8 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 2, char* algo = (char*) "Pu"
   TH2::SetDefaultSumw2();
   
   bool printDebug = true;
-
+  bool dofakeremove = true;
+  
   // get the data and mc histograms from the output of the read macro. 
   
   TDatime date;//this is just here to get them to run optimized. 
@@ -126,11 +144,16 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 2, char* algo = (char*) "Pu"
   // TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PP_data_MC_spectra_residualFactor_rebinned_%s_R0p%d.root",etaWidth,radius));
 
   // Pawan's files:
-  TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuple_PbPb_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth, radius));
+  TFile * fPbPb_in = TFile::Open(Form("Pawan_TTree_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth, radius));
   //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
-  TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius));
+  TFile * fPP_in = TFile::Open(Form("Pawan_TTree_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius));
 
   // TFile * fPbPb_MB_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
+
+
+  TFile * fMinBias = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,radius)); //MinBias File 
+  //TFile * fMinBias = TFile::Open("MinBiasSpectrawiLJcut.root"); //MinBias File 
+
 
   //TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
   //Int_t unfoldingCutBin = htest->FindBin(unfoldingCut);
@@ -160,6 +183,8 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 2, char* algo = (char*) "Pu"
   TH1F *uPbPb_Bayes[nbins_cent+1], *uPbPb_BinByBin[nbins_cent+1], *uPbPb_SVD[nbins_cent+1]; 
   TH1F *uPbPb_BayesianIter[nbins_cent+1][Iterations];
   TH1F *dPbPb_MinBias[nbins_cent];
+  TH1F *hMinBias[nbins_cent];
+  
   
   TH1F *dPP_1, *dPP_2, *dPP_3, *dPP_Comb;
   TH1F *mPP_Gen, *mPP_Reco;
@@ -174,8 +199,102 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 2, char* algo = (char*) "Pu"
 
   TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
   Int_t unfoldingCutBin = htest->FindBin(unfoldingCut);
+
+
+  float cutarray[nbins_cent] = {0.0,0.0,0.0,0.0,0.0,0.0};
   
+  if(radius == 2){
+    cutarray[0] = 55;
+    cutarray[1] = 50;
+    cutarray[2] = 40;
+    cutarray[3] = 30;
+    cutarray[4] = 30;
+    cutarray[5] = 30;
+  }
+    
   
+  if(radius == 3){
+    cutarray[0] = 65;
+    cutarray[1] = 60;
+    cutarray[2] = 50;
+    cutarray[3] = 40;
+    cutarray[4] = 40;
+    cutarray[5] = 40;
+  }
+    
+  if(radius == 4){
+    cutarray[0] = 75;
+    cutarray[1] = 70;
+    cutarray[2] = 60;
+    cutarray[3] = 50;
+    cutarray[4] = 50;
+    cutarray[5] = 50;
+  }
+    
+  
+  // get PbPb data
+  for(int i = 0;i<nbins_cent;++i){
+    if(printDebug) cout<<"cent_"<<i<<endl;
+
+    hMinBias[i]      = (TH1F*)fMinBias->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",radius,etaWidth,i)); //MinBias Histo
+    //hMinBias[i]      = (TH1F*)fMinBias->Get(Form("hptspectrawoleading_cent%d",i)); //MinBias Histo
+    dPbPb_TrgComb[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",radius,etaWidth,i));
+    // //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
+    dPbPb_TrgComb[i]->Print("base");
+
+    //Lets do the subtraction here _Sevil 
+    if(dofakeremove){
+	
+      // Float_t bincon=cutarray[i]; 
+      // Int_t bincut= hMinBias[i]->FindBin(bincon); 
+
+      // for(int k = bincut;k<=400;k++) 
+      // 	{ // cout<<"cent_ "<<i<<" pt "<< hMinBias[i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+      // 	  hMinBias[i]->SetBinContent(k,0); 
+      // 	  hMinBias[i]->SetBinError(k,0);
+      // 	} 
+
+      // for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< hMinBias[i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+      // 	hMinBias[i]->SetBinContent(k,0); 
+      // 	hMinBias[i]->SetBinError(k,0);
+      // }
+
+      Float_t   bin_no = dPbPb_TrgComb[i]->FindBin(15);
+      Float_t bin_end=dPbPb_TrgComb[i]->FindBin(25);
+      
+      Float_t   bin_nomb = hMinBias[i]->FindBin(15);
+      Float_t bin_endmb=hMinBias[i]->FindBin(25);
+      
+      float scalerangeweight=dPbPb_TrgComb[i]->Integral(bin_no,bin_end)/hMinBias[i]->Integral(bin_nomb,bin_endmb);
+
+      // this is just to adjust for the atlas pt bins. 
+      TH1F * hMinBias_test = new TH1F("hMinBias_test","",501,0,501);
+      for(int j = 0; j<hMinBias[i]->GetNbinsX();++j){
+	hMinBias_test->SetBinContent(j+1, hMinBias[i]->GetBinContent(j+1));
+	hMinBias_test->SetBinError(j+1, hMinBias[i]->GetBinError(j+1));
+      }
+      
+      for(int j = 0; j<hMinBias_test->GetNbinsX(); ++j)
+	hMinBias_test->SetBinError(j+1, (Float_t)hMinBias_test->GetBinError(j+1)/scalerangeweight);
+      
+      hMinBias_test->Scale(scalerangeweight);
+      
+      dPbPb_TrgComb[i]->Add(hMinBias_test, -1);
+    }
+    
+    dPbPb_TrgComb[i]->Scale(1./(145.156 * 1e9));
+
+    dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt, Form("PbPb_data_minbiasSub_cent%d",i), boundaries_pt);
+    divideBinWidth(dPbPb_TrgComb[i]);
+
+    for(int k = 1;k<=unfoldingCutBin;k++) {
+      dPbPb_TrgComb[i]->SetBinContent(k,0);
+      dPbPb_TrgComb[i]->SetBinError(k,0);
+    }    
+
+  }
+
+#if 0
   // get PbPb data
   for(int i = 0;i<nbins_cent;i++){
     if(printDebug) cout<<"cent_"<<i<<endl;
@@ -274,7 +393,7 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 2, char* algo = (char*) "Pu"
       dPbPb_TrgComb[i]->SetBinContent(k,0);
     }    
   }
-  
+  #endif
   //Int_t nSVDIter = 4;
   
   if(printDebug)cout<<"loaded the data histograms PbPb"<<endl;
@@ -364,8 +483,8 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 2, char* algo = (char*) "Pu"
       mPbPb_Gen[i]->SetBinContent(k,0);
       mPbPb_Reco[i]->SetBinContent(k,0);
       for(int l = 1;l<=nbins_pt;l++){
-	mPbPb_Matrix[i]->SetBinContent(k,l,0);
-	mPbPb_Matrix[i]->SetBinContent(l,k,0);
+    	mPbPb_Matrix[i]->SetBinContent(k,l,0);
+    	mPbPb_Matrix[i]->SetBinContent(l,k,0);
       }
     }
  
@@ -748,7 +867,7 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 2, char* algo = (char*) "Pu"
     
   }// nbins_pt loop
     
-  TFile f(Form("../../Output/Pawan_ntuple_PbPb_R%d_pp_R%d_noJetID_%s_unfoldingCut_%d_noFakeWeight_data_driven_correction_ak%s%s_%d.root", radius, radius, etaWidth ,unfoldingCut,algo,jet_type,date.GetDate()),"RECREATE");
+  TFile f(Form("Pawan_TTree_PbPb_R%d_pp_R%d_noJetID_fullfinebin_%s_unfoldingCut_%d_SevilFakeMBnoJet80Cut_data_driven_correction_ak%s%s.root", radius, radius, etaWidth , unfoldingCut, algo, jet_type),"RECREATE");
   f.cd();
 
   for(int i = 0;i<nbins_cent;i++) {
@@ -763,8 +882,8 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 2, char* algo = (char*) "Pu"
     hCorrUnfoldingPbPb[i]->Write();
     hCorrUnfoldingPbPb[i]->Print("base");
 
+    dPbPb_TrgComb[i]->SetName(Form("PbPb_data_minbiasSub_cent%d",i));
     dPbPb_TrgComb[i]->Scale(145.156 * 1e9);
-
     dPbPb_TrgComb[i]->Write();
     dPbPb_TrgComb[i]->Print("base");
 
