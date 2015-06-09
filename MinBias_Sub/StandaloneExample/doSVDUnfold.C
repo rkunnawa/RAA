@@ -52,12 +52,12 @@ void doSVDUnfold(TString strInput = "input/UnfoldingHists.root", Int_t kregDraw 
 
   //if useToy==kTRUE, toy experiments are performed to calculate covariance matrix -> adviced for SVD
 
-  Load();
+  // Load();
   gStyle->SetOptStat(0);
   // gStyle->SetOptFit(01);
   gStyle->SetOptTitle(0);
 
-  gSystem->Load("$ROOUNFOLD/libRooUnfold.so"); //adjust to your local path
+  gSystem->Load("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Headers/RooUnfold-1.1.1/libRooUnfold.so"); //adjust to your local path
 
   const Int_t nKregMin = 2;
   const Int_t nKregMax = 7;
@@ -68,11 +68,11 @@ void doSVDUnfold(TString strInput = "input/UnfoldingHists.root", Int_t kregDraw 
   if(useToy)  errorTreatment = RooUnfold::kCovToy;
   cout << "errorTreatment: " << errorTreatment << endl;
 
-  Double_t nEvents = 1e4*1e3;
+  Double_t nEvents = 2.198e7; // 21.96 M events 
 
   TFile *fInput = new TFile(strInput.Data());
-  TH1D *hUnfoldedChi2 = fInput->Get("hUnfolded");
-  TH1D *hFoldedChi2 = fInput->Get("hFolded");
+  //TH1D *hUnfoldedChi2 = fInput->Get("hUnfolded");
+  //TH1D *hFoldedChi2 = fInput->Get("hFolded");
   TH1D *fh1RawJetsCurrent = fInput->Get("fh1RawJetsCurrent");
   TH1D *fh1RawJetsCurrentUnfBinning = fInput->Get("fh1RawJetsCurrentUnfBinning");
 

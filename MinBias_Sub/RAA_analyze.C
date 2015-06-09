@@ -267,13 +267,14 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   if(param2 == 5) smear = "gen2pSmear";
 
   if(radius == 2) unfoldingCut = 30;
-  if(radius == 3) unfoldingCut = 40;
+  if(radius == 3) unfoldingCut = 55;
   if(radius == 4) unfoldingCut = 50;
 
   TDatime date;//this is just here to get them to run optimized. 
 
   // Pawan's files:
   TFile * fPbPb_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_TTree_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
+  TFile * fPbPb_MC_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_TTree_PbPb_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
 //= TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth, radius)); 
   TFile * fPP_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_TTree_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius));
 
@@ -282,8 +283,9 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   
   TFile * fMinBias = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,radius)); //MinBias File 
 
-  // Im going to load the input file from 0528.root to check what the fuck is going on!!!!
-  TFile * fCrossCheck = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_noSmear_20_eta_20_%dGeVCut_akPF_20150528.root", radius, unfoldingCut));
+  // dont need this since i figured out whats happening - related to applying cuts on the response matrix! 
+  // // Im going to load the input file from 0528.root to check what the fuck is going on!!!!
+  // TFile * fCrossCheck = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_noSmear_20_eta_20_%dGeVCut_akPF_20150528.root", radius, unfoldingCut));
   
   cout<<"after input file declaration"<<endl;
   // need to make sure that the file names are in prefect order so that i can run them one after another. 
@@ -306,7 +308,7 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   TH2F *mPbPb_mcclosure_Matrix[nbins_cent+1],*mPbPb_mcclosure_Response[nbins_cent+1], *mPbPb_mcclosure_ResponseNorm[nbins_cent+1];
   TH1F *mPbPb_mcclosure_gen[nbins_cent+1];
 
-  const int Iterations = 20; //for unfolding systematics. 
+  const int Iterations = 6; //for unfolding systematics. 
   const int BayesIter = 4;
   TH1F *uPbPb_Bayes[nbins_cent+1], *uPbPb_BinByBin[nbins_cent+1], *uPbPb_SVD[nbins_cent+1], *uPbPb_JEC_Bayes[nbins_cent+1], *uPbPb_Smear_Bayes[nbins_cent+1]; 
   TH1F *uPbPb_BayesianIter[nbins_cent+1][Iterations];
@@ -402,14 +404,7 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
       // 	hMinBias[i]->SetBinError(k,0);
       // }
 
-      Float_t   bin_no = dPbPb_TrgComb[i]->FindBin(15);
-      Float_t bin_end=dPbPb_TrgComb[i]->FindBin(25);
       
-      Float_t   bin_nomb = hMinBias[i]->FindBin(15);
-      Float_t bin_endmb=hMinBias[i]->FindBin(25);
-      
-      float scalerangeweight=dPbPb_TrgComb[i]->Integral(bin_no,bin_end)/hMinBias[i]->Integral(bin_nomb,bin_endmb);
-
       // this is just to adjust for the atlas pt bins. 
       TH1F * hMinBias_test = new TH1F("hMinBias_test","",501,0,501);
       for(int j = 0; j<hMinBias[i]->GetNbinsX();++j){
@@ -418,6 +413,14 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
       }
       hMinBias_test->Print("base");
       hMinBias[i]->Print("base");
+
+      Float_t   bin_no = dPbPb_TrgComb[i]->FindBin(15);
+      Float_t bin_end=dPbPb_TrgComb[i]->FindBin(25);
+      
+      Float_t   bin_nomb = hMinBias_test->FindBin(15);
+      Float_t bin_endmb=hMinBias_test->FindBin(25);
+      
+      float scalerangeweight=dPbPb_TrgComb[i]->Integral(bin_no,bin_end)/hMinBias_test->Integral(bin_nomb,bin_endmb);
 
       for(int j = 0; j<hMinBias_test->GetNbinsX(); ++j)
 	hMinBias_test->SetBinError(j+1,hMinBias_test->GetBinError(j+1)/scalerangeweight);
@@ -524,22 +527,22 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
     //   if(i == 5 && radius==4) unfoldingCutBin = htest->FindBin(50);
     // }
 
-    for(int k = 1;k<=unfoldingCutBin;k++) {
-      dPbPb_TrgComb[i]->SetBinContent(k,0);
-      dPbPb_JEC_TrgComb[i]->SetBinContent(k,0);
-      dPbPb_Smear_TrgComb[i]->SetBinContent(k,0);
-      dPbPb_Trg80[i]->SetBinContent(k,0);
-      dPbPb_Trg65[i]->SetBinContent(k,0);
-      dPbPb_Trg55[i]->SetBinContent(k,0);
-      dPbPb_TrgComb[i]->SetBinError(k,0);
-      dPbPb_JEC_TrgComb[i]->SetBinError(k,0);
-      dPbPb_Smear_TrgComb[i]->SetBinError(k,0);
-      dPbPb_Trg80[i]->SetBinError(k,0);
-      dPbPb_Trg65[i]->SetBinError(k,0);
-      dPbPb_Trg55[i]->SetBinError(k,0);
-      hMinBias[i]->SetBinContent(k,0);
-      hMinBias[i]->SetBinError(k,0);
-    }
+    // for(int k = 1;k<=unfoldingCutBin;k++) {
+    //   dPbPb_TrgComb[i]->SetBinContent(k,0);
+    //   dPbPb_JEC_TrgComb[i]->SetBinContent(k,0);
+    //   dPbPb_Smear_TrgComb[i]->SetBinContent(k,0);
+    //   dPbPb_Trg80[i]->SetBinContent(k,0);
+    //   dPbPb_Trg65[i]->SetBinContent(k,0);
+    //   dPbPb_Trg55[i]->SetBinContent(k,0);
+    //   dPbPb_TrgComb[i]->SetBinError(k,0);
+    //   dPbPb_JEC_TrgComb[i]->SetBinError(k,0);
+    //   dPbPb_Smear_TrgComb[i]->SetBinError(k,0);
+    //   dPbPb_Trg80[i]->SetBinError(k,0);
+    //   dPbPb_Trg65[i]->SetBinError(k,0);
+    //   dPbPb_Trg55[i]->SetBinError(k,0);
+    //   hMinBias[i]->SetBinContent(k,0);
+    //   hMinBias[i]->SetBinError(k,0);
+    // }
     
   }
 
@@ -616,14 +619,21 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
       mPbPb_Matrix[i]->Print("base");
     }
     
-    mPbPb_mcclosure_data[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hrec_c_f_pbpb_akPu%d_1_%d",radius, radius, i));
-    mPbPb_mcclosure_data[i]->Print("base");
-    mPbPb_mcclosure_gen[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hgen_f_pbpb_akPu%d_1_%d",radius, radius, i));
-    mPbPb_mcclosure_gen[i]->Print("base");
+    // mPbPb_mcclosure_data[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hrec_c_f_pbpb_akPu%d_1_%d",radius, radius, i));
+    // mPbPb_mcclosure_data[i]->Print("base");
+    // mPbPb_mcclosure_gen[i] = (TH1F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hgen_f_pbpb_akPu%d_1_%d",radius, radius, i));
+    // mPbPb_mcclosure_gen[i]->Print("base");
     
-    mPbPb_mcclosure_Matrix[i] = (TH2F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hmatrix_f_pbpb_akPu%d_1_%d",radius, radius, i));
-    mPbPb_mcclosure_Matrix[i]->Print("base");
+    // mPbPb_mcclosure_Matrix[i] = (TH2F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hmatrix_f_pbpb_akPu%d_1_%d",radius, radius, i));
+    // mPbPb_mcclosure_Matrix[i]->Print("base");
 
+    mPbPb_mcclosure_data[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_JetComb_data_R%d_%s_cent%d",radius,etaWidth,i));
+    mPbPb_mcclosure_data[i]->Print("base");
+    mPbPb_mcclosure_gen[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_gen_JetComb_R%d_%s_cent%d",radius,etaWidth,i));
+    mPbPb_mcclosure_gen[i]->Print("base");
+    mPbPb_mcclosure_Matrix[i] = (TH2F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
+    mPbPb_mcclosure_Matrix[i]->Print("base");
+    
     // if(etaWidth == "10_eta_10"){
     //   if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(30);
     //   if(i == 1 && radius==2) unfoldingCutBin = htest->FindBin(30);
@@ -700,18 +710,37 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
       mPbPb_Reco[i]->SetBinContent(k,0);
       mPbPb_Gen[i]->SetBinError(k,0);
       mPbPb_Reco[i]->SetBinError(k,0);
+      mPbPb_mcclosure_data[i]->SetBinContent(k,0);
+      mPbPb_mcclosure_data[i]->SetBinError(k,0);
+      mPbPb_mcclosure_gen[i]->SetBinContent(k,0);
+      mPbPb_mcclosure_gen[i]->SetBinError(k,0);
       //mPbPb_mcclosure_data[i]->SetBinContent(k,0);
       //mPbPb_mcclosure_gen[i]->SetBinContent(k,0);
+      // set bin content matrix l,k works 
       for(int l = 1;l<=mPbPb_Gen[i]->GetNbinsX();l++){
-    	mPbPb_Matrix[i]->SetBinContent(k,l,0);
+    	//mPbPb_Matrix[i]->SetBinContent(k,l,0);
     	mPbPb_Matrix[i]->SetBinContent(l,k,0);
-    	mPbPb_Matrix[i]->SetBinError(k,l,0);
-    	mPbPb_Matrix[i]->SetBinError(l,k,0);
+    	mPbPb_mcclosure_Matrix[i]->SetBinContent(l,k,0);
+    	//mPbPb_Matrix[i]->SetBinError(k,l,0);
+        mPbPb_Matrix[i]->SetBinError(l,k,0);
+        mPbPb_mcclosure_Matrix[i]->SetBinError(l,k,0);
       }
+
+
+      
       //for(int l = 1; l<=mPbPb_mcclosure_data[i]->GetNbinsX(); l++){
       //mPbPb_mcclosure_Matrix[i]->SetBinContent(k,l,0);
       //mPbPb_mcclosure_Matrix[i]->SetBinContent(l,k,0);	
       //}
+    }
+
+    for(int k = 1; k<=20; k++){
+      for(int l = 1; l<=mPbPb_Gen[i]->GetNbinsX();l++){
+	mPbPb_Matrix[i]->SetBinContent(k,l,0);
+	mPbPb_Matrix[i]->SetBinError(k,l,0);
+	mPbPb_mcclosure_Matrix[i]->SetBinError(k,l,0);
+    	mPbPb_mcclosure_Matrix[i]->SetBinContent(k,l,0);
+      }
     }
    
     
@@ -747,11 +776,16 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   mPP_Matrix = (TH2F*)fPP_in->Get(Form("hpp_matrix_HLT_R%d_%s",radius,etaWidth));
   mPP_Matrix->Print("base");
   
-  mPP_mcclosure_data = (TH1F*)fMCClosure->Get(Form("ak%dJetAnalyzer/hrec_c_f_pp_ak%d_0_7",radius,radius));
-  mPP_mcclosure_data->Print("base");
-  mPP_mcclosure_gen = (TH1F*)fMCClosure->Get(Form("ak%dJetAnalyzer/hgen_f_pp_ak%d_0_7",radius,radius));
-  mPP_mcclosure_gen->Print("base");
+  // mPP_mcclosure_data = (TH1F*)fMCClosure->Get(Form("ak%dJetAnalyzer/hrec_c_f_pp_ak%d_0_7",radius,radius));
+  // mPP_mcclosure_data->Print("base");
+  // mPP_mcclosure_gen = (TH1F*)fMCClosure->Get(Form("ak%dJetAnalyzer/hgen_f_pp_ak%d_0_7",radius,radius));
+  // mPP_mcclosure_gen->Print("base");
 
+  mPP_mcclosure_data = (TH1F*)fPP_in->Get(Form("hpp_mcclosure_JetComb_data_R%d_%s",radius,etaWidth));
+  mPP_mcclosure_data->Print("base");
+  mPP_mcclosure_gen = (TH1F*)fPP_in->Get(Form("hpp_mcclosure_gen_JetComb_R%d_%s",radius,etaWidth));
+  mPP_mcclosure_gen->Print("base");
+  
   // mPP_mcclosure_data_um = (TH1F*)fMCClosure->Get(Form("ak%dJetAnalyzer/hrec_um_c_f_pp_ak%d_1_2",radius,radius));
   // mPP_mcclosure_data_um->Print("base");
   // mPP_mcclosure_gen_um = (TH1F*)fMCClosure->Get(Form("ak%dJetAnalyzer/hgen_um_f_pp_ak%d_1_2",radius,radius));
@@ -763,9 +797,11 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   // mPP_mcclosure_gen = (TH1F*) mPP_mcclosure_gen_m->Clone(Form("hgen_f_pp_ak%d_1_2",radius,radius));
   // mPP_mcclosure_gen->Add(mPP_mcclosure_gen_um);
   
-  mPP_mcclosure_Matrix = (TH2F*)fMCClosure->Get(Form("ak%dJetAnalyzer/hmatrix_f_pp_ak%d_0_7",radius,radius));
+  // mPP_mcclosure_Matrix = (TH2F*)fMCClosure->Get(Form("ak%dJetAnalyzer/hmatrix_f_pp_ak%d_0_7",radius,radius));
+  // mPP_mcclosure_Matrix->Print("base");
+  mPP_mcclosure_Matrix = (TH2F*)fPP_in->Get(Form("hpp_mcclosure_matrix_HLT_R%d_%s",radius,etaWidth));
   mPP_mcclosure_Matrix->Print("base");
-
+  
   //RooUnfoldResponse ruResponsePP(mPP_Matrix->ProjectionY(),mPP_Matrix->ProjectionX(), mPP_Matrix,"","");
   //regularization parameter definition: 
   //RooUnfoldSvd unfoldSvdPP(&ruResponsePP, dPP_Comb, nSVDIter);
@@ -878,7 +914,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
     
   }
 
-#if 0
 
   if(printDebug) cout<<"Filling the PbPb mcclosure response Matrix"<<endl;
 
@@ -965,7 +1000,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
 
 
   }
-#endif
   
   if(printDebug) cout<<"Filling PP response Matrix"<<endl;
 
@@ -1054,7 +1088,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
     
     
   }
-#if 0
   if(printDebug) cout<<"Filling PP mcclosure response Matrix"<<endl;
 
   // response matrix for pp.  
@@ -1142,7 +1175,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
     
     
   }
-#endif
   if(printDebug) cout<<"finished with all the response matrix. now going for unfolding"<<endl;
   
 
@@ -1474,7 +1506,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   // think if there are any other systematic checks to be performed. 
   // so i have iteration systematics, what about Unfolding closure using the MC. For that i need to take in half of the MC as data and then unfold it using the same response matrix. I think it would be better if i create a new macro for that. Or coming to think of it, i have all the unfolding here so might as well just make a copy of it. 
 
-#if 0
   // unfolding for the MC closure test. 
 
   // create the necessary histograms.  
@@ -1615,7 +1646,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
 
   delete hPriorPPMC;
   // write it to the output file
-#endif
   
   cout<<"writing to output file"<<endl;
   
@@ -1645,7 +1675,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
     divideBinWidth(mPbPb_Gen[i]);
 
 
-#if 0
     mPbPb_mcclosure_data[i] = (TH1F*)mPbPb_mcclosure_data[i]->Rebin(nbins_pt, Form("mPbPb_mcclosure_data_cent%d",i), boundaries_pt);
     mPbPb_mcclosure_data[i]->SetName(Form("mPbPb_mcclosure_data_cent%d",i));
     divideBinWidth(mPbPb_mcclosure_data[i]);
@@ -1656,7 +1685,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
     divideBinWidth(uPbPb_MC_Bayes[i]); 
     uPbPb_MC_BinByBin[i] = (TH1F*)uPbPb_MC_BinByBin[i]->Rebin(nbins_pt,Form("uPbPb_MC_BinByBin_cent%d",i),boundaries_pt);
     divideBinWidth(uPbPb_MC_BinByBin[i]);
-#endif
 
     
     uPbPb_Bayes[i] = (TH1F*)uPbPb_Bayes[i]->Rebin(nbins_pt,Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i),boundaries_pt);
@@ -1799,7 +1827,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
     
     mPbPb_Response[i]->Write();
     mPbPb_Matrix[i]->Write();
-#if 0
     mPbPb_mcclosure_ResponseNorm[i]->Write();
     mPbPb_mcclosure_Response[i]->Write();
     mPbPb_mcclosure_Matrix[i]->Write();
@@ -1810,7 +1837,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
     uPbPb_MC_Bayes[i]->Write();
     uPbPb_MC_BinByBin[i]->Write();
     
-#endif
     mPbPb_Gen[i]->Scale(1./deltaEta);// delta eta
     mPbPb_Gen[i]->SetName(Form("PbPb_Gen_spectra_refpt_cent%d",i));
     mPbPb_Gen[i]->Write();
@@ -1830,12 +1856,10 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
       divideBinWidth(uPbPb_BayesianIter[i][j-1]);
       uPbPb_BayesianIter[i][j-1]->SetName(Form("uPbPb_BayesianIter%d_cent%d",j,i));
       uPbPb_BayesianIter[i][j-1]->Write();
-#if 0
       uPbPb_MC_BayesianIter[i][j-1] = (TH1F*)uPbPb_MC_BayesianIter[i][j-1]->Rebin(nbins_pt,Form("uPbPb_MC_BayesianIter%d_cent%d",j,i),boundaries_pt);
       divideBinWidth(uPbPb_MC_BayesianIter[i][j-1]);
       uPbPb_MC_BayesianIter[i][j-1]->SetName(Form("uPbPb_MC_BayesianIter%d_cent%d",j,i));      
       uPbPb_MC_BayesianIter[i][j-1]->Write();
-#endif
     }
   }//cent bin loop
 
@@ -1844,12 +1868,10 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
     divideBinWidth(uPP_BayesianIter[i-1]);
     uPP_BayesianIter[i-1]->SetName(Form("uPP_BayesianIter%d",i));
     uPP_BayesianIter[i-1]->Write();
-#if 0
     uPP_MC_BayesianIter[i-1] = (TH1F*)uPP_MC_BayesianIter[i-1]->Rebin(nbins_pt,Form("uPP_MC_BayesianIter%d",i),boundaries_pt);
     divideBinWidth(uPP_MC_BayesianIter[i-1]);
     uPP_MC_BayesianIter[i-1]->SetName(Form("uPP_MC_BayesianIter%d",i));
     uPP_MC_BayesianIter[i-1]->Write();
-#endif
   }
 
   // not rebinning pp data spectra to check comparison with atlas
@@ -1858,12 +1880,10 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
 
   uPP_BinByBin = (TH1F*)uPP_BinByBin->Rebin(nbins_pt,"PP_BinByBin_unfolded_spectra",boundaries_pt);
   divideBinWidth(uPP_BinByBin); 
-#if 0
   uPP_MC_Bayes = (TH1F*)uPP_MC_Bayes->Rebin(nbins_pt,"PP_MC_Bayes_unfolded_spectra",boundaries_pt);
   divideBinWidth(uPP_MC_Bayes);
   uPP_MC_BinByBin = (TH1F*)uPP_MC_BinByBin->Rebin(nbins_pt,"PP_MC_BinByBin_unfolded_spectra",boundaries_pt);
   divideBinWidth(uPP_MC_BinByBin);
-#endif
   
 
   dPP_Comb = (TH1F*)dPP_Comb->Rebin(nbins_pt,"pp_measured_spectra_combined",boundaries_pt);
@@ -1880,14 +1900,12 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   divideBinWidth(mPP_Reco);
   mPP_ResponseNorm = (TH2F*)mPP_ResponseNorm->Rebin2D(5,5,"PP_normalized_response_matrix");    
 
-  #if 0
   mPP_mcclosure_data = (TH1F*)mPP_mcclosure_data->Rebin(nbins_pt, "mPP_mcclosure_data", boundaries_pt);
   mPP_mcclosure_data->SetName("mPP_mcclosure_data");
   divideBinWidth(mPP_mcclosure_data);
   mPP_mcclosure_gen = (TH1F*)mPP_mcclosure_gen->Rebin(nbins_pt, "mPP_mcclosure_gen", boundaries_pt);
   mPP_mcclosure_gen->SetName("mPP_mcclosure_gen");
   divideBinWidth(mPP_mcclosure_gen);
-  #endif
   
   for(int j = 0; j<uPP_Bayes->GetNbinsX(); ++j){
     uPP_Bayes->SetBinError(j+1, hPP_BayesCorrected->GetBinError(j+1));  
@@ -1920,10 +1938,8 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   mPP_ResponseNorm->Write();
 
   mPP_Response->Write();
-#if 0
   mPP_mcclosure_ResponseNorm->Write();
   mPP_mcclosure_Response->Write();
-#endif
   
   mPP_Gen->Scale(1./deltaEta);// delta eta
   mPP_Gen->SetName("PP_Gen_spectra_refpt");
@@ -1934,11 +1950,9 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   mPP_Reco->Write();
   
   mPP_Matrix->Write();
-#if 0
   mPP_mcclosure_Matrix->Write();
   mPP_mcclosure_data->Write();
   mPP_mcclosure_gen->Write();
-#endif
   
   // uPP_Bayes->Scale(1./deltaEta);// delta eta
   // uPP_Bayes->Scale(1./5.3/1e3); //pp lumi to get it to pico barns 
@@ -1952,13 +1966,11 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
   uPP_BinByBin->SetName("PP_BinByBin_unfolded_spectra");
   uPP_BinByBin->Write();
 
-#if 0
   uPP_MC_Bayes->SetName("PP_MC_Bayes_unfolded_spectra");
   uPP_MC_Bayes->Write();
 
   uPP_MC_BinByBin->SetName("PP_MC_BinByBin_unfolded_spectra");
   uPP_MC_BinByBin->Write();
-#endif
   
   fout.Close();
   
