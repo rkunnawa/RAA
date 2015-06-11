@@ -12,118 +12,11 @@
 //
 //
 
+#include "../Headers/plot.h"
+#include "../Headers/utilities.h"
 
-#include <iostream>
-#include <stdio.h>
-
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldResponse.h"
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBayes.h"
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldSvd.h"
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBinByBin.h"
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/prior.h"
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/bayesianUnfold.h"
-#include "TStopwatch.h"
-#include "TRandom3.h"
-
-//static const int nbins_pt = 29;
-//static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 790, 967};
-
-//static const int nbins_pt = 400;
-
-// static const int nbins_yaxian_large = 29;
-// static const double boundaries_yaxian_large[nbins_yaxian_large+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638,790,967};
-
-
-// static const int nbins_pt = 30;
-// static const double boundaries_pt[nbins_pt+1] = {
-//   3, 4, 5, 7, 9, 12, 
-//   15, 18, 21, 24, 28,
-//   32, 37, 43, 49, 56,
-//   64, 74, 84, 97, 114,
-//   133, 153, 174, 196,
-//   220, 245, 300, 
-//   330, 362, 395
-// };
-
-// atlas spectra bins 
-//static const int nbins_pt = 12;
-//static const double boundaries_pt[nbins_pt+1] = {31., 39., 50., 63., 79., 100., 125., 158., 199., 251., 316., 398., 501};
-
-// atlas Rcp bins 
-// static const int nbins_pt = 12;
-// static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};
-
-// analysis full pt bins
-static const int nbins_pt = 32;
-static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300, 330, 362, 395, 501};
-
-
-// Remove bins with error > central value
-void cleanup(TH1F *h){
-  for (int i=1;i<=h->GetNbinsX();i++){
-    double val1 = h->GetBinContent(i);
-    double valErr1 = h->GetBinError(i);
-    if (valErr1>=val1) {
-      h->SetBinContent(i,0);
-      h->SetBinError(i,0);
-    }
-  }   
-}
-
-// Remove error 
-void removeError(TH1F *h){
-  for (int i=1;i<=h->GetNbinsX();i++){
-    h->SetBinError(i,0);
-  } 
-}  
-
-// Remove Zero
-void removeZero(TH1 *h){
-  double min = 0;
-  for(int i = 1;i<h->GetNbinsX();i++){
-    if(h->GetBinContent(i)>min&&h->GetBinContent(i)>0)
-      min = h->GetBinContent(i);
-  }
-  
-  for(int i = 1;i<h->GetNbinsX();i++){
-    if(h->GetBinContent(i) == 0){
-      h->SetBinContent(i,min/10.);
-      h->SetBinError(i,min/10.);
-    }
-  }
-}
-
-// make a histogram from TF1 function
-TH1F *functionHist(TF1 *f, TH1F* h,char *fHistname){
-  TH1F *hF = (TH1F*)h->Clone(fHistname);
-  for (int i=1;i<=h->GetNbinsX();i++){
-    double var = f->Integral(h->GetBinLowEdge(i),h->GetBinLowEdge(i+1))/h->GetBinWidth(i);
-    hF->SetBinContent(i,var);
-    hF->SetBinError(i,0);
-  }
-  return hF;
-}
-
-// divide by bin width
-void divideBinWidth(TH1 *h)
+void RAA_dataDrivenUnfoldingErrorCheck_new(int radius = 3)
 {
-  h->Sumw2();
-  for (int i=0;i<=h->GetNbinsX();i++){
-    Float_t val = h->GetBinContent(i);
-    Float_t valErr = h->GetBinError(i);
-    if(val!=0){
-      val/=h->GetBinWidth(i);
-      valErr/=h->GetBinWidth(i);
-      h->SetBinContent(i,val);
-      h->SetBinError(i,valErr);
-    }  
-  }
-
-  h->GetXaxis()->CenterTitle();
-  h->GetYaxis()->CenterTitle();
-}
-
-void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, char* algo = (char*) "Pu", char *jet_type = (char*) "PF", int unfoldingCut = 40, char* etaWidth = (char*) "20_eta_20", double deltaEta = 4.0){
 
   TStopwatch timer; 
   timer.Start();
@@ -133,43 +26,26 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, char* algo = (char*) "Pu"
   
   bool printDebug = true;
   bool dofakeremove = true;
+
+  int unfoldingCut = 20;
+  
   
   // get the data and mc histograms from the output of the read macro. 
   
   TDatime date;//this is just here to get them to run optimized. 
 
-  // // Raghav's files: 
-  // TFile * fPbPb_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_data_MC_spectra_JetID_CutA_rebinned_%s_R0p%d.root",etaWidth,radius));
-  // //  //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
-  // TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PP_data_MC_spectra_residualFactor_rebinned_%s_R0p%d.root",etaWidth,radius));
-
   // Pawan's files:
-  TFile * fPbPb_in = TFile::Open(Form("MinBias_Sub/Pawan_TTree_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth, radius));
-  //TFile * fPP_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/Pp_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
-  TFile * fPP_in = TFile::Open(Form("MinBias_Sub/Pawan_TTree_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius));
-
-  // TFile * fPbPb_MB_in = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Output/PbPb_MinBiasUPC_CutEfficiency_YetkinCuts_matched_slantedlinecalopfpt_addingunmatched_exclusionhighertriggers_eMaxSumcand_A_R0p%d.root",radius));
-
+  TFile * fPbPb_in = TFile::Open(Form("Pawan_TTree_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root", etaWidth, radius));
+  TFile * fPbPb_MC_in = TFile::Open(Form("Pawan_TTree_PbPb_MC_subid0_spectra_JetID_CutA_%s_%s_R0p%d.root",ptbins, etaWidth, radius));
+  TFile * fPP_in = TFile::Open(Form("Pawan_TTree_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root", etaWidth, radius));
+  TFile * fPP_MC_in = TFile::Open(Form("Pawan_TTree_PP_MC_spectra_residualFactor_%s_%s_R0p%d.root",ptbins, etaWidth, radius));
 
   TFile * fMinBias = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,radius)); //MinBias File 
-  //TFile * fMinBias = TFile::Open("MinBiasSpectrawiLJcut.root"); //MinBias File 
-
-
-  //TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
-  //Int_t unfoldingCutBin = htest->FindBin(unfoldingCut);
   
   cout<<"after input file declaration"<<endl;
-  // need to make sure that the file names are in prefect order so that i can run them one after another. 
-  // for the above condition, i might have to play with the date stamp. 
-  
-  const int nbins_cent = 6;
-  double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
-  double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
   
   // histogram declarations with the following initial appendage: d - Data, m - MC, u- Unfolded
   // for the MC closure test, ive kept separate 
-
-  // setup the radius and the eta bin loop here later. not for the time being. Aug 20th. only run the -2 < eta < 2 with the differenent centrality bins 
 
   TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1];
   
@@ -197,39 +73,41 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, char* algo = (char*) "Pu"
 
   // would be better to read in the histograms and rebin them. come to think of it, it would be better to have them already rebinned (and properly scaled - to the level of differential cross section in what ever barns (inverse micro barns) but keep it consistent) from the read macro. 
 
+  if(radius == 2) unfoldingCut = unfoldingCut_R2;
+  if(radius == 3) unfoldingCut = unfoldingCut_R3;
+  if(radius == 4) unfoldingCut = unfoldingCut_R4;
+  
   TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
   Int_t unfoldingCutBin = htest->FindBin(unfoldingCut);
 
-
-  float cutarray[nbins_cent] = {0.0,0.0,0.0,0.0,0.0,0.0};
+  // float cutarray[nbins_cent] = {0.0,0.0,0.0,0.0,0.0,0.0};
   
-  if(radius == 2){
-    cutarray[0] = 55;
-    cutarray[1] = 50;
-    cutarray[2] = 40;
-    cutarray[3] = 30;
-    cutarray[4] = 30;
-    cutarray[5] = 30;
-  }
-    
+  // if(radius == 2){
+  //   cutarray[0] = 55;
+  //   cutarray[1] = 50;
+  //   cutarray[2] = 40;
+  //   cutarray[3] = 30;
+  //   cutarray[4] = 30;
+  //   cutarray[5] = 30;
+  // }
   
-  if(radius == 3){
-    cutarray[0] = 65;
-    cutarray[1] = 60;
-    cutarray[2] = 50;
-    cutarray[3] = 40;
-    cutarray[4] = 40;
-    cutarray[5] = 40;
-  }
+  // if(radius == 3){
+  //   cutarray[0] = 65;
+  //   cutarray[1] = 60;
+  //   cutarray[2] = 50;
+  //   cutarray[3] = 40;
+  //   cutarray[4] = 40;
+  //   cutarray[5] = 40;
+  // }
     
-  if(radius == 4){
-    cutarray[0] = 75;
-    cutarray[1] = 70;
-    cutarray[2] = 60;
-    cutarray[3] = 50;
-    cutarray[4] = 50;
-    cutarray[5] = 50;
-  }
+  // if(radius == 4){
+  //   cutarray[0] = 75;
+  //   cutarray[1] = 70;
+  //   cutarray[2] = 60;
+  //   cutarray[3] = 50;
+  //   cutarray[4] = 50;
+  //   cutarray[5] = 50;
+  // }
     
   
   // get PbPb data
@@ -259,14 +137,6 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, char* algo = (char*) "Pu"
       // 	hMinBias[i]->SetBinError(k,0);
       // }
 
-      Float_t   bin_no = dPbPb_TrgComb[i]->FindBin(15);
-      Float_t bin_end=dPbPb_TrgComb[i]->FindBin(25);
-      
-      Float_t   bin_nomb = hMinBias[i]->FindBin(15);
-      Float_t bin_endmb=hMinBias[i]->FindBin(25);
-      
-      float scalerangeweight=dPbPb_TrgComb[i]->Integral(bin_no,bin_end)/hMinBias[i]->Integral(bin_nomb,bin_endmb);
-
       // this is just to adjust for the atlas pt bins. 
       TH1F * hMinBias_test = new TH1F("hMinBias_test","",501,0,501);
       for(int j = 0; j<hMinBias[i]->GetNbinsX();++j){
@@ -274,12 +144,23 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, char* algo = (char*) "Pu"
 	hMinBias_test->SetBinError(j+1, hMinBias[i]->GetBinError(j+1));
       }
       
+      Float_t   bin_no = dPbPb_TrgComb[i]->FindBin(15);
+      Float_t bin_end=dPbPb_TrgComb[i]->FindBin(25);
+      
+      Float_t   bin_nomb = hMinBias_test->FindBin(15);
+      Float_t bin_endmb=hMinBias_test->FindBin(25);
+      
+      float scalerangeweight=dPbPb_TrgComb[i]->Integral(bin_no,bin_end)/hMinBias_test->Integral(bin_nomb,bin_endmb);
+
       for(int j = 0; j<hMinBias_test->GetNbinsX(); ++j)
 	hMinBias_test->SetBinError(j+1, (Float_t)hMinBias_test->GetBinError(j+1)/scalerangeweight);
       
       hMinBias_test->Scale(scalerangeweight);
       
       dPbPb_TrgComb[i]->Add(hMinBias_test, -1);
+
+      delete hMinBias_test;
+      
     }
     
     dPbPb_TrgComb[i]->Scale(1./(145.156 * 1e9));
@@ -294,199 +175,103 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, char* algo = (char*) "Pu"
 
   }
 
-#if 0
-  // get PbPb data
-  for(int i = 0;i<nbins_cent;i++){
-    if(printDebug) cout<<"cent_"<<i<<endl;
-    dPbPb_TrgComb[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_anaBin_HLTComb_R%d_%s_cent%d",radius,etaWidth,i));
-    //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
-    dPbPb_TrgComb[i]->Print("base");
-    // dPbPb_Trg80[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLT80_R%d_%s_cent%d",radius,etaWidth,i));
-    // //dPbPb_Trg80[i]->Scale(4*145.156*1e6);
-    // dPbPb_Trg80[i]->Print("base");
-    // dPbPb_Trg65[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLT65_R%d_%s_cent%d",radius,etaWidth,i));
-    // //dPbPb_Trg65[i]->Scale(4*145.156*1e6);
-    // dPbPb_Trg65[i]->Print("base");
-    // dPbPb_Trg55[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_HLT55_R%d_%s_cent%d",radius,etaWidth,i));
-    // //dPbPb_Trg55[i]->Scale(4*145.156*1e6);
-    // dPbPb_Trg55[i]->Print("base");
-    // //dPbPb_TrgComb[i] = (TH1F*)dPbPb_Trg80[i]->Clone(Form("Jet_80_triggered_spectra_data_PbPb_cent%d",i));
-    
-    //dPbPb_MinBias[i] = (TH1F*)fPbPb_MB_in->Get(Form("hpbpb_HLTComb_R%d_n20_eta_p20_cent%d",radius,i));
-    //dPbPb_MinBias[i]->Print("base");
-    dPbPb_TrgComb[i]->Scale(1./(145.156 * 1e9));
-    //dPbPb_MinBias[i]->Scale(1./(161.939 * 1e9));
-    
-    //dPbPb_TrgComb[i]->Add(dPbPb_MinBias[i]);
-
-
-    if(etaWidth == "10_eta_10"){
-      if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 1 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 2 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 3 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 4 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==2) unfoldingCutBin = htest->FindBin(30);
-
-      if(i == 0 && radius==3) unfoldingCutBin = htest->FindBin(40);
-      if(i == 1 && radius==3) unfoldingCutBin = htest->FindBin(40);
-      if(i == 2 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 3 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 4 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==3) unfoldingCutBin = htest->FindBin(30);
-
-      if(i == 0 && radius==4) unfoldingCutBin = htest->FindBin(50);
-      if(i == 1 && radius==4) unfoldingCutBin = htest->FindBin(50);
-      if(i == 2 && radius==4) unfoldingCutBin = htest->FindBin(40);
-      if(i == 3 && radius==4) unfoldingCutBin = htest->FindBin(40);
-      if(i == 4 && radius==4) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==4) unfoldingCutBin = htest->FindBin(30);
-    }
-
-    if(etaWidth == "10_eta_18"){
-      if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(50);
-      if(i == 1 && radius==2) unfoldingCutBin = htest->FindBin(50);
-      if(i == 2 && radius==2) unfoldingCutBin = htest->FindBin(40);
-      if(i == 3 && radius==2) unfoldingCutBin = htest->FindBin(40);
-      if(i == 4 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==2) unfoldingCutBin = htest->FindBin(30);
-
-      if(i == 0 && radius==3) unfoldingCutBin = htest->FindBin(60);
-      if(i == 1 && radius==3) unfoldingCutBin = htest->FindBin(50);
-      if(i == 2 && radius==3) unfoldingCutBin = htest->FindBin(40);
-      if(i == 3 && radius==3) unfoldingCutBin = htest->FindBin(40);
-      if(i == 4 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==3) unfoldingCutBin = htest->FindBin(30);
-
-      if(i == 0 && radius==4) unfoldingCutBin = htest->FindBin(70);
-      if(i == 1 && radius==4) unfoldingCutBin = htest->FindBin(60);
-      if(i == 2 && radius==4) unfoldingCutBin = htest->FindBin(50);
-      if(i == 3 && radius==4) unfoldingCutBin = htest->FindBin(50);
-      if(i == 4 && radius==4) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==4) unfoldingCutBin = htest->FindBin(30);
-    }
-    if(etaWidth == "20_eta_20"){
-      if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(70);
-      if(i == 1 && radius==2) unfoldingCutBin = htest->FindBin(60);
-      if(i == 2 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 3 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 4 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==2) unfoldingCutBin = htest->FindBin(30);
-
-      if(i == 0 && radius==3) unfoldingCutBin = htest->FindBin(70);
-      if(i == 1 && radius==3) unfoldingCutBin = htest->FindBin(60);
-      if(i == 2 && radius==3) unfoldingCutBin = htest->FindBin(50);
-      if(i == 3 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 4 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==3) unfoldingCutBin = htest->FindBin(30);
-
-      if(i == 0 && radius==4) unfoldingCutBin = htest->FindBin(80);
-      if(i == 1 && radius==4) unfoldingCutBin = htest->FindBin(60);
-      if(i == 2 && radius==4) unfoldingCutBin = htest->FindBin(50);
-      if(i == 3 && radius==4) unfoldingCutBin = htest->FindBin(30);
-      if(i == 4 && radius==4) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==4) unfoldingCutBin = htest->FindBin(30);
-    }
-
-    
-    for(int k = 1;k<=unfoldingCutBin;k++) {
-      dPbPb_TrgComb[i]->SetBinContent(k,0);
-    }    
-  }
-  #endif
-  //Int_t nSVDIter = 4;
   
   if(printDebug)cout<<"loaded the data histograms PbPb"<<endl;
   // get PbPb MC
   for(int i = 0;i<nbins_cent;i++){
     
-    mPbPb_Gen[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_anaBin_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i));
+    mPbPb_Gen[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_anaBin_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i));
     mPbPb_Gen[i]->Print("base");
-    mPbPb_Reco[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_anaBin_JetComb_reco_R%d_%s_cent%d",radius,etaWidth,i));
+    mPbPb_Reco[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_anaBin_JetComb_reco_R%d_%s_cent%d",radius,etaWidth,i));
     mPbPb_Reco[i]->Print("base");
-    mPbPb_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_anaBin_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
+    mPbPb_Matrix[i] = (TH2F*)fPbPb_MC_in->Get(Form("hpbpb_anaBin_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
     mPbPb_Matrix[i]->Print("base");
 
     
-    if(etaWidth == "10_eta_10"){
-      if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 1 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 2 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 3 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 4 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    // if(etaWidth == "10_eta_10"){
+    //   if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 1 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 2 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 3 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 4 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 5 && radius==2) unfoldingCutBin = htest->FindBin(30);
 
-      if(i == 0 && radius==3) unfoldingCutBin = htest->FindBin(40);
-      if(i == 1 && radius==3) unfoldingCutBin = htest->FindBin(40);
-      if(i == 2 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 3 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 4 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==3) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 0 && radius==3) unfoldingCutBin = htest->FindBin(40);
+    //   if(i == 1 && radius==3) unfoldingCutBin = htest->FindBin(40);
+    //   if(i == 2 && radius==3) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 3 && radius==3) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 4 && radius==3) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 5 && radius==3) unfoldingCutBin = htest->FindBin(30);
 
-      if(i == 0 && radius==4) unfoldingCutBin = htest->FindBin(50);
-      if(i == 1 && radius==4) unfoldingCutBin = htest->FindBin(50);
-      if(i == 2 && radius==4) unfoldingCutBin = htest->FindBin(40);
-      if(i == 3 && radius==4) unfoldingCutBin = htest->FindBin(40);
-      if(i == 4 && radius==4) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==4) unfoldingCutBin = htest->FindBin(30);
-    }
+    //   if(i == 0 && radius==4) unfoldingCutBin = htest->FindBin(50);
+    //   if(i == 1 && radius==4) unfoldingCutBin = htest->FindBin(50);
+    //   if(i == 2 && radius==4) unfoldingCutBin = htest->FindBin(40);
+    //   if(i == 3 && radius==4) unfoldingCutBin = htest->FindBin(40);
+    //   if(i == 4 && radius==4) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 5 && radius==4) unfoldingCutBin = htest->FindBin(30);
+    // }
 
-    if(etaWidth == "10_eta_18"){
-      if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(50);
-      if(i == 1 && radius==2) unfoldingCutBin = htest->FindBin(50);
-      if(i == 2 && radius==2) unfoldingCutBin = htest->FindBin(40);
-      if(i == 3 && radius==2) unfoldingCutBin = htest->FindBin(40);
-      if(i == 4 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    // if(etaWidth == "10_eta_18"){
+    //   if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(50);
+    //   if(i == 1 && radius==2) unfoldingCutBin = htest->FindBin(50);
+    //   if(i == 2 && radius==2) unfoldingCutBin = htest->FindBin(40);
+    //   if(i == 3 && radius==2) unfoldingCutBin = htest->FindBin(40);
+    //   if(i == 4 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 5 && radius==2) unfoldingCutBin = htest->FindBin(30);
 
-      if(i == 0 && radius==3) unfoldingCutBin = htest->FindBin(60);
-      if(i == 1 && radius==3) unfoldingCutBin = htest->FindBin(50);
-      if(i == 2 && radius==3) unfoldingCutBin = htest->FindBin(40);
-      if(i == 3 && radius==3) unfoldingCutBin = htest->FindBin(40);
-      if(i == 4 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==3) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 0 && radius==3) unfoldingCutBin = htest->FindBin(60);
+    //   if(i == 1 && radius==3) unfoldingCutBin = htest->FindBin(50);
+    //   if(i == 2 && radius==3) unfoldingCutBin = htest->FindBin(40);
+    //   if(i == 3 && radius==3) unfoldingCutBin = htest->FindBin(40);
+    //   if(i == 4 && radius==3) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 5 && radius==3) unfoldingCutBin = htest->FindBin(30);
 
-      if(i == 0 && radius==4) unfoldingCutBin = htest->FindBin(70);
-      if(i == 1 && radius==4) unfoldingCutBin = htest->FindBin(60);
-      if(i == 2 && radius==4) unfoldingCutBin = htest->FindBin(50);
-      if(i == 3 && radius==4) unfoldingCutBin = htest->FindBin(50);
-      if(i == 4 && radius==4) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==4) unfoldingCutBin = htest->FindBin(30);
-    }
+    //   if(i == 0 && radius==4) unfoldingCutBin = htest->FindBin(70);
+    //   if(i == 1 && radius==4) unfoldingCutBin = htest->FindBin(60);
+    //   if(i == 2 && radius==4) unfoldingCutBin = htest->FindBin(50);
+    //   if(i == 3 && radius==4) unfoldingCutBin = htest->FindBin(50);
+    //   if(i == 4 && radius==4) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 5 && radius==4) unfoldingCutBin = htest->FindBin(30);
+    // }
 
-    if(etaWidth == "20_eta_20"){
-      if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(70);
-      if(i == 1 && radius==2) unfoldingCutBin = htest->FindBin(60);
-      if(i == 2 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 3 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 4 && radius==2) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    // if(etaWidth == "20_eta_20"){
+    //   if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(70);
+    //   if(i == 1 && radius==2) unfoldingCutBin = htest->FindBin(60);
+    //   if(i == 2 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 3 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 4 && radius==2) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 5 && radius==2) unfoldingCutBin = htest->FindBin(30);
 
-      if(i == 0 && radius==3) unfoldingCutBin = htest->FindBin(70);
-      if(i == 1 && radius==3) unfoldingCutBin = htest->FindBin(60);
-      if(i == 2 && radius==3) unfoldingCutBin = htest->FindBin(50);
-      if(i == 3 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 4 && radius==3) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==3) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 0 && radius==3) unfoldingCutBin = htest->FindBin(70);
+    //   if(i == 1 && radius==3) unfoldingCutBin = htest->FindBin(60);
+    //   if(i == 2 && radius==3) unfoldingCutBin = htest->FindBin(50);
+    //   if(i == 3 && radius==3) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 4 && radius==3) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 5 && radius==3) unfoldingCutBin = htest->FindBin(30);
 
-      if(i == 0 && radius==4) unfoldingCutBin = htest->FindBin(80);
-      if(i == 1 && radius==4) unfoldingCutBin = htest->FindBin(60);
-      if(i == 2 && radius==4) unfoldingCutBin = htest->FindBin(50);
-      if(i == 3 && radius==4) unfoldingCutBin = htest->FindBin(30);
-      if(i == 4 && radius==4) unfoldingCutBin = htest->FindBin(30);
-      if(i == 5 && radius==4) unfoldingCutBin = htest->FindBin(30);
-    }
+    //   if(i == 0 && radius==4) unfoldingCutBin = htest->FindBin(80);
+    //   if(i == 1 && radius==4) unfoldingCutBin = htest->FindBin(60);
+    //   if(i == 2 && radius==4) unfoldingCutBin = htest->FindBin(50);
+    //   if(i == 3 && radius==4) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 4 && radius==4) unfoldingCutBin = htest->FindBin(30);
+    //   if(i == 5 && radius==4) unfoldingCutBin = htest->FindBin(30);
+    // }
 
     
     for(int k = 1;k<=unfoldingCutBin;k++){
 
       mPbPb_Gen[i]->SetBinContent(k,0);
       mPbPb_Reco[i]->SetBinContent(k,0);
-      for(int l = 1;l<=nbins_pt;l++){
-    	mPbPb_Matrix[i]->SetBinContent(k,l,0);
+      mPbPb_Gen[i]->SetBinError(k,0);
+      mPbPb_Reco[i]->SetBinError(k,0);
+      // set bin content matrix l,k works 
+      for(int l = 1;l<=mPbPb_Gen[i]->GetNbinsX();l++){
     	mPbPb_Matrix[i]->SetBinContent(l,k,0);
+        mPbPb_Matrix[i]->SetBinError(l,k,0);
       }
+
     }
+
  
   }
   
@@ -503,18 +288,20 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, char* algo = (char*) "Pu"
   // dPP_2->Print("base");
   // dPP_3 = (TH1F*)fPP_in->Get(Form("hpp_HLT40_R%d_%s",radius,etaWidth));
   // dPP_3->Print("base");
-  dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_anaBin_HLTComb_R%d_%s",radius,etaWidth));   
+  dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_HLTComb_R%d_%s",radius,etaWidth));
+  dPP_Comb = (TH1F*)dPP_Comb->Rebin(nbins_pt, Form("hpp_anaBin_HLTComb_R%d_%s",radius, etaWidth), boundaries_pt);
+  divideBinWidth(dPP_Comb);
   //dPP_Comb = (TH1F*)dPP_1->Clone(Form("hpp_TrgComb_R%d_n20_eta_p20",radius,etaWidth));   
   dPP_Comb->Print("base");
   dPP_Comb->Scale(1./(5.3 * 1e9));
   
   
   // get PP MC
-  mPP_Gen = (TH1F*)fPP_in->Get(Form("hpp_anaBin_JetComb_gen_R%d_%s",radius,etaWidth));
+  mPP_Gen = (TH1F*)fPP_MC_in->Get(Form("hpp_anaBin_JetComb_gen_R%d_%s",radius,etaWidth));
   mPP_Gen->Print("base");
-  mPP_Reco = (TH1F*)fPP_in->Get(Form("hpp_anaBin_JetComb_reco_R%d_%s",radius,etaWidth));
+  mPP_Reco = (TH1F*)fPP_MC_in->Get(Form("hpp_anaBin_JetComb_reco_R%d_%s",radius,etaWidth));
   mPP_Reco->Print("base");
-  mPP_Matrix = (TH2F*)fPP_in->Get(Form("hpp_anaBin_matrix_HLT_R%d_%s",radius,etaWidth));
+  mPP_Matrix = (TH2F*)fPP_MC_in->Get(Form("hpp_anaBin_matrix_HLT_R%d_%s",radius,etaWidth));
   mPP_Matrix->Print("base");
   
   if(printDebug) cout<<"Filling the PbPb response Matrix"<<endl;
@@ -867,7 +654,7 @@ void RAA_dataDrivenUnfoldingErrorCheck(int radius = 4, char* algo = (char*) "Pu"
     
   }// nbins_pt loop
     
-  TFile f(Form("Pawan_TTree_PbPb_R%d_pp_R%d_noJetID_fullfinebin_%s_unfoldingCut_%d_SevilFakeMBnoJet80Cut_data_driven_correction_ak%s%s.root", radius, radius, etaWidth , unfoldingCut, algo, jet_type),"RECREATE");
+  TFile f(Form("Pawan_TTree_PbPb_R%d_pp_R%d_noJetID_%s_%s_unfoldingCut_%d_SevilFakeMBnoJet80Cut_data_driven_correction_ak%s%s.root", radius, radius, ptbins, etaWidth , unfoldingCut, algo, jet_type),"RECREATE");
   f.cd();
 
   for(int i = 0;i<nbins_cent;i++) {

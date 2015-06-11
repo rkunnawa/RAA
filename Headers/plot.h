@@ -19,6 +19,27 @@
 #include <TF1.h>
 #include <TCut.h>
 #include <TPad.h>
+#include "TLatex.h"
+#include <TColor.h>
+#include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
+
+
+TLegend *getLegend(double x1, double y1, double x2, double y2)
+{
+  TLegend *leg = new TLegend(x1,y1,x2,y2,NULL,"BRNDC");
+  leg->SetHeader("");
+  leg->SetBorderSize(0);
+  leg->SetTextFont(42);
+  leg->SetTextSize(0.06);
+  leg->SetLineColor(1);
+  leg->SetLineStyle(1);
+  leg->SetLineWidth(1);
+  leg->SetFillColor(10);
+  leg->SetFillStyle(1001);
+  return leg;
+}
+
 
 // divide by bin width
 void divideBinWidth(TH1 *h)
@@ -205,7 +226,6 @@ void makeMultiPanelCanvasWithGap(TCanvas*& canv,
 				 const Float_t bottomMargin,
 				 const Float_t edge, const Float_t asyoffset) {
   if (canv==0) {
-    Error("makeMultiPanelCanvas","Got null canvas.");
     return;
   }
   canv->Clear();
@@ -303,7 +323,6 @@ void makeMultiPanelCanvas(TCanvas*& canv,
                           const Float_t bottomMargin,
                           const Float_t edge) {
    if (canv==0) {
-      Error("makeMultiPanelCanvas","Got null canvas.");
       return;
    }
    canv->Clear();
@@ -374,7 +393,6 @@ void makeMultiPanelCanvasWithoutGap(TCanvas*& canv,
 				 const Float_t bottomMargin,
 				 const Float_t edge, const Float_t asyoffset) {
   if (canv==0) {
-    Error("makeMultiPanelCanvas","Got null canvas.");
     return;
   }
   canv->Clear();

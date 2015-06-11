@@ -22,6 +22,27 @@
 #include "TLegend.h"
 #include "TLine.h"
 #include "TLatex.h"
+#include <stdio.h>
+#include <TColor.h>
+#include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TH3.h>
+#include <TStopwatch.h>
+#include <TRandom3.h>
+#include <TChain.h>
+#include <TProfile.h>
+#include <TStopwatch.h>
+#include <TCut.h>
+#include <cstdlib>
+#include <cmath>
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldResponse.h"
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBayes.h"
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldSvd.h"
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBinByBin.h"
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/prior.h"
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/bayesianUnfold.h"
 
 using namespace std;
 
@@ -39,17 +60,28 @@ double npart[nbins_cent+1] = {389.84, 307.65, 223.95, 107.5, 41.65, 11.55, 112.9
 /* const int nbins_pt = 30; */
 /* const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300,   330, 362, 395 }; */
 
+const char * algo = (char*) "Pu";
+const char *jet_type = (char*) "PF";
+char* etaWidth = (char*) "20_eta_20";
+double deltaEta = 4.0;
+const char * ptbins = (char*)"finebins"; /* finebins, atlaspTbins, atlasRcpbins */
+const char * smear = (char*)"noSmear";/* noSmear, 10TrigIneff_Smear, 5TrigIneff_Smear*/
+
+const int unfoldingCut_R2 = 55;
+const int unfoldingCut_R3 = 55;
+const int unfoldingCut_R4 = 55;
+
 // this is the cms full analysis pT bins 
-const int nbins_pt = 32; 
-const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300,   330, 362, 395, 501 }; 
+const int nbins_pt = 32;   
+const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300,   330, 362, 395, 501 };  
 
 // this is the atlas pT binning for the spectra. 
-/* static const int nbins_pt = 12; */
-/* static const double boundaries_pt[nbins_pt+1] = {31., 39., 50., 63., 79., 100., 125., 158., 199., 251., 316., 398., 501}; */
+/* static const int nbins_pt = 12;   */
+/* static const double boundaries_pt[nbins_pt+1] = {31., 39., 50., 63., 79., 100., 125., 158., 199., 251., 316., 398., 501};   */
 
 // this is the atlas pT binning for the Rcp plots. 
-/* static const int nbins_pt = 12;  */
-/* static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};  */
+/* static const int nbins_pt = 12;   */
+/* static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};   */
 
 class SysData
 {
@@ -221,7 +253,7 @@ class SysData
     TH1D *h = new TH1D(Form("hSysTmp_cent%d",i),"",nbins_pt, boundaries_pt);
     makeHistTitle(h,"","Jet p_{T} (GeV/c)","Systematic uncertainty");
     h->SetAxisRange(-0.4,0.4,"Y");
-    h->SetAxisRange(65,299,"X");
+    h->SetAxisRange(65,501,"X");
     h->Draw();
     TH1F* sys = drawEnvelope(hSys[i],"same",hSys[i]->GetLineColor(),1001,hSys[i]->GetLineColor(),-1);
     TH1F* sysIter = drawEnvelope(hSysIter[i],"same",hSysIter[i]->GetLineColor(),3004,hSysIter[i]->GetLineColor(),-1);
