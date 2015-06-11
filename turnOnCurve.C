@@ -104,7 +104,7 @@ void turnOnCurve(int mode = 0)
       evt->SetBranchAddress("vz",&vz);
       skim->SetBranchAddress("pcollisionEventSelection",&pcoll);
       skim->SetBranchAddress("pHBHENoiseFilter",&noise);
-      hlt->SetBranchAddress("HLT_HIJet80_v7",&trigger);
+      hlt->SetBranchAddress("HLT_HIJet55_v7",&trigger);
       jet2->SetBranchAddress("jtpt",&jetpt2);
       jet2->SetBranchAddress("jteta",&jeteta2);
       jet3->SetBranchAddress("jtpt",&jetpt3);
@@ -223,7 +223,7 @@ void turnOnCurve(int mode = 0)
   TGraphAsymmErrors * turnon2Asym;// = new TGraphAsymmErrors(turnon40);
   TGraphAsymmErrors * turnon3Asym;// = new TGraphAsymmErrors(turnon80);
   TGraphAsymmErrors * turnon4Asym;// = new TGraphAsymmErrors(turnon30);
-  TGraphAsymmErrors * turnon5Asym;// = new TGraphAsymmErrors(turnon60);
+  //TGraphAsymmErrors * turnon5Asym;// = new TGraphAsymmErrors(turnon60);
  
 
   TCanvas * c2 = new TCanvas("c2","c2",800,600);
@@ -239,7 +239,7 @@ void turnOnCurve(int mode = 0)
       turnon2Asym->SetPointEXhigh(i,0);
     }
   turnon2Asym->SetLineColor(1);
-  turnon2Asym->SetMarkerSize(0.8);
+  turnon2Asym->SetMarkerSize(1.2);
 
   turnon3Asym = new TGraphAsymmErrors();
   turnon3Asym->SetName("turnon3Asym");
@@ -251,7 +251,7 @@ void turnOnCurve(int mode = 0)
     }
   turnon3Asym->SetLineColor(kRed+1);
   turnon3Asym->SetMarkerColor(kRed+1);
-  turnon3Asym->SetMarkerSize(0.8);
+  turnon3Asym->SetMarkerSize(1.2);
 
   turnon4Asym = new TGraphAsymmErrors();
   turnon4Asym->SetName("turnon4Asym");
@@ -263,34 +263,35 @@ void turnOnCurve(int mode = 0)
     }
   turnon4Asym->SetLineColor(kBlue+1);
   turnon4Asym->SetMarkerColor(kBlue+1);
-  turnon4Asym->SetMarkerSize(0.8);
+  turnon4Asym->SetMarkerSize(1.2);
 
-  turnon5Asym = new TGraphAsymmErrors();
-  turnon5Asym->SetName("turnon5Asym");
-  turnon5Asym->BayesDivide(turnon5,denom5);
-  for(int i =1; i<41; i++)
-    {
-      turnon5Asym->SetPointEXlow(i,0);
-      turnon5Asym->SetPointEXhigh(i,0);
-    }
-  turnon5Asym->SetLineColor(kGreen+1);
-  turnon5Asym->SetMarkerColor(kGreen+1);
-  turnon5Asym->SetMarkerSize(0.8);
+  // turnon5Asym = new TGraphAsymmErrors();
+  // turnon5Asym->SetName("turnon5Asym");
+  // turnon5Asym->BayesDivide(turnon5,denom5);
+  // for(int i =1; i<41; i++)
+  //   {
+  //     turnon5Asym->SetPointEXlow(i,0);
+  //     turnon5Asym->SetPointEXhigh(i,0);
+  //   }
+  // turnon5Asym->SetLineColor(kGreen+1);
+  // turnon5Asym->SetMarkerColor(kGreen+1);
+  // turnon5Asym->SetMarkerSize(0.8);
 
   mg->Add(turnon2Asym,"");
   mg->Add(turnon3Asym,"");
   mg->Add(turnon4Asym,"");
-  mg->Add(turnon5Asym,"");
+  //mg->Add(turnon5Asym,"");
   mg->Draw("AP");
 
-  TLegend * leg = new TLegend(0.80,0.2,0.9,0.4);
-  leg->AddEntry((TObject*)0,"2.76 TeV PYTHIA+HYJET","");
-  leg->AddEntry(turnon2Asym,"R=0.2 Jet80 Trigger","p");
-  leg->AddEntry(turnon3Asym,"R=0.3 Jet80 Trigger","p");
-  leg->AddEntry(turnon4Asym,"R=0.4 Jet80 Trigger","p");
-  leg->AddEntry(turnon5Asym,"R=0.5 Jet80 Trigger","p");
+  TLegend * leg = new TLegend(0.60,0.2,0.9,0.4);
+  leg->AddEntry((TObject*)0,"2.76 TeV PYTHIA+HYJET, akPuPF Jets |#eta|<2","");
+  leg->AddEntry(turnon2Asym,"R=0.2 Jet55 Trigger","p");
+  leg->AddEntry(turnon3Asym,"R=0.3 Jet55 Trigger","p");
+  leg->AddEntry(turnon4Asym,"R=0.4 Jet55 Trigger","p");
+  //leg->AddEntry(turnon5Asym,"R=0.5 Jet80 Trigger","p");
+  leg->SetTextSize(0.04);
   leg->Draw("same");
-  c2->SaveAs("TriggerTurnOn_PbPbMC_etaLT2_Jet80.png");
-  c2->SaveAs("TriggerTurnOn_PbPbMC_etaLT2_jet80.pdf");
+  c2->SaveAs("TriggerTurnOn_PbPbMC_20_eta_20_Jet55.png");
+  c2->SaveAs("TriggerTurnOn_PbPbMC_20_eta_20_jet55.pdf");
   
 }

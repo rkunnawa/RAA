@@ -710,8 +710,8 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
       mPbPb_Reco[i]->SetBinContent(k,0);
       mPbPb_Gen[i]->SetBinError(k,0);
       mPbPb_Reco[i]->SetBinError(k,0);
-      mPbPb_mcclosure_data[i]->SetBinContent(k,0);
-      mPbPb_mcclosure_data[i]->SetBinError(k,0);
+      //mPbPb_mcclosure_data[i]->SetBinContent(k,0);
+      //mPbPb_mcclosure_data[i]->SetBinError(k,0);
       mPbPb_mcclosure_gen[i]->SetBinContent(k,0);
       mPbPb_mcclosure_gen[i]->SetBinError(k,0);
       //mPbPb_mcclosure_data[i]->SetBinContent(k,0);
@@ -725,7 +725,6 @@ void RAA_analyze(int radius = 3, int param1 = 1, int param2 = 1, char* algo = (c
         mPbPb_Matrix[i]->SetBinError(l,k,0);
         mPbPb_mcclosure_Matrix[i]->SetBinError(l,k,0);
       }
-
 
       
       //for(int l = 1; l<=mPbPb_mcclosure_data[i]->GetNbinsX(); l++){

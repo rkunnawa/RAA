@@ -32,8 +32,8 @@
 #include "../Headers/plot.h"
 
 
-static const int nbins_pt = 32;
-static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300, 330, 362, 395, 501};
+// static const int nbins_pt = 32;
+// static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300, 330, 362, 395, 501};
 
 // static const int nbins_pt = 30;
 // static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
@@ -47,14 +47,15 @@ static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21
 // static const double boundaries_pt[nbins_pt+1] = {31., 39., 50., 63., 79., 100., 125., 158., 199., 251., 316., 398., 501};
 
 // the following//  bins is the atlas Rcp pt binning
-// static const int nbins_pt = 12;
-// static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};
+static const int nbins_pt = 12;
+static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};
+
 const double kdelrcut=0.3;
 
 using namespace std;
 
 void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20", 
-				     Int_t radius = 4, 
+				     Int_t radius = 2, 
 				     Int_t etaLow = 20, 
 				     Int_t etaHigh = 20){
 
@@ -68,7 +69,6 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
   bool isSymm = false;
   if(etaLow == etaHigh) isSymm = true;
   char * ntuple = (char*)"Pawan"; //  or "Pawan"
-
   
   // the cut is a 3 step cut based on the different value of the calopt/pfpt - copy the following lines into your loop (with the corresponding branch address set)
   // if(calopt/pfpt <= 0.5 && eMax/Sumcand < 0.05) hGood->Fill();
@@ -196,6 +196,11 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
   //TH2F *hpp_response;
   TH1F *hpp_mcclosure_JetComb_data;
   TH1F *hpp_mcclosure_data;
+  TH1F *hpp_mcclosure_data_train;
+  TH1F *hpp_mcclosure_JetComb_data_train;
+  TH1F *hpp_mcclosure_Jet80_data_train;
+  TH1F *hpp_mcclosure_Jet60_data_train;
+  TH1F *hpp_mcclosure_Jet40_data_train;
   TH1F *hpp_mcclosure_Jet80_data;
   TH1F *hpp_mcclosure_Jet60_data;
   TH1F *hpp_mcclosure_Jet40_data;
@@ -272,6 +277,13 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
   hpp_mcclosure_Jet60_data = new TH1F(Form("hpp_mcclosure_Jet60_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 60  R%d %s ",radius,etaWidth),501,0,501);
   hpp_mcclosure_Jet40_data = new TH1F(Form("hpp_mcclosure_Jet40_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 40  R%d %s ",radius,etaWidth),501,0,501);
 
+  hpp_mcclosure_data_train = new TH1F(Form("hpp_mcclosure_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test R%d %s ",radius,etaWidth),501,0,501);
+  hpp_mcclosure_JetComb_data_train = new TH1F(Form("hpp_mcclosure_JetComb_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger combined  R%d %s ",radius,etaWidth),501,0,501);
+  hpp_mcclosure_Jet80_data_train = new TH1F(Form("hpp_mcclosure_Jet80_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger 80  R%d %s ",radius,etaWidth),501,0,501);
+  hpp_mcclosure_Jet60_data_train = new TH1F(Form("hpp_mcclosure_Jet60_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger 60  R%d %s ",radius,etaWidth),501,0,501);
+  hpp_mcclosure_Jet40_data_train = new TH1F(Form("hpp_mcclosure_Jet40_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger 40  R%d %s ",radius,etaWidth),501,0,501);
+
+  
   hpp_mcclosure_gen = new TH1F(Form("hpp_mcclosure_gen_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test R%d %s ",radius,etaWidth),501,0,501);
   hpp_mcclosure_JetComb_gen = new TH1F(Form("hpp_mcclosure_gen_JetComb_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger combined R%d %s ",radius,etaWidth),501,0,501);
   hpp_mcclosure_Jet80_gen = new TH1F(Form("hpp_mcclosure_gen_Jet80_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 80 R%d %s ",radius,etaWidth),501,0,501);
@@ -597,7 +609,15 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
       hpp_gen->Fill(pfrefpt_2[refid], weight);
       hpp_reco->Fill(pfpt_2[g], weight);
       hpp_matrix->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
-    
+
+      if(nentry%2 == 0){
+	hpp_mcclosure_data->Fill(pfpt_2[g], weight);
+      }else {
+	hpp_mcclosure_matrix->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	hpp_mcclosure_gen->Fill(pfrefpt_2[refid], weight);
+	hpp_mcclosure_data_train->Fill(pfpt_2[g], weight);
+      }
+      
       if(jet40_2 == 1 && jet60_2==0 && jet80_2 == 0){
       
 	hMC_Jet40_noCut->Fill(pfrefpt_2[refid], weight);
@@ -615,6 +635,7 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
 	if(nentry%2==0) {
 	  hpp_mcclosure_matrix_HLT->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	  hpp_mcclosure_Jet40_gen->Fill(pfrefpt_2[refid], weight);
+	  hpp_mcclosure_Jet40_data_train->Fill(pfpt_2[g], weight);
 	}
 	if(nentry%2==1) {
 	  hpp_mcclosure_Jet40_data->Fill(pfpt_2[g], weight);
@@ -675,6 +696,7 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
 	if(nentry%2==0) {
 	  hpp_mcclosure_matrix_HLT->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	  hpp_mcclosure_Jet60_gen->Fill(pfrefpt_2[refid], weight);
+	  hpp_mcclosure_Jet60_data_train->Fill(pfpt_2[g], weight);
 	}
 	if(nentry%2==1) {
 	  hpp_mcclosure_Jet60_data->Fill(pfpt_2[g], weight);
@@ -734,6 +756,7 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
 	if(nentry%2==0) {
 	  hpp_mcclosure_matrix_HLT->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	  hpp_mcclosure_Jet80_gen->Fill(pfrefpt_2[refid], weight);
+	  hpp_mcclosure_Jet80_data_train->Fill(pfpt_2[g], weight);
 	}
 	if(nentry%2==1) {
 	  hpp_mcclosure_Jet80_data->Fill(pfpt_2[g], weight);
@@ -884,7 +907,7 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
   }// mc unmatched  ntuple loop
 #endif
 
-  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PP_MC_spectra_residualFactor_finebins_%s_R0p%d.root",ntuple, etaWidth, radius),"RECREATE");
+  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PP_MC_spectra_residualFactor_atlasRcpbins_%s_R0p%d.root",ntuple, etaWidth, radius),"RECREATE");
   fout.cd();
   
   hpp_TrgObjComb->Add(hpp_TrgObj80);
