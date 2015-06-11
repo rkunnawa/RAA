@@ -288,7 +288,9 @@ void RAA_dataDrivenUnfoldingErrorCheck_new(int radius = 3)
   // dPP_2->Print("base");
   // dPP_3 = (TH1F*)fPP_in->Get(Form("hpp_HLT40_R%d_%s",radius,etaWidth));
   // dPP_3->Print("base");
-  dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_anaBin_HLTComb_R%d_%s",radius,etaWidth));   
+  dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_HLTComb_R%d_%s",radius,etaWidth));
+  dPP_Comb = (TH1F*)dPP_Comb->Rebin(nbins_pt, Form("hpp_anaBin_HLTComb_R%d_%s",radius, etaWidth), boundaries_pt);
+  divideBinWidth(dPP_Comb);
   //dPP_Comb = (TH1F*)dPP_1->Clone(Form("hpp_TrgComb_R%d_n20_eta_p20",radius,etaWidth));   
   dPP_Comb->Print("base");
   dPP_Comb->Scale(1./(5.3 * 1e9));

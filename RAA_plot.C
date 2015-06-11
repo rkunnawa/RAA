@@ -708,7 +708,7 @@ void RAA_plot(int radius = 3)
     drawText("|#eta|<2, |vz|<15)",0.3,0.33,16);
     drawText("Data and gen, opp half statistics",0.3,0.13,16);
   
-    cPbPbMCclosure->SaveAs(Form("MinBias_Sub/Plots/PbPb_unfoldng_mc_closure_opphalf_%dGeVCut_ak%s%d%s_%s_%d.pdf",unfoldingCut,algo,radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
+    cPbPbMCclosure->SaveAs(Form("MinBias_Sub/Plots/Analysis_%s/PbPb_unfoldng_mc_closure_opphalf_%dGeVCut_ak%s%d%s_%s_%d.pdf",ptbins, unfoldingCut,algo,radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -776,7 +776,7 @@ void RAA_plot(int radius = 3)
     drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.2,0.23,20);
     drawText("|#eta|<2, |vz|<15",0.6,0.31,22);
   
-    cPPMCclosure->SaveAs(Form("MinBias_Sub/Plots/PP_unfoldng_mc_closure_test_%dGeVCut_ak%d%s_%s_%d.pdf",unfoldingCut,radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
+    cPPMCclosure->SaveAs(Form("MinBias_Sub/Plots/Analysis_%s/PP_unfoldng_mc_closure_test_%dGeVCut_ak%d%s_%s_%d.pdf",ptbins, unfoldingCut,radius,jet_type,etaWidth,date.GetDate()),"RECREATE");
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

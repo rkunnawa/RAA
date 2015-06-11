@@ -31,7 +31,7 @@ void RAA_plot_finalpaper(){
   
   TFile *fin_R2, *fin_R3, *fin_R4; 
   fin_R2 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_noSmear_%s_%dGeVCut_ak%s_%d.root",2,ptbins,etaWidth,unfoldingCut_R2,jet_type, date.GetDate()));
-  fin_R3 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_noSmear_%s_%dGeVCut_ak%s_%d.root",3,ptbins,etaWidth,unfoldingCut_R3,jet_type, data.GetDate()));
+  fin_R3 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_noSmear_%s_%dGeVCut_ak%s_%d.root",3,ptbins,etaWidth,unfoldingCut_R3,jet_type, date.GetDate()));
   fin_R4 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_noSmear_%s_%dGeVCut_ak%s_%d.root",4,ptbins,etaWidth,unfoldingCut_R4,jet_type, date.GetDate()));
   
   // get the histograms.
@@ -199,7 +199,7 @@ void RAA_plot_finalpaper(){
   drawText("50-70% x 10^{10}", 0.7,0.64,16);
   drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R2->SaveAs(Form("Plots/Final_paper_plots_spectra_%s_akR2_%s_%d.pdf",ptbins, etaWidth,date.GetDate()),"RECREATE");
+  cSpectra_R2->SaveAs(Form("Plots/Analysis_%s/Final_paper_plots_spectra_%s_akR2_%s_%d.pdf",ptbins, ptbins, etaWidth,date.GetDate()),"RECREATE");
 
   
   TCanvas * cSpectra_R3 = new TCanvas("cSpectra_R3","",1200,1000);
@@ -265,7 +265,7 @@ void RAA_plot_finalpaper(){
   drawText("50-70% x 10^{10}", 0.7,0.64,16);
   drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R3->SaveAs(Form("Plots/Final_paper_plots_spectra_%s_akR3_%s_%d.pdf",ptbins, etaWidth, date.GetDate()),"RECREATE");
+  cSpectra_R3->SaveAs(Form("Plots/Analysis_%s/Final_paper_plots_spectra_%s_akR3_%s_%d.pdf",ptbins, ptbins, etaWidth, date.GetDate()),"RECREATE");
 
 
   
@@ -332,7 +332,7 @@ void RAA_plot_finalpaper(){
   drawText("50-70% x 10^{10}", 0.7,0.64,16);
   drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R4->SaveAs(Form("Plots/Final_paper_plots_spectra_%s_akR4_%s_%d.pdf",ptbins, etaWidth, date.GetDate()),"RECREATE");
+  cSpectra_R4->SaveAs(Form("Plots/Analysis_%s/Final_paper_plots_spectra_%s_akR4_%s_%d.pdf",ptbins, ptbins, etaWidth, date.GetDate()),"RECREATE");
 
 
 }

@@ -30,9 +30,9 @@ void RAA_plot_Systematics()
   Float_t etaBoundary = 2.0; 
 
   TFile *fin_R2, *fin_R3, *fin_R4; 
-  fin_R2 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_noSmear_%s_%dGeVCut_ak%s_%d.root",2,ptbins,etaWidth,unfoldingCut_R2,jet_type, date.GetDate()));
-  fin_R3 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_noSmear_%s_%dGeVCut_ak%s_%d.root",3,ptbins,etaWidth,unfoldingCut_R3,jet_type, date.GetDate()));
-  fin_R4 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_noSmear_%s_%dGeVCut_ak%s_%d.root",4,ptbins,etaWidth,unfoldingCut_R4,jet_type, date.GetDate()));
+  fin_R2 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_%s_%s_%dGeVCut_ak%s_%d.root", 2, ptbins, smear, etaWidth, unfoldingCut_R2, jet_type, date.GetDate()));
+  fin_R3 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_%s_%s_%dGeVCut_ak%s_%d.root", 3, ptbins, smear, etaWidth, unfoldingCut_R3, jet_type, date.GetDate()));
+  fin_R4 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_%s_%s_%dGeVCut_ak%s_%d.root", 4, ptbins, smear, etaWidth, unfoldingCut_R4, jet_type, date.GetDate()));
   
   // // get the unfolded error correction files and histograms
   TFile * fError_R2, * fError_R3, * fError_R4;
@@ -2995,7 +2995,24 @@ void RAA_plot_Systematics()
   
   // plot - comparison with ATLAS
   // get the ATLAS most central bin 0-10% RAA from the hepdata http://hepdata.cedar.ac.uk/view/ins1326911/next
+  TH1F * hCMS_ATLAS_RAA_ratio[nbins_cent], * hCMS_ATLAS_PbPb_ratio[nbins_cent], * hCMS_ATLAS_PP_ratio;
+  hCMS_ATLAS_RAA_ratio[0] = (TH1F*)RAA_R4_Bayes[0]->Clone("CMS_0to5_ATLAS_0to10_RAA_ratio");
+  hCMS_ATLAS_RAA_ratio[1] = (TH1F*)RAA_R4_Bayes[1]->Clone("CMS_5to10_ATLAS_0to10_RAA_ratio");
+  hCMS_ATLAS_RAA_ratio[2] = (TH1F*)RAA_R4_Bayes[2]->Clone("CMS_10to30_ATLAS_10to20_RAA_ratio");
+  hCMS_ATLAS_RAA_ratio[3] = (TH1F*)RAA_R4_Bayes[3]->Clone("CMS_30to50_ATLAS_30to40_RAA_ratio");
+  hCMS_ATLAS_RAA_ratio[4] = (TH1F*)RAA_R4_Bayes[4]->Clone("CMS_50to70_ATLAS_50to60_RAA_ratio");
+  hCMS_ATLAS_RAA_ratio[5] = (TH1F*)RAA_R4_Bayes[5]->Clone("CMS_70to90_ATLAS_70to80_RAA_ratio");
 
+  hCMS_ATLAS_PbPb_ratio[0] = (TH1F*)uPbPb_R4_Bayes[0]->Clone("CMS_0to5_ATLAS_0to10_PbPb_ratio");
+  hCMS_ATLAS_PbPb_ratio[1] = (TH1F*)uPbPb_R4_Bayes[1]->Clone("CMS_5to10_ATLAS_0to10_PbPb_ratio");
+  hCMS_ATLAS_PbPb_ratio[2] = (TH1F*)uPbPb_R4_Bayes[2]->Clone("CMS_10to30_ATLAS_10to20_PbPb_ratio");
+  hCMS_ATLAS_PbPb_ratio[3] = (TH1F*)uPbPb_R4_Bayes[3]->Clone("CMS_30to50_ATLAS_30to40_PbPb_ratio");
+  hCMS_ATLAS_PbPb_ratio[4] = (TH1F*)uPbPb_R4_Bayes[4]->Clone("CMS_50to70_ATLAS_50to60_PbPb_ratio");
+  hCMS_ATLAS_PbPb_ratio[5] = (TH1F*)uPbPb_R4_Bayes[5]->Clone("CMS_70to90_ATLAS_70to80_PbPb_ratio");
+
+  hCMS_ATLAS_PP_ratio = (TH1F*)uPP_R4_Bayes->Clone("CMS_ATLAS_PP_ratio");
+
+  int ptbin = 1; // this is for finding the ptbin corresponding to ours to take a ratio. 
   
   // Plot: p8719_d27x1y1 - 0-10%
   double p8719_d27x1y1_xval[] = { 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5, 357.0 };
@@ -3012,7 +3029,38 @@ void RAA_plot_Systematics()
   p8719_d27x1y1->SetTitle(" ");
   p8719_d27x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
   p8719_d27x1y1->GetYaxis()->SetTitle("R_{AA}");
-  
+
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d27x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_RAA_ratio[0]->FindBin(p8719_d27x1y1_xval[npt]);
+      hCMS_ATLAS_RAA_ratio[0]->SetBinContent(ptbin, (double)hCMS_ATLAS_RAA_ratio[0]->GetBinContent(ptbin)/p8719_d27x1y1_yval[npt]);
+    }
+  }
+
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d27x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_RAA_ratio[1]->FindBin(p8719_d27x1y1_xval[npt]);
+      hCMS_ATLAS_RAA_ratio[1]->SetBinContent(ptbin, (double)hCMS_ATLAS_RAA_ratio[1]->GetBinContent(ptbin)/p8719_d27x1y1_yval[npt]);
+    }
+  }
+  // double CMS_05_ATLAS_010_RAA_ratio[];
+  // double CMS_510_ATLAS_010_RAA_ratio[];
+  // TGraphAsymmErrors * CMS_0to5_ATLAS_0to10_RAA_ratio ;
+  // TGraphAsymmErrors * CMS_5to10_ATLAS_0to10_RAA_ratio ;
+
+  // if(ptbins == "atlaspTbins"){
+
+  //   for(int l = 0; l<p8719_d27x1y1_numpoints; ++l){
+  //     CMS_05_ATLAS_010_RAA_ratio[l]= (double)p8719_d27x1y1_yval[l]/RAA_R4_Bayes[0]->GetBinContent(p8719_d27x1y1_xval[l]);
+  //   }
+  //   CMS_0to5_ATLAS_0to10_RAA_ratio = new TGraphAsymmErrors(p8719_d27x1y1_numpoints, p8719_d27x1y1_xval, CMS_05_ATLAS_010_RAA_ratio);
+
+  //   for(int l = 0; l<p8719_d28x1y1_numpoints; ++l){
+  //     CMS_510_ATLAS_010_RAA_ratio[l]= (double)p8719_d28x1y1_yval[l]/RAA_R4_Bayes[1]->GetBinContent(p8719_d28x1y1_xval[l]);
+  //   }
+  //   CMS_5to10_ATLAS_0to10_RAA_ratio = new TGraphAsymmErrors(p8719_d28x1y1_numpoints, p8719_d28x1y1_xval, CMS_510_ATLAS_010_RAA_ratio);
+    
+  // }
 
   // Plot: p8719_d28x1y1 - 10-20% 
   double p8719_d28x1y1_xval[] = { 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5 };
@@ -3029,6 +3077,13 @@ void RAA_plot_Systematics()
   p8719_d28x1y1->SetTitle(" ");
   p8719_d28x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
   p8719_d28x1y1->GetYaxis()->SetTitle("R_{AA}");
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d28x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_RAA_ratio[2]->FindBin(p8719_d28x1y1_xval[npt]);
+      hCMS_ATLAS_RAA_ratio[2]->SetBinContent(ptbin, (double)hCMS_ATLAS_RAA_ratio[2]->GetBinContent(ptbin)/p8719_d28x1y1_yval[npt]);
+    }
+  }
+  
 
   // Plot: p8719_d29x1y1 20-30% 
   double p8719_d29x1y1_xval[] = { 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5 };
@@ -3045,6 +3100,7 @@ void RAA_plot_Systematics()
   p8719_d29x1y1->SetTitle(" ");
   p8719_d29x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
   p8719_d29x1y1->GetYaxis()->SetTitle("R_{AA}");
+  
 
   // Plot: p8719_d30x1y1 30-40% 
   double p8719_d30x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5 };
@@ -3061,6 +3117,12 @@ void RAA_plot_Systematics()
   p8719_d30x1y1->SetTitle(" ");
   p8719_d30x1y1->GetYaxis()->SetTitle("R_{AA}");
   p8719_d30x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d30x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_RAA_ratio[3]->FindBin(p8719_d30x1y1_xval[npt]);
+      hCMS_ATLAS_RAA_ratio[3]->SetBinContent(ptbin, (double)hCMS_ATLAS_RAA_ratio[3]->GetBinContent(ptbin)/p8719_d30x1y1_yval[npt]);
+    }
+  }
   
   // Plot: p8719_d31x1y1 40-50% 
   double p8719_d31x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5 };
@@ -3093,7 +3155,12 @@ void RAA_plot_Systematics()
   p8719_d32x1y1->SetTitle(" ");
   p8719_d32x1y1->GetYaxis()->SetTitle("R_{AA}");
   p8719_d32x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
-
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d32x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_RAA_ratio[4]->FindBin(p8719_d32x1y1_xval[npt]);
+      hCMS_ATLAS_RAA_ratio[4]->SetBinContent(ptbin, (double)hCMS_ATLAS_RAA_ratio[4]->GetBinContent(ptbin)/p8719_d32x1y1_yval[npt]);
+    }
+  }
   // Plot: p8719_d33x1y1 60-70% 
   double p8719_d33x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0 };
   double p8719_d33x1y1_xerrminus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0 };
@@ -3110,6 +3177,7 @@ void RAA_plot_Systematics()
   p8719_d33x1y1->GetYaxis()->SetTitle("R_{AA}");
   p8719_d33x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
 
+  
   // Plot: p8719_d34x1y1 70-80% 
   double p8719_d34x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5 };
   double p8719_d34x1y1_xerrminus[] = { 5.5, 6.5, 8.0, 10.5, 12.5, 16.5, 20.5 };
@@ -3125,6 +3193,12 @@ void RAA_plot_Systematics()
   p8719_d34x1y1->SetTitle(" ");
   p8719_d34x1y1->GetYaxis()->SetTitle("R_{AA}");
   p8719_d34x1y1->GetXaxis()->SetTitle("ak R=0.4 Jet p_{T} (GeV/c)");
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d34x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_RAA_ratio[5]->FindBin(p8719_d34x1y1_xval[npt]);
+      hCMS_ATLAS_RAA_ratio[5]->SetBinContent(ptbin, (double)hCMS_ATLAS_RAA_ratio[5]->GetBinContent(ptbin)/p8719_d34x1y1_yval[npt]);
+    }
+  }
 
   TCanvas * cATLAS = new TCanvas("cATLAS","",1200,1000);
   makeMultiPanelCanvas(cATLAS,3,2,0.0,0.0,0.2,0.15,0.07);
@@ -3283,7 +3357,12 @@ void RAA_plot_Systematics()
   p8719_d2x1y1->SetName("/HepData/8719/d2x1y1");
   p8719_d2x1y1->SetTitle(" ");
 
-
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d2x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_PP_ratio->FindBin(p8719_d2x1y1_xval[npt]);
+      hCMS_ATLAS_PP_ratio->SetBinContent(ptbin, (double)hCMS_ATLAS_PP_ratio->GetBinContent(ptbin)/p8719_d2x1y1_yval[npt]);
+    }
+  }
   // i took care of all the scaling in the RAA_analyze marco 
   //uPP_R4_Bayes->Scale(1./4/5.3/1e3);// to get cross sections in nano barns
   //uPP_R4_Bayes->Scale(1./4/5.429/1e3/0.82698/0.25249);
@@ -3301,8 +3380,8 @@ void RAA_plot_Systematics()
   uPP_R4_Bayes->SetMarkerStyle(24);
   uPP_R4_Bayes->SetMarkerColor(kBlue);
   uPP_R4_Bayes->Draw("same E1");
-  systematics_R4.calcTotalSys(6);
-  systematics_R4.Draw(uPP_R4_Bayes,6,2);
+  //systematics_R4.calcTotalSys(6);
+  //systematics_R4.Draw(uPP_R4_Bayes,6,2);
   
   TLegend *legpp_1 = getLegend(0.40,0.65,0.6,0.85);
   legpp_1->AddEntry(p8719_d2x1y1,"ATLAS pp","p");
@@ -3332,9 +3411,22 @@ void RAA_plot_Systematics()
   TGraphAsymmErrors * p8719_d7x1y1 = new TGraphAsymmErrors(p8719_d7x1y1_numpoints, p8719_d7x1y1_xval, p8719_d7x1y1_yval, p8719_d7x1y1_xerrminus, p8719_d7x1y1_xerrplus, p8719_d7x1y1_yerrminus, p8719_d7x1y1_yerrplus);
   p8719_d7x1y1->SetName("/HepData/8719/d7x1y1");
   p8719_d7x1y1->SetTitle("  ");
-
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d7x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_PbPb_ratio[0]->FindBin(p8719_d7x1y1_xval[npt]);
+      hCMS_ATLAS_PbPb_ratio[0]->SetBinContent(ptbin, (double)hCMS_ATLAS_PbPb_ratio[0]->GetBinContent(ptbin)/p8719_d7x1y1_yval[npt]);
+    }
+  }
+  
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d7x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_PbPb_ratio[1]->FindBin(p8719_d7x1y1_xval[npt]);
+      hCMS_ATLAS_PbPb_ratio[1]->SetBinContent(ptbin, (double)hCMS_ATLAS_PbPb_ratio[1]->GetBinContent(ptbin)/p8719_d7x1y1_yval[npt]);
+    }
+  }
+  
   // Plot: p8719_d8x1y1, 10-20% 
-
+  
   double p8719_d8x1y1_xval[] = { 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5, 357.0 };
   double p8719_d8x1y1_xerrminus[] = { 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5, 41.0 };
   double p8719_d8x1y1_xerrplus[] = { 6.5, 8.0, 10.5, 12.5, 16.5, 20.5, 26.0, 32.5, 41.0 };
@@ -3348,6 +3440,12 @@ void RAA_plot_Systematics()
   TGraphAsymmErrors * p8719_d8x1y1 = new TGraphAsymmErrors(p8719_d8x1y1_numpoints, p8719_d8x1y1_xval, p8719_d8x1y1_yval, p8719_d8x1y1_xerrminus, p8719_d8x1y1_xerrplus, p8719_d8x1y1_yerrminus, p8719_d8x1y1_yerrplus);
   p8719_d8x1y1->SetName("/HepData/8719/d8x1y1");
   p8719_d8x1y1->SetTitle("  ");
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d8x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_PbPb_ratio[2]->FindBin(p8719_d8x1y1_xval[npt]);
+      hCMS_ATLAS_PbPb_ratio[2]->SetBinContent(ptbin, (double)hCMS_ATLAS_PbPb_ratio[2]->GetBinContent(ptbin)/p8719_d8x1y1_yval[npt]);
+    }
+  }
 
   // Plot: p8719_d9x1y1, 20-30% 
   double p8719_d9x1y1_xval[] = { 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5, 357.0 };
@@ -3386,6 +3484,13 @@ void RAA_plot_Systematics()
   TGraphAsymmErrors * p8719_d10x1y1 = new TGraphAsymmErrors(p8719_d10x1y1_numpoints, p8719_d10x1y1_xval, p8719_d10x1y1_yval, p8719_d10x1y1_xerrminus, p8719_d10x1y1_xerrplus, p8719_d10x1y1_yerrminus, p8719_d10x1y1_yerrplus);
   p8719_d10x1y1->SetName("/HepData/8719/d10x1y1");
   p8719_d10x1y1->SetTitle("  ");
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d10x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_PbPb_ratio[3]->FindBin(p8719_d10x1y1_xval[npt]);
+      hCMS_ATLAS_PbPb_ratio[3]->SetBinContent(ptbin, (double)hCMS_ATLAS_PbPb_ratio[3]->GetBinContent(ptbin)/p8719_d10x1y1_yval[npt]);
+    }
+  }
+
 
   // Plot: p8719_d11x1y1, 40-50% 
   double p8719_d11x1y1_xval[] = { 44.5, 56.5, 71.0, 89.5, 112.5, 141.5, 178.5, 225.0, 283.5 };
@@ -3416,6 +3521,12 @@ void RAA_plot_Systematics()
   TGraphAsymmErrors * p8719_d12x1y1 = new TGraphAsymmErrors(p8719_d12x1y1_numpoints, p8719_d12x1y1_xval, p8719_d12x1y1_yval, p8719_d12x1y1_xerrminus, p8719_d12x1y1_xerrplus, p8719_d12x1y1_yerrminus, p8719_d12x1y1_yerrplus);
   p8719_d12x1y1->SetName("/HepData/8719/d12x1y1");
   p8719_d12x1y1->SetTitle("  ");
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d12x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_PbPb_ratio[4]->FindBin(p8719_d12x1y1_xval[npt]);
+      hCMS_ATLAS_PbPb_ratio[4]->SetBinContent(ptbin, (double)hCMS_ATLAS_PbPb_ratio[4]->GetBinContent(ptbin)/p8719_d12x1y1_yval[npt]);
+    }
+  }
 
   
   // Plot: p8719_d13x1y1, 60-70% 
@@ -3447,9 +3558,15 @@ void RAA_plot_Systematics()
 
   TGraphAsymmErrors * p8719_d14x1y1 = new TGraphAsymmErrors(p8719_d14x1y1_numpoints, p8719_d14x1y1_xval, p8719_d14x1y1_yval, p8719_d14x1y1_xerrminus, p8719_d14x1y1_xerrplus, p8719_d14x1y1_yerrminus, p8719_d14x1y1_yerrplus);
   p8719_d14x1y1->SetName("/HepData/8719/d14x1y1");
-  p8719_d14x1y1->SetTitle(" ");
-
-
+p8719_d14x1y1->SetTitle(" ");
+  if(ptbins == "atlaspTbins"){
+    for(int npt = 0; npt<p8719_d14x1y1_numpoints; ++npt){
+      ptbin = hCMS_ATLAS_PbPb_ratio[5]->FindBin(p8719_d14x1y1_xval[npt]);
+      hCMS_ATLAS_PbPb_ratio[5]->SetBinContent(ptbin, (double)hCMS_ATLAS_PbPb_ratio[5]->GetBinContent(ptbin)/p8719_d14x1y1_yval[npt]);
+    }
+  }
+  
+  
   /*
     uPbPb_Bayes[i]->Scale(1./deltaEta);// delta eta
     //uPbPb_Bayes[i]->Scale(1./145.156/1e6);// Jet 80 luminosity
@@ -3612,6 +3729,66 @@ void RAA_plot_Systematics()
   cATLAS_pbpb->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_pbpb_spectra_%d_%s_pawan_ntuple.C",ptbins,date.GetDate(),etaWidth),"RECREATE");
   cATLAS_pbpb->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_pbpb_spectra_%d_%s_pawan_ntuple.root",ptbins,date.GetDate(),etaWidth),"RECREATE");
 
+
+  // Draw the plots here which have the ratio between CMS and ATLAS for PP, PbPb and RAA only for atlaspTbins
+  
+  TCanvas * cCMS_ATLAS_RAA_ratio = new TCanvas("cCMS_ATLAS_RAA_ratio","",1200,1000);
+  makeMultiPanelCanvas(cCMS_ATLAS_RAA_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
+
+  TCanvas * cCMS_ATLAS_PbPb_ratio = new TCanvas("cCMS_ATLAS_RAA_ratio","",1200,1000);
+  makeMultiPanelCanvas(cCMS_ATLAS_PbPb_ratio,3,2,0.0,0.0,0.2,0.15,0.07);
+
+  TCanvas * cCMS_ATLAS_PP_ratio = new TCanvas("cCMS_ATLAS_RAA_ratio","",800,600);
+
+  if(ptbins == "atlaspTbins"){
+
+    for(int i = 0; i<nbins_cent; ++i){
+
+      cCMS_ATLAS_RAA_ratio->cd(nbins_cent-i);
+      makeHistTitle(hCMS_ATLAS_RAA_ratio[i]," ","akPu4PF Jet p_{T} (GeV/c)","CMS/ATLAS RAA ratio");
+      hCMS_ATLAS_RAA_ratio[i]->SetMarkerStyle(20);
+      hCMS_ATLAS_RAA_ratio[i]->SetMarkerColor(kBlack);
+      hCMS_ATLAS_RAA_ratio[i]->Draw();
+      if(i==0)drawText("CMS 0-5% / ATLAS 0-10%",0.8,0.85,20);    
+      if(i==1)drawText("CMS 5-10% / ATLAS 0-10%",0.8,0.85,20);    
+      if(i==2)drawText("CMS 10-30% / ATLAS 10-20%",0.8,0.85,20);    
+      if(i==3)drawText("CMS 30-50% / ATLAS 30-40%",0.8,0.85,20);    
+      if(i==4)drawText("CMS 50-70% / ATLAS 50-60%",0.8,0.85,20);    
+      if(i==5)drawText("CMS 70-90% / ATLAS 70-80%",0.8,0.85,20);
+
+      cCMS_ATLAS_PbPb_ratio->cd(nbins_cent-i);
+      makeHistTitle(hCMS_ATLAS_PbPb_ratio[i]," ","akPu4PF Jet p_{T} (GeV/c)","CMS/ATLAS PbPb Spectra ratio");
+      hCMS_ATLAS_PbPb_ratio[i]->SetMarkerStyle(20);
+      hCMS_ATLAS_PbPb_ratio[i]->SetMarkerColor(kBlack);
+      hCMS_ATLAS_PbPb_ratio[i]->Draw();
+      if(i==0)drawText("CMS 0-5% / ATLAS 0-10%",0.8,0.85,20);    
+      if(i==1)drawText("CMS 5-10% / ATLAS 0-10%",0.8,0.85,20);    
+      if(i==2)drawText("CMS 10-30% / ATLAS 10-20%",0.8,0.85,20);    
+      if(i==3)drawText("CMS 30-50% / ATLAS 30-40%",0.8,0.85,20);    
+      if(i==4)drawText("CMS 50-70% / ATLAS 50-60%",0.8,0.85,20);    
+      if(i==5)drawText("CMS 70-90% / ATLAS 70-80%",0.8,0.85,20);
+
+    }
+
+    cCMS_ATLAS_PP_ratio->cd();
+    makeHistTitle(hCMS_ATLAS_PP_ratio," ","akPu4PF Jet p_{T} (GeV/c)","CMS/ATLAS PP ratio");
+    hCMS_ATLAS_PP_ratio->SetMarkerStyle(20);
+    hCMS_ATLAS_PP_ratio->SetMarkerColor(kBlack);
+    hCMS_ATLAS_PP_ratio->Draw();
+
+    cCMS_ATLAS_RAA_ratio->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_RAA_ratio_%dGeVCut_%d_%s_pawan_ntuple.pdf",ptbins, unfoldingCut_R4,date.GetDate(),etaWidth),"RECREATE");
+    cCMS_ATLAS_RAA_ratio->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_RAA_ratio_%dGeVCut_%d_%s_pawan_ntuple.C",ptbins, unfoldingCut_R4,date.GetDate(),etaWidth),"RECREATE");
+    cCMS_ATLAS_RAA_ratio->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_RAA_ratio_%dGeVCut_%d_%s_pawan_ntuple.root",ptbins, unfoldingCut_R4,date.GetDate(),etaWidth),"RECREATE");
+
+    cCMS_ATLAS_PbPb_ratio->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_PbPb_ratio_%dGeVCut_%d_%s_pawan_ntuple.pdf",ptbins, unfoldingCut_R4,date.GetDate(),etaWidth),"RECREATE");
+    cCMS_ATLAS_PbPb_ratio->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_PbPb_ratio_%dGeVCut_%d_%s_pawan_ntuple.C",ptbins, unfoldingCut_R4,date.GetDate(),etaWidth),"RECREATE");
+    cCMS_ATLAS_PbPb_ratio->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_PbPb_ratio_%dGeVCut_%d_%s_pawan_ntuple.root",ptbins, unfoldingCut_R4,date.GetDate(),etaWidth),"RECREATE");
+    
+    cCMS_ATLAS_PP_ratio->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_PP_ratio_%dGeVCut_%d_%s_pawan_ntuple.pdf",ptbins, unfoldingCut_R4,date.GetDate(),etaWidth),"RECREATE");
+    cCMS_ATLAS_PP_ratio->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_PP_ratio_%dGeVCut_%d_%s_pawan_ntuple.C",ptbins, unfoldingCut_R4,date.GetDate(),etaWidth),"RECREATE");
+    cCMS_ATLAS_PP_ratio->SaveAs(Form("Plots/Analysis_%s/comparison_with_ATLAS_PP_ratio_%dGeVCut_%d_%s_pawan_ntuple.root",ptbins, unfoldingCut_R4,date.GetDate(),etaWidth),"RECREATE");
+    
+  }
 
   // do the statistical error check
   // we have three histograms here:

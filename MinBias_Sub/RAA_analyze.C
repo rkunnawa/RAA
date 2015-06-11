@@ -103,30 +103,28 @@ void RAA_analyze(int radius = 3)
   bool printDebug = true;
   bool isFineBin = false; 
   bool dofakeremove=true;
-  // get the data and mc histograms from the output of the read macro. 
-  int param1 = 1;
-  int param2 = 1;
+  // get the data and mc histograms from//  the output of the read macro. 
+  // int param1 = 1;
+  // int param2 = 1;
 
-  if(param1 == 1) {
-    etaWidth = "20_eta_20";
-    deltaEta = 4.0;
-  }
-  if(param1 == 2) {
-    etaWidth = "10_eta_10";
-    deltaEta = 2.0; 
-  }
-  if(param1 == 3) {
-    etaWidth = "10_eta_18";
-    deltaEta = 1.6;
-  }
-
-  char * smear = (char*)"noSmear";
+  // if(param1 == 1) {
+  //   etaWidth = "20_eta_20";
+  //   deltaEta = 4.0;
+  // }
+  // if(param1 == 2) {
+  //   etaWidth = "10_eta_10";
+  //   deltaEta = 2.0; 
+  // }
+  // if(param1 == 3) {
+  //   etaWidth = "10_eta_18";
+  //   deltaEta = 1.6;
+  // }
   
-  if(param2 == 1) smear = "noSmear";
-  if(param2 == 2) smear = "GenSmear";
-  if(param2 == 3) smear = "RecoSmear";
-  if(param2 == 4) smear = "BothSmear";
-  if(param2 == 5) smear = "gen2pSmear";
+  // if(param2 == 1) smear = "noSmear";
+  // if(param2 == 2) smear = "GenSmear";
+  // if(param2 == 3) smear = "RecoSmear";
+  // if(param2 == 4) smear = "BothSmear";
+  // if(param2 == 5) smear = "gen2pSmear";
 
   TDatime date;//this is just here to get 
   // Pawan's files:
@@ -418,17 +416,24 @@ void RAA_analyze(int radius = 3)
       mPbPb_Reco[i]->Print("base");
       mPbPb_Matrix[i] = (TH2F*)fPbPb_MC_in->Get(Form("hpbpb_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
       mPbPb_Matrix[i]->Print("base");
+    }
+    
+    if(smear == "5TrigIneff_Smear"){
+      mPbPb_Gen[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_JetComb_gen_5TrigIneff_Smear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_Gen[i]->Print("base");
+      mPbPb_Reco[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_JetComb_reco_5TrigIneff_Smear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_Reco[i]->Print("base");
+      mPbPb_Matrix[i] = (TH2F*)fPbPb_MC_in->Get(Form("hpbpb_matrix_HLT_5TrigIneffSmear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_Matrix[i]->Print("base");
+    }
 
-      //mPbPb_Gen[i]->Scale(1e6);
-      //mPbPb_Reco[i]->Scale(1e6);
-      //mPbPb_Matrix[i]->Scale(1e6);
-
-      // mPbPb_Gen[i] = (TH1F*)fCrossCheck->Get(Form("PbPb_Gen_spectra_refpt_cent%d",i));
-      // mPbPb_Gen[i]->Print("base");
-      // mPbPb_Reco[i] = (TH1F*)fCrossCheck->Get(Form("PbPb_Reco_spectra_jtpt_cent%d",i));
-      // mPbPb_Reco[i]->Print("base");
-      // mPbPb_Matrix[i] = (TH2F*)fCrossCheck->Get(Form("hpbpb_matrix_HLT_R3_20_eta_20_cent%d",i));
-      // mPbPb_Matrix[i]->Print("base");
+    if(smear == "10TrigIneff_Smear"){
+      mPbPb_Gen[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_JetComb_gen_10TrigIneff_Smear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_Gen[i]->Print("base");
+      mPbPb_Reco[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_JetComb_reco_10TrigIneff_Smear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_Reco[i]->Print("base");
+      mPbPb_Matrix[i] = (TH2F*)fPbPb_MC_in->Get(Form("hpbpb_matrix_HLT_10TrigIneffSmear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_Matrix[i]->Print("base");
     }
 
     if(smear == "GenSmear"){
@@ -475,12 +480,32 @@ void RAA_analyze(int radius = 3)
     // mPbPb_mcclosure_Matrix[i] = (TH2F*)fMCClosure->Get(Form("akPu%dJetAnalyzer/hmatrix_f_pbpb_akPu%d_1_%d",radius, radius, i));
     // mPbPb_mcclosure_Matrix[i]->Print("base");
 
-    mPbPb_mcclosure_data[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_JetComb_data_R%d_%s_cent%d",radius,etaWidth,i));
-    mPbPb_mcclosure_data[i]->Print("base");
-    mPbPb_mcclosure_gen[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_gen_JetComb_R%d_%s_cent%d",radius,etaWidth,i));
-    mPbPb_mcclosure_gen[i]->Print("base");
-    mPbPb_mcclosure_Matrix[i] = (TH2F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
-    mPbPb_mcclosure_Matrix[i]->Print("base");
+    if(smear == "noSmear"){
+      mPbPb_mcclosure_data[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_JetComb_data_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_mcclosure_data[i]->Print("base");
+      mPbPb_mcclosure_gen[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_gen_JetComb_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_mcclosure_gen[i]->Print("base");
+      mPbPb_mcclosure_Matrix[i] = (TH2F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_mcclosure_Matrix[i]->Print("base");
+    }
+
+    if(smear == "5TrigIneff_Smear"){
+      mPbPb_mcclosure_data[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_JetComb_data_5TrigIneff_Smear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_mcclosure_data[i]->Print("base");
+      mPbPb_mcclosure_gen[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_gen_JetComb_5TrigIneff_Smear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_mcclosure_gen[i]->Print("base");
+      mPbPb_mcclosure_Matrix[i] = (TH2F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_matrix_HLT_5TrigIneff_Smear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_mcclosure_Matrix[i]->Print("base");
+    }
+
+    if(smear == "10TrigIneff_Smear"){
+      mPbPb_mcclosure_data[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_JetComb_data_10TrigIneff_Smear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_mcclosure_data[i]->Print("base");
+      mPbPb_mcclosure_gen[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_gen_JetComb_10TrigIneff_Smear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_mcclosure_gen[i]->Print("base");
+      mPbPb_mcclosure_Matrix[i] = (TH2F*)fPbPb_MC_in->Get(Form("hpbpb_mcclosure_matrix_HLT_10TrigIneff_Smear_R%d_%s_cent%d",radius,etaWidth,i));
+      mPbPb_mcclosure_Matrix[i]->Print("base");
+    }
     
     // if(etaWidth == "10_eta_10"){
     //   if(i == 0 && radius==2) unfoldingCutBin = htest->FindBin(30);
@@ -573,8 +598,6 @@ void RAA_analyze(int radius = 3)
         mPbPb_Matrix[i]->SetBinError(l,k,0);
         mPbPb_mcclosure_Matrix[i]->SetBinError(l,k,0);
       }
-
-
       
       //for(int l = 1; l<=mPbPb_mcclosure_data[i]->GetNbinsX(); l++){
       //mPbPb_mcclosure_Matrix[i]->SetBinContent(k,l,0);
@@ -588,6 +611,14 @@ void RAA_analyze(int radius = 3)
 	mPbPb_Matrix[i]->SetBinError(k,l,0);
 	mPbPb_mcclosure_Matrix[i]->SetBinError(k,l,0);
     	mPbPb_mcclosure_Matrix[i]->SetBinContent(k,l,0);
+      }
+    }
+
+
+    for(int k = 20; k<80; k++){
+      for(int l = unfoldingCutBin; l<mPbPb_Gen[i]->GetNbinsY(); l++){
+	if(mPbPb_Matrix[i]->GetBinContent(k,l)== 0) continue;
+	mPbPb_Matrix[i]->SetBinContent(k,l, mPbPb_Matrix[i]->GetBinContent(k,l) * 1.05);	
       }
     }
    
@@ -1040,7 +1071,7 @@ void RAA_analyze(int radius = 3)
     myPrior.unfold(dPbPb_TrgComb[i],1);
     TH1F* hPrior = (TH1F*)hMCGen->Clone("hPrior");
     removeZero(hPrior);
-    hPrior->Scale(dPbPb_TrgComb[i]->Integral(0,400)/hPrior->Integral(0,400));
+    hPrior->Scale(dPbPb_TrgComb[i]->Integral(0,501)/hPrior->Integral(0,501));
     hBinByBinCorRaw->Divide(hMCGen);
     TF1 *f = new TF1("f","[0]+[1]*x");
     hBinByBinCorRaw->Fit("f","LL ","",60,300);
@@ -1065,6 +1096,10 @@ void RAA_analyze(int radius = 3)
     delete hBinByBinCorRaw;
     delete hMCGen;
 
+    // for(int j = 0; j< 80 ; ++j){
+    //   hPrior->SetBinContent(j+1, hPrior->GetBinContent(j+1)*1.05);
+    // }
+    
     // Iteration Systematics
     for (int j=1;j<=Iterations;j++){
       bayesianUnfold myUnfoldingSys(mPbPb_Matrix[i],hPrior,0);
