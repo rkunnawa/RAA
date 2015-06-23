@@ -1,0 +1,45 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 16:48:37 EDT 2015 at WN: hibat0023.cmsaf.mit.edu 
+Job is running on Linux hibat0023.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.5G   16G  19% /
+tmpfs                  24G     0   24G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             1.8T   90G  1.7T   5% /export/data1
+/dev/sdb1             1.8T  1.6T  199G  90% /export/00b
+/dev/sdc1             1.8T  1.6T  209G  89% /export/00c
+/dev/sdd1             1.8T  1.7T  193G  90% /export/00d
+/dev/sde1             1.8T  1.6T  197G  90% /export/00e
+/dev/sdf1             1.8T  1.7T  191G  90% /export/00f
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   88G   10G  90% /cvmfs/cms.cern.ch
+cvmfs2                 98G   88G   10G  90% /cvmfs/oasis.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/159215
+10000/159215
+20000/159215
+30000/159215
+40000/159215
+50000/159215
+60000/159215
+70000/159215
+80000/159215
+90000/159215
+100000/159215
+110000/159215
+120000/159215
+130000/159215
+140000/159215
+150000/159215
+Macro finished: 
+CPU time (min)  = 1.45483
+Real time (min) = 2.45924
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

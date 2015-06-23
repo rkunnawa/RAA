@@ -1,0 +1,98 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 17:54:15 EDT 2015 at WN: t2bat0321.cmsaf.mit.edu 
+Job is running on Linux t2bat0321.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.5G   17G  14% /
+/dev/sda3              20G  2.5G   17G  14% /
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   57G  359G  14% /export/data1
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.2T  397G  90% /export/00b
+/dev/sda4             416G   57G  359G  14% /export/data1
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.2T  397G  90% /export/00b
+/dev/sdc1             3.6T  3.2T  411G  89% /export/00c
+/dev/sdd1             3.6T  3.2T  411G  89% /export/00d
+/dev/sde1             3.6T  3.2T  402G  90% /export/00e
+/dev/sdf1             3.6T  3.2T  401G  90% /export/00f
+/dev/sdg1             3.6T  3.3T  382G  90% /export/00g
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   54G   45G  55% /cvmfs/cms.cern.ch
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/650603
+10000/650603
+20000/650603
+30000/650603
+40000/650603
+50000/650603
+60000/650603
+70000/650603
+80000/650603
+90000/650603
+100000/650603
+110000/650603
+120000/650603
+130000/650603
+140000/650603
+150000/650603
+160000/650603
+170000/650603
+180000/650603
+190000/650603
+200000/650603
+210000/650603
+220000/650603
+230000/650603
+240000/650603
+250000/650603
+260000/650603
+270000/650603
+280000/650603
+290000/650603
+300000/650603
+310000/650603
+320000/650603
+330000/650603
+340000/650603
+350000/650603
+360000/650603
+370000/650603
+380000/650603
+390000/650603
+400000/650603
+410000/650603
+420000/650603
+430000/650603
+440000/650603
+450000/650603
+460000/650603
+470000/650603
+480000/650603
+490000/650603
+500000/650603
+510000/650603
+520000/650603
+530000/650603
+540000/650603
+550000/650603
+560000/650603
+570000/650603
+580000/650603
+590000/650603
+600000/650603
+610000/650603
+620000/650603
+630000/650603
+640000/650603
+650000/650603
+Macro finished: 
+CPU time (min)  = 4.085
+Real time (min) = 5.35734
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

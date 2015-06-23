@@ -1,0 +1,53 @@
+000 (426432.000.000) 06/22 20:50:05 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426432.000.000) 06/22 20:50:50 Job executing on host: <18.12.12.9:49125>
+...
+006 (426432.000.000) 06/22 20:50:59 Image size of job updated: 1
+	3  -  MemoryUsage of job (MB)
+	2352  -  ResidentSetSize of job (KB)
+...
+006 (426432.000.000) 06/22 20:51:02 Image size of job updated: 153156
+	3  -  MemoryUsage of job (MB)
+	2352  -  ResidentSetSize of job (KB)
+...
+004 (426432.000.000) 06/22 20:51:02 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :        3        3          
+...
+009 (426432.000.000) 06/22 20:51:10 Job was aborted by the user.
+	via condor_rm (by user rkunnawa)
+...
+000 (426571.000.000) 06/22 20:51:42 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426571.000.000) 06/22 20:52:11 Job executing on host: <18.12.9.51:49855>
+...
+006 (426571.000.000) 06/22 20:52:20 Image size of job updated: 245736
+	83  -  MemoryUsage of job (MB)
+	84272  -  ResidentSetSize of job (KB)
+...
+006 (426571.000.000) 06/22 20:56:25 Image size of job updated: 246904
+	83  -  MemoryUsage of job (MB)
+	84272  -  ResidentSetSize of job (KB)
+...
+005 (426571.000.000) 06/22 20:56:25 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:02:37, Sys 0 00:00:03  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:02:37, Sys 0 00:00:03  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	495152  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	495152  -  Total Bytes Sent By Job
+	41910  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :       83       83          
+...

@@ -1,0 +1,103 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 09:50:15 EDT 2015 at WN: t2bat0339.cmsaf.mit.edu 
+Job is running on Linux t2bat0339.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.4G   17G  13% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   93G  323G  23% /export/data1
+fuse_dfs              4.9P  4.4P  518T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.2T  447G  88% /export/00b
+/dev/sdc1             3.6T  3.2T  480G  87% /export/00c
+/dev/sdd1             3.6T  3.2T  454G  88% /export/00d
+/dev/sde1             3.6T  3.2T  457G  88% /export/00e
+/dev/sdf1             3.6T  3.2T  489G  87% /export/00f
+/dev/sdg1             3.6T  3.2T  432G  89% /export/00g
+cvmfs2                 98G   90G  8.3G  92% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   90G  8.3G  92% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   90G  8.3G  92% /cvmfs/oasis.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+radius = 2
+reading from 0 to 1
+Tree loaded  hltanalysis/HltTree
+Entries : 333206
+Tree loaded  skimanalysis/HltTree
+Entries : 333206
+Tree loaded  akPu2PFJetAnalyzer/t
+Entries : 333206
+Tree loaded  akPu3CaloJetAnalyzer/t
+Entries : 333206
+Tree loaded  hiEvtAnalyzer/HiTree
+Entries : 333206
+jet selection file 274374
+event selection file333206
+Running through all the events now
+0/10
+nEvt = 0
+forest values = 134, 121220, 1, 15153, -7.17859
+nEvt = 1
+forest values = 66, 121221, 1, 15153, 3.17253
+hibin hiForest = 66, evtTree = 66, jetTree = 66
+evt hiForest   = 121221, evtTree = 121221, jetTree = 121221
+lumi hiForest  = 15153, evtTree = 15153, jetTree = 15153
+vz hiForest    = 3.17253, evtTree = 3.17253, jetTree = 3.17253
+nref_F = 6, nref_eS = 6, nref_jS = 6
+
+nEvt = 2
+forest values = 19, 121222, 1, 15153, 0.742401
+nEvt = 3
+forest values = 83, 121223, 1, 15153, 2.89178
+hibin hiForest = 83, evtTree = 83, jetTree = 83
+evt hiForest   = 121223, evtTree = 121223, jetTree = 121223
+lumi hiForest  = 15153, evtTree = 15153, jetTree = 15153
+vz hiForest    = 2.89178, evtTree = 2.89178, jetTree = 2.89178
+nref_F = 1, nref_eS = 1, nref_jS = 1
+
+nEvt = 4
+forest values = 163, 121224, 1, 15153, -2.06111
+nEvt = 5
+forest values = 146, 121281, 1, 15161, -0.848043
+hibin hiForest = 146, evtTree = 146, jetTree = 146
+evt hiForest   = 121281, evtTree = 121281, jetTree = 121281
+lumi hiForest  = 15161, evtTree = 15161, jetTree = 15161
+vz hiForest    = -0.848043, evtTree = -0.848043, jetTree = -0.848043
+nref_F = 1, nref_eS = 1, nref_jS = 1
+
+nEvt = 6
+forest values = 26, 121282, 1, 15161, -5.7504
+hibin hiForest = 26, evtTree = 26, jetTree = 26
+evt hiForest   = 121282, evtTree = 121282, jetTree = 121282
+lumi hiForest  = 15161, evtTree = 15161, jetTree = 15161
+vz hiForest    = -5.7504, evtTree = -5.7504, jetTree = -5.7504
+nref_F = 42, nref_eS = 42, nref_jS = 42
+
+nEvt = 7
+forest values = 126, 121283, 1, 15161, 2.78709
+hibin hiForest = 126, evtTree = 126, jetTree = 126
+evt hiForest   = 121283, evtTree = 121283, jetTree = 121283
+lumi hiForest  = 15161, evtTree = 15161, jetTree = 15161
+vz hiForest    = 2.78709, evtTree = 2.78709, jetTree = 2.78709
+nref_F = 0, nref_eS = 0, nref_jS = 0
+
+nEvt = 8
+forest values = 154, 121284, 1, 15161, 12.2166
+nEvt = 9
+forest values = 2, 121285, 1, 15161, -7.84135
+hibin hiForest = 2, evtTree = 2, jetTree = 2
+evt hiForest   = 121285, evtTree = 121285, jetTree = 121285
+lumi hiForest  = 15161, evtTree = 15161, jetTree = 15161
+vz hiForest    = -7.84135, evtTree = -7.84135, jetTree = -7.84135
+nref_F = 75, nref_eS = 75, nref_jS = 75
+
+Macro finished: 
+CPU time (min)  = 0.036
+Real time (min) = 0.056569
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

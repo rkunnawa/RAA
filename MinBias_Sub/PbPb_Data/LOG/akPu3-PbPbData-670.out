@@ -1,0 +1,71 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 16:48:42 EDT 2015 at WN: t2bat0127.cmsaf.mit.edu 
+Job is running on Linux t2bat0127.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.5G   17G  14% /
+tmpfs                 7.8G     0  7.8G   0% /dev/shm
+/dev/sda1              97M   33M   60M  36% /boot
+/dev/sda4             415G   74G  341G  18% /export/data1
+/dev/sdb1             1.8T  1.6T  257G  87% /export/00b
+/dev/sdc1             1.8T  1.6T  270G  86% /export/00c
+/dev/sdd1             1.8T  1.6T  262G  86% /export/00d
+/dev/sde1             1.8T  1.6T  254G  87% /export/00e
+/dev/sdf1             1.8T  1.6T  257G  87% /export/00f
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+cvmfs2                 98G   72G   27G  74% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   72G   27G  74% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   72G   27G  74% /cvmfs/oasis.opensciencegrid.org
+hisrv0001:/export/home
+                      2.0T  1.6T  353G  82% /net/hisrv0001/home
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/388284
+10000/388284
+20000/388284
+30000/388284
+40000/388284
+50000/388284
+60000/388284
+70000/388284
+80000/388284
+90000/388284
+100000/388284
+110000/388284
+120000/388284
+130000/388284
+140000/388284
+150000/388284
+160000/388284
+170000/388284
+180000/388284
+190000/388284
+200000/388284
+210000/388284
+220000/388284
+230000/388284
+240000/388284
+250000/388284
+260000/388284
+270000/388284
+280000/388284
+290000/388284
+300000/388284
+310000/388284
+320000/388284
+330000/388284
+340000/388284
+350000/388284
+360000/388284
+370000/388284
+380000/388284
+Macro finished: 
+CPU time (min)  = 3.3265
+Real time (min) = 8.67635
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

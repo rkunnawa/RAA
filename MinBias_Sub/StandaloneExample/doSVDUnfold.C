@@ -294,28 +294,31 @@ TH1D* MultiplyResponseGenerated(TH1 *hGen, TH2 *hResponse,TH1 *hEfficiency,Bool_
 
 
 //_______________________________________________________________________________________________________________________
-TMatrixT<double> *CalrowculatePearsonCoefficients(TMatrixT<double> *covmat) {
+TMatrixT<double> CalculatePearsonCoefficients(TMatrixT<double> *covmat) {
 
-  TMatrixT<double> *pearsonCoefs = (TMatrixT<double>*)covmat->Clone("pearsonCoefs");
+  //  TMatrixT<double> *pearsonCoefs = (TMatrixT<double>*)covmat->Clone("pearsonCoefs");
   //  pearsonCoefs->Clear();
+  TMatrixD pearsonCoefs(*covmat);
 
   Int_t nrows = covmat->GetNrows();
   Int_t ncols = covmat->GetNcols();
+
+  TMatrixD mat(*covmat);
 
   Double_t pearson = 0.;
 
   for(int row = 0; row<nrows; row++) {
     for(int col = 0; col<ncols; col++) {
 
-      pearson = covmat(row,col)/TMath::Sqrt(covmat(row,row)*covmat(col,col));
+      pearson = mat(row,col)/TMath::Sqrt(mat(row,row)*mat(col,col));
       //      cout << "(" << row << "," << col << ") = " << pearson << endl;
       pearsonCoefs(row,col) = pearson;
     }
   }
 
   return pearsonCoefs;
-
 }
+
 
 using namespace std; 
 
@@ -333,7 +336,7 @@ void doSVDUnfold(TString strInput = "/export/d00/scratch/rkunnawa/rootfiles/RAA/
 
   const Int_t nKregMin = 2;
   const Int_t nKregMax = 7;
-  if(kregDraw>nKregMax) nKregMax=kregDraw+1;
+  //if(kregDraw>nKregMax) nKregMax=kregDraw+1;
 
   //RooUnfold::ErrorTreatment
   RooUnfold::ErrorTreatment errorTreatment = RooUnfold::kCovariance;
@@ -495,11 +498,11 @@ void doSVDUnfold(TString strInput = "/export/d00/scratch/rkunnawa/rootfiles/RAA/
 
     //Get covariance matrix and calculate corresponding Pearson coefficients    
     TMatrixD covmat = unfoldSVD.Ereco(errorTreatment);
-    TMatrixD *pearson = (TMatrixD*)CalculatePearsonCoefficients(&covmat);
+    TMatrixD pearson = CalculatePearsonCoefficients(&covmat);
 
     if(pearson) {
       cout << "print pearson coefficients" << endl;      
-      pearson->Print();
+      pearson.Print();
 
       hPearsonSVDPriorMeas[ikreg-1] = new TH2D(*pearson);
       

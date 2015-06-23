@@ -46,18 +46,18 @@ void RAA_plot_triggerTurnon_v2() {
 
   TDatime date; 
 
-  static const int nbins_pt = 39;
-  static const double boundaries_pt[nbins_pt+1] = {
-    3, 4, 5, 7, 9, 12,
-    15, 18, 21, 24, 28,
-    32, 37, 43, 49, 56,
-    64, 74, 84, 97, 114,
-    133, 153, 174, 196,
-    220, 245, 272, 300,
-    330, 362, 395, 430,
-    468, 507, 548, 592,
-    638, 686, 1000
-  };
+  // static const int nbins_pt = 39;
+  // static const double boundaries_pt[nbins_pt+1] = {
+  //   3, 4, 5, 7, 9, 12,
+  //   15, 18, 21, 24, 28,
+  //   32, 37, 43, 49, 56,
+  //   64, 74, 84, 97, 114,
+  //   133, 153, 174, 196,
+  //   220, 245, 272, 300,
+  //   330, 362, 395, 430,
+  //   468, 507, 548, 592,
+  //   638, 686, 1000
+  // };
 
   TFile * fin = TFile::Open("../../Output/PbPb_MinBiasUPC_supernova30_nojetid_prescl_akPuPF_20150420.root");
   

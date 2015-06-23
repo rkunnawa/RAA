@@ -1,0 +1,46 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 16:48:35 EDT 2015 at WN: t2bat0317.cmsaf.mit.edu 
+Job is running on Linux t2bat0317.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.7G   16G  15% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G  100G  316G  24% /export/data1
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.3T  347G  91% /export/00b
+/dev/sdc1             3.6T  3.2T  403G  90% /export/00c
+/dev/sdd1             3.6T  3.2T  411G  89% /export/00d
+/dev/sde1             3.6T  3.2T  392G  90% /export/00e
+/dev/sdf1             3.6T  3.2T  430G  89% /export/00f
+/dev/sdg1             3.6T  3.2T  435G  89% /export/00g
+cvmfs2                 98G   97G  682M 100% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   97G  682M 100% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   97G  682M 100% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   97G  682M 100% /cvmfs/cdfcfs.fnal.gov
+cvmfs2                 98G   97G  682M 100% /cvmfs/cvmfs.cmsaf.mit.edu
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/129158
+10000/129158
+20000/129158
+30000/129158
+40000/129158
+50000/129158
+60000/129158
+70000/129158
+80000/129158
+90000/129158
+100000/129158
+110000/129158
+120000/129158
+Macro finished: 
+CPU time (min)  = 0.9935
+Real time (min) = 2.07128
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

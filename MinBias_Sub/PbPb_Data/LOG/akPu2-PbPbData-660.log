@@ -1,0 +1,49 @@
+000 (426480.000.000) 06/22 20:50:10 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426480.000.000) 06/22 20:50:57 Job executing on host: <18.12.9.74:47227>
+...
+006 (426480.000.000) 06/22 20:51:02 Image size of job updated: 153144
+	0  -  MemoryUsage of job (MB)
+	0  -  ResidentSetSize of job (KB)
+...
+004 (426480.000.000) 06/22 20:51:02 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :        0        0          
+...
+009 (426480.000.000) 06/22 20:51:10 Job was aborted by the user.
+	via condor_rm (by user rkunnawa)
+...
+000 (426595.000.000) 06/22 20:51:44 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426595.000.000) 06/22 20:52:18 Job executing on host: <18.12.8.243:45475>
+...
+006 (426595.000.000) 06/22 20:52:26 Image size of job updated: 245248
+	59  -  MemoryUsage of job (MB)
+	59400  -  ResidentSetSize of job (KB)
+...
+006 (426595.000.000) 06/22 20:57:26 Image size of job updated: 247892
+	131  -  MemoryUsage of job (MB)
+	133688  -  ResidentSetSize of job (KB)
+...
+005 (426595.000.000) 06/22 20:58:46 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:03:52, Sys 0 00:00:04  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:03:52, Sys 0 00:00:04  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	495472  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	495472  -  Total Bytes Sent By Job
+	41910  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :      131      131          
+...

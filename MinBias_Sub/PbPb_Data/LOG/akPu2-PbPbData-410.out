@@ -1,0 +1,76 @@
+
+----------------------------------------------------
+Job started on Mon Jun 22 20:52:12 EDT 2015 at WN: t2bat0311.cmsaf.mit.edu 
+Job is running on Linux t2bat0311.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  17% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   95G  321G  23% /export/data1
+fuse_dfs              4.9P  4.4P  522T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.3T  379G  90% /export/00b
+/dev/sdc1             3.6T  3.3T  391G  90% /export/00c
+/dev/sdd1             3.6T  3.3T  388G  90% /export/00d
+/dev/sde1             3.6T  3.3T  387G  90% /export/00e
+/dev/sdf1             3.6T  3.2T  422G  89% /export/00f
+/dev/sdg1             3.6T  3.2T  454G  88% /export/00g
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   90G  7.8G  93% /cvmfs/cms.cern.ch
+cvmfs2                 98G   90G  7.8G  93% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   90G  7.8G  93% /cvmfs/oasis.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/449931
+10000/449931
+20000/449931
+30000/449931
+40000/449931
+50000/449931
+60000/449931
+70000/449931
+80000/449931
+90000/449931
+100000/449931
+110000/449931
+120000/449931
+130000/449931
+140000/449931
+150000/449931
+160000/449931
+170000/449931
+180000/449931
+190000/449931
+200000/449931
+210000/449931
+220000/449931
+230000/449931
+240000/449931
+250000/449931
+260000/449931
+270000/449931
+280000/449931
+290000/449931
+300000/449931
+310000/449931
+320000/449931
+330000/449931
+340000/449931
+350000/449931
+360000/449931
+370000/449931
+380000/449931
+390000/449931
+400000/449931
+410000/449931
+420000/449931
+430000/449931
+440000/449931
+Macro finished: 
+CPU time (min)  = 3.76
+Real time (min) = 4.85098
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

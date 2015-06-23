@@ -37,12 +37,12 @@
 #include <TCut.h>
 #include <cstdlib>
 #include <cmath>
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldResponse.h"
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBayes.h"
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldSvd.h"
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBinByBin.h"
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/prior.h"
-#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/bayesianUnfold.h"
+/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldResponse.h" */
+/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBayes.h" */
+/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldSvd.h" */
+/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBinByBin.h" */
+/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/prior.h" */
+/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/bayesianUnfold.h" */
 
 using namespace std;
 
@@ -82,6 +82,34 @@ const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24,
 // this is the atlas pT binning for the Rcp plots. 
 /* static const int nbins_pt = 12;   */
 /* static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};   */
+
+TH1 *Truncate1D(TH1 * hInput, Int_t nbins, Int_t xLow, Int_t xHigh){
+
+  TH1F * hOutput = new TH1F("hOutput","",nbins,xLow, xHigh);
+  for(int j = 1; j<=hInput->GetNbinsX(); j++){
+    if( j >= xLow && j <= xHigh){ 
+    hOutput->SetBinContent(j-xLow, hInput->GetBinContent(j));
+    hOutput->SetBinError(j-xLow, hInput->GetBinError(j));
+    }
+  }
+  return hOutput; 
+}
+
+TH2 *Truncate2D(TH2 * hInput, Int_t nbins_X, Int_t xLow, Int_t xHigh, Int_t nbins_Y, Int_t yLow, Int_t yHigh){
+
+  TH2F * hOutput = new TH2F("hOutput","", nbins_X, xLow, xHigh, nbins_Y, yLow, yHigh);
+  for(int k = 1; k<=hInput->GetNbinsY(); k++){
+    for(int j = 1; j<=hInput->GetNbinsX(); j++){
+      if( j >= xLow && j <= xHigh && k >= yLow && k <= yHigh){ 
+	hOutput->SetBinContent(j-xLow,k-yLow, hInput->GetBinContent(j,k));
+	hOutput->SetBinError(j-xLow,k-yLow, hInput->GetBinError(j,k));
+      }
+    }
+  }
+
+  return hOutput; 
+}
+
 
 class SysData
 {

@@ -1,0 +1,72 @@
+
+----------------------------------------------------
+Job started on Mon Jun 22 20:52:15 EDT 2015 at WN: t2bat0238.cmsaf.mit.edu 
+Job is running on Linux t2bat0238.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G   63G  812G   8% /export/data1
+/dev/sdb1             1.8T  1.6T  213G  89% /export/00b
+/dev/sdc1             1.8T  1.7T  191G  90% /export/00c
+/dev/sdd1             1.8T  1.6T  196G  90% /export/00d
+/dev/sde1             1.8T  1.6T  200G  90% /export/00e
+/dev/sdf1             1.8T  1.6T  201G  90% /export/00f
+fuse_dfs              4.9P  4.4P  522T  90% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   59G   39G  61% /cvmfs/cms.cern.ch
+cvmfs2                 98G   59G   39G  61% /cvmfs/mu2e.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/427742
+10000/427742
+20000/427742
+30000/427742
+40000/427742
+50000/427742
+60000/427742
+70000/427742
+80000/427742
+90000/427742
+100000/427742
+110000/427742
+120000/427742
+130000/427742
+140000/427742
+150000/427742
+160000/427742
+170000/427742
+180000/427742
+190000/427742
+200000/427742
+210000/427742
+220000/427742
+230000/427742
+240000/427742
+250000/427742
+260000/427742
+270000/427742
+280000/427742
+290000/427742
+300000/427742
+310000/427742
+320000/427742
+330000/427742
+340000/427742
+350000/427742
+360000/427742
+370000/427742
+380000/427742
+390000/427742
+400000/427742
+410000/427742
+420000/427742
+Macro finished: 
+CPU time (min)  = 4.3875
+Real time (min) = 5.98872
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

@@ -1,0 +1,72 @@
+
+----------------------------------------------------
+Job started on Mon Jun 22 20:55:29 EDT 2015 at WN: t2bat0300.cmsaf.mit.edu 
+Job is running on Linux t2bat0300.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.2G   16G  18% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   98G  318G  24% /export/data1
+fuse_dfs              4.9P  4.4P  522T  90% /mnt/hadoop
+/dev/sdb1             2.7T  2.4T  306G  89% /export/00b
+/dev/sdc1             2.7T  2.4T  307G  89% /export/00c
+/dev/sdd1             2.7T  2.4T  298G  90% /export/00d
+/dev/sde1             2.7T  2.4T  313G  89% /export/00e
+/dev/sdf1             2.7T  2.4T  311G  89% /export/00f
+/dev/sdg1             2.7T  2.4T  300G  90% /export/00g
+/dev/sdh1             2.7T  2.4T  323G  89% /export/00h
+/dev/sdi1             2.7T  2.4T  312G  89% /export/00i
+/dev/sdj1             2.7T  2.4T  319G  89% /export/00j
+/dev/sdk1             2.7T  2.4T  314G  89% /export/00k
+/dev/sdl1             2.7T  2.5T  289G  90% /export/00l
+cvmfs2                 98G   96G  2.7G  98% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   96G  2.7G  98% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   96G  2.7G  98% /cvmfs/mu2e.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/350643
+10000/350643
+20000/350643
+30000/350643
+40000/350643
+50000/350643
+60000/350643
+70000/350643
+80000/350643
+90000/350643
+100000/350643
+110000/350643
+120000/350643
+130000/350643
+140000/350643
+150000/350643
+160000/350643
+170000/350643
+180000/350643
+190000/350643
+200000/350643
+210000/350643
+220000/350643
+230000/350643
+240000/350643
+250000/350643
+260000/350643
+270000/350643
+280000/350643
+290000/350643
+300000/350643
+310000/350643
+320000/350643
+330000/350643
+340000/350643
+350000/350643
+Macro finished: 
+CPU time (min)  = 3.433
+Real time (min) = 13.4483
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

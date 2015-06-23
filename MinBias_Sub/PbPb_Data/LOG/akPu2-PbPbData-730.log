@@ -1,0 +1,53 @@
+000 (426494.000.000) 06/22 20:50:11 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426494.000.000) 06/22 20:50:52 Job executing on host: <18.12.6.74:45110>
+...
+006 (426494.000.000) 06/22 20:51:00 Image size of job updated: 13384
+	2  -  MemoryUsage of job (MB)
+	1976  -  ResidentSetSize of job (KB)
+...
+006 (426494.000.000) 06/22 20:51:02 Image size of job updated: 245708
+	2  -  MemoryUsage of job (MB)
+	1976  -  ResidentSetSize of job (KB)
+...
+004 (426494.000.000) 06/22 20:51:02 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:00:01, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :        2        2          
+...
+009 (426494.000.000) 06/22 20:51:10 Job was aborted by the user.
+	via condor_rm (by user rkunnawa)
+...
+000 (426602.000.000) 06/22 20:51:45 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426602.000.000) 06/22 20:52:15 Job executing on host: <18.12.8.238:49782>
+...
+006 (426602.000.000) 06/22 20:52:24 Image size of job updated: 245716
+	60  -  MemoryUsage of job (MB)
+	60448  -  ResidentSetSize of job (KB)
+...
+006 (426602.000.000) 06/22 20:57:25 Image size of job updated: 247440
+	131  -  MemoryUsage of job (MB)
+	133300  -  ResidentSetSize of job (KB)
+...
+005 (426602.000.000) 06/22 20:58:17 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:04:12, Sys 0 00:00:04  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:04:12, Sys 0 00:00:04  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	495312  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	495312  -  Total Bytes Sent By Job
+	41910  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :      131      131          
+...

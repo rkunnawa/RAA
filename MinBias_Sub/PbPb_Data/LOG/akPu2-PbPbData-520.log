@@ -1,0 +1,49 @@
+000 (426452.000.000) 06/22 20:50:07 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426452.000.000) 06/22 20:50:55 Job executing on host: <18.12.8.113:46716>
+...
+006 (426452.000.000) 06/22 20:51:02 Image size of job updated: 143764
+	0  -  MemoryUsage of job (MB)
+	0  -  ResidentSetSize of job (KB)
+...
+004 (426452.000.000) 06/22 20:51:02 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      549      549          
+	   Memory (MB)          :        0        0          
+...
+009 (426452.000.000) 06/22 20:51:03 Job was aborted by the user.
+	via condor_rm (by user rkunnawa)
+...
+000 (426581.000.000) 06/22 20:51:43 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426581.000.000) 06/22 20:52:43 Job executing on host: <18.12.9.55:40657>
+...
+006 (426581.000.000) 06/22 20:52:51 Image size of job updated: 1
+	3  -  MemoryUsage of job (MB)
+	2376  -  ResidentSetSize of job (KB)
+...
+006 (426581.000.000) 06/22 20:57:51 Image size of job updated: 246924
+	120  -  MemoryUsage of job (MB)
+	121912  -  ResidentSetSize of job (KB)
+...
+005 (426581.000.000) 06/22 20:59:17 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:02:13, Sys 0 00:00:03  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:02:13, Sys 0 00:00:03  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	495249  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	495249  -  Total Bytes Sent By Job
+	41910  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :      120      120          
+...

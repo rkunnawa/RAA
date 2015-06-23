@@ -1,0 +1,49 @@
+000 (426470.000.000) 06/22 20:50:09 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426470.000.000) 06/22 20:50:53 Job executing on host: <18.12.8.125:49125>
+...
+006 (426470.000.000) 06/22 20:51:02 Image size of job updated: 184216
+	47  -  MemoryUsage of job (MB)
+	47184  -  ResidentSetSize of job (KB)
+...
+004 (426470.000.000) 06/22 20:51:02 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :       47       47          
+...
+009 (426470.000.000) 06/22 20:51:10 Job was aborted by the user.
+	via condor_rm (by user rkunnawa)
+...
+000 (426590.000.000) 06/22 20:51:44 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426590.000.000) 06/22 20:52:13 Job executing on host: <18.12.9.11:47957>
+...
+006 (426590.000.000) 06/22 20:52:21 Image size of job updated: 245024
+	46  -  MemoryUsage of job (MB)
+	46636  -  ResidentSetSize of job (KB)
+...
+006 (426590.000.000) 06/22 20:54:24 Image size of job updated: 246452
+	46  -  MemoryUsage of job (MB)
+	46636  -  ResidentSetSize of job (KB)
+...
+005 (426590.000.000) 06/22 20:54:24 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:01:29, Sys 0 00:00:02  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:01:29, Sys 0 00:00:02  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	494998  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	494998  -  Total Bytes Sent By Job
+	41910  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :       46       46          
+...

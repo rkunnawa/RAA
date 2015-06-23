@@ -65,8 +65,9 @@ void RAA_unfold_svd(int radius = 3,
 
   
   // Pawan's files:
-  TFile * fPbPb_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
-  TFile * fPP_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius));
+  TFile * fPbPb_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_TTree_PbPb_Data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
+  TFile * fPbPb_MC_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_TTree_PbPb_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,radius));
+  TFile * fPP_in = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_TTree_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, radius));
 
 
   // we also need to get the files for the MC closure histograms.
@@ -127,47 +128,42 @@ void RAA_unfold_svd(int radius = 3,
     // //dPbPb_TrgComb[i]->Scale(4*145.156*1e6);
     dPbPb_TrgComb[i]->Print("base");
 
-    float cutarray[6]={65,60,50,40,40,40};
-	
-    Float_t bincon=cutarray[i]; 
-    Int_t bincut= hMinBias[i]->FindBin(bincon); 
-
-    for(int k = bincut;k<=400;k++) 
-      { // cout<<"cent_ "<<i<<" pt "<< hMinBias[i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
-	hMinBias[i]->SetBinContent(k,0); 
-	hMinBias[i]->SetBinError(k,0);
-      } 
-
-    for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< hMinBias[i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
-      hMinBias[i]->SetBinContent(k,0); 
-      hMinBias[i]->SetBinError(k,0);
+    TH1F * hMinBias_test = new TH1F("hMinBias_test","",501,0,501);
+    for(int j = 0; j<hMinBias[i]->GetNbinsX();++j){
+      hMinBias_test->SetBinContent(j+1, hMinBias[i]->GetBinContent(j+1));
+      hMinBias_test->SetBinError(j+1, hMinBias[i]->GetBinError(j+1));
     }
+    hMinBias_test->Print("base");
+    hMinBias[i]->Print("base");
 
     Float_t   bin_no = dPbPb_TrgComb[i]->FindBin(15);
     Float_t bin_end=dPbPb_TrgComb[i]->FindBin(25);
       
-    Float_t   bin_nomb = hMinBias[i]->FindBin(15);
-    Float_t bin_endmb=hMinBias[i]->FindBin(25);
-    
-    float scalerangeweight=dPbPb_TrgComb[i]->Integral(bin_no,bin_end)/hMinBias[i]->Integral(bin_nomb,bin_endmb);
+    Float_t   bin_nomb = hMinBias_test->FindBin(15);
+    Float_t bin_endmb=hMinBias_test->FindBin(25);
+      
+    float scalerangeweight=dPbPb_TrgComb[i]->Integral(bin_no,bin_end)/hMinBias_test->Integral(bin_nomb,bin_endmb);
 
-    // correct for the minbias error before subtraction and scaling. 
-    for(int j = 0; j<hMinBias[i]->GetNbinsX(); ++j)
-      hMinBias[i]->SetBinError(j+1, (Float_t)hMinBias[i]->GetBinError(j+1)/scalerangeweight);
+    for(int j = 0; j<hMinBias_test->GetNbinsX(); ++j)
+      hMinBias_test->SetBinError(j+1,hMinBias_test->GetBinError(j+1)/scalerangeweight);
+
+    hMinBias_test->Scale(scalerangeweight);
 
     hMinBias[i]->Scale(scalerangeweight);
-    dPbPb_TrgComb[i]->Add(hMinBias[i], -1);
+    dPbPb_TrgComb[i]->Add(hMinBias_test, -1);
+
+    delete hMinBias_test;
     
     dPbPb_TrgComb[i] = (TH1F*)dPbPb_TrgComb[i]->Rebin(nbins_pt, Form("PbPb_data_minbiasSub_cent%d",i), boundaries_pt);
     divideBinWidth(dPbPb_TrgComb[i]);
 
     //dPbPb_TrgComb[i]->Scale(1./(145.156 * 1e3)); // scale it to milli barns which is the luminosity of the MC 
 
-    mPbPb_Gen[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_anaBin_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i));
+    mPbPb_Gen[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_anaBin_JetComb_gen_R%d_%s_cent%d",radius,etaWidth,i));
     mPbPb_Gen[i]->Print("base");
-    mPbPb_Reco[i] = (TH1F*)fPbPb_in->Get(Form("hpbpb_anaBin_JetComb_reco_R%d_%s_cent%d",radius,etaWidth,i));
+    mPbPb_Reco[i] = (TH1F*)fPbPb_MC_in->Get(Form("hpbpb_anaBin_JetComb_reco_R%d_%s_cent%d",radius,etaWidth,i));
     mPbPb_Reco[i]->Print("base");
-    mPbPb_Matrix[i] = (TH2F*)fPbPb_in->Get(Form("hpbpb_anaBin_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
+    mPbPb_Matrix[i] = (TH2F*)fPbPb_MC_in->Get(Form("hpbpb_anaBin_Trans_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i));
     mPbPb_Matrix[i]->Print("base");
 
     cout<<"matrix bin content 100 before scaling = "<<mPbPb_Matrix[i]->GetBinContent(22,22)<<endl;
@@ -198,27 +194,27 @@ void RAA_unfold_svd(int radius = 3,
       mPbPb_Gen[i]->SetBinError(k,0);
       mPbPb_Reco[i]->SetBinError(k,0);
       for(int l = 1;l<=nbins_pt;l++){
-    	mPbPb_Matrix[i]->SetBinContent(k,l,0);
+    	//mPbPb_Matrix[i]->SetBinContent(k,l,0);
     	mPbPb_Matrix[i]->SetBinContent(l,k,0);
-    	mPbPb_Matrix[i]->SetBinError(k,l,0);
+    	//mPbPb_Matrix[i]->SetBinError(k,l,0);
     	mPbPb_Matrix[i]->SetBinError(l,k,0);	
       }
     }
 
-    for(int k = 28;k<=nbins_pt;k++){
-      dPbPb_TrgComb[i]->SetBinContent(k,0);
-      mPbPb_Gen[i]->SetBinContent(k,0);
-      mPbPb_Reco[i]->SetBinContent(k,0);
-      dPbPb_TrgComb[i]->SetBinError(k,0);
-      mPbPb_Gen[i]->SetBinError(k,0);
-      mPbPb_Reco[i]->SetBinError(k,0);
-      for(int l = 1;l<=nbins_pt;l++){
-    	mPbPb_Matrix[i]->SetBinContent(k,l,0);
-    	mPbPb_Matrix[i]->SetBinContent(l,k,0);
-    	mPbPb_Matrix[i]->SetBinError(k,l,0);
-    	mPbPb_Matrix[i]->SetBinError(l,k,0);	
-      }
-    }
+    // for(int k = 28;k<=nbins_pt;k++){
+    //   dPbPb_TrgComb[i]->SetBinContent(k,0);
+    //   mPbPb_Gen[i]->SetBinContent(k,0);
+    //   mPbPb_Reco[i]->SetBinContent(k,0);
+    //   dPbPb_TrgComb[i]->SetBinError(k,0);
+    //   mPbPb_Gen[i]->SetBinError(k,0);
+    //   mPbPb_Reco[i]->SetBinError(k,0);
+    //   for(int l = 1;l<=nbins_pt;l++){
+    // 	mPbPb_Matrix[i]->SetBinContent(k,l,0);
+    // 	mPbPb_Matrix[i]->SetBinContent(l,k,0);
+    // 	mPbPb_Matrix[i]->SetBinError(k,l,0);
+    // 	mPbPb_Matrix[i]->SetBinError(l,k,0);	
+    //   }
+    // }
   }
 
   dPP_Comb = (TH1F*)fPP_in->Get(Form("hpp_anaBin_HLTComb_R%d_%s",radius,etaWidth));
@@ -251,7 +247,7 @@ void RAA_unfold_svd(int radius = 3,
   
   Int_t nSVDIter = 1.0;
   
-  for(int j = 2; j<21; ++j){
+  for(int j = 3; j<=7; ++j){
     nSVDIter = j;
     
     for(int i = 0;i<nbins_cent;++i){

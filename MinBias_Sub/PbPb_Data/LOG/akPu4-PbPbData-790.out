@@ -1,0 +1,65 @@
+
+----------------------------------------------------
+Job started on Mon Jun 22 20:55:29 EDT 2015 at WN: t2bat0225.cmsaf.mit.edu 
+Job is running on Linux t2bat0225.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.5G   17G  13% /
+tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G   92G  783G  11% /export/data1
+/dev/sdb1             1.8T  1.7T  192G  90% /export/00b
+/dev/sdc1             1.8T  1.6T  199G  90% /export/00c
+/dev/sdd1             1.8T  1.6T  199G  90% /export/00d
+/dev/sde1             1.8T  1.6T  205G  89% /export/00e
+/dev/sdf1             1.8T  1.6T  203G  89% /export/00f
+fuse_dfs              4.9P  4.4P  522T  90% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   83G   15G  85% /cvmfs/cms.cern.ch
+cvmfs2                 98G   83G   15G  85% /cvmfs/atlas.cern.ch
+cvmfs2                 98G   83G   15G  85% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   83G   15G  85% /cvmfs/atlas-condb.cern.ch
+cvmfs2                 98G   83G   15G  85% /cvmfs/oasis.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/322741
+10000/322741
+20000/322741
+30000/322741
+40000/322741
+50000/322741
+60000/322741
+70000/322741
+80000/322741
+90000/322741
+100000/322741
+110000/322741
+120000/322741
+130000/322741
+140000/322741
+150000/322741
+160000/322741
+170000/322741
+180000/322741
+190000/322741
+200000/322741
+210000/322741
+220000/322741
+230000/322741
+240000/322741
+250000/322741
+260000/322741
+270000/322741
+280000/322741
+290000/322741
+300000/322741
+310000/322741
+320000/322741
+Macro finished: 
+CPU time (min)  = 3.47783
+Real time (min) = 5.07064
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

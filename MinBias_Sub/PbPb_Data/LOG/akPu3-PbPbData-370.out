@@ -1,0 +1,70 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 16:48:36 EDT 2015 at WN: t2bat0312.cmsaf.mit.edu 
+Job is running on Linux t2bat0312.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.9G   16G  16% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   53G  363G  13% /export/data1
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.2T  408G  89% /export/00b
+/dev/sdc1             3.6T  3.2T  405G  89% /export/00c
+/dev/sdd1             3.6T  3.2T  409G  89% /export/00d
+/dev/sde1             3.6T  3.2T  403G  90% /export/00e
+/dev/sdf1             3.6T  3.2T  404G  90% /export/00f
+/dev/sdg1             3.6T  3.3T  388G  90% /export/00g
+cvmfs2                 98G   50G   48G  52% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   50G   48G  52% /cvmfs/oasis.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/390868
+10000/390868
+20000/390868
+30000/390868
+40000/390868
+50000/390868
+60000/390868
+70000/390868
+80000/390868
+90000/390868
+100000/390868
+110000/390868
+120000/390868
+130000/390868
+140000/390868
+150000/390868
+160000/390868
+170000/390868
+180000/390868
+190000/390868
+200000/390868
+210000/390868
+220000/390868
+230000/390868
+240000/390868
+250000/390868
+260000/390868
+270000/390868
+280000/390868
+290000/390868
+300000/390868
+310000/390868
+320000/390868
+330000/390868
+340000/390868
+350000/390868
+360000/390868
+370000/390868
+380000/390868
+390000/390868
+Macro finished: 
+CPU time (min)  = 3.06517
+Real time (min) = 5.35063
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

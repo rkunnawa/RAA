@@ -1,0 +1,67 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 09:57:42 EDT 2015 at WN: t2bat0121.cmsaf.mit.edu 
+Job is running on Linux t2bat0121.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                 7.8G     0  7.8G   0% /dev/shm
+/dev/sda1              97M   33M   60M  36% /boot
+/dev/sda4             415G   89G  326G  22% /export/data1
+fuse_dfs              4.9P  4.4P  518T  90% /mnt/hadoop
+/dev/sdb1             1.8T  1.6T  213G  89% /export/00b
+/dev/sdc1             1.8T  1.7T  185G  90% /export/00c
+/dev/sdd1             1.8T  1.6T  202G  89% /export/00d
+/dev/sde1             1.8T  1.7T  195G  90% /export/00e
+/dev/sdf1             1.8T  1.6T  209G  89% /export/00f
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   88G   10G  90% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   88G   10G  90% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   88G   10G  90% /cvmfs/cms.cern.ch
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/368126
+10000/368126
+20000/368126
+30000/368126
+40000/368126
+50000/368126
+60000/368126
+70000/368126
+80000/368126
+90000/368126
+100000/368126
+110000/368126
+120000/368126
+130000/368126
+140000/368126
+150000/368126
+160000/368126
+170000/368126
+180000/368126
+190000/368126
+200000/368126
+210000/368126
+220000/368126
+230000/368126
+240000/368126
+250000/368126
+260000/368126
+270000/368126
+280000/368126
+290000/368126
+300000/368126
+310000/368126
+320000/368126
+330000/368126
+340000/368126
+350000/368126
+360000/368126
+Macro finished: 
+CPU time (min)  = 2.71533
+Real time (min) = 3.2633
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

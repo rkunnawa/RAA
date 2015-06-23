@@ -1,0 +1,72 @@
+
+----------------------------------------------------
+Job started on Mon Jun 22 20:55:58 EDT 2015 at WN: hibat0057.cmsaf.mit.edu 
+Job is running on Linux hibat0057.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.3G   16G  18% /
+tmpfs                  24G     0   24G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             873G   80G  794G  10% /export/data1
+/dev/sdb1             2.7T  2.5T  260G  91% /export/00b
+/dev/sdc1             2.7T  2.5T  268G  91% /export/00c
+/dev/sdd1             2.7T  2.5T  281G  90% /export/00d
+/dev/sde1             2.7T  2.5T  255G  91% /export/00e
+/dev/sdf1             2.7T  2.5T  256G  91% /export/00f
+fuse_dfs              4.9P  4.4P  522T  90% /mnt/hadoop
+/dev/sdg1             3.6T  3.1T  507G  87% /export/00g
+/dev/sdh1             3.6T  3.1T  509G  87% /export/00h
+cvmfs2                 98G   78G   20G  80% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   78G   20G  80% /cvmfs/mu2e.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/405935
+10000/405935
+20000/405935
+30000/405935
+40000/405935
+50000/405935
+60000/405935
+70000/405935
+80000/405935
+90000/405935
+100000/405935
+110000/405935
+120000/405935
+130000/405935
+140000/405935
+150000/405935
+160000/405935
+170000/405935
+180000/405935
+190000/405935
+200000/405935
+210000/405935
+220000/405935
+230000/405935
+240000/405935
+250000/405935
+260000/405935
+270000/405935
+280000/405935
+290000/405935
+300000/405935
+310000/405935
+320000/405935
+330000/405935
+340000/405935
+350000/405935
+360000/405935
+370000/405935
+380000/405935
+390000/405935
+400000/405935
+Macro finished: 
+CPU time (min)  = 4.54217
+Real time (min) = 6.00907
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

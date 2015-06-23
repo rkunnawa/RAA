@@ -1,0 +1,60 @@
+
+----------------------------------------------------
+Job started on Mon Jun 22 20:55:27 EDT 2015 at WN: t2bat0313.cmsaf.mit.edu 
+Job is running on Linux t2bat0313.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.5G   17G  14% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   90G  326G  22% /export/data1
+fuse_dfs              4.9P  4.4P  522T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.2T  415G  89% /export/00b
+/dev/sdc1             3.6T  3.2T  398G  90% /export/00c
+/dev/sdd1             3.6T  3.2T  413G  89% /export/00d
+/dev/sde1             3.6T  3.3T  375G  90% /export/00e
+cvmfs2                 98G   86G   13G  88% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   86G   13G  88% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   86G   13G  88% /cvmfs/cdfcfs.fnal.gov
+cvmfs2                 98G   86G   13G  88% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   86G   13G  88% /cvmfs/mu2e.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/284850
+10000/284850
+20000/284850
+30000/284850
+40000/284850
+50000/284850
+60000/284850
+70000/284850
+80000/284850
+90000/284850
+100000/284850
+110000/284850
+120000/284850
+130000/284850
+140000/284850
+150000/284850
+160000/284850
+170000/284850
+180000/284850
+190000/284850
+200000/284850
+210000/284850
+220000/284850
+230000/284850
+240000/284850
+250000/284850
+260000/284850
+270000/284850
+280000/284850
+Macro finished: 
+CPU time (min)  = 2.74133
+Real time (min) = 3.74187
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

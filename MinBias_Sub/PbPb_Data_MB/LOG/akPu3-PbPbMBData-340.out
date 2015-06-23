@@ -1,0 +1,86 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 17:54:18 EDT 2015 at WN: t2bat0328.cmsaf.mit.edu 
+Job is running on Linux t2bat0328.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.6G   17G  14% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   78G  338G  19% /export/data1
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.2T  403G  90% /export/00b
+/dev/sdc1             3.6T  3.3T  383G  90% /export/00c
+/dev/sdd1             3.6T  3.2T  398G  90% /export/00d
+/dev/sde1             3.6T  3.2T  391G  90% /export/00e
+/dev/sdf1             3.6T  3.2T  394G  90% /export/00f
+/dev/sdg1             3.6T  3.2T  448G  88% /export/00g
+cvmfs2                 98G   75G   24G  77% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   75G   24G  77% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   75G   24G  77% /cvmfs/grid.cern.ch
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/541336
+10000/541336
+20000/541336
+30000/541336
+40000/541336
+50000/541336
+60000/541336
+70000/541336
+80000/541336
+90000/541336
+100000/541336
+110000/541336
+120000/541336
+130000/541336
+140000/541336
+150000/541336
+160000/541336
+170000/541336
+180000/541336
+190000/541336
+200000/541336
+210000/541336
+220000/541336
+230000/541336
+240000/541336
+250000/541336
+260000/541336
+270000/541336
+280000/541336
+290000/541336
+300000/541336
+310000/541336
+320000/541336
+330000/541336
+340000/541336
+350000/541336
+360000/541336
+370000/541336
+380000/541336
+390000/541336
+400000/541336
+410000/541336
+420000/541336
+430000/541336
+440000/541336
+450000/541336
+460000/541336
+470000/541336
+480000/541336
+490000/541336
+500000/541336
+510000/541336
+520000/541336
+530000/541336
+540000/541336
+Macro finished: 
+CPU time (min)  = 3.62183
+Real time (min) = 4.64611
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

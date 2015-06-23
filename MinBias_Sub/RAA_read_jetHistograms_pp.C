@@ -38,6 +38,9 @@
 // static const int nbins_pt = 30;
 // static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
 
+static const int nbins_pt = 17;
+static const double boundaries_pt[nbins_pt+1] = { 32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330};
+
 // the following bins is the cms pp nlo pt bins
 // static const int nbins_pt = 29;
 // static const double boundaries_pt[nbins_pt+1] = {22, 27, 33, 39, 47, 55, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245, 272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638,790,967};
@@ -47,17 +50,19 @@
 // static const double boundaries_pt[nbins_pt+1] = {31., 39., 50., 63., 79., 100., 125., 158., 199., 251., 316., 398., 501};
 
 // the following//  bins is the atlas Rcp pt binning
-static const int nbins_pt = 12;
-static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};
+// static const int nbins_pt = 12;
+// static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};
 
 const double kdelrcut=0.3;
 
 using namespace std;
 
 void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20", 
-				     Int_t radius = 2, 
-				     Int_t etaLow = 20, 
-				     Int_t etaHigh = 20){
+			       Int_t radius = 3, 
+			       Int_t etaLow = 20, 
+			       Int_t etaHigh = 20,
+			       char * ptbins = (char*)"finebinscut")
+{
 
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
@@ -323,6 +328,9 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
   Float_t phSum_1[1000], phSum_2[1000];
   Float_t neSum_1[1000], neSum_2[1000];
   Float_t muSum_1[1000], muSum_2[1000];
+  Float_t phMax_1[1000], phMax_2[1000];
+  Float_t neMax_1[1000], neMax_2[1000];
+  Float_t muMax_1[1000], muMax_2[1000];
   Int_t jet40_1, jet60_1, jet80_1;
   Int_t jet40_p_1, jet60_p_1, jet80_p_1;
   Int_t jet40_2, jet60_2, jet80_2;
@@ -344,6 +352,9 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
   Data_matched->SetBranchAddress("phSum",&phSum_1);
   Data_matched->SetBranchAddress("neSum",&neSum_1);
   Data_matched->SetBranchAddress("muSum",&muSum_1);
+  Data_matched->SetBranchAddress("phMax",&phMax_1);
+  Data_matched->SetBranchAddress("neMax",&neMax_1);
+  Data_matched->SetBranchAddress("muMax",&muMax_1);
   Data_matched->SetBranchAddress("jet40",&jet40_1);
   Data_matched->SetBranchAddress("jet60",&jet60_1);
   Data_matched->SetBranchAddress("jet80",&jet80_1);
@@ -378,6 +389,9 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
   MC_matched->SetBranchAddress("eMax",&eMax_2);
   MC_matched->SetBranchAddress("vz",&vz);
   MC_matched->SetBranchAddress("chMax",&chMax_2);
+  MC_matched->SetBranchAddress("phMax",&phMax_2);
+  MC_matched->SetBranchAddress("neMax",&neMax_2);
+  MC_matched->SetBranchAddress("muMax",&muMax_2);
   MC_matched->SetBranchAddress("chSum",&chSum_2);
   MC_matched->SetBranchAddress("phSum",&phSum_2);
   MC_matched->SetBranchAddress("neSum",&neSum_2);
@@ -416,7 +430,6 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
   // data loop
   long entries = Data_matched->GetEntries();
   //entries = 1000;
-#if 0
   cout<<"matched Data ntuple "<<endl;
 
   Float_t Jet40_prescl = 9.275;
@@ -427,6 +440,8 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
     Data_matched->GetEntry(nentry);
 
     for(int g = 0; g<npf_1; ++g){
+
+      //if(muMax_1[g]/(chMax_1[g]+phMax_1[g]+neMax_1[g]+muMax_1[g]+eMax_1[g]) > 0.975) continue;
 
       Float_t Sumcand = chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g];
 
@@ -517,7 +532,6 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
     
   }// data ntuple loop
 
-#endif
 #if 0
   // data unmatched loop:
   entries = Data_unmatched->GetEntries();
@@ -600,6 +614,7 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
       refid = pfrefidx_2[g];
       if(subid_2[refid] != 0 || fabs(refdrjt_2[refid]) > kdelrcut) continue;
       if(refid < 0) continue;
+      //if(muMax_1[g]/(chMax_2[g]+phMax_2[g]+neMax_2[g]+muMax_2[g]+eMax_2[g]) > 0.975) continue;
 
       if(isSymm && TMath::Abs(eta_2[g]) > (Float_t)etaHigh/10) continue;       
       if(!isSymm && (TMath::Abs(eta_2[g]) < (Float_t)etaLow/10 || TMath::Abs(eta_2[g]) > (Float_t)etaHigh/10)) continue;
@@ -907,7 +922,7 @@ void RAA_read_jetHistograms_pp(char * etaWidth = (char*)"20_eta_20",
   }// mc unmatched  ntuple loop
 #endif
 
-  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PP_MC_spectra_residualFactor_atlasRcpbins_%s_R0p%d.root",ntuple, etaWidth, radius),"RECREATE");
+  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PP_Data_MC_spectra_residualFactor_%s_%s_R0p%d.root",ntuple, ptbins, etaWidth, radius),"RECREATE");
   fout.cd();
   
   hpp_TrgObjComb->Add(hpp_TrgObj80);

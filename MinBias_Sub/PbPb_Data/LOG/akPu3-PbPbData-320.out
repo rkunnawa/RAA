@@ -1,0 +1,59 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 16:48:38 EDT 2015 at WN: hibat0089.cmsaf.mit.edu 
+Job is running on Linux hibat0089.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.4G   16G  19% /
+tmpfs                  24G     0   24G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             873G   93G  781G  11% /export/data1
+/dev/sdb1             2.7T  2.7T   85G  97% /export/00b
+/dev/sdc1             2.7T  2.7T   73G  98% /export/00c
+/dev/sdd1             2.7T  2.7T   70G  98% /export/00d
+/dev/sde1             2.7T  2.7T   80G  98% /export/00e
+/dev/sdf1             2.7T  2.7T   72G  98% /export/00f
+/dev/sdg1             3.6T  3.1T  587G  85% /export/00g
+/dev/sdh1             3.6T  3.1T  565G  85% /export/00h
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+cvmfs2                 98G   92G  6.5G  94% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   92G  6.5G  94% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   92G  6.5G  94% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   92G  6.5G  94% /cvmfs/fermilab.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/255811
+10000/255811
+20000/255811
+30000/255811
+40000/255811
+50000/255811
+60000/255811
+70000/255811
+80000/255811
+90000/255811
+100000/255811
+110000/255811
+120000/255811
+130000/255811
+140000/255811
+150000/255811
+160000/255811
+170000/255811
+180000/255811
+190000/255811
+200000/255811
+210000/255811
+220000/255811
+230000/255811
+240000/255811
+250000/255811
+Macro finished: 
+CPU time (min)  = 2.67133
+Real time (min) = 4.08334
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

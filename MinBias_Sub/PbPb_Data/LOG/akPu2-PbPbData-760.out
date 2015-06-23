@@ -1,0 +1,50 @@
+
+----------------------------------------------------
+Job started on Mon Jun 22 20:52:15 EDT 2015 at WN: hibat0043.cmsaf.mit.edu 
+Job is running on Linux hibat0043.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.3G   16G  18% /
+tmpfs                  24G     0   24G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G  104G  771G  12% /export/data1
+/dev/sdb1             1.8T  1.7T  195G  90% /export/00b
+/dev/sdc1             1.8T  1.6T  202G  90% /export/00c
+/dev/sdd1             1.8T  1.6T  207G  89% /export/00d
+/dev/sde1             1.8T  1.7T  194G  90% /export/00e
+/dev/sdf1             1.8T  1.6T  197G  90% /export/00f
+fuse_dfs              4.9P  4.4P  522T  90% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   98G   60M 100% /cvmfs/cms.cern.ch
+cvmfs2                 98G   98G   60M 100% /cvmfs/oasis.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/208816
+10000/208816
+20000/208816
+30000/208816
+40000/208816
+50000/208816
+60000/208816
+70000/208816
+80000/208816
+90000/208816
+100000/208816
+110000/208816
+120000/208816
+130000/208816
+140000/208816
+150000/208816
+160000/208816
+170000/208816
+180000/208816
+190000/208816
+200000/208816
+Macro finished: 
+CPU time (min)  = 2.27833
+Real time (min) = 3.1979
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

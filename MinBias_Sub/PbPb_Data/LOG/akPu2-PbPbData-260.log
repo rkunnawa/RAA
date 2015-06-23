@@ -1,0 +1,53 @@
+000 (426400.000.000) 06/22 20:50:02 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426400.000.000) 06/22 20:50:44 Job executing on host: <18.12.8.213:46424>
+...
+006 (426400.000.000) 06/22 20:50:52 Image size of job updated: 147020
+	35  -  MemoryUsage of job (MB)
+	35376  -  ResidentSetSize of job (KB)
+...
+006 (426400.000.000) 06/22 20:51:02 Image size of job updated: 245064
+	35  -  MemoryUsage of job (MB)
+	35376  -  ResidentSetSize of job (KB)
+...
+004 (426400.000.000) 06/22 20:51:02 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:00:04, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :       35       35          
+...
+009 (426400.000.000) 06/22 20:51:10 Job was aborted by the user.
+	via condor_rm (by user rkunnawa)
+...
+000 (426555.000.000) 06/22 20:51:40 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426555.000.000) 06/22 20:52:11 Job executing on host: <18.12.9.14:42117>
+...
+006 (426555.000.000) 06/22 20:52:19 Image size of job updated: 244980
+	87  -  MemoryUsage of job (MB)
+	88384  -  ResidentSetSize of job (KB)
+...
+006 (426555.000.000) 06/22 20:54:34 Image size of job updated: 371272
+	87  -  MemoryUsage of job (MB)
+	88384  -  ResidentSetSize of job (KB)
+...
+005 (426555.000.000) 06/22 20:54:34 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:01:16, Sys 0 00:00:02  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:01:16, Sys 0 00:00:02  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	494893  -  Run Bytes Sent By Job
+	41910  -  Run Bytes Received By Job
+	494893  -  Total Bytes Sent By Job
+	41910  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      550      550          
+	   Memory (MB)          :       87       87          
+...

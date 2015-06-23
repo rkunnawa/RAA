@@ -1,0 +1,88 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 17:54:16 EDT 2015 at WN: t2bat0304.cmsaf.mit.edu 
+Job is running on Linux t2bat0304.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.7G   17G  14% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   96G  320G  24% /export/data1
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.2T  441G  88% /export/00b
+/dev/sdc1             3.6T  3.2T  405G  89% /export/00c
+/dev/sdd1             3.6T  3.2T  398G  90% /export/00d
+/dev/sde1             3.6T  3.2T  407G  89% /export/00e
+/dev/sdf1             3.6T  3.2T  404G  89% /export/00f
+/dev/sdg1             3.6T  3.2T  417G  89% /export/00g
+cvmfs2                 98G   93G  5.0G  95% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   93G  5.0G  95% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   93G  5.0G  95% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   93G  5.0G  95% /cvmfs/fermilab.opensciencegrid.org
+cvmfs2                 98G   93G  5.0G  95% /cvmfs/grid.cern.ch
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/547899
+10000/547899
+20000/547899
+30000/547899
+40000/547899
+50000/547899
+60000/547899
+70000/547899
+80000/547899
+90000/547899
+100000/547899
+110000/547899
+120000/547899
+130000/547899
+140000/547899
+150000/547899
+160000/547899
+170000/547899
+180000/547899
+190000/547899
+200000/547899
+210000/547899
+220000/547899
+230000/547899
+240000/547899
+250000/547899
+260000/547899
+270000/547899
+280000/547899
+290000/547899
+300000/547899
+310000/547899
+320000/547899
+330000/547899
+340000/547899
+350000/547899
+360000/547899
+370000/547899
+380000/547899
+390000/547899
+400000/547899
+410000/547899
+420000/547899
+430000/547899
+440000/547899
+450000/547899
+460000/547899
+470000/547899
+480000/547899
+490000/547899
+500000/547899
+510000/547899
+520000/547899
+530000/547899
+540000/547899
+Macro finished: 
+CPU time (min)  = 3.48567
+Real time (min) = 5.67088
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22
