@@ -1,0 +1,93 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 17:54:17 EDT 2015 at WN: t2bat0285.cmsaf.mit.edu 
+Job is running on Linux t2bat0285.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  6.1G   13G  33% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   96G  320G  23% /export/data1
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+/dev/sdb1             2.7T  2.4T  294G  90% /export/00b
+/dev/sdc1             2.7T  2.5T  292G  90% /export/00c
+/dev/sdd1             2.7T  2.4T  307G  89% /export/00d
+/dev/sde1             2.7T  2.4T  327G  89% /export/00e
+/dev/sdf1             2.7T  2.4T  302G  90% /export/00f
+/dev/sdg1             2.7T  2.4T  307G  89% /export/00g
+/dev/sdh1             2.7T  2.4T  320G  89% /export/00h
+/dev/sdi1             2.7T  2.4T  305G  89% /export/00i
+/dev/sdj1             2.7T  2.4T  316G  89% /export/00j
+/dev/sdk1             2.7T  2.4T  307G  89% /export/00k
+/dev/sdl1             2.7T  2.4T  309G  89% /export/00l
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   90G  8.5G  92% /cvmfs/cms.cern.ch
+cvmfs2                 98G   90G  8.5G  92% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   90G  8.5G  92% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   90G  8.5G  92% /cvmfs/cdfcfs.fnal.gov
+cvmfs2                 98G   90G  8.5G  92% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   90G  8.5G  92% /cvmfs/grid.cern.ch
+cvmfs2                 98G   90G  8.5G  92% /cvmfs/fermilab.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/523842
+10000/523842
+20000/523842
+30000/523842
+40000/523842
+50000/523842
+60000/523842
+70000/523842
+80000/523842
+90000/523842
+100000/523842
+110000/523842
+120000/523842
+130000/523842
+140000/523842
+150000/523842
+160000/523842
+170000/523842
+180000/523842
+190000/523842
+200000/523842
+210000/523842
+220000/523842
+230000/523842
+240000/523842
+250000/523842
+260000/523842
+270000/523842
+280000/523842
+290000/523842
+300000/523842
+310000/523842
+320000/523842
+330000/523842
+340000/523842
+350000/523842
+360000/523842
+370000/523842
+380000/523842
+390000/523842
+400000/523842
+410000/523842
+420000/523842
+430000/523842
+440000/523842
+450000/523842
+460000/523842
+470000/523842
+480000/523842
+490000/523842
+500000/523842
+510000/523842
+520000/523842
+Macro finished: 
+CPU time (min)  = 4.3565
+Real time (min) = 17.952
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

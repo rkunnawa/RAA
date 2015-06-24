@@ -1,0 +1,121 @@
+
+----------------------------------------------------
+Job started on Tue Jun 23 17:54:15 EDT 2015 at WN: t2bat0312.cmsaf.mit.edu 
+Job is running on Linux t2bat0312.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.9G   16G  16% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   53G  363G  13% /export/data1
+fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.2T  408G  89% /export/00b
+/dev/sdc1             3.6T  3.2T  405G  89% /export/00c
+/dev/sdd1             3.6T  3.2T  409G  89% /export/00d
+/dev/sde1             3.6T  3.2T  403G  90% /export/00e
+/dev/sdf1             3.6T  3.2T  404G  90% /export/00f
+/dev/sdg1             3.6T  3.3T  388G  90% /export/00g
+cvmfs2                 98G   51G   48G  52% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   51G   48G  52% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   51G   48G  52% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   51G   48G  52% /cvmfs/cdfcfs.fnal.gov
+cvmfs2                 98G   51G   48G  52% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   51G   48G  52% /cvmfs/grid.cern.ch
+cvmfs2                 98G   51G   48G  52% /cvmfs/fermilab.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/859705
+10000/859705
+20000/859705
+30000/859705
+40000/859705
+50000/859705
+60000/859705
+70000/859705
+80000/859705
+90000/859705
+100000/859705
+110000/859705
+120000/859705
+130000/859705
+140000/859705
+150000/859705
+160000/859705
+170000/859705
+180000/859705
+190000/859705
+200000/859705
+210000/859705
+220000/859705
+230000/859705
+240000/859705
+250000/859705
+260000/859705
+270000/859705
+280000/859705
+290000/859705
+300000/859705
+310000/859705
+320000/859705
+330000/859705
+340000/859705
+350000/859705
+360000/859705
+370000/859705
+380000/859705
+390000/859705
+400000/859705
+410000/859705
+420000/859705
+430000/859705
+440000/859705
+450000/859705
+460000/859705
+470000/859705
+480000/859705
+490000/859705
+500000/859705
+510000/859705
+520000/859705
+530000/859705
+540000/859705
+550000/859705
+560000/859705
+570000/859705
+580000/859705
+590000/859705
+600000/859705
+610000/859705
+620000/859705
+630000/859705
+640000/859705
+650000/859705
+660000/859705
+670000/859705
+680000/859705
+690000/859705
+700000/859705
+710000/859705
+720000/859705
+730000/859705
+740000/859705
+750000/859705
+760000/859705
+770000/859705
+780000/859705
+790000/859705
+800000/859705
+810000/859705
+820000/859705
+830000/859705
+840000/859705
+850000/859705
+Macro finished: 
+CPU time (min)  = 5.6835
+Real time (min) = 6.95936
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

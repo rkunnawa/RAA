@@ -1,0 +1,51 @@
+000 (426907.000.000) 06/22 21:37:32 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426907.000.000) 06/22 21:37:52 Job executing on host: <18.12.8.170:47446>
+...
+006 (426907.000.000) 06/22 21:38:00 Image size of job updated: 69048
+	15  -  MemoryUsage of job (MB)
+	14916  -  ResidentSetSize of job (KB)
+...
+006 (426907.000.000) 06/22 21:43:00 Image size of job updated: 409364
+	197  -  MemoryUsage of job (MB)
+	201476  -  ResidentSetSize of job (KB)
+...
+006 (426907.000.000) 06/22 21:48:00 Image size of job updated: 410204
+	198  -  MemoryUsage of job (MB)
+	202272  -  ResidentSetSize of job (KB)
+...
+006 (426907.000.000) 06/22 21:58:02 Image size of job updated: 410656
+	199  -  MemoryUsage of job (MB)
+	202776  -  ResidentSetSize of job (KB)
+...
+006 (426907.000.000) 06/22 22:03:02 Image size of job updated: 411096
+	199  -  MemoryUsage of job (MB)
+	203216  -  ResidentSetSize of job (KB)
+...
+006 (426907.000.000) 06/22 22:08:03 Image size of job updated: 411316
+	199  -  MemoryUsage of job (MB)
+	203216  -  ResidentSetSize of job (KB)
+...
+006 (426907.000.000) 06/22 22:13:04 Image size of job updated: 416676
+	226  -  MemoryUsage of job (MB)
+	230696  -  ResidentSetSize of job (KB)
+...
+006 (426907.000.000) 06/22 22:18:04 Image size of job updated: 416676
+	226  -  MemoryUsage of job (MB)
+	230700  -  ResidentSetSize of job (KB)
+...
+005 (426907.000.000) 06/22 22:19:48 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:17:47, Sys 0 00:00:07  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:17:47, Sys 0 00:00:07  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	128190  -  Run Bytes Sent By Job
+	28496  -  Run Bytes Received By Job
+	128190  -  Total Bytes Sent By Job
+	28496  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      178      178          
+	   Memory (MB)          :      226      226          
+...
