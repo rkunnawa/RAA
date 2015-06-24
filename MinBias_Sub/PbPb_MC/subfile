@@ -9,13 +9,13 @@ Environment = "HOSTNAME=hidsk0001.cmsaf.mit.edu"
 Executable     = raa_pbpb_mc_condor_run.sh
 +AccountingGroup = "group_cmshi.rkunnawa"
 #+IsMadgraph = 1
-Arguments      = 8 9 3 PbPb_MC_histograms_FromForest_akPu3_20_eta_20_9.root
+Arguments      = 0 9 3 PbPb_MC_histograms_FromForest_akPu3_20_eta_20_9.root
 # input files. in this case, there are none.
 Input          = /dev/null
 # log files
-Error          = LOG/akPu3-PbPbMC-8.err
-Output         = LOG/akPu3-PbPbMC-8.out
-Log            = LOG/akPu3-PbPbMC-8.log
+Error          = LOG/akPu3-PbPbMC-9.err
+Output         = LOG/akPu3-PbPbMC-9.out
+Log            = LOG/akPu3-PbPbMC-9.log
 # get the environment (path, etc.)
 Getenv         = True
 # prefer to run on fast computers

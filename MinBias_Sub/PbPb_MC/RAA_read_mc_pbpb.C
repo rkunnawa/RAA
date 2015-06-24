@@ -165,10 +165,10 @@ bool compare_pt(Jet jet1, Jet jet2){
 
 using namespace std;
 
-void RAA_read_mc_pbpb(int startfile = 5,
-		      int endfile = 6,
+void RAA_read_mc_pbpb(int startfile = 0,
+		      int endfile = 1,
 		      int radius = 3,
-		      std::string kFoname="PbPb_MC_histograms_FromForest_pthatCutonJets_akPu3_20_eta_20_6.root"){
+		      std::string kFoname="PbPb_MC_histograms_FromForest_pthatCutonJets_akPu3_20_eta_20_1.root"){
   
   TStopwatch timer;
   timer.Start();
@@ -262,29 +262,15 @@ void RAA_read_mc_pbpb(int startfile = 5,
 
   }
   
-  TF1 *fVz=0;
-  fVz = new TF1("fVz","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
-  fVz->SetParameters(9.86748e-01, -8.91367e-03, 5.35416e-04, 2.67665e-06, -2.01867e-06);
-  
-  
   jetpbpb[2]->AddFriend(jetpbpb[0]);
   jetpbpb[2]->AddFriend(jetpbpb[1]);
   jetpbpb[2]->AddFriend(jetpbpb[4]);
   jetpbpb[3]->AddFriend(jetpbpb[0]);
   jetpbpb[3]->AddFriend(jetpbpb[1]);
   jetpbpb[3]->AddFriend(jetpbpb[4]);
-
-  // get the number of events per pthat bin from the HiForest store that value as an integer.
-  double Nevents[9];
-  
-  for(int iter = 0; iter < 9; ++iter){
-    xsecs[iter] = xsecs[iter] - xsecs[iter+1];
-    TCut pthatCut(Form("pthat >= %f && pthat < %f",pthat[i],pthat[i+1]));
-    Nevents[i] = jetpbpb[2]->GetEntries(pthatCut);
-  }
-  
   jetpbpb[2]->AddFriend(evt_select);
   jetpbpb[3]->AddFriend(evt_select);
+  
   // Forest files 
   int nref_F;
   float pt_F[1000];
@@ -484,8 +470,8 @@ void RAA_read_mc_pbpb(int startfile = 5,
     * hpbpb_Jet65_gen2pSmear[nbins_cent],
     * hpbpb_Jet55_gen2pSmear[nbins_cent];
 
-  TH1F * hpbpb_pthat_Cut[nbins_cent];
-  TH1F * hpbpb_pthat_noCut[nbins_cent];
+  TH1F * hpbpb_pthat_oldWeight[nbins_cent];
+  TH1F * hpbpb_pthat_newWeight[nbins_cent];
 
   TH1F *hpbpb_gen[nbins_cent],*hpbpb_reco[nbins_cent];
   TH2F *hpbpb_matrix[nbins_cent];
@@ -541,8 +527,8 @@ void RAA_read_mc_pbpb(int startfile = 5,
   
   for(int i = 0;i<nbins_cent;++i){
 
-    hpbpb_pthat_Cut[i] = new TH1F(Form("pthat_Cut_cent%d",i),"",1000,0,1000);
-    hpbpb_pthat_noCut[i] = new TH1F(Form("pthat_noCut_cent%d",i),"",1000,0,1000);
+    hpbpb_pthat_oldWeight[i] = new TH1F(Form("pthat_oldWeight_cent%d",i),"",1000,0,1000);
+    hpbpb_pthat_newWeight[i] = new TH1F(Form("pthat_newWeight_cent%d",i),"",1000,0,1000);
     
     hpbpb_gen[i] = new TH1F(Form("hpbpb_gen_R%d_%s_cent%d",radius,etaWidth,i),Form("Gen refpt R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     //cout<<"A"<<endl;
@@ -641,13 +627,30 @@ void RAA_read_mc_pbpb(int startfile = 5,
     hpbpb_Jet65_raw[i] = new TH1F(Form("hpbpb_Jet65_raw_R%d_%s_cent%d",radius,etaWidth,i),Form("raw jtpt from Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
     hpbpb_Jet55_raw[i] = new TH1F(Form("hpbpb_Jet55_raw_R%d_%s_cent%d",radius,etaWidth,i),Form("raw jtpt from Jet55 && !Jet65 && !Jet80 trigger R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
   }
+
+  TFile * pthat_weight = TFile::Open("weights.root");
+  TTree * weights = (TTree*)pthat_weight->Get("weights");
+  double pthatweight;
+  int hiBin_w, evt_w, lumi_w;
+  float vz_w;
+  weights->SetBranchAddress("pthatweight",&pthatweight);
+  weights->SetBranchAddress("hiBin",&hiBin_w);
+  weights->SetBranchAddress("evt",&evt_w);
+  weights->SetBranchAddress("lumi",&lumi_w);
+  weights->SetBranchAddress("vz",&vz_w);
+
+  jetpbpb[2]->AddFriend(weights);
   
+  TFile * cent_vz_weight = TFile::Open("data_mc_cent_vz_weight.root");
+  TH1F * hCent_weight = (TH1F*)cent_vz_weight->Get("hCent_weight");
+  TH1F * hVz_weight = (TH1F*)cent_vz_weight->Get("hVz_weight");
+
   // now start the event loop for each file. 
   
   if(printDebug) cout<<"Running through all the events now"<<endl;
   Long64_t nentries = jetpbpb[0]->GetEntries();
   Long64_t nGoodEvt = 0;
-  //if(printDebug) nentries = 10;
+  if(printDebug) nentries = 10;
   TRandom rnd; 
 
   for(int nEvt = 0; nEvt < nentries; ++ nEvt) {
@@ -661,7 +664,8 @@ void RAA_read_mc_pbpb(int startfile = 5,
     jetpbpb[4]->GetEntry(nEvt);
     jetpbpb[3]->GetEntry(nEvt);
     evt_select->GetEntry(nEvt);
-
+    weights->GetEntry(nEvt);
+    
     //if(printDebug) cout<<"forest values = "<<hiBin_F<<", "<<evt_F<<", "<<run_F<<", "<<lumi_F<<", "<<vz_F<<endl;
 
     // if(pcollisionEventSelection_F==0) continue; 
@@ -677,7 +681,7 @@ void RAA_read_mc_pbpb(int startfile = 5,
     if(hiBin_eS != hiBin_F || evt_eS != evt_F || run_eS != run_F || lumi_eS != lumi_F || vz_eS != vz_F) cout<<"ERROR mismatch eS, F"<<endl;
     if(hiBin_eS != hiBin_jS || evt_eS != evt_jS || run_eS != run_jS || lumi_eS != lumi_jS || vz_eS != vz_jS) cout<<"ERROR mismatch eS, jS"<<endl;
     if(hiBin_F != hiBin_jS || evt_F != evt_jS || run_F != run_jS || lumi_F != lumi_jS || vz_F != vz_jS) cout<<"ERROR mismatch F, jS"<<endl;
-
+    if(hiBin_F != hiBin_w || evt_F != evt_w || lumi_F != lumi_w || vz_F != vz_w) cout<<"ERROR mismatch forest and weight tree"<<endl;
     
     if(printDebug) cout<<"hibin hiForest = "<<hiBin_F<<", evtTree = "<<hiBin_eS<<", jetTree = "<<hiBin_jS<<endl;
     if(printDebug) cout<<"evt hiForest   = "<<evt_F<<", evtTree = "<<evt_eS<<", jetTree = "<<evt_jS<<endl;
@@ -688,7 +692,15 @@ void RAA_read_mc_pbpb(int startfile = 5,
 
     if(nref_F != nref_eS) cout<<"ERROR mismatch in jet counts"<<endl;
 
-    hpbpb_pthat_noCut[cBin]->Fill(pthat_F, weight_eS);
+    double cent_weight = hCent_weight->GetBinContent(hCent_weight->FindBin(hiBin_F));
+    double vz_weight = hVz_weight->GetBinContent(hVz_weight->FindBin(vz_F));
+  
+    double new_weight = pthatweight * cent_weight * vz_weight; 
+
+    hpbpb_pthat_oldWeight[cBin]->Fill(pthat_F, weight_eS);
+    hpbpb_pthat_newWeight[cBin]->Fill(pthat_F, new_weight);
+
+    if(printDebug) cout<<"Old weight = "<<weight_eS<<", new Weight = "<<new_weight<<endl;
 
     // // if(pthat_F < pthat[startfile] || pthat_F >= pthat[endfile]) continue;
     // double cweight = exp(- pow(varbin+1.11957e+01,2) / pow(1.34120e+01,2) / 2);
@@ -697,7 +709,6 @@ void RAA_read_mc_pbpb(int startfile = 5,
     // weight = cweight * fVz->Eval(vz_F);    
     // double scale = xsecs[]
     
-    // hpbpb_pthat_Cut[cBin]->Fill(pthat_F, weight);
     
     /*    //! Sort the jetTree jets according to pT, from the evtTree now. 
     std::vector < Jet > vJet;
@@ -769,6 +780,9 @@ void RAA_read_mc_pbpb(int startfile = 5,
 
       // if(printDebug)cout<<jet<<", hiForest pT = "<<pt_F[jet]<<", jetTree pT = "<<pt_jS[jetLoc]<<", electronCut = "<<isPFElecCut_eS[jetLoc]<<", eMax from hiForest = "<<eMax_F[jet]<<", eMax from jet Tree = "<<eMax_jS[jetLoc]<<endl;
       */
+
+    weight_eS = new_weight;
+
     for( int jet = 0; jet<nref_F; jet++ ){
 
       //cout  << "  subid : "  << subid_F[jet] << " refpt : "  << refpt_F[jet] << " pfpt :  " << pt_F[jet] << endl;
