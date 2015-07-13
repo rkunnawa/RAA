@@ -1,103 +1,57 @@
 
 ----------------------------------------------------
-Job started on Tue Jun 23 17:54:24 EDT 2015 at WN: t2bat0301.cmsaf.mit.edu 
-Job is running on Linux t2bat0301.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Job started on Fri Jul 10 16:50:21 EDT 2015 at WN: t2bat0199.cmsaf.mit.edu 
+Job is running on Linux t2bat0199.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
 Filesystem            Size  Used Avail Use% Mounted on
-tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda3              20G  3.5G   16G  19% /
+tmpfs                  12G     0   12G   0% /dev/shm
 /dev/sda1              97M   32M   61M  35% /boot
-/dev/sda4             416G   63G  353G  16% /export/data1
-/dev/sda1              97M   32M   61M  35% /boot
-/dev/sda4             416G   63G  353G  16% /export/data1
-fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
-/dev/sdb1             3.6T  3.1T  510G  87% /export/00b
-/dev/sdc1             3.6T  3.1T  534G  86% /export/00c
-/dev/sdd1             3.6T  3.1T  524G  86% /export/00d
-/dev/sde1             3.6T  3.1T  545G  86% /export/00e
-/dev/sdf1             3.6T  3.2T  492G  87% /export/00f
-/dev/sdg1             3.6T  3.1T  527G  86% /export/00g
-/dev/sdh1             3.6T  3.1T  519G  86% /export/00h
-/dev/sdi1             3.6T  3.1T  558G  85% /export/00i
-/dev/sdj1             3.6T  3.1T  539G  86% /export/00j
-/dev/sdk1             3.6T  3.1T  538G  86% /export/00k
-/dev/sdl1             3.6T  3.1T  554G  85% /export/00l
-cvmfs2                 98G   60G   38G  62% /cvmfs/cms.cern.ch
+/dev/sda4             874G   94G  781G  11% /export/data1
+/dev/sdb1             1.8T  1.7T  173G  91% /export/00b
+/dev/sdc1             1.8T  1.7T  169G  91% /export/00c
+/dev/sdd1             1.8T  1.7T  170G  91% /export/00d
+/dev/sde1             1.8T  1.7T  153G  92% /export/00e
+/dev/sdf1             1.8T  1.7T  165G  92% /export/00f
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
 t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
-cvmfs2                 98G   60G   38G  62% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   89G  9.1G  91% /cvmfs/cms.cern.ch
+cvmfs2                 98G   89G  9.1G  91% /cvmfs/cvmfs.cmsaf.mit.edu
 gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
 Copyright (C) 2010 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 Processing...
-0/660797
-10000/660797
-20000/660797
-30000/660797
-40000/660797
-50000/660797
-60000/660797
-70000/660797
-80000/660797
-90000/660797
-100000/660797
-110000/660797
-120000/660797
-130000/660797
-140000/660797
-150000/660797
-160000/660797
-170000/660797
-180000/660797
-190000/660797
-200000/660797
-210000/660797
-220000/660797
-230000/660797
-240000/660797
-250000/660797
-260000/660797
-270000/660797
-280000/660797
-290000/660797
-300000/660797
-310000/660797
-320000/660797
-330000/660797
-340000/660797
-350000/660797
-360000/660797
-370000/660797
-380000/660797
-390000/660797
-400000/660797
-410000/660797
-420000/660797
-430000/660797
-440000/660797
-450000/660797
-460000/660797
-470000/660797
-480000/660797
-490000/660797
-500000/660797
-510000/660797
-520000/660797
-530000/660797
-540000/660797
-550000/660797
-560000/660797
-570000/660797
-580000/660797
-590000/660797
-600000/660797
-610000/660797
-620000/660797
-630000/660797
-640000/660797
-650000/660797
-660000/660797
+0/276985
+10000/276985
+20000/276985
+30000/276985
+40000/276985
+50000/276985
+60000/276985
+70000/276985
+80000/276985
+90000/276985
+100000/276985
+110000/276985
+120000/276985
+130000/276985
+140000/276985
+150000/276985
+160000/276985
+170000/276985
+180000/276985
+190000/276985
+200000/276985
+210000/276985
+220000/276985
+230000/276985
+240000/276985
+250000/276985
+260000/276985
+270000/276985
 Macro finished: 
-CPU time (min)  = 4.36833
-Real time (min) = 5.89028
+CPU time (min)  = 2.5635
+Real time (min) = 3.05482
 Done!
 Copied output files to hadoop rootfiles/JetRAA/June22

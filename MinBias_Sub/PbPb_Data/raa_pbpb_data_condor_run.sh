@@ -32,7 +32,7 @@ root -b -l <<EOF
 .q
 EOF
 
-mv $outfile /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June22/
+mv $outfile /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June29/
 
 echo "Done!"
 

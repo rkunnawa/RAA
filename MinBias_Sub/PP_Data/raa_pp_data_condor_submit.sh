@@ -5,7 +5,7 @@
 counter=0
 incrementer=1
 
-destination=/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June22/
+destination=/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June29/
 filelist=jetRAA_pp_data_forest.txt
 
 nFiles=`wc -l < $filelist`

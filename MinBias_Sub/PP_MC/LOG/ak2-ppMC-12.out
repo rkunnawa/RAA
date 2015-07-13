@@ -1,25 +1,23 @@
 
 ----------------------------------------------------
-Job started on Mon Jun 22 21:37:14 EDT 2015 at WN: t2bat0261.cmsaf.mit.edu 
-Job is running on Linux t2bat0261.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Job started on Fri Jul  3 12:35:28 EDT 2015 at WN: t2bat0250.cmsaf.mit.edu 
+Job is running on Linux t2bat0250.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
 Filesystem            Size  Used Avail Use% Mounted on
 /dev/sda3              20G  3.0G   16G  16% /
 tmpfs                  12G     0   12G   0% /dev/shm
 /dev/sda1              97M   32M   61M  35% /boot
-/dev/sda4             874G   91G  784G  11% /export/data1
-/dev/sdb1             1.8T  1.6T  202G  90% /export/00b
-/dev/sdc1             1.8T  1.6T  208G  89% /export/00c
-/dev/sdd1             1.8T  1.7T  193G  90% /export/00d
-/dev/sde1             1.8T  1.6T  201G  90% /export/00e
-/dev/sdf1             1.8T  1.7T  191G  90% /export/00f
-fuse_dfs              4.9P  4.4P  522T  90% /mnt/hadoop
+/dev/sda4             874G   86G  788G  10% /export/data1
+/dev/sdb1             1.8T  1.7T  192G  90% /export/00b
+/dev/sdc1             1.8T  1.6T  198G  90% /export/00c
+/dev/sdd1             1.8T  1.6T  201G  90% /export/00d
+/dev/sde1             1.8T  1.7T  186G  90% /export/00e
+/dev/sdf1             1.8T  1.6T  199G  90% /export/00f
+fuse_dfs              4.9P  4.4P  508T  90% /mnt/hadoop
+cvmfs2                 98G   84G   15G  86% /cvmfs/cms.cern.ch
 t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
-cvmfs2                 98G   89G  9.5G  91% /cvmfs/cms.cern.ch
-cvmfs2                 98G   89G  9.5G  91% /cvmfs/oasis.opensciencegrid.org
-cvmfs2                 98G   89G  9.5G  91% /cvmfs/cdfcfs.fnal.gov
-cvmfs2                 98G   89G  9.5G  91% /cvmfs/grid.cern.ch
-cvmfs2                 98G   89G  9.5G  91% /cvmfs/fermilab.opensciencegrid.org
-cvmfs2                 98G   89G  9.5G  91% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   84G   15G  86% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   84G   15G  86% /cvmfs/cdfcfs.fnal.gov
+cvmfs2                 98G   84G   15G  86% /cvmfs/cvmfs.cmsaf.mit.edu
 gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
 Copyright (C) 2010 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
@@ -152,7 +150,7 @@ Processing...
 1230000/1244000
 1240000/1244000
 Macro finished: 
-CPU time (min)  = 16.9585
-Real time (min) = 20.8675
+CPU time (min)  = 17.3643
+Real time (min) = 24.7291
 Done!
 Copied output files to hadoop rootfiles/JetRAA/June22

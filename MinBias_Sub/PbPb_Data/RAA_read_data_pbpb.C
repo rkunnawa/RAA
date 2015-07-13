@@ -136,8 +136,8 @@ bool compare_pt(Jet jet1, Jet jet2){
 
 using namespace std;
 
-void RAA_read_data_pbpb(int startfile = 8,
-		      int endfile = 9,
+void RAA_read_data_pbpb(int startfile = 0,
+		      int endfile = 1,
 		      int radius = 3,
 		      std::string kFoname="test_output.root"){
   
@@ -332,6 +332,8 @@ void RAA_read_data_pbpb(int startfile = 8,
   int isTrackCut_eS[1000];
   int isMuCut_eS[1000];
   int index_eS[1000];
+  float pt_eS[1000];
+  float calopt_eS[1000];
   Double_t weight_eS;
 
   evt_select->SetBranchAddress("hiBin",&hiBin_eS);
@@ -339,15 +341,17 @@ void RAA_read_data_pbpb(int startfile = 8,
   evt_select->SetBranchAddress("evt_value",&evt_eS);
   evt_select->SetBranchAddress("lumi_value",&lumi_eS);
   evt_select->SetBranchAddress("vz",&vz_eS);
+  evt_select->SetBranchAddress("weight", &weight_eS);  
+  evt_select->SetBranchAddress("isGoodEvt",&isGoodEvent_eS);
   evt_select->SetBranchAddress("nref",&nref_eS);
   evt_select->SetBranchAddress("index", index_eS);
-  evt_select->SetBranchAddress("isGoodEvt",&isGoodEvent_eS);
   evt_select->SetBranchAddress("isMlMatch",isMiMatch_eS);
-  evt_select->SetBranchAddress("isClMatch", isClMatch_eS);
+  evt_select->SetBranchAddress("isClMatch",isClMatch_eS);
   evt_select->SetBranchAddress("isPFElecCut",isPFElecCut_eS);
   evt_select->SetBranchAddress("isTrackCut",isTrackCut_eS);
   evt_select->SetBranchAddress("isMuCut",isMuCut_eS);
-  evt_select->SetBranchAddress("weight", &weight_eS);  
+  evt_select->SetBranchAddress("pfpt",pt_eS);
+  evt_select->SetBranchAddress("calopt",calopt_eS);
 
   // jet tree selection file:
   int hiBin_jS;
@@ -415,34 +419,62 @@ void RAA_read_data_pbpb(int startfile = 8,
   TH1F *hpbpb_Smear_TrgObj55[nbins_cent];
   TH1F *hpbpb_Smear_TrgObjComb[nbins_cent];
 
+  TH1F * hcentrality_Jet55[nbins_cent];
+  TH1F * hcentrality_Jet55not65not80[nbins_cent];
+  TH1F * hcentrality_Jet65[nbins_cent];
+  TH1F * hcentrality_Jet65not80[nbins_cent];
+  TH1F * hcentrality_Jet80[nbins_cent];
+  TH1F * hcentrality_Jet55_Prescl[nbins_cent];
+  TH1F * hcentrality_Jet55not65not80_Prescl[nbins_cent];
+  TH1F * hcentrality_Jet65_Prescl[nbins_cent];
+  TH1F * hcentrality[nbins_cent];
+
+
   for(int i = 0;i<nbins_cent;++i){
 
-    hpbpb_TrgObj80[i] = new TH1F(Form("hpbpb_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_TrgObj65[i] = new TH1F(Form("hpbpb_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_TrgObj55[i] = new TH1F(Form("hpbpb_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_TrgObjComb[i] = new TH1F(Form("hpbpb_HLTComb_R%d_%s_cent%d",radius,etaWidth,i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
+    hcentrality[i] = new TH1F(Form("hcentrality_cent%d",i),"",200, 0, 200);
+    hcentrality_Jet55[i] = new TH1F(Form("hcentrality_Jet55_cent%d",i),"",200, 0, 200);
+    hcentrality_Jet55_Prescl[i] = new TH1F(Form("hcentrality_Jet55_Prescl_cent%d",i),"",200, 0, 200);
+    hcentrality_Jet55not65not80[i] = new TH1F(Form("hcentrality_Jet55not65not80_cent%d",i),"",200, 0, 200);
+    hcentrality_Jet55not65not80_Prescl[i] = new TH1F(Form("hcentrality_Jet55not65not80_Prescl_cent%d",i),"",200, 0, 200);
+    hcentrality_Jet65[i] = new TH1F(Form("hcentrality_Jet65_cent%d",i),"",200, 0, 200);
+    hcentrality_Jet65_Prescl[i] = new TH1F(Form("hcentrality_Jet65_Prescl_cent%d",i),"",200, 0, 200);
+    hcentrality_Jet65not80[i] = new TH1F(Form("hcentrality_Jet65not80_cent%d",i),"",200, 0, 200);
+    hcentrality_Jet80[i] = new TH1F(Form("hcentrality_Jet80_cent%d",i),"",200, 0, 200);
 
-    hpbpb_raw_TrgObj80[i] = new TH1F(Form("hpbpb_raw_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_raw_TrgObj65[i] = new TH1F(Form("hpbpb_raw_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_raw_TrgObj55[i] = new TH1F(Form("hpbpb_raw_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_raw_TrgObjComb[i] = new TH1F(Form("hpbpb_raw_HLTComb_R%d_%s_cent%d",radius,etaWidth,i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
+    hpbpb_TrgObj80[i] = new TH1F(Form("hpbpb_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_TrgObj65[i] = new TH1F(Form("hpbpb_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_TrgObj55[i] = new TH1F(Form("hpbpb_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_TrgObjComb[i] = new TH1F(Form("hpbpb_HLTComb_R%d_%s_cent%d",radius,etaWidth,i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+
+    hpbpb_raw_TrgObj80[i] = new TH1F(Form("hpbpb_raw_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_raw_TrgObj65[i] = new TH1F(Form("hpbpb_raw_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_raw_TrgObj55[i] = new TH1F(Form("hpbpb_raw_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_raw_TrgObjComb[i] = new TH1F(Form("hpbpb_raw_HLTComb_R%d_%s_cent%d",radius,etaWidth,i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 
     hpbpb_anaBin_TrgObj80[i] = new TH1F(Form("hpbpb_anaBin_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
     hpbpb_anaBin_TrgObj65[i] = new TH1F(Form("hpbpb_anaBin_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
     hpbpb_anaBin_TrgObj55[i] = new TH1F(Form("hpbpb_anaBin_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
     hpbpb_anaBin_TrgObjComb[i] = new TH1F(Form("hpbpb_anaBin_HLTComb_R%d_%s_cent%d",radius,etaWidth,i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt);
     
-    hpbpb_JEC_TrgObj80[i] = new TH1F(Form("hpbpb_JEC_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_JEC_TrgObj65[i] = new TH1F(Form("hpbpb_JEC_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_JEC_TrgObj55[i] = new TH1F(Form("hpbpb_JEC_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_JEC_TrgObjComb[i] = new TH1F(Form("hpbpb_JEC_HLTComb_R%d_%s_cent%d",radius,etaWidth,i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
+    hpbpb_JEC_TrgObj80[i] = new TH1F(Form("hpbpb_JEC_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_JEC_TrgObj65[i] = new TH1F(Form("hpbpb_JEC_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_JEC_TrgObj55[i] = new TH1F(Form("hpbpb_JEC_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_JEC_TrgObjComb[i] = new TH1F(Form("hpbpb_JEC_HLTComb_R%d_%s_cent%d",radius,etaWidth,i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 
-    hpbpb_Smear_TrgObj80[i] = new TH1F(Form("hpbpb_Smear_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_Smear_TrgObj65[i] = new TH1F(Form("hpbpb_Smear_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_Smear_TrgObj55[i] = new TH1F(Form("hpbpb_Smear_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
-    hpbpb_Smear_TrgObjComb[i] = new TH1F(Form("hpbpb_Smear_HLTComb_R%d_%s_cent%d",radius,etaWidth,i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501);
+    hpbpb_Smear_TrgObj80[i] = new TH1F(Form("hpbpb_Smear_HLT80_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_Smear_TrgObj65[i] = new TH1F(Form("hpbpb_Smear_HLT65_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from  Jet 65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_Smear_TrgObj55[i] = new TH1F(Form("hpbpb_Smear_HLT55_R%d_%s_cent%d",radius,etaWidth,i),Form("Spectra from Jet 55 && !jet65 && !jet80 R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
+    hpbpb_Smear_TrgObjComb[i] = new TH1F(Form("hpbpb_Smear_HLTComb_R%d_%s_cent%d",radius,etaWidth,i),Form("Trig Combined Spectra R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),1000,0,1000);
 
   }
+
+  // get the HLT information per forest file.
+  TH1F * hJet55_File = new TH1F("hJet55_File","",902, 0, 902);
+  TH1F * hJet65_File = new TH1F("hJet65_File","",902, 0, 902);
+  TH1F * hJet80_File = new TH1F("hJet80_File","",902, 0, 902);
+  TH1F * hJet65not80_File = new TH1F("hJet65not80_File","",902, 0, 902);
+  TH1F * hJet55not6580_File = new TH1F("hJet55not6580_File","",902, 0, 902);
   
   // now start the event loop for each file. 
   
@@ -466,15 +498,32 @@ void RAA_read_data_pbpb(int startfile = 8,
 
     if(printDebug) cout<<"forest values = "<<hiBin_F<<", "<<evt_F<<", "<<run_F<<", "<<lumi_F<<", "<<vz_F<<endl;
     
-    // if(pcollisionEventSelection_F==0) continue; 
-    // if(fabs(vz_F)>15) continue;
     if(!isGoodEvent_eS) continue; 
     
     jet_select->GetEntry(nGoodEvt);
     ++nGoodEvt;
 
-    int cBin = findBin(hiBin_F);//tells us the centrality of the event. 
-    if(cBin==-1 || cBin==nbins_cent) continue;
+    int cBin = findBin(hiBin_F);//tells us the centrality of the event.
+    if(cBin == -1) continue;
+    if(cBin == nbins_cent) continue;
+    
+    hcentrality[cBin]->Fill(hiBin_F);
+    if(jet55_F == 1) hcentrality_Jet55[cBin]->Fill(hiBin_F);
+    if(jet55_F == 1) hcentrality_Jet55_Prescl[cBin]->Fill(hiBin_F, jet55_p_F);
+    if(jet65_F == 1) hcentrality_Jet65[cBin]->Fill(hiBin_F);
+    if(jet65_F == 1) hcentrality_Jet65_Prescl[cBin]->Fill(hiBin_F, jet65_p_F);
+    if(jet80_F == 1) hcentrality_Jet80[cBin]->Fill(hiBin_F);
+    if(jet55_F == 1 && jet65_F == 0 && jet80_F == 0) hcentrality_Jet55not65not80[cBin]->Fill(hiBin_F);
+    if(jet55_F == 1 && jet65_F == 0 && jet80_F == 0) hcentrality_Jet55not65not80_Prescl[cBin]->Fill(hiBin_F, jet55_p_F);
+    if(jet65_F == 1 && jet80_F == 0) hcentrality_Jet65not80[cBin]->Fill(hiBin_F);
+
+    
+
+    if(jet55_F == 1) hJet55_File->Fill(startfile);
+    if(jet65_F == 1) hJet65_File->Fill(startfile);
+    if(jet80_F == 1) hJet80_File->Fill(startfile);
+    if(jet55_F == 1 && jet65_F == 0 && jet80_F == 0) hJet55not6580_File->Fill(startfile);
+    if(jet65_F == 1 && jet80_F == 0) hJet65not80_File->Fill(startfile);
 
     if(hiBin_eS != hiBin_F || evt_eS != evt_F || run_eS != run_F || lumi_eS != lumi_F || vz_eS != vz_F) cout<<"ERROR mismatch eS, F"<<endl;
     if(hiBin_eS != hiBin_jS || evt_eS != evt_jS || run_eS != run_jS || lumi_eS != lumi_jS || vz_eS != vz_jS) cout<<"ERROR mismatch eS, jS"<<endl;
@@ -489,55 +538,83 @@ void RAA_read_data_pbpb(int startfile = 8,
 
     if(nref_F != nref_eS) cout<<"ERROR mismatch in jet counts"<<endl;
 
-    //! Sort the jetTree jets according to pT
-    std::vector < Jet > vJet;
-    for(int jet2 = 0; jet2<nref_jS; ++jet2){
-      //cout <<"\t \t jetTree *** "<< jet2 <<  ", pT " << pt_jS[jet2] <<  ", chSum : "<< chSum_jS[jet2] << endl;
-      Jet ijet;
-      ijet.id = jet2;
-      ijet.pt = pt_jS[jet2];
-      vJet.push_back(ijet);
-    }
-    std::sort (vJet.begin(), vJet.end(), compare_pt);
-    std::vector < Jet >::const_iterator itr;
+    // //! Sort the jetTree jets according to pT
+    // std::vector < Jet > vJet;
+    // for(int jet2 = 0; jet2<nref_jS; ++jet2){
+    //   //cout <<"\t \t jetTree *** "<< jet2 <<  ", pT " << pt_jS[jet2] <<  ", chSum : "<< chSum_jS[jet2] << endl;
+    //   Jet ijet;
+    //   ijet.id = jet2;
+    //   ijet.pt = pt_jS[jet2];
+    //   vJet.push_back(ijet);
+    // }
+    // std::sort (vJet.begin(), vJet.end(), compare_pt);
+    // std::vector < Jet >::const_iterator itr;
 
-    int jet=0;
-    for(itr=vJet.begin(); itr!=vJet.end(); ++itr, ++jet){
+    // int jet=0;
+    // for(itr=vJet.begin(); itr!=vJet.end(); ++itr, ++jet){
 
-      int jetLoc = (*itr).id;
-      if(isMultiMatch_jS[jetLoc]) {
-	++itr;
-	jetLoc = (*itr).id;
-	if(itr == vJet.end())  break;
-      }
-      if(fabs(eta_jS[jetLoc]) > 2) continue;
-      //if(isPFElecCut_eS[jet] != 1) continue;
-      // if(isMiMatch_eS[jet]) continue;
-      if(pt_jS[jetLoc] <15) continue;
+    //   int jetLoc = (*itr).id;
+    //   if(isMultiMatch_jS[jetLoc]) {
+    // 	++itr;
+    // 	jetLoc = (*itr).id;
+    // 	if(itr == vJet.end())  break;
+    //   }
+    //   if(fabs(eta_jS[jetLoc]) > 2) continue;
+    //   //if(isPFElecCut_eS[jet] != 1) continue;
+    //   // if(isMiMatch_eS[jet]) continue;
+    //   if(pt_jS[jetLoc] <15) continue;
+
+    //   bool PFElecCut = false;
+
+    //   Float_t Sumcand = chSum_jS[jetLoc] + phSum_jS[jetLoc] + neSum_jS[jetLoc] + muSum_jS[jetLoc];
+    //   if(isCaloMatch_jS[jetLoc] == 1){
+    // 	if(calopt_jS[jetLoc]/pt_jS[jetLoc] > 0.5 && calopt_jS[jetLoc]/pt_jS[jetLoc] <= 0.85 && eMax_jS[jetLoc]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_jS[jetLoc]/pt_jS[jetLoc] - (Float_t)9/7)) PFElecCut = true;
+    // 	if(calopt_jS[jetLoc]/pt_jS[jetLoc] > 0.85) PFElecCut = true;
+    // 	if(calopt_jS[jetLoc]/pt_jS[jetLoc] <= 0.5 && eMax_jS[jetLoc]/Sumcand < 0.05) PFElecCut = true;
+    //   }
+    //   if(isCaloMatch_jS[jetLoc] == 0)
+    // 	if(eMax_jS[jetLoc]/Sumcand < 0.05 ) PFElecCut = true;
+
+    //   // if(!PFElecCut) continue;
+      
+    //   // if(printDebug && (fabs(eta_jS[jet] > 2))) cout<<"jets with |eta| > 2 in jetTree"<<endl;
+    //   // if(printDebug && (fabs(eta_F[jet] > 2)))  cout<<"jets with |eta| > 2 in Forest"<<endl;
+
+    Float_t wght = 1; 
+      
+    //   if(printDebug && index_eS[jet] >= 0 )cout<<jet<<", hiForest pT = "<<pt_F[jet]<<", jetTree pT = "<<pt_jS[jetLoc]<<", electronCut = "<<isPFElecCut_eS[jetLoc]<<", Calo pT = "<<calopt_F[index_eS[jet]]<<", onFly flag calculation = "<<PFElecCut<<", eMax from hiForest = "<<eMax_F[jet]<<", eMax from jet Tree = "<<eMax_jS[jetLoc]<<endl;      // if(printDebug)cout<<jet<<", hiForest pT = "<<pt_F[jet]<<", jetTree pT = "<<pt_jS[jetLoc]<<", electronCut = "<<isPFElecCut_eS[jetLoc]<<", eMax from hiForest = "<<eMax_F[jet]<<", eMax from jet Tree = "<<eMax_jS[jetLoc]<<endl;
+
+
+    for( int jet = 0; jet<nref_F; jet++ ){
+
+      if( fabs(eta_F[jet]) > 2.0 ) continue;
+      //if( isPFElecCut_eS[jet] != 1 ) continue;
+
+      //if( chMax_F[jet] < 7 && trkMax_F[jet] < 7 && neMax_F[jet] < 8 ) continue;
+      if( trkMax_F[jet] < 7 && neMax_F[jet] < 8 ) continue;
 
       bool PFElecCut = false;
 
-      Float_t Sumcand = chSum_jS[jetLoc] + phSum_jS[jetLoc] + neSum_jS[jetLoc] + muSum_jS[jetLoc];
-      if(isCaloMatch_jS[jetLoc] == 1){
-	if(calopt_jS[jetLoc]/pt_jS[jetLoc] > 0.5 && calopt_jS[jetLoc]/pt_jS[jetLoc] <= 0.85 && eMax_jS[jetLoc]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_jS[jetLoc]/pt_jS[jetLoc] - (Float_t)9/7)) PFElecCut = true;
-	if(calopt_jS[jetLoc]/pt_jS[jetLoc] > 0.85) PFElecCut = true;
-	if(calopt_jS[jetLoc]/pt_jS[jetLoc] <= 0.5 && eMax_jS[jetLoc]/Sumcand < 0.05) PFElecCut = true;
+      Float_t Sumcand = chSum_F[jet] + phSum_F[jet] + neSum_F[jet] + muSum_F[jet];
+      if(isClMatch_eS[jet] == 1){
+    	if(calopt_eS[jet]/pt_F[jet] > 0.5 && calopt_eS[jet]/pt_F[jet] <= 0.85 && eMax_F[jet]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_eS[jet]/pt_F[jet] - (Float_t)9/7)) PFElecCut = true;
+    	if(calopt_eS[jet]/pt_F[jet] > 0.85) PFElecCut = true;
+    	if(calopt_eS[jet]/pt_F[jet] <= 0.5 && eMax_F[jet]/Sumcand < 0.05) PFElecCut = true;
       }
-      if(isCaloMatch_jS[jetLoc] == 0)
-	if(eMax_jS[jetLoc]/Sumcand < 0.05 ) PFElecCut = true;
+      if(isClMatch_eS[jet] == 0)
+    	if(eMax_F[jet]/Sumcand < 0.05 ) PFElecCut = true;
 
-      // if(!PFElecCut) continue;
-      
-      // if(printDebug && (fabs(eta_jS[jet] > 2))) cout<<"jets with |eta| > 2 in jetTree"<<endl;
-      // if(printDebug && (fabs(eta_F[jet] > 2)))  cout<<"jets with |eta| > 2 in Forest"<<endl;
+      if(isPFElecCut_eS[jet] != PFElecCut && printDebug) 
+	cout<<" pf e cut not same, run = "<<run_F<<" "<<run_eS<<", event = "<<evt_F<<" "<<evt_eS<<" , lumi = "<<lumi_F<<" "<<lumi_eS<<endl;
+	  
+      if(!PFElecCut) continue;
 
-      Float_t wght = 1; 
-      
-      if(printDebug && index_eS[jet] >= 0 )cout<<jet<<", hiForest pT = "<<pt_F[jet]<<", jetTree pT = "<<pt_jS[jetLoc]<<", electronCut = "<<isPFElecCut_eS[jetLoc]<<", Calo pT = "<<calopt_F[index_eS[jet]]<<", onFly flag calculation = "<<PFElecCut<<", eMax from hiForest = "<<eMax_F[jet]<<", eMax from jet Tree = "<<eMax_jS[jetLoc]<<endl;      // if(printDebug)cout<<jet<<", hiForest pT = "<<pt_F[jet]<<", jetTree pT = "<<pt_jS[jetLoc]<<", electronCut = "<<isPFElecCut_eS[jetLoc]<<", eMax from hiForest = "<<eMax_F[jet]<<", eMax from jet Tree = "<<eMax_jS[jetLoc]<<endl;
-
-      float recpt = pt_jS[jetLoc];
+      // also need to cut on the high pT jets from the Jet 55 sample. unmatched PF jets with pfpt > 110 and calopt < 30 including -999, check on their high track content. at the moment dont worry about this.  
+    
+      float recpt = pt_F[jet];
       
       if(jet55_F == 1 && jet65_F == 0 && jet80_F == 0){
+	//if(recpt > 140) continue;
 	hpbpb_TrgObj55[cBin]->Fill(recpt, jet55_p_F* wght);
 	hpbpb_raw_TrgObj55[cBin]->Fill(rawpt_F[jet], jet55_p_F* wght);
 	hpbpb_anaBin_TrgObj55[cBin]->Fill(recpt, jet55_p_F* wght);
@@ -546,6 +623,7 @@ void RAA_read_data_pbpb(int startfile = 8,
       }
 
       if(jet65_F == 1 && jet80_F == 0){
+	//if(recpt > 140) continue;
 	hpbpb_TrgObj65[cBin]->Fill(recpt, wght);
 	hpbpb_raw_TrgObj65[cBin]->Fill(rawpt_F[jet], wght);
 	hpbpb_anaBin_TrgObj65[cBin]->Fill(recpt, wght);

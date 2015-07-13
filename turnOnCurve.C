@@ -76,8 +76,8 @@ void turnOnCurve(int mode = 0)
 
   //TFile * inf = new TFile("/mnt/hadoop/cms/store/user/dgulhan/HIMinBiasUPC-HIRun2011-14Mar2014-v2_tag_HI_MatchEqR_DatabaseJEC_merged2/HIMinBiasUPC-HIRun2011-14Mar2014-v2_tag_HI_MatchEqR_DatabaseJEC.root","read");
 
-  int trigger55 = -1;
-  int trigger65 = -1;
+  int trigger40 = -1;
+  int trigger60 = -1;
   int trigger80 = -1;
   int noise = -1;
   int pcoll = -1;
@@ -113,12 +113,13 @@ void turnOnCurve(int mode = 0)
   
   for(int ifile = 0; ifile<6; ifile++)
     {
-      TFile * inf = TFile::Open(Form("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat%d_Track9_Jet30_matchEqR_merged_forest_0.root",(int)bins[ifile]),"read");
+      //TFile * inf = TFile::Open(Form("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat%d_Track9_Jet30_matchEqR_merged_forest_0.root",(int)bins[ifile]),"read");
+      TFile * inf = TFile::Open(Form("/mnt/hadoop/cms/store/user/velicanu/HiForest_pp_Offical_MC_pthat_%d_53X_STARTHI53_V29_5_3_20_correctJEC_pawan_30Nov2014_hadd/0.root",(int)bins[ifile]),"read");
       TTree * skim = (TTree*)inf->Get("skimanalysis/HltTree");
       TTree * evt  = (TTree*)inf->Get("hiEvtAnalyzer/HiTree"); 
-      TTree * jet2 = (TTree*)inf->Get("akPu2PFJetAnalyzer/t");
-      TTree * jet3 = (TTree*)inf->Get("akPu3PFJetAnalyzer/t");
-      TTree * jet4 = (TTree*)inf->Get("akPu4PFJetAnalyzer/t");
+      TTree * jet2 = (TTree*)inf->Get("ak2PFJetAnalyzer/t");
+      TTree * jet3 = (TTree*)inf->Get("ak3PFJetAnalyzer/t");
+      TTree * jet4 = (TTree*)inf->Get("ak4PFJetAnalyzer/t");
       //TTree * jet5 = (TTree*)inf->Get("akPu5PFJetAnalyzer/t");
       TTree * hlt =  (TTree*)inf->Get("hltanalysis/HltTree");
 
@@ -130,12 +131,12 @@ void turnOnCurve(int mode = 0)
       skim->AddFriend(hlt);
 
       evt->SetBranchAddress("vz",&vz);
-      evt->SetBranchAddress("hiBin",&hiBin);
-      skim->SetBranchAddress("pcollisionEventSelection",&pcoll);
+      // evt->SetBranchAddress("hiBin",&hiBin);
+      skim->SetBranchAddress("pPAcollisionEventSelectionPA",&pcoll);
       skim->SetBranchAddress("pHBHENoiseFilter",&noise);
-      hlt->SetBranchAddress("HLT_HIJet80_v7",&trigger80);
-      hlt->SetBranchAddress("HLT_HIJet65_v7",&trigger65);
-      hlt->SetBranchAddress("HLT_HIJet55_v7",&trigger55);
+      hlt->SetBranchAddress("HLT_PAJet80_NoJetID_v1",&trigger80);
+      hlt->SetBranchAddress("HLT_PAJet60_NoJetID_v1",&trigger60);
+      hlt->SetBranchAddress("HLT_PAJet40_NoJetID_v1",&trigger40);
       jet2->SetBranchAddress("jtpt",&jetpt2);
       jet2->SetBranchAddress("jteta",&jeteta2);
       jet3->SetBranchAddress("jtpt",&jetpt3);
@@ -151,14 +152,15 @@ void turnOnCurve(int mode = 0)
 
 
       int nEntries = skim->GetEntries();
-      //int nEntries = 100;
+      nEntries = 400000;
       for(int i = 0; i<nEntries; i++)
 	{
-	  if(i%1000==0) std::cout << i << "/" << skim->GetEntries() << std::endl;
+	  if(i%10000==0) std::cout << i << "/" << skim->GetEntries() << std::endl;
 	  skim->GetEntry(i);
 	  if(pcoll==0) continue;
-	  Int_t cBin = findBin(hiBin);
-	  if(cBin == -1 || cBin >= nbins_cent) continue;
+	  //Int_t cBin = findBin(hiBin);
+	  //if(cBin == -1 || cBin >= nbins_cent) continue;
+	  int cBin = 0;
 	  if(vz>15 || vz<-15) continue;
 	  //if(noise==0) continue;
 	  //std::cout << noise << " " << pcoll << " " << trigger << " " << std::endl;
@@ -169,9 +171,9 @@ void turnOnCurve(int mode = 0)
 	      if(TMath::Abs(jeteta2[0])<2)
 		{
 		  denom2[6]->Fill(jetpt2[0]);
-		  if(trigger65 && !trigger80) turnon2[6]->Fill(jetpt2[0]);
+		  if(trigger80) turnon2[6]->Fill(jetpt2[0]);
 		  denom2[cBin]->Fill(jetpt2[0]);
-		  if(trigger65 && !trigger80) turnon2[cBin]->Fill(jetpt2[0]);
+		  if(trigger80) turnon2[cBin]->Fill(jetpt2[0]);
 		}
 	    }
 	  if(nref3!=0)//TMath::Abs(jeteta3[0])<1.6)
@@ -179,9 +181,9 @@ void turnOnCurve(int mode = 0)
 	      if(TMath::Abs(jeteta3[0])<2)
 		{
 		  denom3[6]->Fill(jetpt3[0]);
-		  if(trigger65 && !trigger80) turnon3[6]->Fill(jetpt3[0]);
+		  if(trigger80) turnon3[6]->Fill(jetpt3[0]);
 		  denom3[cBin]->Fill(jetpt3[0]);
-		  if(trigger65 && !trigger80) turnon3[cBin]->Fill(jetpt3[0]);
+		  if(trigger80) turnon3[cBin]->Fill(jetpt3[0]);
 		}
 	    }
 	  if(nref4!=0)//TMath::Abs(jeteta4[0])<1.6)
@@ -189,9 +191,9 @@ void turnOnCurve(int mode = 0)
 	      if(TMath::Abs(jeteta4[0])<2)
 		{
 		  denom4[6]->Fill(jetpt4[0]);
-		  if(trigger65 && !trigger80) turnon4[6]->Fill(jetpt4[0]);
+		  if(trigger80) turnon4[6]->Fill(jetpt4[0]);
 		  denom4[cBin]->Fill(jetpt4[0]);
-		  if(trigger65 && !trigger80) turnon4[cBin]->Fill(jetpt4[0]);
+		  if(trigger80) turnon4[cBin]->Fill(jetpt4[0]);
 		}
 	    }
 	//   if(nref5!=0)//TMath::Abs(jeteta5[0])<1.6)
@@ -337,7 +339,7 @@ void turnOnCurve(int mode = 0)
   c2->SaveAs("TriggerTurnOn_PbPbMC_20_eta_20_jet55.pdf");
 #endif
   
-  TFile fout("MinBias_Sub/PbPb_MCPYHYD_trigger_TurnonCurve_histograms_Jet65not80_R234_20_eta_20_20150618.root","RECREATE");
+  TFile fout("MinBias_Sub/PP_MCPY_trigger_TurnonCurve_histograms_Jet480_R234_20_eta_20_20150702.root","RECREATE");
   fout.cd();
 
   for(int i = 0; i<nbins_cent+1; ++i){

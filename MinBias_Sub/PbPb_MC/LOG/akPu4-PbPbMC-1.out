@@ -1,28 +1,32 @@
 
 ----------------------------------------------------
-Job started on Tue Jun 23 09:59:21 EDT 2015 at WN: lnbat0004.cmsaf.mit.edu 
-Job is running on Linux lnbat0004.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Job started on Fri Jul  3 12:38:22 EDT 2015 at WN: t2bat0188.cmsaf.mit.edu 
+Job is running on Linux t2bat0188.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
 Filesystem            Size  Used Avail Use% Mounted on
-/dev/sda3              20G  3.9G   15G  21% /
+/dev/sda3              20G  3.0G   16G  16% /
 tmpfs                  12G     0   12G   0% /dev/shm
 /dev/sda1              97M   32M   61M  35% /boot
-/dev/sda4             1.8T   96G  1.7T   6% /export/data1
-/dev/sdb1             1.8T  1.6T  203G  89% /export/00b
-/dev/sdc1             1.8T  1.7T  192G  90% /export/00c
-/dev/sdd1             1.8T  1.6T  203G  89% /export/00d
-/dev/sde1             1.8T  1.6T  219G  89% /export/00e
-/dev/sdf1             1.8T  1.7T  185G  90% /export/00f
-fuse_dfs              4.9P  4.4P  518T  90% /mnt/hadoop
+/dev/sda4             874G   74G  800G   9% /export/data1
+/dev/sdb1             1.8T  1.6T  197G  90% /export/00b
+/dev/sdc1             1.8T  1.6T  209G  89% /export/00c
+/dev/sdd1             1.8T  1.6T  202G  90% /export/00d
+/dev/sde1             1.8T  1.6T  206G  89% /export/00e
+/dev/sdf1             1.8T  1.7T  194G  90% /export/00f
+fuse_dfs              4.9P  4.4P  508T  90% /mnt/hadoop
+cvmfs2                 98G   71G   28G  73% /cvmfs/cms.cern.ch
 t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
-cvmfs2                 98G   94G  4.7G  96% /cvmfs/cms.cern.ch
-cvmfs2                 98G   94G  4.7G  96% /cvmfs/mu2e.opensciencegrid.org
-cvmfs2                 98G   94G  4.7G  96% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   71G   28G  73% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   71G   28G  73% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   71G   28G  73% /cvmfs/cdfcfs.fnal.gov
 gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
 Copyright (C) 2010 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 Processing...
+filename: /mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat30_Track9_Jet30_matchEqR_merged_forest_0.root
+pthat = 30
+Total number of events loaded in HiForest = 250567
 0/250567
 10000/250567
 20000/250567
@@ -50,7 +54,7 @@ Processing...
 240000/250567
 250000/250567
 Macro finished: 
-CPU time (min)  = 3.132
-Real time (min) = 3.70345
+CPU time (min)  = 3.1025
+Real time (min) = 3.69676
 Done!
 Copied output files to hadoop rootfiles/JetRAA/June22

@@ -1,0 +1,52 @@
+
+ *** Break *** segmentation violation
+
+
+
+===========================================================
+There was a crash.
+This is the entire stack trace of all threads:
+===========================================================
+#0  0x00000033516ac76e in waitpid () from /lib64/libc.so.6
+#1  0x000000335163e889 in do_system () from /lib64/libc.so.6
+#2  0x00002b6666b3d81c in TUnixSystem::StackTrace() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#3  0x00002b6666b40003 in TUnixSystem::DispatchSignals(ESignals) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#4  <signal handler called>
+#5  0x0000000000841f0f in ?? ()
+#6  0x00002b6667f25e6a in RAA_read_data_pbpb(int, int, int, std::basic_string<char, std::char_traits<char>, std::allocator<char> >) () from /export/data1/condor/execute/dir_19519/./RAA_read_data_pbpb_C.so
+#7  0x00002b6667f27b6c in G__RAA_read_data_pbpb_C_ACLiC_dict__0_2033(G__value*, char const*, G__param*, int) () from /export/data1/condor/execute/dir_19519/./RAA_read_data_pbpb_C.so
+#8  0x00002b66670c9767 in Cint::G__ExceptionWrapper(int (*)(G__value*, char const*, G__param*, int), G__value*, char*, G__param*, int) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCint.so
+#9  0x00002b66671725f1 in G__execute_call () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCint.so
+#10 0x00002b66671729be in G__call_cppfunc () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCint.so
+#11 0x00002b66671579b3 in G__interpret_func () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCint.so
+#12 0x00002b6667141639 in G__getfunction () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCint.so
+#13 0x00002b666711c9b2 in G__getitem () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCint.so
+#14 0x00002b6667122f1a in G__getexpr () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCint.so
+#15 0x00002b666712e32d in G__calc_internal () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCint.so
+#16 0x00002b66671afe60 in G__process_cmd () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCint.so
+#17 0x00002b6666b0a4f1 in TCint::ProcessLine(char const*, TInterpreter::EErrorCode*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#18 0x00002b6666b01023 in TCint::ProcessLineSynch(char const*, TInterpreter::EErrorCode*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#19 0x00002b6666a75ddd in TApplication::ExecuteFile(char const*, int*, bool) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#20 0x00002b6666a74b9a in TApplication::ProcessLine(char const*, bool, int*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#21 0x00002b6667a87b49 in TRint::HandleTermInput() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libRint.so
+#22 0x00002b6666b3efed in TUnixSystem::CheckDescriptors() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#23 0x00002b6666b40738 in TUnixSystem::DispatchOneEvent(bool) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#24 0x00002b6666ac7a86 in TSystem::InnerLoop() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#25 0x00002b6666ac9654 in TSystem::Run() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#26 0x00002b6666a72b1f in TApplication::Run(bool) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libCore.so
+#27 0x00002b6667a88817 in TRint::Run(bool) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc472/lcg/root/5.32.00-cms/lib/libRint.so
+#28 0x0000000000400f8c in main ()
+===========================================================
+
+
+The lines below might hint at the cause of the crash.
+If they do not help you then please submit a bug report at
+http://root.cern.ch/bugs. Please post the ENTIRE stack trace
+from above as an attachment in addition to anything else
+that might help us fixing this issue.
+===========================================================
+#5  0x0000000000841f0f in ?? ()
+#6  0x00002b6667f25e6a in RAA_read_data_pbpb(int, int, int, std::basic_string<char, std::char_traits<char>, std::allocator<char> >) () from /export/data1/condor/execute/dir_19519/./RAA_read_data_pbpb_C.so
+===========================================================
+
+

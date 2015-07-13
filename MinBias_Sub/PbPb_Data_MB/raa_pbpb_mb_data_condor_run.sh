@@ -25,14 +25,16 @@ startfile=$1
 endfile=$2
 radius=$3
 outfile=$4
+ptCut=$5
+
 echo "Processing..."
 
 root -b -l <<EOF
-.x RAA_read_mb_data_pbpb.C+($startfile,$endfile,$radius,"$outfile")
+.x RAA_read_mb_data_pbpb.C+($startfile,$endfile,$radius,"$outfile",$ptCut)
 .q
 EOF
 
-mv $outfile /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June22/
+mv $outfile /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June29/
 
 echo "Done!"
 

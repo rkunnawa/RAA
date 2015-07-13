@@ -295,7 +295,7 @@ void RAA_read_data_pp(int startfile = 8,
   jetpp[0]->SetBranchAddress("HLT_PAJet80_NoJetID_v1",&jet80_F);
   jetpp[0]->SetBranchAddress("HLT_PAJet80_NoJetID_v1_Prescl",&jet80_p_F);
 
- 
+  
   // event tree selection file:
   int run_eS;
   int evt_eS;
@@ -325,24 +325,25 @@ void RAA_read_data_pp(int startfile = 8,
   evt_select->SetBranchAddress("isMuCut",&isMuCut_eS);
   evt_select->SetBranchAddress("weight", &weight_eS);  
 
-  // jet tree selection file:
-  int run_jS;
-  int evt_jS;
-  int lumi_jS;
-  float vz_jS;
-  int nref_jS;
-  float pt_jS[1000];
-  float eta_jS[1000];
-  float eMax_jS[1000];
 
-  jet_select->SetBranchAddress("run_value",&run_jS);
-  jet_select->SetBranchAddress("evt_value",&evt_jS);
-  jet_select->SetBranchAddress("lumi_value",&lumi_jS);
-  jet_select->SetBranchAddress("vz",&vz_jS);
-  jet_select->SetBranchAddress("npf", &nref_jS);  
-  jet_select->SetBranchAddress("pfpt", &pt_jS);  
-  jet_select->SetBranchAddress("eMax", &eMax_jS);  
-  jet_select->SetBranchAddress("pfeta", &eta_jS);  
+  // // jet tree selection file:
+  // int run_jS;
+  // int evt_jS;
+  // int lumi_jS;
+  // float vz_jS;
+  // int nref_jS;
+  // float pt_jS[1000];
+  // float eta_jS[1000];
+  // float eMax_jS[1000];
+
+  // jet_select->SetBranchAddress("run_value",&run_jS);
+  // jet_select->SetBranchAddress("evt_value",&evt_jS);
+  // jet_select->SetBranchAddress("lumi_value",&lumi_jS);
+  // jet_select->SetBranchAddress("vz",&vz_jS);
+  // jet_select->SetBranchAddress("npf", &nref_jS);  
+  // jet_select->SetBranchAddress("pfpt", &pt_jS);  
+  // jet_select->SetBranchAddress("eMax", &eMax_jS);  
+  // jet_select->SetBranchAddress("pfeta", &eta_jS);  
 
   // Declare the output File and the necessary histograms after that:
   // std::string outdir="";
@@ -370,20 +371,20 @@ void RAA_read_data_pp(int startfile = 8,
   TH1F *hpp_anaBin_TrgObj40;
   TH1F *hpp_anaBin_TrgObjComb;
 
-    hpp_TrgObj80 = new TH1F(Form("hpp_HLT80_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 80 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_TrgObj60 = new TH1F(Form("hpp_HLT60_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 60 && !jet80 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_TrgObj40 = new TH1F(Form("hpp_HLT40_R%d_%s",radius,etaWidth),Form("Spectra from Jet 40 && !jet60 && !jet80 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_TrgObjComb = new TH1F(Form("hpp_HLTComb_R%d_%s",radius,etaWidth),Form("Trig Combined Spectra R%d %s ",radius,etaWidth),501,0,501);
+    hpp_TrgObj80 = new TH1F(Form("hpp_HLT80_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 80 R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_TrgObj60 = new TH1F(Form("hpp_HLT60_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 60 && !jet80 R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_TrgObj40 = new TH1F(Form("hpp_HLT40_R%d_%s",radius,etaWidth),Form("Spectra from Jet 40 && !jet60 && !jet80 R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_TrgObjComb = new TH1F(Form("hpp_HLTComb_R%d_%s",radius,etaWidth),Form("Trig Combined Spectra R%d %s ",radius,etaWidth),1000,0,1000);
 
-  hpp_JEC_TrgObj80 = new TH1F(Form("hpp_JEC_HLT80_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 80 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_JEC_TrgObj60 = new TH1F(Form("hpp_JEC_HLT60_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 60 && !jet80 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_JEC_TrgObj40 = new TH1F(Form("hpp_JEC_HLT40_R%d_%s",radius,etaWidth),Form("Spectra from Jet 40 && !jet60 && !jet80 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_JEC_TrgObjComb = new TH1F(Form("hpp_JEC_HLTComb_R%d_%s",radius,etaWidth),Form("Trig Combined Spectra R%d %s ",radius,etaWidth),501,0,501);
+  hpp_JEC_TrgObj80 = new TH1F(Form("hpp_JEC_HLT80_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 80 R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_JEC_TrgObj60 = new TH1F(Form("hpp_JEC_HLT60_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 60 && !jet80 R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_JEC_TrgObj40 = new TH1F(Form("hpp_JEC_HLT40_R%d_%s",radius,etaWidth),Form("Spectra from Jet 40 && !jet60 && !jet80 R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_JEC_TrgObjComb = new TH1F(Form("hpp_JEC_HLTComb_R%d_%s",radius,etaWidth),Form("Trig Combined Spectra R%d %s ",radius,etaWidth),1000,0,1000);
 
-  hpp_Smear_TrgObj80 = new TH1F(Form("hpp_Smear_HLT80_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 80 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_Smear_TrgObj60 = new TH1F(Form("hpp_Smear_HLT60_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 60 && !jet80 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_Smear_TrgObj40 = new TH1F(Form("hpp_Smear_HLT40_R%d_%s",radius,etaWidth),Form("Spectra from Jet 40 && !jet60 && !jet80 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_Smear_TrgObjComb = new TH1F(Form("hpp_Smear_HLTComb_R%d_%s",radius,etaWidth),Form("Trig Combined Spectra R%d %s ",radius,etaWidth),501,0,501);
+  hpp_Smear_TrgObj80 = new TH1F(Form("hpp_Smear_HLT80_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 80 R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_Smear_TrgObj60 = new TH1F(Form("hpp_Smear_HLT60_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 60 && !jet80 R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_Smear_TrgObj40 = new TH1F(Form("hpp_Smear_HLT40_R%d_%s",radius,etaWidth),Form("Spectra from Jet 40 && !jet60 && !jet80 R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_Smear_TrgObjComb = new TH1F(Form("hpp_Smear_HLTComb_R%d_%s",radius,etaWidth),Form("Trig Combined Spectra R%d %s ",radius,etaWidth),1000,0,1000);
 
   hpp_anaBin_TrgObj80 = new TH1F(Form("hpp_anaBin_HLT80_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 80 R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);
   hpp_anaBin_TrgObj60 = new TH1F(Form("hpp_anaBin_HLT60_R%d_%s",radius,etaWidth),Form("Spectra from  Jet 60 && !jet80 R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);
@@ -444,7 +445,7 @@ void RAA_read_data_pp(int startfile = 8,
     //if(printDebug) cout<<"lumi hiForest  = "<<lumi_F<<", evtTree = "<<lumi_eS<<", jetTree = "<<lumi_jS<<endl;
     //if(printDebug) cout<<"vz hiForest    = "<<vz_F<<", evtTree = "<<vz_eS<<", jetTree = "<<vz_jS<<endl;
     
-    if(printDebug) cout<<"nref_F = "<<nref_F<<", nref_eS = "<<nref_eS<<", nref_jS = "<<nref_jS<<endl;
+    if(printDebug) cout<<"nref_F = "<<nref_F<<", nref_eS = "<<nref_eS<<endl;
 
     if(nref_F != nref_eS) cout<<"ERROR mismatch in jet counts"<<endl;
 

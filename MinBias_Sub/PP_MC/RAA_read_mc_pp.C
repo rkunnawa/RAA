@@ -68,7 +68,6 @@
 #include "TMath.h"
 #include "TLine.h"
 
-
 static const int nbins_pt = 39;
 static const double boundaries_pt[nbins_pt+1] = {
   3, 4, 5, 7, 9, 12, 
@@ -81,6 +80,12 @@ static const double boundaries_pt[nbins_pt+1] = {
   468, 507, 548, 592,
   638, 686, 1000 
 };
+
+// static const int nbins_pt = 14;
+// static const double boundaries_pt[nbins_pt+1] = {
+//   49, 56, 64, 74, 84, 97, 114, 133,
+//   153, 174, 196, 220, 245, 272, 300
+// };
 
 //these are the only radii we are interested for the RAA analysis: 2,3,4,5
 //static const int no_radius = 3; 
@@ -164,7 +169,8 @@ void RAA_read_mc_pp(int startfile = 8,
   const int N = 5; //6
 
   TChain * jetpp[N];
-  TChain * evt_select, * jet_select; 
+  TChain * evt_select;
+  //TChain * jet_select; 
 
   string dir[N];
   dir[0] = "hltanalysis";
@@ -188,7 +194,10 @@ void RAA_read_mc_pp(int startfile = 8,
   }//tree loop ends
 
   evt_select = new TChain(Form("ak%dJetAnalyzer/evtTree",radius));
-  jet_select = new TChain(Form("ak%dJetAnalyzer/jetTree",radius));
+  //jet_select = new TChain(Form("ak%dJetAnalyzer/jetTree",radius));
+
+  TFile * fweight = new TFile(Form("weights_pp_%d.root",endfile), "r");
+  TTree * weight_Tree = (TTree*)fweight->Get("weights");
 
   for(int ifile = startfile; ifile<endfile; ++ifile){
 
@@ -200,7 +209,7 @@ void RAA_read_mc_pp(int startfile = 8,
     jetpp[2]->Add(filename_Forest.c_str());
     jetpp[3]->Add(filename_Forest.c_str());
     jetpp[4]->Add(filename_Forest.c_str());
-    jet_select->Add(filename_Select.c_str());
+    //jet_select->Add(filename_Select.c_str());
     evt_select->Add(filename_Select.c_str());
     
     if(printDebug)cout << "Tree loaded  " << string(dir[0]+"/"+trees[0]).data() << endl;
@@ -213,7 +222,7 @@ void RAA_read_mc_pp(int startfile = 8,
     if(printDebug)cout << "Entries : " << jetpp[3]->GetEntries() << endl;
     if(printDebug)cout << "Tree loaded  " << string(dir[4]+"/"+trees[4]).data() << endl;
     if(printDebug)cout << "Entries : " << jetpp[4]->GetEntries() << endl;
-    if(printDebug)cout << "jet selection file " << jet_select->GetEntries() << endl;
+    //if(printDebug)cout << "jet selection file " << jet_select->GetEntries() << endl;
     if(printDebug)cout << "event selection file" << evt_select->GetEntries() << endl;
 
   }
@@ -248,7 +257,9 @@ void RAA_read_mc_pp(int startfile = 8,
   float eSum_F[1000];
   float muSum_F[1000];
   float jtpu_F[1000];
-  float subid_F[1000];
+  int subid_F[1000];
+  float refdrjt_F[1000];
+
   float pthat_F;
   int jet40_F;
   int jet60_F;
@@ -275,6 +286,7 @@ void RAA_read_mc_pp(int startfile = 8,
   //jetpp[0]->SetBranchAddress("pVertexFilterCutGplus",&pVertexFilterCutGplus_F);
   jetpp[2]->SetBranchAddress("nref",&nref_F);
   jetpp[2]->SetBranchAddress("subid",&subid_F);
+  jetpp[2]->SetBranchAddress("refdrjt",refdrjt_F);
   jetpp[2]->SetBranchAddress("refpt", &refpt_F);
   jetpp[2]->SetBranchAddress("jtpt",&pt_F);
   jetpp[2]->SetBranchAddress("jteta",&eta_F);
@@ -301,7 +313,6 @@ void RAA_read_mc_pp(int startfile = 8,
   jetpp[0]->SetBranchAddress("HLT_PAJet80_NoJetID_v1",&jet80_F);
   jetpp[0]->SetBranchAddress("HLT_PAJet80_NoJetID_v1_Prescl",&jet80_p_F);
 
- 
   // event tree selection file:
   int run_eS;
   int evt_eS;
@@ -329,26 +340,38 @@ void RAA_read_mc_pp(int startfile = 8,
   evt_select->SetBranchAddress("isPFElecCut",&isPFElecCut_eS);
   evt_select->SetBranchAddress("isTrackCut",&isTrackCut_eS);
   evt_select->SetBranchAddress("isMuCut",&isMuCut_eS);
-  evt_select->SetBranchAddress("weight", &weight_eS);  
+  evt_select->SetBranchAddress("weight", &weight_eS);
 
-  // jet tree selection file:
-  int run_jS;
-  int evt_jS;
-  int lumi_jS;
-  float vz_jS;
-  int nref_jS;
-  float pt_jS[1000];
-  float eta_jS[1000];
-  float eMax_jS[1000];
+  double pthatweight;
+  int evt_w;
+  int lumi_w;
+  float vz_w;
 
-  jet_select->SetBranchAddress("run_value",&run_jS);
-  jet_select->SetBranchAddress("evt_value",&evt_jS);
-  jet_select->SetBranchAddress("lumi_value",&lumi_jS);
-  jet_select->SetBranchAddress("vz",&vz_jS);
-  jet_select->SetBranchAddress("npf", &nref_jS);  
-  jet_select->SetBranchAddress("pfpt", &pt_jS);  
-  jet_select->SetBranchAddress("eMax", &eMax_jS);  
-  jet_select->SetBranchAddress("pfeta", &eta_jS);  
+  weight_Tree->SetBranchAddress("pthatweight",&pthatweight);
+  weight_Tree->SetBranchAddress("evt",&evt_w);
+  weight_Tree->SetBranchAddress("lumi",&lumi_w);
+  weight_Tree->SetBranchAddress("vz",&vz_w);
+
+  jetpp[2]->AddFriend(weight_Tree);
+  
+  // // jet tree selection file:
+  // int run_jS;
+  // int evt_jS;
+  // int lumi_jS;
+  // float vz_jS;
+  // int nref_jS;
+  // float pt_jS[1000];
+  // float eta_jS[1000];
+  // float eMax_jS[1000];
+
+  // jet_select->SetBranchAddress("run_value",&run_jS);
+  // jet_select->SetBranchAddress("evt_value",&evt_jS);
+  // jet_select->SetBranchAddress("lumi_value",&lumi_jS);
+  // jet_select->SetBranchAddress("vz",&vz_jS);
+  // jet_select->SetBranchAddress("npf", &nref_jS);  
+  // jet_select->SetBranchAddress("pfpt", &pt_jS);  
+  // jet_select->SetBranchAddress("eMax", &eMax_jS);  
+  // jet_select->SetBranchAddress("pfeta", &eta_jS);  
 
   // Declare the output File and the necessary histograms after that:
   // std::string outdir="";
@@ -368,10 +391,44 @@ void RAA_read_mc_pp(int startfile = 8,
   
   TH1F *hpp_gen,*hpp_reco;
   TH2F *hpp_matrix;
-  TH2F *hpp_matrix_HLT;
-  TH2F *hpp_anaBin_matrix_HLT;
   TH2F *hpp_mcclosure_matrix;
+
+  TH2F *hpp_matrix_HLT;
+  TH2F *hpp_Trans_matrix_HLT;
+  TH2F *hpp_anaBin_matrix_HLT;
+  TH2F *hpp_anaBin_Trans_matrix_HLT;
   TH2F *hpp_mcclosure_matrix_HLT;
+  TH2F *hpp_mcclosure_Trans_matrix_HLT;
+  TH2F *hpp_anaBin_mcclosure_matrix_HLT;
+  TH2F *hpp_anaBin_mcclosure_Trans_matrix_HLT;
+
+  TH2F *hpp_matrix_HLT_Jet80;
+  TH2F *hpp_Trans_matrix_HLT_Jet80;
+  TH2F *hpp_anaBin_matrix_HLT_Jet80;
+  TH2F *hpp_anaBin_Trans_matrix_HLT_Jet80;
+  TH2F *hpp_mcclosure_matrix_HLT_Jet80;
+  TH2F *hpp_mcclosure_Trans_matrix_HLT_Jet80;
+  TH2F *hpp_anaBin_mcclosure_matrix_HLT_Jet80;
+  TH2F *hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet80;
+
+  TH2F *hpp_matrix_HLT_Jet60;
+  TH2F *hpp_Trans_matrix_HLT_Jet60;
+  TH2F *hpp_anaBin_matrix_HLT_Jet60;
+  TH2F *hpp_anaBin_Trans_matrix_HLT_Jet60;
+  TH2F *hpp_mcclosure_matrix_HLT_Jet60;
+  TH2F *hpp_mcclosure_Trans_matrix_HLT_Jet60;
+  TH2F *hpp_anaBin_mcclosure_matrix_HLT_Jet60;
+  TH2F *hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet60;
+
+  TH2F *hpp_matrix_HLT_Jet40;
+  TH2F *hpp_Trans_matrix_HLT_Jet40;
+  TH2F *hpp_anaBin_matrix_HLT_Jet40;
+  TH2F *hpp_anaBin_Trans_matrix_HLT_Jet40;
+  TH2F *hpp_mcclosure_matrix_HLT_Jet40;
+  TH2F *hpp_mcclosure_Trans_matrix_HLT_Jet40;
+  TH2F *hpp_anaBin_mcclosure_matrix_HLT_Jet40;
+  TH2F *hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet40;
+  
   //TH2F *hpp_response;
   TH1F *hpp_mcclosure_JetComb_data;
   TH1F *hpp_mcclosure_data;
@@ -389,45 +446,44 @@ void RAA_read_mc_pp(int startfile = 8,
   TH1F *hpp_mcclosure_Jet60_gen;
   TH1F *hpp_mcclosure_Jet40_gen;
 
+  TH1F * hpthat_oldWeight = new TH1F("hpthat_oldWeight","",1000,0,1000);
+  TH1F * hpthat_newWeight = new TH1F("hpthat_newWeight","",1000,0,1000);
   
-  hpp_gen = new TH1F(Form("hpp_gen_R%d_%s",radius,etaWidth),Form("Gen refpt R%d %s ",radius,etaWidth),501,0,501);
+  hpp_gen = new TH1F(Form("hpp_gen_R%d_%s",radius,etaWidth),Form("Gen refpt R%d %s ",radius,etaWidth),1000,0,1000);
   //cout<<"A"<<endl;
-  hpp_reco = new TH1F(Form("hpp_reco_R%d_%s",radius,etaWidth),Form("Reco jtpt R%d %s ",radius,etaWidth),501,0,501);
+  hpp_reco = new TH1F(Form("hpp_reco_R%d_%s",radius,etaWidth),Form("Reco jtpt R%d %s ",radius,etaWidth),1000,0,1000);
   //cout<<"B"<<endl;
-  hpp_matrix = new TH2F(Form("hpp_matrix_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt R%d %s ",radius,etaWidth),501,0,501,501,0,501);
-  hpp_matrix_HLT = new TH2F(Form("hpp_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),501,0,501,501,0,501);
+  hpp_matrix = new TH2F(Form("hpp_matrix_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt R%d %s ",radius,etaWidth),1000,0,1000,1000,0,1000);
+
+  hpp_matrix_HLT = new TH2F(Form("hpp_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),1000,0,1000,1000,0,1000);
+  hpp_Trans_matrix_HLT = new TH2F(Form("hpp_Trans_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),1000,0,1000,1000,0,1000);
   hpp_anaBin_matrix_HLT = new TH2F(Form("hpp_anaBin_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
-  hpp_mcclosure_matrix = new TH2F(Form("hpp_mcclosure_matrix_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt R%d %s ",radius,etaWidth),501,0,501,501,0,501);
-  hpp_mcclosure_matrix_HLT = new TH2F(Form("hpp_mcclosure_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),501,0,501,501,0,501);
-  //cout<<"C"<<endl;
-  hpp_mcclosure_data = new TH1F(Form("hpp_mcclosure_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_JetComb_data = new TH1F(Form("hpp_mcclosure_JetComb_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger combined  R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_Jet80_data = new TH1F(Form("hpp_mcclosure_Jet80_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 80  R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_Jet60_data = new TH1F(Form("hpp_mcclosure_Jet60_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 60  R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_Jet40_data = new TH1F(Form("hpp_mcclosure_Jet40_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 40  R%d %s ",radius,etaWidth),501,0,501);
+  hpp_anaBin_Trans_matrix_HLT = new TH2F(Form("hpp_anaBin_Trans_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
 
-  hpp_mcclosure_data_train = new TH1F(Form("hpp_mcclosure_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_JetComb_data_train = new TH1F(Form("hpp_mcclosure_JetComb_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger combined  R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_Jet80_data_train = new TH1F(Form("hpp_mcclosure_Jet80_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger 80  R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_Jet60_data_train = new TH1F(Form("hpp_mcclosure_Jet60_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger 60  R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_Jet40_data_train = new TH1F(Form("hpp_mcclosure_Jet40_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger 40  R%d %s ",radius,etaWidth),501,0,501);
+  hpp_matrix_HLT_Jet80 = new TH2F(Form("hpp_matrix_HLT_Jet80_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),1000,0,1000,1000,0,1000);
+  hpp_Trans_matrix_HLT_Jet80 = new TH2F(Form("hpp_Trans_matrix_HLT_Jet80_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),1000,0,1000,1000,0,1000);
+  hpp_anaBin_matrix_HLT_Jet80 = new TH2F(Form("hpp_anaBin_matrix_HLT_Jet80_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_anaBin_Trans_matrix_HLT_Jet80 = new TH2F(Form("hpp_anaBin_Trans_matrix_HLT_Jet80_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
 
-  
-  hpp_mcclosure_gen = new TH1F(Form("hpp_mcclosure_gen_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_JetComb_gen = new TH1F(Form("hpp_mcclosure_gen_JetComb_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger combined R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_Jet80_gen = new TH1F(Form("hpp_mcclosure_gen_Jet80_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 80 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_Jet60_gen = new TH1F(Form("hpp_mcclosure_gen_Jet60_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 60 R%d %s ",radius,etaWidth),501,0,501);
-  hpp_mcclosure_Jet40_gen = new TH1F(Form("hpp_mcclosure_gen_Jet40_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 40 R%d %s ",radius,etaWidth),501,0,501);
+  hpp_matrix_HLT_Jet60 = new TH2F(Form("hpp_matrix_HLT_Jet60_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),1000,0,1000,1000,0,1000);
+  hpp_Trans_matrix_HLT_Jet60 = new TH2F(Form("hpp_Trans_matrix_HLT_Jet60_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),1000,0,1000,1000,0,1000);
+  hpp_anaBin_matrix_HLT_Jet60 = new TH2F(Form("hpp_anaBin_matrix_HLT_Jet60_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_anaBin_Trans_matrix_HLT_Jet60 = new TH2F(Form("hpp_anaBin_Trans_matrix_HLT_Jet60_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
 
-  hpp_JetComb_gen = new TH1F(Form("hpp_JetComb_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from HLT trigger combined R%d %s ",radius,etaWidth),501,0,501);
-  hpp_JetComb_reco = new TH1F(Form("hpp_JetComb_reco_R%d_%s",radius,etaWidth),Form("reco jtpt from HLT trigger combined R%d %s ",radius,etaWidth),501,0,501);
-  hpp_Jet80_gen = new TH1F(Form("hpp_Jet80_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from Jet80 trigger R%d %s ",radius,etaWidth),501,0,501);
-  hpp_Jet80_reco = new TH1F(Form("hpp_Jet80_reco_R%d_%s",radius,etaWidth),Form("reco jtpt from Jet80 trigger R%d %s ",radius,etaWidth),501,0,501);
-  hpp_Jet60_gen = new TH1F(Form("hpp_Jet60_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from Jet60 && !Jet80 trigger R%d %s ",radius,etaWidth),501,0,501);
-  hpp_Jet60_reco = new TH1F(Form("hpp_Jet60_reco_R%d_%s",radius,etaWidth),Form("reco jtpt from Jet60 && !Jet80 trigger R%d %s ",radius,etaWidth),501,0,501);
-  hpp_Jet40_gen = new TH1F(Form("hpp_Jet40_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from Jet40 && !Jet60 && !Jet80 trigger R%d %s ",radius,etaWidth),501,0,501);
-  hpp_Jet40_reco = new TH1F(Form("hpp_Jet40_reco_R%d_%s",radius,etaWidth),Form("reco jtpt from Jet40 && !Jet60 && !Jet80 trigger R%d %s ",radius,etaWidth),501,0,501);
+  hpp_matrix_HLT_Jet40 = new TH2F(Form("hpp_matrix_HLT_Jet40_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),1000,0,1000,1000,0,1000);
+  hpp_Trans_matrix_HLT_Jet40 = new TH2F(Form("hpp_Trans_matrix_HLT_Jet40_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),1000,0,1000,1000,0,1000);
+  hpp_anaBin_matrix_HLT_Jet40 = new TH2F(Form("hpp_anaBin_matrix_HLT_Jet40_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_anaBin_Trans_matrix_HLT_Jet40 = new TH2F(Form("hpp_anaBin_Trans_matrix_HLT_Jet40_R%d_%s",radius,etaWidth),Form("Matrix refpt jtpt from trigger addition R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
 
+
+  hpp_JetComb_gen = new TH1F(Form("hpp_JetComb_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from HLT trigger combined R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_JetComb_reco = new TH1F(Form("hpp_JetComb_reco_R%d_%s",radius,etaWidth),Form("reco jtpt from HLT trigger combined R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_Jet80_gen = new TH1F(Form("hpp_Jet80_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from Jet80 trigger R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_Jet80_reco = new TH1F(Form("hpp_Jet80_reco_R%d_%s",radius,etaWidth),Form("reco jtpt from Jet80 trigger R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_Jet60_gen = new TH1F(Form("hpp_Jet60_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from Jet60 && !Jet80 trigger R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_Jet60_reco = new TH1F(Form("hpp_Jet60_reco_R%d_%s",radius,etaWidth),Form("reco jtpt from Jet60 && !Jet80 trigger R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_Jet40_gen = new TH1F(Form("hpp_Jet40_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from Jet40 && !Jet60 && !Jet80 trigger R%d %s ",radius,etaWidth),1000,0,1000);
+  hpp_Jet40_reco = new TH1F(Form("hpp_Jet40_reco_R%d_%s",radius,etaWidth),Form("reco jtpt from Jet40 && !Jet60 && !Jet80 trigger R%d %s ",radius,etaWidth),1000,0,1000);
   hpp_anaBin_JetComb_gen = new TH1F(Form("hpp_anaBin_JetComb_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from HLT trigger combined R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);
   hpp_anaBin_JetComb_reco = new TH1F(Form("hpp_anaBin_JetComb_reco_R%d_%s",radius,etaWidth),Form("reco jtpt from HLT trigger combined R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);
   hpp_anaBin_Jet80_gen = new TH1F(Form("hpp_anaBin_Jet80_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from Jet80 trigger R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);
@@ -437,15 +493,56 @@ void RAA_read_mc_pp(int startfile = 8,
   hpp_anaBin_Jet40_gen = new TH1F(Form("hpp_anaBin_Jet40_gen_R%d_%s",radius,etaWidth),Form("Gen refpt from Jet40 && !Jet60 && !Jet80 trigger R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);
   hpp_anaBin_Jet40_reco = new TH1F(Form("hpp_anaBin_Jet40_reco_R%d_%s",radius,etaWidth),Form("reco jtpt from Jet40 && !Jet60 && !Jet80 trigger R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt);  
 
+ 
+  hpp_anaBin_mcclosure_Trans_matrix_HLT = new TH2F(Form("hpp_anaBin_mcclosure_Trans_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_anaBin_mcclosure_matrix_HLT = new TH2F(Form("hpp_anaBin_mcclosure_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_mcclosure_matrix_HLT = new TH2F(Form("hpp_mcclosure_matrix_HLT_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),1000, 0, 1000,1000, 0, 1000);
+  hpp_mcclosure_Trans_matrix_HLT = new TH2F(Form("hpp_mcclosure_Trans_matrix_HLT_R%d_%s",radius,etaWidth),Form("Trans Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),1000, 0, 1000,1000, 0, 1000);
+
+  hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet40 = new TH2F(Form("hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet40_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_anaBin_mcclosure_matrix_HLT_Jet40 = new TH2F(Form("hpp_anaBin_mcclosure_matrix_HLT_Jet40_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_mcclosure_matrix_HLT_Jet40 = new TH2F(Form("hpp_mcclosure_matrix_HLT_Jet40_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),1000, 0, 1000,1000, 0, 1000);
+  hpp_mcclosure_Trans_matrix_HLT_Jet40 = new TH2F(Form("hpp_mcclosure_Trans_matrix_HLT_Jet40_R%d_%s",radius,etaWidth),Form("Trans Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),1000, 0, 1000,1000, 0, 1000);
+
+  hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet60 = new TH2F(Form("hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet60_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_anaBin_mcclosure_matrix_HLT_Jet60 = new TH2F(Form("hpp_anaBin_mcclosure_matrix_HLT_Jet60_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_mcclosure_matrix_HLT_Jet60 = new TH2F(Form("hpp_mcclosure_matrix_HLT_Jet60_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),1000, 0, 1000,1000, 0, 1000);
+  hpp_mcclosure_Trans_matrix_HLT_Jet60 = new TH2F(Form("hpp_mcclosure_Trans_matrix_HLT_Jet60_R%d_%s",radius,etaWidth),Form("Trans Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),1000, 0, 1000,1000, 0, 1000);
+
+  hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet80 = new TH2F(Form("hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet80_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_anaBin_mcclosure_matrix_HLT_Jet80 = new TH2F(Form("hpp_anaBin_mcclosure_matrix_HLT_Jet80_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+  hpp_mcclosure_matrix_HLT_Jet80 = new TH2F(Form("hpp_mcclosure_matrix_HLT_Jet80_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),1000, 0, 1000,1000, 0, 1000);
+  hpp_mcclosure_Trans_matrix_HLT_Jet80 = new TH2F(Form("hpp_mcclosure_Trans_matrix_HLT_Jet80_R%d_%s",radius,etaWidth),Form("Trans Matrix for mcclosure refpt jtpt from Jet triggers R%d %s ",radius,etaWidth),1000, 0, 1000,1000, 0, 1000);
+
+
+  hpp_mcclosure_matrix = new TH2F(Form("hpp_mcclosure_matrix_R%d_%s",radius,etaWidth),Form("Matrix for mcclosure refpt jtpt R%d %s ",radius,etaWidth),1000, 0, 1000,1000, 0, 1000);
+  hpp_mcclosure_data = new TH1F(Form("hpp_mcclosure_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_JetComb_data = new TH1F(Form("hpp_mcclosure_JetComb_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger combined  R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_Jet80_data = new TH1F(Form("hpp_mcclosure_Jet80_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 80  R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_Jet60_data = new TH1F(Form("hpp_mcclosure_Jet60_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 60  R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_Jet40_data = new TH1F(Form("hpp_mcclosure_Jet40_data_R%d_%s",radius,etaWidth),Form("data for unfolding mc closure test trigger 40  R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_data_train = new TH1F(Form("hpp_mcclosure_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_JetComb_data_train = new TH1F(Form("hpp_mcclosure_JetComb_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger combined  R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_Jet80_data_train = new TH1F(Form("hpp_mcclosure_Jet80_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger 80  R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_Jet60_data_train = new TH1F(Form("hpp_mcclosure_Jet60_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger 60  R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_Jet40_data_train = new TH1F(Form("hpp_mcclosure_Jet40_data_train_R%d_%s",radius,etaWidth),Form("data_train for unfolding mc closure test trigger 40  R%d %s ",radius,etaWidth),1000, 0, 1000);  
+  hpp_mcclosure_gen = new TH1F(Form("hpp_mcclosure_gen_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_JetComb_gen = new TH1F(Form("hpp_mcclosure_gen_JetComb_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger combined R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_Jet80_gen = new TH1F(Form("hpp_mcclosure_gen_Jet80_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 80 R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_Jet60_gen = new TH1F(Form("hpp_mcclosure_gen_Jet60_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 60 R%d %s ",radius,etaWidth),1000, 0, 1000);
+  hpp_mcclosure_Jet40_gen = new TH1F(Form("hpp_mcclosure_gen_Jet40_R%d_%s",radius,etaWidth),Form("gen spectra for unfolding mc closure test trigger 40 R%d %s ",radius,etaWidth),1000, 0, 1000);
+
   
-  // now start the event loop for each file. 
+  // now start the event loop for each file.
   
   if(printDebug) cout<<"Running through all the events now"<<endl;
   Long64_t nentries = jetpp[0]->GetEntries();
-  Long64_t nGoodEvt = 0;
+  //Long64_t nGoodEvt = 0;
   if(printDebug) nentries = 10;
   TRandom rnd; 
-
+  TF1 *fVzPP = new TF1("fVzPP","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");
+  fVzPP->SetParameters(8.41684e-01,-2.58609e-02,4.86550e-03,-3.10581e-04,2.07918e-05);
+  
   for(int nEvt = 0; nEvt < nentries; ++ nEvt) {
 
     if(nEvt%10000 == 0)cout<<nEvt<<"/"<<nentries<<endl;
@@ -457,15 +554,16 @@ void RAA_read_mc_pp(int startfile = 8,
     jetpp[4]->GetEntry(nEvt);
     jetpp[3]->GetEntry(nEvt);
     evt_select->GetEntry(nEvt);
-
+    weight_Tree->GetEntry(nEvt);
+    
     //if(printDebug) cout<<"forest values = "<<hiBin_F<<", "<<evt_F<<", "<<run_F<<", "<<lumi_F<<", "<<vz_F<<endl;
     
-    // if(pcollisionEventSelection_F==0) continue; 
-    // if(fabs(vz_F)>15) continue;
-    if(!isGoodEvent_eS) continue; 
+    if(pcollisionEventSelection_F==0) continue; 
+    if(fabs(vz_F)>15) continue;
+    //if(!isGoodEvent_eS) continue; 
     
-    jet_select->GetEntry(nGoodEvt);
-    ++nGoodEvt;
+    // jet_select->GetEntry(nGoodEvt);
+    // ++nGoodEvt;
 
     //if(hiBin_eS != hiBin_F || evt_eS != evt_F || run_eS != run_F || lumi_eS != lumi_F || vz_eS != vz_F) cout<<"ERROR mismatch eS, F"<<endl;
     //if(hiBin_eS != hiBin_jS || evt_eS != evt_jS || run_eS != run_jS || lumi_eS != lumi_jS || vz_eS != vz_jS) cout<<"ERROR mismatch eS, jS"<<endl;
@@ -476,87 +574,114 @@ void RAA_read_mc_pp(int startfile = 8,
     //if(printDebug) cout<<"lumi hiForest  = "<<lumi_F<<", evtTree = "<<lumi_eS<<", jetTree = "<<lumi_jS<<endl;
     //if(printDebug) cout<<"vz hiForest    = "<<vz_F<<", evtTree = "<<vz_eS<<", jetTree = "<<vz_jS<<endl;
     
-    if(printDebug) cout<<"nref_F = "<<nref_F<<", nref_eS = "<<nref_eS<<", nref_jS = "<<nref_jS<<endl;
+    //    if(printDebug) cout<<"nref_F = "<<nref_F<<", nref_eS = "<<nref_eS<<", nref_jS = "<<nref_jS<<endl;
 
     if(nref_F != nref_eS) cout<<"ERROR mismatch in jet counts"<<endl;
+
+    double vz_weight = fVzPP->Eval(vz_F);
+    
+    hpthat_oldWeight->Fill(pthat_F, weight_eS);
+    hpthat_newWeight->Fill(pthat_F, pthatweight);
+
+    weight_eS = pthatweight * vz_weight;
 
     for(int jet = 0; jet<nref_F; ++jet){
 
       if(fabs(eta_F[jet]) > 2) continue;
       if(subid_F[jet] != 0) continue;
-      if(pt_F[jet] > 2 * pthat_F) continue;
+      if(pt_F[jet] > 3 * pthat_F) continue;
+      if(refdrjt_F[jet] > 0.3) continue; 
 
-      hpp_gen->Fill(refpt_F[jet], weight_eS);
-      hpp_reco->Fill(pt_F[jet], weight_eS);
-      hpp_matrix->Fill(refpt_F[jet], pt_F[jet], weight_eS);
+      float genpt = refpt_F[jet];
+      float recpt = pt_F[jet];
+      
+      hpp_gen->Fill(genpt, weight_eS);
+      hpp_reco->Fill(recpt, weight_eS);
+      hpp_matrix->Fill(genpt, recpt, weight_eS);
 
       if(nEvt%2 == 0){
-	hpp_mcclosure_data->Fill(pt_F[jet], weight_eS);
+	hpp_mcclosure_data->Fill(recpt, weight_eS);
       }else {
-	hpp_mcclosure_matrix->Fill(refpt_F[jet], pt_F[jet], weight_eS);
-	hpp_mcclosure_gen->Fill(refpt_F[jet], weight_eS);
-	hpp_mcclosure_data_train->Fill(pt_F[jet], weight_eS);
+	hpp_mcclosure_matrix->Fill(genpt, recpt, weight_eS);
+	hpp_mcclosure_gen->Fill(genpt, weight_eS);
+	hpp_mcclosure_data_train->Fill(recpt, weight_eS);
       }
       
       if(jet40_F == 1 && jet60_F==0 && jet80_F == 0){
-      
-	hpp_Jet40_gen->Fill(refpt_F[jet], weight_eS);
-	hpp_Jet40_reco->Fill(pt_F[jet], weight_eS);
-	hpp_matrix_HLT->Fill(refpt_F[jet], pt_F[jet], weight_eS);
-	
-	hpp_anaBin_Jet40_gen->Fill(refpt_F[jet], weight_eS);
-	hpp_anaBin_Jet40_reco->Fill(pt_F[jet], weight_eS);
-	hpp_anaBin_matrix_HLT->Fill(refpt_F[jet], pt_F[jet], weight_eS);
+ 
+	hpp_Jet40_gen->Fill(genpt, weight_eS * jet40_p_F);
+	hpp_Jet40_reco->Fill(recpt, weight_eS * jet40_p_F);
+
+	hpp_matrix_HLT_Jet40->Fill(genpt, recpt, weight_eS * jet40_p_F);
+	hpp_Trans_matrix_HLT_Jet40->Fill(recpt, genpt, weight_eS * jet40_p_F);
+	hpp_anaBin_Trans_matrix_HLT_Jet40->Fill(recpt, genpt, weight_eS * jet40_p_F);
+	hpp_anaBin_matrix_HLT_Jet40->Fill(genpt, recpt, weight_eS * jet40_p_F);
+
+	hpp_anaBin_Jet40_gen->Fill(genpt, weight_eS * jet40_p_F);
+	hpp_anaBin_Jet40_reco->Fill(recpt, weight_eS * jet40_p_F);
 	
 	if(nEvt%2==0) {
-	  hpp_mcclosure_matrix_HLT->Fill(refpt_F[jet], pt_F[jet], weight_eS);
-	  hpp_mcclosure_Jet40_gen->Fill(refpt_F[jet], weight_eS);
-	  hpp_mcclosure_Jet40_data_train->Fill(pt_F[jet], weight_eS);
+	  hpp_anaBin_mcclosure_matrix_HLT_Jet40->Fill(genpt, recpt, weight_eS * jet40_p_F);
+	  hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet40->Fill(recpt, genpt, weight_eS * jet40_p_F);
+	  hpp_mcclosure_Trans_matrix_HLT_Jet40->Fill(recpt, genpt, weight_eS * jet40_p_F);
+	  hpp_mcclosure_matrix_HLT_Jet40->Fill(genpt, recpt, weight_eS * jet40_p_F);
+	  
+	  hpp_mcclosure_Jet40_gen->Fill(genpt, weight_eS * jet40_p_F);
+	  hpp_mcclosure_Jet40_data_train->Fill(recpt, weight_eS * jet40_p_F);
 	}
 	if(nEvt%2==1) {
-	  hpp_mcclosure_Jet40_data->Fill(pt_F[jet], weight_eS);
+	  hpp_mcclosure_Jet40_data->Fill(recpt, weight_eS * jet40_p_F);
 	}
 
       }
       
       if(jet60_F == 1 && jet80_F == 0){
 
-	hpp_Jet60_gen->Fill(refpt_F[jet], weight_eS);
-	hpp_Jet60_reco->Fill(pt_F[jet], weight_eS);
-	hpp_matrix_HLT->Fill(refpt_F[jet], pt_F[jet], weight_eS);
+	hpp_Jet60_gen->Fill(genpt, weight_eS);
+	hpp_Jet60_reco->Fill(recpt, weight_eS);
+	hpp_anaBin_Jet60_gen->Fill(genpt, weight_eS);
+	hpp_anaBin_Jet60_reco->Fill(recpt, weight_eS);
 
-	hpp_anaBin_Jet60_gen->Fill(refpt_F[jet], weight_eS);
-	hpp_anaBin_Jet60_reco->Fill(pt_F[jet], weight_eS);
-	hpp_anaBin_matrix_HLT->Fill(refpt_F[jet], pt_F[jet], weight_eS);
-	
+	hpp_matrix_HLT_Jet60->Fill(genpt, recpt, weight_eS);
+	hpp_anaBin_matrix_HLT_Jet60->Fill(genpt, recpt, weight_eS);
+	hpp_Trans_matrix_HLT_Jet60->Fill(recpt, genpt, weight_eS);
+	hpp_anaBin_Trans_matrix_HLT_Jet60->Fill(recpt, genpt, weight_eS);
+
 	if(nEvt%2==0) {
-	  hpp_mcclosure_matrix_HLT->Fill(refpt_F[jet], pt_F[jet], weight_eS);
-	  hpp_mcclosure_Jet60_gen->Fill(refpt_F[jet], weight_eS);
-	  hpp_mcclosure_Jet60_data_train->Fill(pt_F[jet], weight_eS);
+	  hpp_anaBin_mcclosure_matrix_HLT_Jet60->Fill(genpt, recpt, weight_eS);
+	  hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet60->Fill(recpt, genpt, weight_eS);
+	  hpp_mcclosure_Trans_matrix_HLT_Jet60->Fill(recpt, genpt, weight_eS);
+	  hpp_mcclosure_matrix_HLT_Jet60->Fill(genpt, recpt, weight_eS);
+	  hpp_mcclosure_Jet60_gen->Fill(genpt, weight_eS);
+	  hpp_mcclosure_Jet60_data_train->Fill(recpt, weight_eS);
 	}
 	if(nEvt%2==1) {
-	  hpp_mcclosure_Jet60_data->Fill(pt_F[jet], weight_eS);
+	  hpp_mcclosure_Jet60_data->Fill(recpt, weight_eS);
 	}
 
       }
 
       if(jet80_F == 1){
 
-	hpp_Jet80_gen->Fill(refpt_F[jet], weight_eS);
-	hpp_Jet80_reco->Fill(pt_F[jet], weight_eS);
-	hpp_matrix_HLT->Fill(refpt_F[jet], pt_F[jet], weight_eS);
-
-	hpp_anaBin_Jet80_gen->Fill(refpt_F[jet], weight_eS);
-	hpp_anaBin_Jet80_reco->Fill(pt_F[jet], weight_eS);
-	hpp_anaBin_matrix_HLT->Fill(refpt_F[jet], pt_F[jet], weight_eS);
+	hpp_Jet80_gen->Fill(genpt, weight_eS);
+	hpp_Jet80_reco->Fill(recpt, weight_eS);
+	hpp_anaBin_Jet80_gen->Fill(genpt, weight_eS);
+	hpp_anaBin_Jet80_reco->Fill(recpt, weight_eS);
+	hpp_matrix_HLT_Jet80->Fill(genpt, recpt, weight_eS);
+	hpp_anaBin_matrix_HLT_Jet80->Fill(genpt, recpt, weight_eS);
+	hpp_Trans_matrix_HLT_Jet80->Fill(recpt, genpt, weight_eS);
+	hpp_anaBin_Trans_matrix_HLT_Jet80->Fill(recpt, genpt, weight_eS);
 	
 	if(nEvt%2==0) {
-	  hpp_mcclosure_matrix_HLT->Fill(refpt_F[jet], pt_F[jet], weight_eS);
-	  hpp_mcclosure_Jet80_gen->Fill(refpt_F[jet], weight_eS);
-	  hpp_mcclosure_Jet80_data_train->Fill(pt_F[jet], weight_eS);
+	  hpp_anaBin_mcclosure_matrix_HLT_Jet80->Fill(genpt, recpt, weight_eS);
+	  hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet80->Fill(recpt, genpt, weight_eS);
+	  hpp_mcclosure_Trans_matrix_HLT_Jet80->Fill(recpt, genpt, weight_eS);
+	  hpp_mcclosure_matrix_HLT_Jet80->Fill(genpt, recpt, weight_eS);
+	  hpp_mcclosure_Jet80_gen->Fill(genpt, weight_eS);
+	  hpp_mcclosure_Jet80_data_train->Fill(recpt, weight_eS);
 	}
 	if(nEvt%2==1) {
-	  hpp_mcclosure_Jet80_data->Fill(pt_F[jet], weight_eS);
+	  hpp_mcclosure_Jet80_data->Fill(recpt, weight_eS);
 	}
 
       }
@@ -566,6 +691,38 @@ void RAA_read_mc_pp(int startfile = 8,
 
   }// event loop
 
+  hpp_matrix_HLT->Add(hpp_matrix_HLT_Jet80);
+  hpp_matrix_HLT->Add(hpp_matrix_HLT_Jet60);
+  hpp_matrix_HLT->Add(hpp_matrix_HLT_Jet40);
+  
+  hpp_anaBin_matrix_HLT->Add(hpp_anaBin_matrix_HLT_Jet80);
+  hpp_anaBin_matrix_HLT->Add(hpp_anaBin_matrix_HLT_Jet60);
+  hpp_anaBin_matrix_HLT->Add(hpp_anaBin_matrix_HLT_Jet40);
+  
+  hpp_Trans_matrix_HLT->Add(hpp_Trans_matrix_HLT_Jet80);
+  hpp_Trans_matrix_HLT->Add(hpp_Trans_matrix_HLT_Jet60);
+  hpp_Trans_matrix_HLT->Add(hpp_Trans_matrix_HLT_Jet40);
+  
+  hpp_anaBin_Trans_matrix_HLT->Add(hpp_anaBin_Trans_matrix_HLT_Jet80);
+  hpp_anaBin_Trans_matrix_HLT->Add(hpp_anaBin_Trans_matrix_HLT_Jet60);
+  hpp_anaBin_Trans_matrix_HLT->Add(hpp_anaBin_Trans_matrix_HLT_Jet40);
+  
+  hpp_mcclosure_matrix_HLT->Add(hpp_mcclosure_matrix_HLT_Jet80);
+  hpp_mcclosure_matrix_HLT->Add(hpp_mcclosure_matrix_HLT_Jet60);
+  hpp_mcclosure_matrix_HLT->Add(hpp_mcclosure_matrix_HLT_Jet40);
+  
+  hpp_anaBin_mcclosure_matrix_HLT->Add(hpp_anaBin_mcclosure_matrix_HLT_Jet80);
+  hpp_anaBin_mcclosure_matrix_HLT->Add(hpp_anaBin_mcclosure_matrix_HLT_Jet60);
+  hpp_anaBin_mcclosure_matrix_HLT->Add(hpp_anaBin_mcclosure_matrix_HLT_Jet40);
+  
+  hpp_mcclosure_Trans_matrix_HLT->Add(hpp_mcclosure_Trans_matrix_HLT_Jet80);
+  hpp_mcclosure_Trans_matrix_HLT->Add(hpp_mcclosure_Trans_matrix_HLT_Jet60);
+  hpp_mcclosure_Trans_matrix_HLT->Add(hpp_mcclosure_Trans_matrix_HLT_Jet40);
+  
+  hpp_anaBin_mcclosure_Trans_matrix_HLT->Add(hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet80);
+  hpp_anaBin_mcclosure_Trans_matrix_HLT->Add(hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet60);
+  hpp_anaBin_mcclosure_Trans_matrix_HLT->Add(hpp_anaBin_mcclosure_Trans_matrix_HLT_Jet40);
+  
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet80_data);
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet60_data);
   hpp_mcclosure_JetComb_data->Add(hpp_mcclosure_Jet40_data);

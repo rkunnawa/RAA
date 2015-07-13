@@ -33,7 +33,7 @@ root -b -l <<EOF
 EOF
 
 # root -b -q RAA_read_mc_pbpb.C\+\($startfile,$endfile\)
-mv $outfile /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June22/
+mv $outfile /mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June29/
 
 echo "Done!"
 

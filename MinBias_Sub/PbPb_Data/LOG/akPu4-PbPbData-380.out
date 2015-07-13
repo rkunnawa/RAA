@@ -1,66 +1,52 @@
 
 ----------------------------------------------------
-Job started on Mon Jun 22 20:55:27 EDT 2015 at WN: t2bat0317.cmsaf.mit.edu 
-Job is running on Linux t2bat0317.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Job started on Mon Jun 29 21:56:50 EDT 2015 at WN: t2bat0320.cmsaf.mit.edu 
+Job is running on Linux t2bat0320.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
 Filesystem            Size  Used Avail Use% Mounted on
-/dev/sda3              20G  2.7G   16G  15% /
+/dev/sda3              20G  3.5G   16G  19% /
 tmpfs                  32G     0   32G   0% /dev/shm
 /dev/sda1              97M   32M   61M  35% /boot
-/dev/sda4             416G   94G  322G  23% /export/data1
-fuse_dfs              4.9P  4.4P  522T  90% /mnt/hadoop
-/dev/sdb1             3.6T  3.3T  349G  91% /export/00b
-/dev/sdc1             3.6T  3.2T  404G  89% /export/00c
-/dev/sdd1             3.6T  3.2T  412G  89% /export/00d
-/dev/sde1             3.6T  3.2T  394G  90% /export/00e
-/dev/sdf1             3.6T  3.2T  431G  89% /export/00f
-/dev/sdg1             3.6T  3.2T  437G  89% /export/00g
-cvmfs2                 98G   90G  8.2G  92% /cvmfs/cms.cern.ch
+/dev/sda4             416G   81G  335G  20% /export/data1
+/dev/sdb1             3.6T  3.1T  534G  86% /export/00b
+/dev/sdc1             3.6T  3.1T  536G  86% /export/00c
+/dev/sdd1             3.6T  3.1T  539G  86% /export/00d
+/dev/sde1             3.6T  3.1T  547G  86% /export/00e
+/dev/sdk1             3.6T  3.1T  513G  87% /export/00f
+/dev/sdf1             3.6T  3.1T  519G  86% /export/00g
+/dev/sdg1             3.6T  3.1T  511G  87% /export/00h
+/dev/sdh1             3.6T  3.1T  529G  86% /export/00i
+/dev/sdi1             3.6T  3.1T  564G  85% /export/00j
+/dev/sdj1             3.6T  3.1T  512G  87% /export/00k
+/dev/sdl1             3.6T  3.1T  557G  85% /export/00l
+fuse_dfs              4.9P  4.4P  527T  90% /mnt/hadoop
+cvmfs2                 98G   70G   29G  72% /cvmfs/cms.cern.ch
 t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
-cvmfs2                 98G   90G  8.2G  92% /cvmfs/mu2e.opensciencegrid.org
-cvmfs2                 98G   90G  8.2G  92% /cvmfs/oasis.opensciencegrid.org
-cvmfs2                 98G   90G  8.2G  92% /cvmfs/cdfcfs.fnal.gov
-cvmfs2                 98G   90G  8.2G  92% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   70G   29G  72% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   70G   29G  72% /cvmfs/cdfcfs.fnal.gov
 gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
 Copyright (C) 2010 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 Processing...
-0/325240
-10000/325240
-20000/325240
-30000/325240
-40000/325240
-50000/325240
-60000/325240
-70000/325240
-80000/325240
-90000/325240
-100000/325240
-110000/325240
-120000/325240
-130000/325240
-140000/325240
-150000/325240
-160000/325240
-170000/325240
-180000/325240
-190000/325240
-200000/325240
-210000/325240
-220000/325240
-230000/325240
-240000/325240
-250000/325240
-260000/325240
-270000/325240
-280000/325240
-290000/325240
-300000/325240
-310000/325240
-320000/325240
+0/155465
+10000/155465
+20000/155465
+30000/155465
+40000/155465
+50000/155465
+60000/155465
+70000/155465
+80000/155465
+90000/155465
+100000/155465
+110000/155465
+120000/155465
+130000/155465
+140000/155465
+150000/155465
 Macro finished: 
-CPU time (min)  = 3.17883
-Real time (min) = 4.30841
+CPU time (min)  = 1.61817
+Real time (min) = 2.26454
 Done!
 Copied output files to hadoop rootfiles/JetRAA/June22

@@ -5,12 +5,13 @@
 counter=0
 incrementer=1
 
-destination=/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June22/
+destination=/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June29/
 filelist=jetRAA_PbPb_MB_data_forest.txt
 
 nFiles=`wc -l < $filelist`
 tardir=`pwd`
 radius=3
+ptCut=15
 
 echo "nFiles in list: $nFiles"
 while [ $counter -lt $1 ]
@@ -28,7 +29,7 @@ do
         let counter=$1
     fi
 
-    outfile="PbPb_MB_Data_histograms_FromForest_akPu${radius}_20_eta_20_${endfile}.root"
+    outfile="PbPb_MB_Data_histograms_FromForest_trkMax7OrNeMax8GeVCut_fix_pt${ptCut}GeVCut_akPu${radius}_20_eta_20_${endfile}.root"
     
     # Condor submit file
     cat > subfile <<EOF
@@ -43,7 +44,7 @@ Environment = "HOSTNAME=$HOSTNAME"
 Executable     = raa_pbpb_mb_data_condor_run.sh
 +AccountingGroup = "group_cmshi.rkunnawa"
 #+IsMadgraph = 1
-Arguments      = $startfile $endfile $radius $outfile
+Arguments      = $startfile $endfile $radius $outfile $ptCut
 # input files. in this case, there are none.
 Input          = /dev/null
 # log files

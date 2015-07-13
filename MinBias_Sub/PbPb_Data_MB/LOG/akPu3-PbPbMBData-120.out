@@ -1,77 +1,59 @@
 
 ----------------------------------------------------
-Job started on Tue Jun 23 17:54:16 EDT 2015 at WN: t2bat0338.cmsaf.mit.edu 
-Job is running on Linux t2bat0338.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Job started on Fri Jul 10 16:45:45 EDT 2015 at WN: t2bat0141.cmsaf.mit.edu 
+Job is running on Linux t2bat0141.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
 Filesystem            Size  Used Avail Use% Mounted on
-/dev/sda3              20G   13G  6.5G  66% /
-tmpfs                  32G     0   32G   0% /dev/shm
-/dev/sda1              97M   32M   61M  35% /boot
-/dev/sda4             416G   94G  322G  23% /export/data1
-fuse_dfs              4.9P  4.4P  516T  90% /mnt/hadoop
-/dev/sdb1             3.6T  3.3T  375G  90% /export/00b
-/dev/sdc1             3.6T  3.2T  397G  90% /export/00c
-/dev/sdd1             3.6T  3.2T  417G  89% /export/00d
-/dev/sde1             3.6T  3.2T  407G  89% /export/00e
-/dev/sdf1             3.6T  3.2T  397G  90% /export/00f
-/dev/sdg1             3.6T  3.2T  428G  89% /export/00g
-cvmfs2                 98G   91G  7.0G  93% /cvmfs/cms.cern.ch
+/dev/sda3              20G  2.3G   17G  13% /
+tmpfs                 7.8G     0  7.8G   0% /dev/shm
+/dev/sda1              97M   33M   60M  36% /boot
+/dev/sda4             415G   93G  322G  23% /export/data1
+/dev/sdb1             1.8T  1.7T  176G  91% /export/00b
+/dev/sdc1             1.8T  1.7T  157G  92% /export/00c
+/dev/sdd1             1.8T  1.7T  156G  92% /export/00d
+/dev/sde1             1.8T  1.7T  169G  91% /export/00e
+/dev/sdf1             1.8T  1.7T  172G  91% /export/00f
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+cvmfs2                 98G   92G  6.6G  94% /cvmfs/cms.cern.ch
 t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
-cvmfs2                 98G   91G  7.0G  93% /cvmfs/mu2e.opensciencegrid.org
-cvmfs2                 98G   91G  7.0G  93% /cvmfs/oasis.opensciencegrid.org
-cvmfs2                 98G   91G  7.0G  93% /cvmfs/grid.cern.ch
-cvmfs2                 98G   91G  7.0G  93% /cvmfs/fermilab.opensciencegrid.org
+cvmfs2                 98G   92G  6.6G  94% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   92G  6.6G  94% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   92G  6.6G  94% /cvmfs/icecube.opensciencegrid.org
+cvmfs2                 98G   92G  6.6G  94% /cvmfs/atlas.cern.ch
+cvmfs2                 98G   92G  6.6G  94% /cvmfs/atlas-nightlies.cern.ch
+cvmfs2                 98G   92G  6.6G  94% /cvmfs/atlas-condb.cern.ch
+cvmfs2                 98G   92G  6.6G  94% /cvmfs/sft.cern.ch
 gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
 Copyright (C) 2010 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 Processing...
-0/439680
-10000/439680
-20000/439680
-30000/439680
-40000/439680
-50000/439680
-60000/439680
-70000/439680
-80000/439680
-90000/439680
-100000/439680
-110000/439680
-120000/439680
-130000/439680
-140000/439680
-150000/439680
-160000/439680
-170000/439680
-180000/439680
-190000/439680
-200000/439680
-210000/439680
-220000/439680
-230000/439680
-240000/439680
-250000/439680
-260000/439680
-270000/439680
-280000/439680
-290000/439680
-300000/439680
-310000/439680
-320000/439680
-330000/439680
-340000/439680
-350000/439680
-360000/439680
-370000/439680
-380000/439680
-390000/439680
-400000/439680
-410000/439680
-420000/439680
-430000/439680
+0/236165
+10000/236165
+20000/236165
+30000/236165
+40000/236165
+50000/236165
+60000/236165
+70000/236165
+80000/236165
+90000/236165
+100000/236165
+110000/236165
+120000/236165
+130000/236165
+140000/236165
+150000/236165
+160000/236165
+170000/236165
+180000/236165
+190000/236165
+200000/236165
+210000/236165
+220000/236165
+230000/236165
 Macro finished: 
-CPU time (min)  = 3.07
-Real time (min) = 3.91332
+CPU time (min)  = 1.468
+Real time (min) = 1.85966
 Done!
 Copied output files to hadoop rootfiles/JetRAA/June22

@@ -5,7 +5,7 @@
 counter=0
 incrementer=1
 
-destination=/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June22/
+destination=/mnt/hadoop/cms/store/user/rkunnawa/rootfiles/JetRAA/June29/
 filelist=jetRAA_PbPb_data_forest.txt
 
 nFiles=`wc -l < $filelist`
@@ -28,7 +28,7 @@ do
         let counter=$1
     fi
 
-    outfile="PbPb_Data_histograms_FromForest_akPu${radius}_20_eta_20_${endfile}.root"
+    outfile="PbPb_Data_histograms_FromForest_trkMax7OrNeMax8GeVCut_akPu${radius}_20_eta_20_${endfile}.root"
     
     # Condor submit file
     cat > subfile <<EOF

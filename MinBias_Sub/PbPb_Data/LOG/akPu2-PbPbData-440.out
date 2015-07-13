@@ -1,53 +1,44 @@
 
 ----------------------------------------------------
-Job started on Mon Jun 22 20:52:17 EDT 2015 at WN: t2bat0271.cmsaf.mit.edu 
-Job is running on Linux t2bat0271.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Job started on Mon Jun 29 22:00:15 EDT 2015 at WN: hibat0074.cmsaf.mit.edu 
+Job is running on Linux hibat0074.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
 Filesystem            Size  Used Avail Use% Mounted on
-/dev/sda3              20G  3.0G   16G  16% /
-tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda3              20G  3.4G   16G  19% /
+tmpfs                  24G     0   24G   0% /dev/shm
 /dev/sda1              97M   32M   61M  35% /boot
-/dev/sda4             874G   72G  803G   9% /export/data1
-/dev/sdb1             1.8T  1.7T  189G  90% /export/00b
-/dev/sdc1             1.8T  1.7T  176G  91% /export/00c
-/dev/sdd1             1.8T  1.6T  211G  89% /export/00d
-/dev/sde1             1.8T  1.6T  204G  89% /export/00e
-/dev/sdf1             1.8T  1.6T  210G  89% /export/00f
-fuse_dfs              4.9P  4.4P  522T  90% /mnt/hadoop
+/dev/sda4             874G   77G  798G   9% /export/data1
+/dev/sdb1             1.8T  1.6T  204G  89% /export/00b
+/dev/sdc1             1.8T  1.7T  185G  90% /export/00c
+/dev/sdd1             1.8T  1.6T  204G  89% /export/00d
+/dev/sde1             1.8T  1.6T  220G  89% /export/00e
+/dev/sdf1             1.8T  1.6T  215G  89% /export/00f
+fuse_dfs              4.9P  4.4P  527T  90% /mnt/hadoop
 t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
-cvmfs2                 98G   69G   30G  71% /cvmfs/cms.cern.ch
-cvmfs2                 98G   69G   30G  71% /cvmfs/mu2e.opensciencegrid.org
+cvmfs2                 98G   73G   26G  74% /cvmfs/cms.cern.ch
+cvmfs2                 98G   73G   26G  74% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   73G   26G  74% /cvmfs/oasis.opensciencegrid.org
 gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
 Copyright (C) 2010 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 Processing...
-0/232615
-10000/232615
-20000/232615
-30000/232615
-40000/232615
-50000/232615
-60000/232615
-70000/232615
-80000/232615
-90000/232615
-100000/232615
-110000/232615
-120000/232615
-130000/232615
-140000/232615
-150000/232615
-160000/232615
-170000/232615
-180000/232615
-190000/232615
-200000/232615
-210000/232615
-220000/232615
-230000/232615
+0/132328
+10000/132328
+20000/132328
+30000/132328
+40000/132328
+50000/132328
+60000/132328
+70000/132328
+80000/132328
+90000/132328
+100000/132328
+110000/132328
+120000/132328
+130000/132328
 Macro finished: 
-CPU time (min)  = 2.45717
-Real time (min) = 3.81752
+CPU time (min)  = 1.46617
+Real time (min) = 1.82474
 Done!
 Copied output files to hadoop rootfiles/JetRAA/June22

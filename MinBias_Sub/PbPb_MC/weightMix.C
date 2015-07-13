@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "TCanvas.h"
 #include "TError.h"
 #include "TPad.h"
@@ -52,10 +53,9 @@ static bool plotSubtraction = 0;
 static bool reweightCentrality = 1;
 
 static const double pi = TMath::Pi();
-
+static const int Nfiles = 9; 
 
 void weightMix(){
-
 
   TH1::SetDefaultSumw2();
 
@@ -68,8 +68,16 @@ void weightMix(){
   double *xs;
   double *pthats;
   int nev[20];
-  int n[20];
-
+  int n[9] = {315269, 243155, 379848, 362476, 359581, 359272, 217873, 88991, 25252};
+// no of events in pthat = 15 = 315269
+// no of events in pthat = 30 = 243155
+// no of events in pthat = 50 = 379848
+// no of events in pthat = 80 = 362476
+// no of events in pthat = 120 = 359581
+// no of events in pthat = 170 = 359272
+// no of events in pthat = 220 = 217873
+// no of events in pthat = 280 = 88991
+// no of events in pthat = 370 = 25252
   Npt = 9;
   xs = xs2011;
   pthats = pthatBins2011;
@@ -78,76 +86,74 @@ void weightMix(){
     xs[i] -= xs[i+1];
   }
 
-  TChain* nt;
-  TChain* evt;
-  TFile* outf;
+  //TChain* nt;
+  //TChain* evt;
+  TFile* outf[Nfiles];
 
-  nt = new TChain("akPu3PFJetAnalyzer/t");
-  evt = new TChain("hiEvtAnalyzer/HiTree");
-  // Order of files matters a lot!
-  nt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat15_Track9_Jet30_matchEqR_merged_forest_0.root");
-  nt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat30_Track9_Jet30_matchEqR_merged_forest_0.root");
-  nt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat50_Track9_Jet30_matchEqR_merged_forest_0.root");
-  nt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat80_Track9_Jet30_matchEqR_merged_forest_0.root");
-  nt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat120_Track9_Jet30_matchEqR_merged_forest_0.root");
-  nt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat170_Track9_Jet30_matchEqR_merged_forest_0.root");
-  nt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat220_Track9_Jet30_matchEqR_merged_forest_0.root");
-  nt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat280_Track9_Jet30_matchEqR_merged_forest_0.root");
-  nt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat370_Track9_Jet30_matchEqR_merged_forest_0.root");
-  evt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat15_Track9_Jet30_matchEqR_merged_forest_0.root");
-  evt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat30_Track9_Jet30_matchEqR_merged_forest_0.root");
-  evt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat50_Track9_Jet30_matchEqR_merged_forest_0.root");
-  evt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat80_Track9_Jet30_matchEqR_merged_forest_0.root");
-  evt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat120_Track9_Jet30_matchEqR_merged_forest_0.root");
-  evt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat170_Track9_Jet30_matchEqR_merged_forest_0.root");
-  evt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat220_Track9_Jet30_matchEqR_merged_forest_0.root");
-  evt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat280_Track9_Jet30_matchEqR_merged_forest_0.root");
-  evt->AddFile("/mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat370_Track9_Jet30_matchEqR_merged_forest_0.root");
+  //nt->AddFriend(evt);
 
-  nt->AddFriend(evt);
+  std::string infile_Forest;
+  infile_Forest = "jetRAA_PbPb_mc_forest.txt";
+  std::ifstream instr_Forest(infile_Forest.c_str(),std::ifstream::in);
+  std::string filename_Forest;
+  std::string filename_array[Nfiles];
 
-  outf = new TFile(Form("weights.root"),"recreate");
-  TTree *ntw = new TTree("weights","");
-  int hiBin, evnt, lumi;
-  float vz;
-  double pthatweight = 0;
-  ntw->Branch("pthatweight",&pthatweight,"pthatweight/D");
-  ntw->Branch("hiBin",&hiBin,"hiBin/I");
-  ntw->Branch("evt",&evnt,"evt/I");
-  ntw->Branch("lumi",&lumi,"lumi/I");
-  ntw->Branch("vz",&vz,"vz/F");
+  for(int ifile = 0; ifile<Nfiles; ++ifile){
+    instr_Forest>>filename_Forest;
+    //nt->AddFile(filename_Forest.c_str());
+    filename_array[ifile] = filename_Forest.c_str();
+  }
 
-  float varpthat, varbin, varvz;
+  for(int i = 0; i<Nfiles; ++i){
 
+    cout<<"Now looping over individual file : "<<filename_array[i].c_str()<<endl;
+
+    TFile * fin = new TFile(filename_array[i].c_str());
+    TTree * newTree = (TTree*)fin->Get("akPu3PFJetAnalyzer/t");
+    TTree * evtTree = (TTree*)fin->Get("hiEvtAnalyzer/HiTree");
+
+    double pthatweight = 0;
+    float varpthat;
+    int hiBin, evnt, lumi;
+    float vz;
+    
+    newTree->SetBranchAddress("pthat",&varpthat);
+    evtTree->SetBranchAddress("hiBin",&hiBin);
+    evtTree->SetBranchAddress("evt", &evnt);
+    evtTree->SetBranchAddress("lumi", &lumi);
+    evtTree->SetBranchAddress("vz", &vz);
+
+    outf[i] = new TFile(Form("weights_pbpb_%d.root",i+1),"recreate");
+    
+    TTree *ntw = new TTree("weights","");
+
+    ntw->Branch("pthatweight",&pthatweight,"pthatweight/D");
+    ntw->Branch("hiBin",&hiBin,"hiBin/I");
+    ntw->Branch("evt",&evnt,"evt/I");
+    ntw->Branch("lumi",&lumi,"lumi/I");
+    ntw->Branch("vz",&vz,"vz/F");
   
-  nt->SetBranchAddress("pthat",&varpthat);
-  evt->SetBranchAddress("hiBin", &hiBin);
-  evt->SetBranchAddress("evt", &evnt);
-  evt->SetBranchAddress("lumi", &lumi);
-  evt->SetBranchAddress("vz", &vz);
+    cout<<"loaded all the files"<<endl;
+   
+    for(int ie = 0; ie < newTree->GetEntries(); ++ie){
 
-  for(int i = 0; i < Npt; ++i){
-    TCut pthatCut(Form("pthat >= %f && pthat < %f",pthats[i],pthats[i+1]));
-    n[i] = nt->GetEntries(pthatCut);
-  }
+      if(ie%50000 == 0) cout<<ie<<"/"<<newTree->GetEntries()<<endl;
+    
+      newTree->GetEntry(ie);    
+    
+      for(int i = 0; i < Npt; ++i){
+	if(n[i] > 0 && varpthat >= pthats[i]) pthatweight = xs[i]/n[i];
+      }
+      ntw->Fill();
 
-  for(int ie = 0; ie < nt->GetEntries(); ++ie){
-
-    if(ie%50000 == 0) cout<<ie<<"/"<<nt->GetEntries()<<endl;
-    
-    nt->GetEntry(ie);
-    
-    
-    for(int i = 0; i < Npt; ++i){
-      if(n[i] > 0 && varpthat >= pthats[i]) pthatweight = xs[i]/n[i];
     }
-    ntw->Fill();
 
+    outf[i]->cd();
+    ntw->Write();
+    outf[i]->Write();
+    outf[i]->Close();
+    
   }
-
-  outf->cd();
-  ntw->Write();
-  outf->Write();
 
 }
 
