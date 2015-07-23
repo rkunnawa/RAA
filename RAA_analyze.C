@@ -1253,14 +1253,24 @@ void RAA_analyze(int radius = 3)
   // the 343 is ratio of total events in MB / HLT_80 in MB since HLT_80 is unprescaled
 
   // for pp we just take the luminosity multiplying by the factor of good events that pass our ntuple selection. 
+
+  Double_t NeqMB[nbins_cent] = {
+    1.756e08, 1.57e08, 6.321e08, 1.3306e09, 1.9343e09, 3.159e09
+  }
   
   Double_t ScaleFactor_PbPb[nbins_cent] = {
-    64/(0.787 * 7.65 * ncoll[0] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[1] - boundaries_cent[0]))),
-    64/(0.787 * 7.65 * ncoll[1] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[2] - boundaries_cent[1]))),
-    64/(0.787 * 7.65 * ncoll[2] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[3] - boundaries_cent[2]))),
-    64/(0.787 * 7.65 * ncoll[3] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[4] - boundaries_cent[3]))),
-    64/(0.787 * 7.65 * ncoll[4] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[5] - boundaries_cent[4]))),
-    64/(0.787 * 7.65 * ncoll[5] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[6] - boundaries_cent[5])))
+    ( 64 * 1e6 ) / ( ncoll[0] * 4 * NeqMB[0] ),
+    ( 64 * 1e6 ) / ( ncoll[1] * 4 * NeqMB[1] ),
+    ( 64 * 1e6 ) / ( ncoll[2] * 4 * NeqMB[2] ),
+    ( 64 * 1e6 ) / ( ncoll[3] * 4 * NeqMB[3] ),
+    ( 64 * 1e6 ) / ( ncoll[4] * 4 * NeqMB[4] ),
+    ( 64 * 1e6 ) / ( ncoll[5] * 4 * NeqMB[5] )
+    // 64/(0.787 * 7.65 * ncoll[0] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[1] - boundaries_cent[0]))),
+    // 64/(0.787 * 7.65 * ncoll[1] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[2] - boundaries_cent[1]))),
+    // 64/(0.787 * 7.65 * ncoll[2] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[3] - boundaries_cent[2]))),
+    // 64/(0.787 * 7.65 * ncoll[3] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[4] - boundaries_cent[3]))),
+    // 64/(0.787 * 7.65 * ncoll[4] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[5] - boundaries_cent[4]))),
+    // 64/(0.787 * 7.65 * ncoll[5] * deltaEta * 0.967 * 160.521 * (0.025*(boundaries_cent[6] - boundaries_cent[5])))
   };
   Double_t ScaleFactor_PP = 1./( 1 * deltaEta * 5.429 * 1e3 * 0.82698);
   

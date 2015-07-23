@@ -140,7 +140,7 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   TH1F * PbPb_MBSub[3][nbins_cent];
   
 
- Double_t xAxis1[48] = {30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500}; 
+  Double_t xAxis1[48] = {30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500}; 
 
   Float_t bin_no = 1;
   Float_t bin_end = 1;
@@ -161,7 +161,6 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
     PbPb_MBSub[0][i]    = (TH1F*)fMinBias_R2->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",2,etaWidth,i));
     PbPb_MBSub[1][i]    = (TH1F*)fMinBias_R3->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",3,etaWidth,i));
     PbPb_MBSub[2][i]    = (TH1F*)fMinBias_R4->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",4,etaWidth,i));
-    
     
     PbPb_bayesian[0][i] = (TH1F*)f_unfold_R2->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
     PbPb_measured[0][i] = (TH1F*)f_unfold_R2->Get(Form("PbPb_measured_spectra_combined_cent%d",i));

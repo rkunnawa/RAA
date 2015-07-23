@@ -13,7 +13,7 @@
 
 using namespace std;
 
-void RAA_plot_finalpaper(){
+void RAA_plot_finalpaper(bool isATLASCut = true){
     
   TStopwatch timer;
   timer.Start();
@@ -26,13 +26,18 @@ void RAA_plot_finalpaper(){
   TH2::SetDefaultSumw2();
 
   char * etaLable = (char*) "0.0 < |#eta| < 2.0";
+  char * trkMaxCut = (char*)"_";
+  if(isATLASCut) trkMaxCut = (char*)"_trkMax7OrNeMax8GeVCut_";
+  char * outLocation = (char*) "July20/";
+  if(isATLASCut) outLocation = "July20/ATLASCut/";
+  
   Float_t etaLow = 0;
   Float_t etaHigh = 2.0;
   
   TFile *fin_R2, *fin_R3, *fin_R4; 
-  fin_R2 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_noSmear_%s_%dGeVCut_ak%s_%d.root",2,ptbins,etaWidth,unfoldingCut_R2,jet_type, date.GetDate()));
-  fin_R3 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_noSmear_%s_%dGeVCut_ak%s_%d.root",3,ptbins,etaWidth,unfoldingCut_R3,jet_type, date.GetDate()));
-  fin_R4 = TFile::Open(Form("Pawan_TTree_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_%s_noSmear_%s_%dGeVCut_ak%s_%d.root",4,ptbins,etaWidth,unfoldingCut_R4,jet_type, date.GetDate()));
+  fin_R2 = TFile::Open(Form("July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p2_MCCloSameSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, date.GetDate()));
+  fin_R3 = TFile::Open(Form("July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p3_MCCloSameSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, date.GetDate()));
+  fin_R4 = TFile::Open(Form("July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p4_MCCloSameSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, date.GetDate()));
   
   // get the histograms.
   TH1F * uPbPb_R2_Bayes[nbins_cent], * uPP_R2_Bayes, * uPbPb_R3_Bayes[nbins_cent], * uPP_R3_Bayes, * uPbPb_R4_Bayes[nbins_cent], * uPP_R4_Bayes;
@@ -131,7 +136,7 @@ void RAA_plot_finalpaper(){
   //   mPbPb_R4[i]->Scale(1./(0.025*(boundaries_cent[i+1] - boundaries_cent[i])));
   //   mPbPb_R4[i]->Scale(64.*1e9/(ncoll[i]*1e3));
   //   mPbPb_R4[i]->Scale(1./(7.65));
-    
+  
   // }
   
   Double_t ScaleFactor[nbins_cent+2] = {1, 1e2, 1e4, 1e6, 1e8, 1e10, 1e12, 1e14};  
@@ -145,8 +150,8 @@ void RAA_plot_finalpaper(){
   uPP_R2_Bayes->Scale(ScaleFactor[0]);
   uPP_R2_Bayes->SetMarkerStyle(20);
   uPP_R2_Bayes->SetMarkerColor(kBlack);
-  makeHistTitle(uPP_R2_Bayes," "," Jet p_{T} (GeV/c)","#frac{d N}{T_{AA} dp_{T} d#eta} nb");
-  uPP_R2_Bayes->SetAxisRange(unfoldingCut_R4, 299, "X");
+  makeHistTitle(uPP_R2_Bayes," "," Jet p_{T} (GeV/c)","#frac{d#sigma}{dp_{T} d#eta}(nb)                       #frac{d N}{T_{AA} dp_{T} d#eta} (nb)");
+  uPP_R2_Bayes->SetAxisRange(60, 299, "X");
   uPP_R2_Bayes->SetAxisRange(1e-4, 1e14, "Y");
   uPP_R2_Bayes->GetYaxis()->SetMoreLogLabels(kFALSE);
   uPP_R2_Bayes->Draw();
@@ -154,14 +159,17 @@ void RAA_plot_finalpaper(){
   // draw the MC
   mPP_R2->Scale(ScaleFactor[0]);
   mPP_R2->SetLineColor(kBlack);
-  mPP_R2->SetAxisRange(unfoldingCut_R2, 299, "X");
+  mPP_R2->SetAxisRange(64, 299, "X");
   //mPP_R2->Draw("same Lhist");
   
   for(int i = 0; i<nbins_cent; ++i){
+    for(int j = 0; j<uPbPb_R2_Bayes[i]->GetNbinsX(); ++j)
+      uPbPb_R2_Bayes[i]->SetBinError(j+1, uPbPb_R2_Bayes[i]->GetBinError(j+1)/ScaleFactor[i+1]);
+    
     uPbPb_R2_Bayes[i]->Scale(ScaleFactor[i+1]);
     uPbPb_R2_Bayes[i]->SetMarkerStyle(33);
     uPbPb_R2_Bayes[i]->SetMarkerColor(kRed);
-    uPbPb_R2_Bayes[i]->SetAxisRange(unfoldingCut_R2, 299, "X");
+    uPbPb_R2_Bayes[i]->SetAxisRange(60, 299, "X");
     uPbPb_R2_Bayes[i]->Draw("same");
 
     // mPbPb_R2[i]->Scale(ScaleFactor[i+2]);
@@ -175,7 +183,6 @@ void RAA_plot_finalpaper(){
   //leg1_R2->AddEntry(mPP_R2,"PYTHIA","pl");
   leg1_R2->SetTextSize(0.02);
   leg1_R2->Draw();
-
 
   TLegend * leg2_R2 = myLegend(0.7,0.8,0.8,0.9);
   leg2_R2->AddEntry(uPbPb_R2_Bayes[0],"PbPb Data","pl");
@@ -199,7 +206,7 @@ void RAA_plot_finalpaper(){
   drawText("50-70% x 10^{10}", 0.7,0.64,16);
   drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R2->SaveAs(Form("Plots/Analysis_%s/Final_paper_plots_spectra_%s_akR2_%s_%d.pdf",ptbins, ptbins, etaWidth,date.GetDate()),"RECREATE");
+  cSpectra_R2->SaveAs(Form("%sFinal_paper_plots_%disATLASCut_spectra_%s_akR2_%dGeVCut_%s_%d.pdf",outLocation, isATLASCut, ptbins, 50,  etaWidth,date.GetDate()),"RECREATE");
 
   
   TCanvas * cSpectra_R3 = new TCanvas("cSpectra_R3","",1200,1000);
@@ -211,8 +218,8 @@ void RAA_plot_finalpaper(){
   uPP_R3_Bayes->Scale(ScaleFactor[0]);
   uPP_R3_Bayes->SetMarkerStyle(20);
   uPP_R3_Bayes->SetMarkerColor(kBlack);
-  makeHistTitle(uPP_R3_Bayes," "," Jet p_{T} (GeV/c)","#frac{d N}{T_{AA} dp_{T} d#eta} nb");
-  uPP_R3_Bayes->SetAxisRange(unfoldingCut_R4, 299, "X");
+  makeHistTitle(uPP_R3_Bayes," "," Jet p_{T} (GeV/c)","#frac{d#sigma}{dp_{T} d#eta}(nb)                       #frac{d N}{T_{AA} dp_{T} d#eta} (nb)");
+  uPP_R3_Bayes->SetAxisRange(60, 299, "X");
   uPP_R3_Bayes->SetAxisRange(1e-4, 1e14, "Y");
   uPP_R3_Bayes->GetYaxis()->SetMoreLogLabels(kFALSE);
   uPP_R3_Bayes->Draw();
@@ -220,14 +227,17 @@ void RAA_plot_finalpaper(){
   // draw the MC
   mPP_R3->Scale(ScaleFactor[0]);
   mPP_R3->SetLineColor(kBlack);
-  mPP_R3->SetAxisRange(unfoldingCut_R3, 299, "X");
+  mPP_R3->SetAxisRange(64, 299, "X");
   //mPP_R3->Draw("same Lhist");
   
   for(int i = 0; i<nbins_cent; ++i){
+    for(int j = 0; j<uPbPb_R3_Bayes[i]->GetNbinsX(); ++j)
+      uPbPb_R3_Bayes[i]->SetBinError(j+1, uPbPb_R3_Bayes[i]->GetBinError(j+1)/ScaleFactor[i+1]);
+    
     uPbPb_R3_Bayes[i]->Scale(ScaleFactor[i+1]);
     uPbPb_R3_Bayes[i]->SetMarkerStyle(33);
     uPbPb_R3_Bayes[i]->SetMarkerColor(kRed);
-    uPbPb_R3_Bayes[i]->SetAxisRange(unfoldingCut_R3, 299, "X");
+    uPbPb_R3_Bayes[i]->SetAxisRange(60, 499, "X");
     uPbPb_R3_Bayes[i]->Draw("same");
 
     // mPbPb_R3[i]->Scale(ScaleFactor[i+2]);
@@ -241,7 +251,6 @@ void RAA_plot_finalpaper(){
   //leg1_R3->AddEntry(mPP_R3,"PYTHIA","pl");
   leg1_R3->SetTextSize(0.02);
   leg1_R3->Draw();
-
 
   TLegend * leg2_R3 = myLegend(0.7,0.8,0.8,0.9);
   leg2_R3->AddEntry(uPbPb_R3_Bayes[0],"PbPb Data","pl");
@@ -265,7 +274,7 @@ void RAA_plot_finalpaper(){
   drawText("50-70% x 10^{10}", 0.7,0.64,16);
   drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R3->SaveAs(Form("Plots/Analysis_%s/Final_paper_plots_spectra_%s_akR3_%s_%d.pdf",ptbins, ptbins, etaWidth, date.GetDate()),"RECREATE");
+  cSpectra_R3->SaveAs(Form("%sFinal_paper_plots_%disATLASCut_spectra_%s_akR3_%dGeVCut_%s_%d.pdf",outLocation, isATLASCut, ptbins, 50, etaWidth, date.GetDate()),"RECREATE");
 
 
   
@@ -278,8 +287,8 @@ void RAA_plot_finalpaper(){
   uPP_R4_Bayes->Scale(ScaleFactor[0]);
   uPP_R4_Bayes->SetMarkerStyle(20);
   uPP_R4_Bayes->SetMarkerColor(kBlack);
-  makeHistTitle(uPP_R4_Bayes," "," Jet p_{T} (GeV/c)","#frac{d N}{T_{AA} dp_{T} d#eta} nb");
-  uPP_R4_Bayes->SetAxisRange(unfoldingCut_R4, 299, "X");
+  makeHistTitle(uPP_R4_Bayes," "," Jet p_{T} (GeV/c)","#frac{d#sigma}{dp_{T} d#eta}(nb)                       #frac{d N}{T_{AA} dp_{T} d#eta} (nb)");
+  uPP_R4_Bayes->SetAxisRange(60, 299, "X");
   uPP_R4_Bayes->SetAxisRange(1e-4, 1e14, "Y");
   uPP_R4_Bayes->GetYaxis()->SetMoreLogLabels(kFALSE);
   uPP_R4_Bayes->Draw();
@@ -287,14 +296,17 @@ void RAA_plot_finalpaper(){
   // draw the MC
   mPP_R4->Scale(ScaleFactor[0]);
   mPP_R4->SetLineColor(kBlack);
-  mPP_R4->SetAxisRange(unfoldingCut_R4, 299, "X");
+  mPP_R4->SetAxisRange(64, 299, "X");
   //mPP_R4->Draw("same Lhist");
   
   for(int i = 0; i<nbins_cent; ++i){
+    for(int j = 0; j<uPbPb_R4_Bayes[i]->GetNbinsX(); ++j)
+      uPbPb_R4_Bayes[i]->SetBinError(j+1, uPbPb_R4_Bayes[i]->GetBinError(j+1)/ScaleFactor[i+1]);
+    
     uPbPb_R4_Bayes[i]->Scale(ScaleFactor[i+1]);
     uPbPb_R4_Bayes[i]->SetMarkerStyle(33);
     uPbPb_R4_Bayes[i]->SetMarkerColor(kRed);
-    uPbPb_R4_Bayes[i]->SetAxisRange(unfoldingCut_R4, 299, "X");
+    uPbPb_R4_Bayes[i]->SetAxisRange(60, 299, "X");
     uPbPb_R4_Bayes[i]->Draw("same");
 
     // mPbPb_R4[i]->Scale(ScaleFactor[i+2]);
@@ -308,7 +320,6 @@ void RAA_plot_finalpaper(){
   //leg1_R4->AddEntry(mPP_R4,"PYTHIA","pl");
   leg1_R4->SetTextSize(0.02);
   leg1_R4->Draw();
-
 
   TLegend * leg2_R4 = myLegend(0.7,0.8,0.8,0.9);
   leg2_R4->AddEntry(uPbPb_R4_Bayes[0],"PbPb Data","pl");
@@ -332,7 +343,7 @@ void RAA_plot_finalpaper(){
   drawText("50-70% x 10^{10}", 0.7,0.64,16);
   drawText("70-90% x 10^{12}", 0.7,0.72,16);
 
-  cSpectra_R4->SaveAs(Form("Plots/Analysis_%s/Final_paper_plots_spectra_%s_akR4_%s_%d.pdf",ptbins, ptbins, etaWidth, date.GetDate()),"RECREATE");
+  cSpectra_R4->SaveAs(Form("%sFinal_paper_plots_%disATLASCut_spectra_%s_akR4_%dGeCut_%s_%d.pdf", outLocation, isATLASCut, ptbins, 50, etaWidth, date.GetDate()),"RECREATE");
 
 
 }
