@@ -1,0 +1,51 @@
+
+----------------------------------------------------
+Job started on Mon Jun 29 21:59:54 EDT 2015 at WN: hibat0085.cmsaf.mit.edu 
+Job is running on Linux hibat0085.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  4.4G   15G  24% /
+tmpfs                  24G     0   24G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             873G   74G  800G   9% /export/data1
+/dev/sdb1             2.7T  2.7T   66G  98% /export/00b
+/dev/sdc1             2.7T  2.7T   69G  98% /export/00c
+/dev/sdd1             2.7T  2.7T   81G  98% /export/00d
+/dev/sde1             2.7T  2.7T   61G  98% /export/00e
+/dev/sdf1             2.7T  2.7T   76G  98% /export/00f
+/dev/sdg1             3.6T  3.1T  560G  85% /export/00g
+/dev/sdh1             3.6T  3.1T  583G  85% /export/00h
+fuse_dfs              4.9P  4.4P  527T  90% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   72G   27G  73% /cvmfs/cms.cern.ch
+cvmfs2                 98G   72G   27G  73% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   72G   27G  73% /cvmfs/oasis.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/189092
+10000/189092
+20000/189092
+30000/189092
+40000/189092
+50000/189092
+60000/189092
+70000/189092
+80000/189092
+90000/189092
+100000/189092
+110000/189092
+120000/189092
+130000/189092
+140000/189092
+150000/189092
+160000/189092
+170000/189092
+180000/189092
+Macro finished: 
+CPU time (min)  = 2.09083
+Real time (min) = 4.89469
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

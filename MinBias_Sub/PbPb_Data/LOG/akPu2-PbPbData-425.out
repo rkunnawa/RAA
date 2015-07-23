@@ -1,0 +1,43 @@
+
+----------------------------------------------------
+Job started on Mon Jun 29 21:59:48 EDT 2015 at WN: t2bat0029.cmsaf.mit.edu 
+Job is running on Linux t2bat0029.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.2G   16G  17% /
+tmpfs                 7.8G     0  7.8G   0% /dev/shm
+/dev/sda1              97M   33M   60M  36% /boot
+/dev/sda4             415G   70G  346G  17% /export/data1
+/dev/sdb1             1.8T  1.6T  198G  90% /export/00b
+/dev/sdc1             1.8T  1.6T  201G  90% /export/00c
+/dev/sdd1             1.8T  1.6T  199G  90% /export/00d
+/dev/sde1             1.8T  1.6T  210G  89% /export/00e
+/dev/sdf1             1.8T  1.6T  222G  88% /export/00f
+fuse_dfs              4.9P  4.4P  527T  90% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   66G   32G  68% /cvmfs/cms.cern.ch
+cvmfs2                 98G   66G   32G  68% /cvmfs/cvmfs.cmsaf.mit.edu
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/138921
+10000/138921
+20000/138921
+30000/138921
+40000/138921
+50000/138921
+60000/138921
+70000/138921
+80000/138921
+90000/138921
+100000/138921
+110000/138921
+120000/138921
+130000/138921
+Macro finished: 
+CPU time (min)  = 1.81733
+Real time (min) = 2.33541
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

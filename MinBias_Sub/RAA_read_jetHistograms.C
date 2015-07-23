@@ -56,8 +56,8 @@ int findBin(int bin)
 static const int nbins_pt = 32;
 static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 272, 300, 330, 362, 395, 501};
 
-// static const int nbins_pt = 30;
-// static const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12, 15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330, 362, 395};
+// static const int nbins_pt = 17;
+// static const double boundaries_pt[nbins_pt+1] = { 32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300, 330};
 
 // the following bins is the cms pp nlo pt bins
 // static const int nbins_pt = 29;
@@ -91,6 +91,19 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 
   bool isSymm = false;
   if(etaLow == etaHigh) isSymm = true;
+  bool cutEvents = true; 
+
+  // declare #of events to run through for specific triggers, in Millions
+  Long_t nEvents_Jet55 = 3;
+  Long_t nEvents_Jet65 = 3;
+
+  Long_t jet55_counter = 0, jet65_counter = 0, jet80_counter = 0; 
+  
+  // the prescl for the specific trigger is then scaled by the factor of no of events you are choosing.
+  // so if you choose 1M events for jet55, then you a prescl of prescl * 20/1,
+  double Jet55_prescl_fac = (double)20.0/nEvents_Jet55;
+  double Jet65_prescl_fac = (double)6.5/nEvents_Jet65;
+  
   
   char * ntuple = (char*)"Pawan"; //  or "Pawan"
   
@@ -120,7 +133,8 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     MC_matched = (TTree*)fMC->Get("matchedJets");
     MC_unmatched = (TTree*)fMC->Get("unmatchedPFJets");
   }
-  
+
+#if 0
   TH1F * hMC_Jet55_noCut = new TH1F("hMC_Jet55_noCut","data from matched jets without any jet ID cut",501,0,501);
   TH1F * hMC_Jet55_CutA = new TH1F("hMC_Jet55_CutA","data from matched jets with Jet ID cut: slant line from 0.4 calopt/pfpt from eMax/Sumcand 0 till 0.9  and then calopt/pfpt > 0.85",501,0,501);
   TH1F * hMC_Jet55_CutA_rej = new TH1F("hMC_Jet55_CutA_rej","data from matched jets rejected by Jet ID cut: slant line from 0.4 calopt/pfpt from eMax/Sumcand 0 till 0.9  and then calopt/pfpt > 0.85",501,0,501);
@@ -226,6 +240,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   TH1F *hpbpb_gen[nbins_cent],*hpbpb_reco[nbins_cent];
   TH2F *hpbpb_matrix[nbins_cent];
   TH2F *hpbpb_matrix_HLT[nbins_cent];
+  TH2F *hpbpb_Trans_matrix_HLT[nbins_cent];
   TH2F *hpbpb_matrix_HLT_GenSmear[nbins_cent];
   TH2F *hpbpb_matrix_HLT_gen2pSmear[nbins_cent];
   TH2F *hpbpb_matrix_HLT_RecoSmear[nbins_cent];
@@ -280,6 +295,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   TH1F *hpbpb_anaBin_TrgObj55[nbins_cent];
   TH1F *hpbpb_anaBin_TrgObjComb[nbins_cent];
   TH2F *hpbpb_anaBin_matrix_HLT[nbins_cent];
+  TH2F *hpbpb_anaBin_Trans_matrix_HLT[nbins_cent];
   TH1F *hpbpb_anaBin_Jet80_gen[nbins_cent],*hpbpb_anaBin_Jet80_reco[nbins_cent];
   TH1F *hpbpb_anaBin_Jet65_gen[nbins_cent],*hpbpb_anaBin_Jet65_reco[nbins_cent];
   TH1F *hpbpb_anaBin_Jet55_gen[nbins_cent],*hpbpb_anaBin_Jet55_reco[nbins_cent];
@@ -342,6 +358,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     hpbpb_matrix[i] = new TH2F(Form("hpbpb_matrix_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501,501,0,501);
     
     hpbpb_matrix_HLT[i] = new TH2F(Form("hpbpb_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501,501,0,501);
+    hpbpb_Trans_matrix_HLT[i] = new TH2F(Form("hpbpb_Trans_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501,501,0,501);
     hpbpb_matrix_HLT_GenSmear[i] = new TH2F(Form("hpbpb_matrix_HLT_GenSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501,501,0,501);
     hpbpb_matrix_HLT_gen2pSmear[i] = new TH2F(Form("hpbpb_matrix_HLT_gen2pSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501,501,0,501);
     hpbpb_matrix_HLT_RecoSmear[i] = new TH2F(Form("hpbpb_matrix_HLT_RecoSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501,501,0,501);
@@ -350,6 +367,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     hpbpb_matrix_HLT_10TrigIneff_Smear[i] = new TH2F(Form("hpbpb_matrix_HLT_10TrigIneffSmear_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501,501,0,501);
 
     hpbpb_anaBin_matrix_HLT[i] = new TH2F(Form("hpbpb_anaBin_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
+    hpbpb_anaBin_Trans_matrix_HLT[i] = new TH2F(Form("hpbpb_anaBin_Trans_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix refpt jtpt from trigger addition R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),nbins_pt, boundaries_pt,nbins_pt, boundaries_pt);
 
     hpbpb_mcclosure_matrix[i] = new TH2F(Form("hpbpb_mcclosure_matrix_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix for mcclosure refpt jtpt R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501,501,0,501);
     hpbpb_mcclosure_matrix_HLT[i] = new TH2F(Form("hpbpb_mcclosure_matrix_HLT_R%d_%s_cent%d",radius,etaWidth,i),Form("Matrix for mcclosure refpt jtpt from Jet triggers R%d %s %2.0f - %2.0f cent",radius,etaWidth,5*boundaries_cent[i],5*boundaries_cent[i+1]),501,0,501,501,0,501);
@@ -433,7 +451,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     
 	
   }// centrality bin loop
-  
+#endif
 
 
   // Define all the histograms necessary for the analysis: 
@@ -450,6 +468,11 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   Float_t phSum_1[1000], phSum_2[1000];
   Float_t neSum_1[1000], neSum_2[1000];
   Float_t muSum_1[1000], muSum_2[1000];
+  Float_t phMax_1[1000], phMax_2[1000];
+  Float_t neMax_1[1000], neMax_2[1000];
+  Float_t muMax_1[1000], muMax_2[1000];
+  Float_t trkMax_1[1000], trkMax_2[1000];
+  Int_t event_value_1, lumi_value_1, run_value_1; 
   Int_t jet55_1, jet65_1, jet80_1;
   Int_t jet55_p_1, jet65_p_1, jet80_p_1;
   Int_t jet55_2, jet65_2, jet80_2;
@@ -465,6 +488,9 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   Float_t refdrjt_2[1000];
 
   if(ntuple == "Pawan"){
+    Data_matched->SetBranchAddress("evt_value", &event_value_1);
+    Data_matched->SetBranchAddress("run_value", &run_value_1);
+    Data_matched->SetBranchAddress("lumi_value", &lumi_value_1);
     Data_matched->SetBranchAddress("npf", &npf_1);
     Data_matched->SetBranchAddress("isCaloMatch", &isCaloMatch_1);
     Data_matched->SetBranchAddress("calopt",&calopt_1);
@@ -472,6 +498,10 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     Data_matched->SetBranchAddress("eMax",&eMax_1);
     Data_matched->SetBranchAddress("chMax",&chMax_1);
     Data_matched->SetBranchAddress("chSum",&chSum_1);
+    Data_matched->SetBranchAddress("phMax",&phMax_1);
+    Data_matched->SetBranchAddress("neMax",&neMax_1);
+    Data_matched->SetBranchAddress("muMax",&muMax_1);
+    Data_matched->SetBranchAddress("trMax",&trkMax_1);
     Data_matched->SetBranchAddress("phSum",&phSum_1);
     Data_matched->SetBranchAddress("neSum",&neSum_1);
     Data_matched->SetBranchAddress("muSum",&muSum_1);
@@ -513,6 +543,9 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     Data_unmatched->SetBranchAddress("phSum",&phSum_1);
     Data_unmatched->SetBranchAddress("neSum",&neSum_1);
     Data_unmatched->SetBranchAddress("muSum",&muSum_1);
+    Data_unmatched->SetBranchAddress("phMax",&phMax_1);
+    Data_unmatched->SetBranchAddress("neMax",&neMax_1);
+    Data_unmatched->SetBranchAddress("muMax",&muMax_1);
     Data_unmatched->SetBranchAddress("hiBin",&hiBin_1);
     Data_unmatched->SetBranchAddress("jet55",&jet55_1);
     Data_unmatched->SetBranchAddress("jet65",&jet65_1);
@@ -535,7 +568,11 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   MC_matched->SetBranchAddress("pfpt",&pfpt_2);
   MC_matched->SetBranchAddress("eMax",&eMax_2);
   MC_matched->SetBranchAddress("chMax",&chMax_2);
+  MC_matched->SetBranchAddress("trMax",&trkMax_2);
   MC_matched->SetBranchAddress("chSum",&chSum_2);
+  MC_matched->SetBranchAddress("phMax",&phMax_2);
+  MC_matched->SetBranchAddress("neMax",&neMax_2);
+  MC_matched->SetBranchAddress("muMax",&muMax_2);
   MC_matched->SetBranchAddress("phSum",&phSum_2);
   MC_matched->SetBranchAddress("neSum",&neSum_2);
   MC_matched->SetBranchAddress("muSum",&muSum_2);
@@ -605,7 +642,27 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.97, 0.99, 0.995, 1.0, 1.0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1} //70-90%
   };
 #endif
+
+  // create an output TTree file that gets a value for each PF jets per event if it passes the Jet ID cut or not.
+
+  TFile fout1(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PbPb_Data_MC_JetID_CutA_flag_R0p%d.root", ntuple, radius),"RECREATE");
+  fout1.cd();
+  TTree * jetID_Data = new TTree("jetID_Data","");
+  Int_t jetid[1000];
+  Int_t event, run, lumi;
+  Int_t nPFjets;
+  jetID_Data->Branch("event",&event,"event/I");
+  jetID_Data->Branch("run",&run,"run/I");
+  jetID_Data->Branch("lumi",&lumi,"lumi/I");
+  jetID_Data->Branch("nPFjets",&nPFjets,"nPFjets/I");
+  jetID_Data->Branch("jetid",&jetid, "jetid[nPFjets]/I");
   
+  TTree * jetID_MC = new TTree("jetID_MC","");
+  Int_t jetid_2[1000];
+  Int_t nPFjets_2;
+  jetID_MC->Branch("nPFjets",&nPFjets_2,"nPFjets/I");
+  jetID_MC->Branch("jetid",&jetid_2, "jetid[nPFjets]/I");
+
   // data loop
   long entries = Data_matched->GetEntries();
   //entries = 1000;
@@ -613,9 +670,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 
   // get the random value for smear systematics, TRandom rnd, value per jet = rnd.Gaus(0,1);
   TRandom rnd; 
-  TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
-
-#if 0
+  //TH1F * htest = new TH1F("htest","",nbins_pt, boundaries_pt);
   cout<<"matched Data ntuple "<<endl;
 
   for(long nentry = 0; nentry < entries; ++nentry ){
@@ -623,10 +678,41 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     if(nentry%100000 == 0) cout<<nentry<<"/"<<entries<<endl;
     Data_matched->GetEntry(nentry);
 
+    event = event_value_1;
+    run = run_value_1;
+    lumi = lumi_value_1;
+
+    nPFjets = npf_1;     
+    for(int g = 0; g<npf_1; ++g){ // jet loop
+      
+      jetid[g] = 0;
+      Float_t Sumcand = chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g];
+
+      if(isCaloMatch_1[g] == 1){
+	if(calopt_1[g]/pfpt_1[g] > 0.5 && calopt_1[g]/pfpt_1[g] <= 0.85 && eMax_1[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1[g]/pfpt_1[g] - (Float_t)9/7)) jetid[g] = 1;
+	if(calopt_1[g]/pfpt_1[g] > 0.85) jetid[g] = 1;
+	if(calopt_1[g]/pfpt_1[g] <= 0.5 && eMax_1[g]/Sumcand < 0.05) jetid[g] = 1;
+      }
+      if(isCaloMatch_1[g] == 0)
+	if(eMax_1[g]/Sumcand < 0.05 ) jetid[g] = 1;
+    }
+    jetID_Data->Fill();
+#if 0
+
+    
+
     Int_t cBin = findBin(hiBin_1);
     if(cBin == -1 || cBin >= nbins_cent) continue;
 
-    Float_t wght = 1; 
+    // if(jet55_1 == 1) jet55_counter++;
+    // if(jet65_1 == 1) jet65_counter++;
+    // if(jet80_1 == 1) jet80_counter++;
+
+    // if(jet55_counter%100000 == 0) cout<<"read "<<jet55_counter<<" jet55 events"<<endl;
+    // if(jet65_counter%100000 == 0) cout<<"read "<<jet65_counter<<" jet65 events"<<endl;
+    // if(jet80_counter%100000 == 0) cout<<"read "<<jet80_counter<<" jet80 events"<<endl;
+    
+    double wght = 1; 
     // if(etaBoundary == 1.0){ 
     //   if(radius == 2) wght = R2nCorr[cBin][htest->FindBin(pfpt_1)];
     //   if(radius == 3) wght = R3nCorr[cBin][htest->FindBin(pfpt_1)];
@@ -635,82 +721,107 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     
     for(int g = 0; g<npf_1; ++g){ // jet loop
 
+      jetid[g] = 0;
+
       if(isSymm && TMath::Abs(eta_1[g]) > (Float_t)etaHigh/10) continue;       
       if(!isSymm && (TMath::Abs(eta_1[g]) < (Float_t)etaLow/10 || TMath::Abs(eta_1[g]) > (Float_t)etaHigh/10)) continue;
    
       Float_t Sumcand = chSum_1[g] + phSum_1[g] + neSum_1[g] + muSum_1[g];
 
       if(isCaloMatch_1[g] == 1){
+	if(calopt_1[g]/pfpt_1[g] > 0.5 && calopt_1[g]/pfpt_1[g] <= 0.85 && eMax_1[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1[g]/pfpt_1[g] - (Float_t)9/7)) jetid[g] = 1;
+	if(calopt_1[g]/pfpt_1[g] > 0.85) jetid[g] = 1;
+	if(calopt_1[g]/pfpt_1[g] <= 0.5 && eMax_1[g]/Sumcand < 0.05) jetid[g] = 1;
+      }
+      if(isCaloMatch_1[g] == 0)
+	if(eMax_1[g]/Sumcand < 0.05 ) jetid[g] = 1;
+
+      if(isCaloMatch_1[g] == 1){
+	
+	//if(trkMax_1[g] < 7) continue; 
+	//if(muMax_1[g]/(chMax_1[g]+phMax_1[g]+neMax_1[g]+muMax_1[g]+eMax_1[g]) > 0.975) continue;
+	//if(trkMax_1[g] / pfpt_1[g] <= 0.02) continue;
 
 	if(jet55_1 == 1 && jet65_1 == 0 && jet80_1 == 0 ) {
-      
-	  hData_Jet55_noCut->Fill(pfpt_1[g], Jet55_prescl* wght);
-	  hpbpb_Data_Jet55_noCut[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
 
-	  if(calopt_1[g]/pfpt_1[g] > 0.5 && calopt_1[g]/pfpt_1[g] <= 0.85 && eMax_1[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1[g]/pfpt_1[g] - (Float_t)9/7)) {
-	    hData_Jet55_CutA->Fill(pfpt_1[g], Jet55_prescl* wght);
-	    hpbpb_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
-	    hpbpb_raw_TrgObj55[cBin]->Fill(pfrawpt_1[g], Jet55_prescl* wght);
-	    hpbpb_anaBin_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
-	    hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl* wght);
-	    hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), Jet55_prescl* wght);
-	  }
-	  if(calopt_1[g]/pfpt_1[g] > 0.85){
-	    hData_Jet55_CutA->Fill(pfpt_1[g], Jet55_prescl* wght);
-	    hpbpb_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
-	    hpbpb_raw_TrgObj55[cBin]->Fill(pfrawpt_1[g], Jet55_prescl* wght);
-	    hpbpb_anaBin_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
-	    hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl* wght);
-	    hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), Jet55_prescl* wght);
-	  }
-	  if(calopt_1[g]/pfpt_1[g] <= 0.5 && eMax_1[g]/Sumcand < 0.05) {
-	    hData_Jet55_CutA->Fill(pfpt_1[g], Jet55_prescl* wght);
-	    hpbpb_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
-	    hpbpb_raw_TrgObj55[cBin]->Fill(pfrawpt_1[g], Jet55_prescl* wght);
-	    hpbpb_anaBin_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
-	    hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl* wght);
-	    hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), Jet55_prescl* wght);
-	  }
-	  if(calopt_1[g]/pfpt_1[g] <= 0.5 && eMax_1[g]/Sumcand >= 0.05) hData_Jet55_CutA_rej->Fill(pfpt_1[g], Jet55_prescl* wght);
-	  if(calopt_1[g]/pfpt_1[g] > 0.5 && calopt_1[g]/pfpt_1[g] <= 0.85 && eMax_1[g]/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1[g]/pfpt_1[g] - (Float_t)9/7)) hData_Jet55_CutA_rej->Fill(pfpt_1[g], Jet55_prescl* wght);
-      
+	  // if(jet55_counter <= nEvents_Jet55 * 1e6){
+	  //   wght = 1 * Jet55_prescl_fac; 
+
+	  //Jet55_prescl = 1; 
+	  
+	    hData_Jet55_noCut->Fill(pfpt_1[g], Jet55_prescl* wght);
+	    hpbpb_Data_Jet55_noCut[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
+
+	    if(calopt_1[g]/pfpt_1[g] > 0.5 && calopt_1[g]/pfpt_1[g] <= 0.85 && eMax_1[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1[g]/pfpt_1[g] - (Float_t)9/7)) {
+	      hData_Jet55_CutA->Fill(pfpt_1[g], Jet55_prescl* wght);
+	      hpbpb_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
+	      hpbpb_raw_TrgObj55[cBin]->Fill(pfrawpt_1[g], Jet55_prescl* wght);
+	      hpbpb_anaBin_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
+	      hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl* wght);
+	      hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), Jet55_prescl* wght);
+	    }
+	    if(calopt_1[g]/pfpt_1[g] > 0.85){
+	      hData_Jet55_CutA->Fill(pfpt_1[g], Jet55_prescl* wght);
+	      hpbpb_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
+	      hpbpb_raw_TrgObj55[cBin]->Fill(pfrawpt_1[g], Jet55_prescl* wght);
+	      hpbpb_anaBin_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
+	      hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl* wght);
+	      hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), Jet55_prescl* wght);
+	    }
+	    if(calopt_1[g]/pfpt_1[g] <= 0.5 && eMax_1[g]/Sumcand < 0.05) {
+	      hData_Jet55_CutA->Fill(pfpt_1[g], Jet55_prescl* wght);
+	      hpbpb_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
+	      hpbpb_raw_TrgObj55[cBin]->Fill(pfrawpt_1[g], Jet55_prescl* wght);
+	      hpbpb_anaBin_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl* wght);
+	      hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl* wght);
+	      hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), Jet55_prescl* wght);
+	    }
+	    if(calopt_1[g]/pfpt_1[g] <= 0.5 && eMax_1[g]/Sumcand >= 0.05) hData_Jet55_CutA_rej->Fill(pfpt_1[g], Jet55_prescl* wght);
+	    if(calopt_1[g]/pfpt_1[g] > 0.5 && calopt_1[g]/pfpt_1[g] <= 0.85 && eMax_1[g]/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1[g]/pfpt_1[g] - (Float_t)9/7)) hData_Jet55_CutA_rej->Fill(pfpt_1[g], Jet55_prescl* wght);
+
+	    //	  }
 	}
     
 	if(jet65_1 == 1 && jet80_1 == 0 ) {
+
+	  // if(jet65_counter <= nEvents_Jet65 * 1e6){
+	  //   //wght = wght * Jet65_prescl_fac;
+	  wght = 1; 
       
-	  hData_Jet65_noCut->Fill(pfpt_1[g], wght);
-	  hpbpb_Data_Jet65_noCut[cBin]->Fill(pfpt_1[g], wght);
+	    hData_Jet65_noCut->Fill(pfpt_1[g], wght);
+	    hpbpb_Data_Jet65_noCut[cBin]->Fill(pfpt_1[g], wght);
 	    
-	  if(calopt_1[g]/pfpt_1[g] > 0.5 && calopt_1[g]/pfpt_1[g] <= 0.85 && eMax_1[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1[g]/pfpt_1[g] - (Float_t)9/7)){
-	    hData_Jet65_CutA->Fill(pfpt_1[g], wght);
-	    hpbpb_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
-	    hpbpb_raw_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
-	    hpbpb_anaBin_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
-	    hpbpb_JEC_TrgObj65[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), wght);
-	    hpbpb_Smear_TrgObj65[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), wght);
-	  }
-	  if(calopt_1[g]/pfpt_1[g] > 0.85) {
-	    hData_Jet65_CutA->Fill(pfpt_1[g], wght);
-	    hpbpb_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
-	    hpbpb_raw_TrgObj65[cBin]->Fill(pfrawpt_1[g], wght);
-	    hpbpb_anaBin_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
-	    hpbpb_JEC_TrgObj65[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), wght);
-	    hpbpb_Smear_TrgObj65[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), wght);
-	  }
-	  if(calopt_1[g]/pfpt_1[g] <= 0.5 && eMax_1[g]/Sumcand < 0.05) {
-	    hData_Jet65_CutA->Fill(pfpt_1[g], wght);
-	    hpbpb_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
-	    hpbpb_raw_TrgObj65[cBin]->Fill(pfrawpt_1[g], wght);
-	    hpbpb_anaBin_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
-	    hpbpb_JEC_TrgObj65[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), wght);
-	    hpbpb_Smear_TrgObj65[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), wght);
-	  }
-	  if(calopt_1[g]/pfpt_1[g] <= 0.5 && eMax_1[g]/Sumcand >= 0.05) hData_Jet65_CutA_rej->Fill(pfpt_1[g], wght);
-	  if(calopt_1[g]/pfpt_1[g] > 0.5 && calopt_1[g]/pfpt_1[g] <= 0.85 && eMax_1[g]/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1[g]/pfpt_1[g] - (Float_t)9/7)) hData_Jet65_CutA_rej->Fill(pfpt_1[g], wght);
-      
+	    if(calopt_1[g]/pfpt_1[g] > 0.5 && calopt_1[g]/pfpt_1[g] <= 0.85 && eMax_1[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_1[g]/pfpt_1[g] - (Float_t)9/7)){
+	      hData_Jet65_CutA->Fill(pfpt_1[g], wght);
+	      hpbpb_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
+	      hpbpb_raw_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
+	      hpbpb_anaBin_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
+	      hpbpb_JEC_TrgObj65[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), wght);
+	      hpbpb_Smear_TrgObj65[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), wght);
+	    }
+	    if(calopt_1[g]/pfpt_1[g] > 0.85) {
+	      hData_Jet65_CutA->Fill(pfpt_1[g], wght);
+	      hpbpb_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
+	      hpbpb_raw_TrgObj65[cBin]->Fill(pfrawpt_1[g], wght);
+	      hpbpb_anaBin_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
+	      hpbpb_JEC_TrgObj65[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), wght);
+	      hpbpb_Smear_TrgObj65[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), wght);
+	    }
+	    if(calopt_1[g]/pfpt_1[g] <= 0.5 && eMax_1[g]/Sumcand < 0.05) {
+	      hData_Jet65_CutA->Fill(pfpt_1[g], wght);
+	      hpbpb_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
+	      hpbpb_raw_TrgObj65[cBin]->Fill(pfrawpt_1[g], wght);
+	      hpbpb_anaBin_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
+	      hpbpb_JEC_TrgObj65[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), wght);
+	      hpbpb_Smear_TrgObj65[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), wght);
+	    }
+	    if(calopt_1[g]/pfpt_1[g] <= 0.5 && eMax_1[g]/Sumcand >= 0.05) hData_Jet65_CutA_rej->Fill(pfpt_1[g], wght);
+	    if(calopt_1[g]/pfpt_1[g] > 0.5 && calopt_1[g]/pfpt_1[g] <= 0.85 && eMax_1[g]/Sumcand >= ((Float_t)18/7 *(Float_t)calopt_1[g]/pfpt_1[g] - (Float_t)9/7)) hData_Jet65_CutA_rej->Fill(pfpt_1[g], wght);
+	    //	  }
 	}
 
 	if(jet80_1 == 1) {
+	  wght = 1; 
     
 	  hData_Jet80_noCut->Fill(pfpt_1[g], wght);
 	  hpbpb_Data_Jet80_noCut[cBin]->Fill(pfpt_1[g], wght);   
@@ -745,43 +856,55 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
       }
       // fill the histograms with unmatched Jets 
       if(isCaloMatch_1[g] ==0) {
-      	
+
+	//if(trkMax_1[g] < 7) continue; 
+	//if(muMax_1[g]/(chMax_1[g]+phMax_1[g]+neMax_1[g]+muMax_1[g]+eMax_1[g]) > 0.975) continue;
+	//if(trkMax_1[g] / pfpt_1[g] <= 0.02) continue;
+
 	if(jet55_1 == 1 && jet65_1 == 0 && jet80_1 == 0 ) {
-    
-	  hData_unmatched_Jet55_noCut->Fill(pfpt_1[g], Jet55_prescl*wght);
-	  hpbpb_Data_Jet55_noCut[cBin]->Fill(pfpt_1[g], Jet55_prescl*wght);
 
-	  if(eMax_1[g]/Sumcand < 0.05 ){
-	    hpbpb_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl*wght);
-	    hpbpb_raw_TrgObj55[cBin]->Fill(pfrawpt_1[g], Jet55_prescl*wght);
-	    hpbpb_anaBin_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl*wght);
-	    hData_unmatched_Jet55_CutA->Fill(pfpt_1[g], Jet55_prescl*wght);
-	    hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl*wght);
-	    hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), Jet55_prescl*wght);
+	  //Jet55_prescl = 1;
+	  
+	  // if(jet55_counter <= nEvents_Jet55 * 1e6){
+	  //   wght =  1 * Jet55_prescl_fac;
+	    hData_unmatched_Jet55_noCut->Fill(pfpt_1[g], Jet55_prescl*wght);
+	    hpbpb_Data_Jet55_noCut[cBin]->Fill(pfpt_1[g], Jet55_prescl*wght);
 
-	  }
-	  else hData_unmatched_Jet55_CutA_rej->Fill(pfpt_1[g], Jet55_prescl*wght);
-      
+	    if(eMax_1[g]/Sumcand < 0.05 ){
+	      hpbpb_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl*wght);
+	      hpbpb_raw_TrgObj55[cBin]->Fill(pfrawpt_1[g], Jet55_prescl*wght);
+	      hpbpb_anaBin_TrgObj55[cBin]->Fill(pfpt_1[g], Jet55_prescl*wght);
+	      hData_unmatched_Jet55_CutA->Fill(pfpt_1[g], Jet55_prescl*wght);
+	      hpbpb_JEC_TrgObj55[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), Jet55_prescl*wght);
+	      hpbpb_Smear_TrgObj55[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), Jet55_prescl*wght);
+
+	    }
+	    else hData_unmatched_Jet55_CutA_rej->Fill(pfpt_1[g], Jet55_prescl*wght);
+	    //  }
 	}
 
 	if(jet65_1 == 1 && jet80_1 == 0 ) {
 
-	  hData_unmatched_Jet65_noCut->Fill(pfpt_1[g], wght);
-	  hpbpb_Data_Jet65_noCut[cBin]->Fill(pfpt_1[g], wght);
+	  // if(jet65_counter <= nEvents_Jet65 * 1e6){
+	  //   //wght = wght * Jet65_prescl_fac;
+	    wght = 1; 
+	    hData_unmatched_Jet65_noCut->Fill(pfpt_1[g], wght);
+	    hpbpb_Data_Jet65_noCut[cBin]->Fill(pfpt_1[g], wght);
 
-	  if(eMax_1[g]/Sumcand < 0.05  ){
-	    hpbpb_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
-	    hpbpb_raw_TrgObj65[cBin]->Fill(pfrawpt_1[g], wght);
-	    hpbpb_anaBin_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
-	    hpbpb_JEC_TrgObj65[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), wght);
-	    hpbpb_Smear_TrgObj65[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), wght);
-	    hData_unmatched_Jet65_CutA->Fill(pfpt_1[g], wght);}
-	  else hData_unmatched_Jet65_CutA_rej->Fill(pfpt_1[g], wght);
-      
+	    if(eMax_1[g]/Sumcand < 0.05  ){
+	      hpbpb_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
+	      hpbpb_raw_TrgObj65[cBin]->Fill(pfrawpt_1[g], wght);
+	      hpbpb_anaBin_TrgObj65[cBin]->Fill(pfpt_1[g], wght);
+	      hpbpb_JEC_TrgObj65[cBin]->Fill(pfpt_1[g] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), wght);
+	      hpbpb_Smear_TrgObj65[cBin]->Fill(pfpt_1[g] + rnd.Gaus(0,1), wght);
+	      hData_unmatched_Jet65_CutA->Fill(pfpt_1[g], wght);}
+	    else hData_unmatched_Jet65_CutA_rej->Fill(pfpt_1[g], wght);
+	    //	  }
 	}
 
 	if(jet80_1 == 1) {
-    
+
+	  wght = 1;
 	  hData_unmatched_Jet80_noCut->Fill(pfpt_1[g], wght);
 	  hpbpb_Data_Jet80_noCut[cBin]->Fill(pfpt_1[g], wght);
 
@@ -799,13 +922,10 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
       
       }
     
-    }// jet loop
-    
-    
-    
+    }// jet loop    
+#endif    
   }// data ntuple loop
-#endif
-  
+
 #if 0
   if(ntuple == "Raghav"){
     // data unmatched loop:
@@ -894,13 +1014,32 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 
     if(nentry%100000 == 0) cout<<nentry<<"/"<<entries<<endl;
     MC_matched->GetEntry(nentry);
+
+    nPFjets_2 = npf_2;
     
+    for(int g = 0; g<npf_2; ++g){
+      Float_t Sumcand = chSum_2[g] + phSum_2[g] + neSum_2[g] + muSum_2[g];
+      
+      jetid_2[g] = 0;
+      if(isCaloMatch_2[g] == 1){
+	if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)) jetid_2[g] = 1;
+	if(calopt_2[g]/pfpt_2[g] > 0.85) jetid_2[g] = 1;
+	if(calopt_2[g]/pfpt_2[g] <= 0.5 && eMax_2[g]/Sumcand < 0.05) jetid_2[g] = 1;
+      }
+      if(isCaloMatch_2[g] == 0)
+	if(eMax_2[g]/Sumcand < 0.05 ) jetid_2[g] = 1;
+      
+    }
+    jetID_MC->Fill();
+
+#if 0
+
     Int_t cBin = findBin(hiBin_2);
-    if(cBin == -1 || cBin >= nbins_cent) continue;    
+    if(cBin == -1 || cBin >= nbins_cent) continue;
+
     
     for(int g = 0; g<npf_2; ++g){
     
-      Float_t Sumcand = chSum_2[g] + phSum_2[g] + neSum_2[g] + muSum_2[g];
       int refid = -1; 
       
       if(pfpt_2[g] > 2 * pthat_2) continue;
@@ -911,8 +1050,13 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
       if(isSymm && TMath::Abs(eta_2[g]) > (Float_t)etaHigh/10) continue;       
       if(!isSymm && (TMath::Abs(eta_2[g]) < (Float_t)etaLow/10 || TMath::Abs(eta_2[g]) > (Float_t)etaHigh/10)) continue;
 
+
       if(isCaloMatch_2[g] == 1){
-    
+
+	//if(trkMax_2[g] < 7) continue;
+	//if(muMax_2[g]/(chMax_2[g]+phMax_2[g]+neMax_2[g]+muMax_2[g]+eMax_2[g]) > 0.975) continue;
+	//if(trkMax_2[g] / pfpt_2[g] <= 0.02) continue;
+
 	if(calopt_2[g]/pfpt_2[g] > 0.5 && calopt_2[g]/pfpt_2[g] <= 0.85 && eMax_2[g]/Sumcand < ((Float_t)18/7 *(Float_t)calopt_2[g]/pfpt_2[g] - (Float_t)9/7)){
 	  hpbpb_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	  hpbpb_reco[cBin]->Fill(pfpt_2[g], weight);
@@ -981,6 +1125,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_Jet55_RecoSmear[cBin]->Fill(pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet55_raw[cBin]->Fill(pfrawpt_2[g], weight);
 	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
 	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
@@ -988,6 +1133,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet55_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
 
 	    if(nentry%2==0){
 	      hpbpb_mcclosure_Jet55_data_5TrigIneff_Smear[cBin]->Fill(pfpt_2[g]* (1. + 0.5/nbins_cent*(nbins_cent-cBin)), weight);
@@ -1020,11 +1166,13 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_matrix_HLT_5TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.05/nbins_cent*(nbins_cent-cBin)), pfpt_2[g] * (1. + 0.05/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_matrix_HLT_10TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.1/nbins_cent*(nbins_cent-cBin)), pfpt_2[g] * (1. + 0.1/nbins_cent*(nbins_cent-cBin)), weight);
 
-	    
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+
 	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
 
 	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet55_reco[cBin]->Fill(pfpt_2[g], weight);
@@ -1055,6 +1203,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
 
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
 
 	    hpbpb_Jet55_gen_5TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.05/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_Jet55_gen_10TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.10/nbins_cent*(nbins_cent-cBin)), weight);
@@ -1062,6 +1211,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_Jet55_reco_10TrigIneff_Smear[cBin]->Fill(pfpt_2[g] * (1. + 0.10/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_matrix_HLT_5TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.05/nbins_cent*(nbins_cent-cBin)), pfpt_2[g] * (1. + 0.05/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_matrix_HLT_10TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.1/nbins_cent*(nbins_cent-cBin)), pfpt_2[g] * (1. + 0.1/nbins_cent*(nbins_cent-cBin)), weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
 
 	    
 	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
@@ -1113,7 +1263,9 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
-	
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+	    
 	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
@@ -1143,7 +1295,9 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
-	
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+
 	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
@@ -1175,7 +1329,9 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
-	
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+
 	    hpbpb_anaBin_Jet65_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet65_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
@@ -1218,7 +1374,9 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
-	
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+
 	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
 	    hpbpb_anaBin_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
@@ -1245,11 +1403,13 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 
 	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
 
 	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
 	
 	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
@@ -1277,11 +1437,13 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 
 	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
 
 	    hpbpb_matrix_HLT[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_GenSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_RecoSmear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
 	
 	    hpbpb_anaBin_Jet80_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet80_reco[cBin]->Fill(pfpt_2[g], weight);
@@ -1305,7 +1467,11 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
       }// matched jets 
 
       if(isCaloMatch_2[g] == 0){
-	
+
+	//if(trkMax_2[g] < 7) continue; // atlas cut. 
+	//if(muMax_2[g]/(chMax_2[g]+phMax_2[g]+neMax_2[g]+muMax_2[g]+eMax_2[g]) > 0.975) continue;
+	//if(trkMax_2[g] / pfpt_2[g] <= 0.02) continue;
+
 	if(eMax_2[g]/Sumcand < 0.05  ){
 	  hpbpb_gen[cBin]->Fill(pfrefpt_2[refid], weight);
 	  hpbpb_reco[cBin]->Fill(pfpt_2[g], weight);
@@ -1337,6 +1503,8 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet55_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+
 	    hpbpb_Jet55_gen_5TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.05/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_Jet55_gen_10TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.10/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_Jet55_reco_5TrigIneff_Smear[cBin]->Fill(pfpt_2[g] * (1. + 0.05/nbins_cent*(nbins_cent-cBin)), weight);
@@ -1344,6 +1512,7 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_matrix_HLT_5TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.05/nbins_cent*(nbins_cent-cBin)), pfpt_2[g] * (1. + 0.05/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_matrix_HLT_10TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.1/nbins_cent*(nbins_cent-cBin)), pfpt_2[g] * (1. + 0.1/nbins_cent*(nbins_cent-cBin)), weight);
 
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
 
 	    hMC_unmatched_Jet55_CutA->Fill(pfrefpt_2[refid], weight);
 	    hpbpb_anaBin_Jet55_gen[cBin]->Fill(pfrefpt_2[refid], weight);
@@ -1383,6 +1552,9 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet65_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+
 	    hpbpb_matrix_HLT_5TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_10TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] , pfpt_2[g], weight);
 	    hMC_unmatched_Jet65_CutA->Fill(pfrefpt_2[refid], weight);
@@ -1420,6 +1592,9 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
 	    hpbpb_matrix_HLT_BothSmear[cBin]->Fill(pfrefpt_2[refid] + rnd.Gaus(0,1), pfpt_2[g] + rnd.Gaus(0,1), weight);
 	    hpbpb_Jet80_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), weight);
 	    hpbpb_matrix_HLT_gen2pSmear[cBin]->Fill(pfrefpt_2[refid] * (1. + 0.02/nbins_cent*(nbins_cent-cBin)), pfpt_2[g], weight);
+	    hpbpb_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+	    hpbpb_anaBin_Trans_matrix_HLT[cBin]->Fill( pfpt_2[g],pfrefpt_2[refid], weight);
+
 	    hpbpb_matrix_HLT_5TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid], pfpt_2[g], weight);
 	    hpbpb_matrix_HLT_10TrigIneff_Smear[cBin]->Fill(pfrefpt_2[refid] , pfpt_2[g], weight);
 	    hMC_unmatched_Jet80_CutA->Fill(pfrefpt_2[refid], weight);
@@ -1443,6 +1618,8 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
       }//unmatched jets
 
     }// jet loop
+#endif
+
     
   }// mc ntuple loop
 
@@ -1566,7 +1743,15 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   }
 #endif
 
-  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PbPb_MC_subid0_spectra_JetID_CutA_%s_%s_R0p%d.root",ntuple,ptbins,etaWidth,radius),"RECREATE");
+  // cout<<"Number of events that passed Jet 55 = "<<jet55_counter<<endl;
+  // cout<<"Number of events that passed Jet 65 = "<<jet65_counter<<endl;
+
+  //jetID_Data->Write();
+  jetID_MC->Write();
+  fout1.Close();
+
+#if 0
+  TFile fout(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/%s_TTree_PbPb_MC_subid0_spectra_JetID_CutA_%s_%s_R0p%d.root",ntuple, ptbins, etaWidth, radius),"RECREATE");
   fout.cd();
   
   for(int i = 0;i<nbins_cent;++i){
@@ -1584,10 +1769,14 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     hpbpb_Data_Comb_noCut[i]->Add(hpbpb_Data_Jet65_noCut[i]);
     hpbpb_Data_Comb_noCut[i]->Add(hpbpb_Data_Jet55_noCut[i]);
 
+    // hpbpb_TrgObj80[i]->Scale(1./4/1e8/(1+0.898+0.494));
+    // hpbpb_TrgObj65[i]->Scale(1./2.93/1e8/(1+0.898+0.494));
+    // hpbpb_TrgObj55[i]->Scale(1./2.52/1e8/(1+0.898+0.494));
+    
     hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj80[i]);
     hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj65[i]);
     hpbpb_TrgObjComb[i]->Add(hpbpb_TrgObj55[i]);
-
+    
     divideBinWidth(hpbpb_TrgObjComb[i]);
     divideBinWidth(hpbpb_TrgObj80[i]);
     divideBinWidth(hpbpb_TrgObj65[i]);
@@ -1765,11 +1954,13 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
     hpbpb_Smear_TrgObj55[i]->Write();
     
     hpbpb_matrix_HLT[i]->Write();
+    hpbpb_Trans_matrix_HLT[i]->Write();
     hpbpb_matrix_HLT_GenSmear[i]->Write();
     hpbpb_matrix_HLT_gen2pSmear[i]->Write();
     hpbpb_matrix_HLT_RecoSmear[i]->Write();
     hpbpb_matrix_HLT_BothSmear[i]->Write();
     hpbpb_anaBin_matrix_HLT[i]->Write();
+    hpbpb_anaBin_Trans_matrix_HLT[i]->Write();
     hpbpb_matrix_HLT_5TrigIneff_Smear[i]->Write();
     hpbpb_matrix_HLT_10TrigIneff_Smear[i]->Write();
     
@@ -2264,6 +2455,6 @@ void RAA_read_jetHistograms(char* etaWidth = (char*)"20_eta_20",
   //drawText()
 
   cTriggerCombination->SaveAs(Form("TriggerCombination_YetkinCuts_R0p%d.pdf",radius),"RECREATE");
-
+#endif
 
 }

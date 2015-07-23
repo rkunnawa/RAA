@@ -1,0 +1,97 @@
+000 (426805.000.000) 06/22 21:36:32 Job submitted from host: <18.12.1.74:48322>
+...
+001 (426805.000.000) 06/22 21:36:43 Job executing on host: <18.12.9.54:46570>
+...
+006 (426805.000.000) 06/22 21:36:52 Image size of job updated: 93712
+	3  -  MemoryUsage of job (MB)
+	2432  -  ResidentSetSize of job (KB)
+...
+006 (426805.000.000) 06/22 21:41:53 Image size of job updated: 381352
+	181  -  MemoryUsage of job (MB)
+	184608  -  ResidentSetSize of job (KB)
+...
+006 (426805.000.000) 06/22 21:46:54 Image size of job updated: 383964
+	183  -  MemoryUsage of job (MB)
+	187208  -  ResidentSetSize of job (KB)
+...
+006 (426805.000.000) 06/22 21:51:54 Image size of job updated: 384504
+	184  -  MemoryUsage of job (MB)
+	187708  -  ResidentSetSize of job (KB)
+...
+005 (426805.000.000) 06/22 21:52:23 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:13:12, Sys 0 00:00:09  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:13:12, Sys 0 00:00:09  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	128042  -  Run Bytes Sent By Job
+	28496  -  Run Bytes Received By Job
+	128042  -  Total Bytes Sent By Job
+	28496  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :      178      178          
+	   Memory (MB)          :      184      184          
+...
+000 (491459.000.000) 06/29 08:39:41 Job submitted from host: <18.12.1.74:48322>
+...
+001 (491459.000.000) 06/29 08:40:06 Job executing on host: <18.12.8.104:49709>
+...
+006 (491459.000.000) 06/29 08:40:15 Image size of job updated: 93700
+	3  -  MemoryUsage of job (MB)
+	2432  -  ResidentSetSize of job (KB)
+...
+006 (491459.000.000) 06/29 08:45:16 Image size of job updated: 418188
+	188  -  MemoryUsage of job (MB)
+	192248  -  ResidentSetSize of job (KB)
+...
+006 (491459.000.000) 06/29 08:50:17 Image size of job updated: 425564
+	230  -  MemoryUsage of job (MB)
+	234836  -  ResidentSetSize of job (KB)
+...
+005 (491459.000.000) 06/29 08:52:43 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:10:10, Sys 0 00:00:12  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:10:10, Sys 0 00:00:12  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	27225500  -  Run Bytes Sent By Job
+	18573400  -  Run Bytes Received By Job
+	27225500  -  Total Bytes Sent By Job
+	18573400  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :    44751    44751          
+	   Memory (MB)          :      230      230          
+...
+000 (495832.000.000) 07/03 12:34:13 Job submitted from host: <18.12.1.74:48322>
+...
+001 (495832.000.000) 07/03 12:34:46 Job executing on host: <18.12.8.162:48541>
+...
+006 (495832.000.000) 07/03 12:34:54 Image size of job updated: 1
+	3  -  MemoryUsage of job (MB)
+	2384  -  ResidentSetSize of job (KB)
+...
+006 (495832.000.000) 07/03 12:39:54 Image size of job updated: 559680
+	338  -  MemoryUsage of job (MB)
+	345592  -  ResidentSetSize of job (KB)
+...
+006 (495832.000.000) 07/03 12:54:56 Image size of job updated: 567056
+	379  -  MemoryUsage of job (MB)
+	387984  -  ResidentSetSize of job (KB)
+...
+005 (495832.000.000) 07/03 13:01:13 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:14:46, Sys 0 00:00:06  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:14:46, Sys 0 00:00:06  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	28191560  -  Run Bytes Sent By Job
+	18576446  -  Run Bytes Received By Job
+	28191560  -  Total Bytes Sent By Job
+	18576446  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request          
+	   Cpus                 :                 1          
+	   Disk (KB)            :    45697    45697          
+	   Memory (MB)          :      379      379          
+...

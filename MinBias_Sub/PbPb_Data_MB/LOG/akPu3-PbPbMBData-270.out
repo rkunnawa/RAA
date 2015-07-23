@@ -1,0 +1,95 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 16:47:17 EDT 2015 at WN: t2bat0269.cmsaf.mit.edu 
+Job is running on Linux t2bat0269.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G   63G  811G   8% /export/data1
+/dev/sdb1             1.8T  1.7T  167G  91% /export/00b
+/dev/sdc1             1.8T  1.7T  168G  91% /export/00c
+/dev/sdd1             1.8T  1.7T  170G  91% /export/00d
+/dev/sde1             1.8T  1.7T  162G  92% /export/00e
+/dev/sdf1             1.8T  1.7T  161G  92% /export/00f
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   62G   37G  64% /cvmfs/cms.cern.ch
+cvmfs2                 98G   62G   37G  64% /cvmfs/cvmfs.cmsaf.mit.edu
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/656254
+10000/656254
+20000/656254
+30000/656254
+40000/656254
+50000/656254
+60000/656254
+70000/656254
+80000/656254
+90000/656254
+100000/656254
+110000/656254
+120000/656254
+130000/656254
+140000/656254
+150000/656254
+160000/656254
+170000/656254
+180000/656254
+190000/656254
+200000/656254
+210000/656254
+220000/656254
+230000/656254
+240000/656254
+250000/656254
+260000/656254
+270000/656254
+280000/656254
+290000/656254
+300000/656254
+310000/656254
+320000/656254
+330000/656254
+340000/656254
+350000/656254
+360000/656254
+370000/656254
+380000/656254
+390000/656254
+400000/656254
+410000/656254
+420000/656254
+430000/656254
+440000/656254
+450000/656254
+460000/656254
+470000/656254
+480000/656254
+490000/656254
+500000/656254
+510000/656254
+520000/656254
+530000/656254
+540000/656254
+550000/656254
+560000/656254
+570000/656254
+580000/656254
+590000/656254
+600000/656254
+610000/656254
+620000/656254
+630000/656254
+640000/656254
+650000/656254
+Macro finished: 
+CPU time (min)  = 5.00033
+Real time (min) = 5.73744
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

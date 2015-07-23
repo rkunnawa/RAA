@@ -1,0 +1,92 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 16:51:28 EDT 2015 at WN: t2bat0291.cmsaf.mit.edu 
+Job is running on Linux t2bat0291.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G   14G  5.0G  74% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   97G  319G  24% /export/data1
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+/dev/sdb1             2.7T  2.5T  253G  91% /export/00b
+/dev/sdc1             2.7T  2.5T  273G  91% /export/00c
+/dev/sdd1             2.7T  2.5T  273G  91% /export/00d
+/dev/sde1             2.7T  2.5T  287G  90% /export/00e
+/dev/sdf1             2.7T  2.5T  265G  91% /export/00f
+/dev/sdg1             2.7T  2.5T  261G  91% /export/00g
+/dev/sdh1             2.7T  2.5T  267G  91% /export/00h
+/dev/sdi1             2.7T  2.5T  282G  90% /export/00i
+/dev/sdj1             2.7T  2.5T  270G  91% /export/00j
+/dev/sdk1             2.7T  2.5T  261G  91% /export/00k
+/dev/sdl1             2.7T  2.5T  252G  91% /export/00l
+cvmfs2                 98G   89G  9.0G  91% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   89G  9.0G  91% /cvmfs/cvmfs.cmsaf.mit.edu
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/562367
+10000/562367
+20000/562367
+30000/562367
+40000/562367
+50000/562367
+60000/562367
+70000/562367
+80000/562367
+90000/562367
+100000/562367
+110000/562367
+120000/562367
+130000/562367
+140000/562367
+150000/562367
+160000/562367
+170000/562367
+180000/562367
+190000/562367
+200000/562367
+210000/562367
+220000/562367
+230000/562367
+240000/562367
+250000/562367
+260000/562367
+270000/562367
+280000/562367
+290000/562367
+300000/562367
+310000/562367
+320000/562367
+330000/562367
+340000/562367
+350000/562367
+360000/562367
+370000/562367
+380000/562367
+390000/562367
+400000/562367
+410000/562367
+420000/562367
+430000/562367
+440000/562367
+450000/562367
+460000/562367
+470000/562367
+480000/562367
+490000/562367
+500000/562367
+510000/562367
+520000/562367
+530000/562367
+540000/562367
+550000/562367
+560000/562367
+Macro finished: 
+CPU time (min)  = 4.6815
+Real time (min) = 20.0573
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

@@ -59,8 +59,8 @@ static const double boundaries_pt[nbins_pt+1] = {
 static const int nbins_cent = 6;
 static const double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
 static const char centWidth[nbins_cent+1][256] = {"0 - 5 %","5 - 10 %","10 - 30 %","30 - 50 %","50 - 70 %","70 - 90 %","0 - 100 %"};
-static const int no_radius = 3;//necessary for the RAA analysis  
-static const int list_radius[no_radius] = {2,3,4};
+static const int no_radius = 1;//necessary for the RAA analysis  
+//static const int list_radius[no_radius] = {2,3,4};
 static const int TrigValue = 4;
 static const char TrigName [TrigValue][256] = {"HLT55","HLT65","HLT80","FullDataset"};
 
@@ -109,7 +109,7 @@ double Calc_deltaR(float eta1, float phi1, float eta2, float phi2)
 
 using namespace std;
 
-void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 30.0, Float_t PFPTCUT = 30.0, char *dataset = "MC", char * etaWidth = "n20_eta_p20"){
+void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 1, int radius=3, char *algo = "Pu", int deltaR=2/*which i will divide by 10 later when using*/, Float_t CALOPTCUT = 10.0, Float_t PFPTCUT = 10.0, Float_t ETACUT = 2.0, char *dataset = "Data", char * etaWidth = "n20_eta_p20"){
 
   TH1::SetDefaultSumw2();
 
@@ -175,7 +175,7 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
   for(int ifile = startfile;ifile<endfile;ifile++){
     
     instr1>>filename1;
-    if(printDebug)cout<<"File: "<<filename1<<endl;
+    cout<<"File: "<<filename1<<endl;
     for(int k = 0;k<no_radius;k++){
 
       for(int t = 0;t<N;t++){
@@ -224,10 +224,9 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
   //get the centrality weight from the root file created in the plotting macro. 
   TFile *fcentin = TFile::Open("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Macros/RAA/PbPb_DataMC_cent_ratio_20141117.root");
   TH1F *hCentWeight = (TH1F*)fcentin->Get("hCentRatio");
-
   
-  TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_%s_closure_histogram_deltaR_0p%d_ak%s%d_%d_%d.root",dataset,deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
-  f.cd();
+  // TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_%s_closure_histogram_deltaR_0p%d_ak%s%d_%d_%d.root",dataset,deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
+  // f.cd();
 
 
   //set the branch addresses:
@@ -349,7 +348,6 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
     jetpbpb1[2][k]->SetBranchAddress("rawpt",&raw_1);
     jetpbpb1[2][k]->SetBranchAddress("jtpu",&jtpu_1);
 
-    
     jetpbpb1[2][k]->SetBranchAddress("chargedMax",&chMax_1);
     jetpbpb1[2][k]->SetBranchAddress("chargedSum",&chSum_1);
     jetpbpb1[2][k]->SetBranchAddress("trackMax",&trkMax_1);
@@ -485,6 +483,9 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
 
   //   }
   // }
+
+  TFile f(Form("PbPb_data_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
+  f.cd();
 
   cout<<"after histogram declaration"<<endl;
 
@@ -641,8 +642,9 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
       delete el;
     }
     
-    for(Long64_t nentry = 0; nentry<nentries;nentry++){
+    for(Long64_t nentry = 0; nentry<1;nentry++){
       if(printDebug)cout<<"event no = "<<nentry<<endl;
+      cout<<nentry<<"/"<<nentries<<endl;
       for(int t = 0;t<N;t++)  jetpbpb1[t][k]->GetEntry(nentry);
       
       hEvents->Fill(0);
@@ -712,6 +714,10 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
       
       hEvents->Fill(5);
 
+      if(dataset == "Data" && run_1 != 181687 && evt_1 != 498663 && lumi_1 != 34) continue;
+
+      cout<<"eent = "<<nentry<<endl;
+
       //if(nentry%100000 == 0) cout<<"jetMB_1 = "<<jetMB_1<<endl;
 
       // start calo jet loop
@@ -722,14 +728,12 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
 	calojet_pt = pt_1[g];
 	
 	if(calojet_pt < CALOPTCUT) continue;
-	if(TMath::Abs(calojet_eta) > 2.0) continue;
+	if(fabs(calojet_eta) > ETACUT) continue;
 	
 	int pfmatchcounter = 0;
 	deltaR_calovsPF.push_back(vector<vector<double> > ());
-	
 	calosize++;
-
-
+	
 	// start pf jet lop
 	for(int j = 0;j<nrefe_2;j++){
 
@@ -738,13 +742,13 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
 	  pfjet_pt = pt_2[j];
 
 	  if(pfjet_pt < PFPTCUT) continue;
-	  if(TMath::Abs(pfjet_eta) > 2.0) continue;
+	  if(fabs(pfjet_eta) > ETACUT) continue;
 
 	  deltaRCaloPF = Calc_deltaR(calojet_eta, calojet_phi, pfjet_eta, pfjet_phi);
 	  
 	  // if(deltaRCaloPF > (Float_t)deltaR/10) continue;
 	  deltapT = TMath::Abs(calojet_pt - pfjet_pt);
-
+	  
 	  // fill the 2D matrix rrequired for matching 
 	  deltaR_calovsPF[calomatchcounter].push_back(vector<double> ());
 	  deltaR_calovsPF[calomatchcounter][pfmatchcounter].push_back(deltaRCaloPF); // 0 - delta R
@@ -831,6 +835,15 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
       Int_t small_calo = 0;
       Int_t small_pf = 0;
 
+
+      for(int x = 0; x<deltaR_calovsPF.size(); ++x){
+	for(int y = 0; y<deltaR_calovsPF[x].size(); ++y){
+	  if(deltaR_calovsPF[x][y][0] <= 0.2) cout<<"calo pt = "<<deltaR_calovsPF[x][y][3]<<", pfpt = "<<deltaR_calovsPF[x][y][5]<<"delta R = "<<deltaR_calovsPF[x][y][0]<<endl;
+	} // y - pf jets
+      } // x - calo jets
+      cout<<endl<<endl<<endl;
+      
+      
       for(int c = 0;c<deltaR_calovsPF.size();++c){
 	// if(printDebug)cout<<"going through all rows in the  matrix "<<c<<endl;
 	for(int a = 0;a<deltaR_calovsPF.size();++a){
@@ -850,9 +863,10 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
 	    }
 	  }
 	}
-
+      
 	// condition for matching 
 	if(smallDeltaR > (Float_t)deltaR/10 || deltaR_calovsPF[small_calo][small_pf][16] == 1) continue;
+	// if(smallDeltaR > (Float_t)deltaR/10) continue;
 	
 	calopt = deltaR_calovsPF[small_calo][small_pf][3];
 	pfpt = deltaR_calovsPF[small_calo][small_pf][5];
@@ -883,7 +897,7 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
 	hcalSum = deltaR_calovsPF[small_calo][small_pf][17];
 	ecalSum = deltaR_calovsPF[small_calo][small_pf][18];
 	
-	//matchJets->Fill();
+	matchJets->Fill();
 
 #if 0
 	if(c==0)hEvents->Fill(6);
@@ -1023,7 +1037,7 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
 	
 	smallDeltaR = 10;
 	for(int b = 0;b<deltaR_calovsPF[small_calo].size();++b){
-	  deltaR_calovsPF[small_calo][b][16] = 1; // by setting this value you effectively remove that calo and pf jet for further matching // removes the column for getting matched. 
+	  deltaR_calovsPF[small_calo][b][16] = 1; // by setting this value you effectively remove that calo and pf jet for further matching // removes the column from getting matched. 
 	}
 	for(int a = 0;a<deltaR_calovsPF.size();++a){
 	  deltaR_calovsPF[a][small_pf][16] = 1; // this removes the whole row from getting matched later. 
@@ -1062,7 +1076,7 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
 	hcalSum = deltaR_calovsPF[0][b][17];
 	ecalSum = deltaR_calovsPF[0][b][18];
 	
-	//unmatchPFJets->Fill();
+	unmatchPFJets->Fill();
 
 #if 0
 
@@ -1134,7 +1148,6 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
       
       //if(printDebug)cout<<"now going to find unmatched calo jets"<<endl;
 
-#if 0
       if(deltaR_calovsPF[0].size() == 0) continue;
       
       for(int a = 0;a<deltaR_calovsPF.size();++a){
@@ -1165,10 +1178,9 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
 	hcalSum = deltaR_calovsPF[a][0][31];
 	ecalSum = deltaR_calovsPF[a][0][32];
 	
-	//unmatchCaloJets->Fill();
+	unmatchCaloJets->Fill();
 
       }
-#endif
       // put centrality histogram here.
       
       
@@ -1176,14 +1188,13 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
 
   }// radius loop
 
-  //TFile f(Form("/net/hisrv0001/home/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/Output/PbPb_data_calo_pf_jet_correlation_deltaR_0p%d_ak%s%d_%d_%d.root",deltaR,algo,radius,date.GetDate(),endfile),"RECREATE");
 
-  // matchJets->Write();
-  // matchJets->Print();
-  // unmatchPFJets->Write();
-  // unmatchPFJets->Print();
-  // unmatchCaloJets->Write();
-  // unmatchCaloJets->Print();
+  matchJets->Write();
+  matchJets->Print();
+  unmatchPFJets->Write();
+  unmatchPFJets->Print();
+  unmatchCaloJets->Write();
+  unmatchCaloJets->Print();
   //unmatch_CaloJets->Write();
   //unmatch_CaloJets->Print();
   
@@ -1207,6 +1218,7 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
     
   // }
 
+#if 0
   for(int i = 0;i<nbins_cent;++i){
 
     hpbpb_mcclosure_JetComb_data[i]->Add(hpbpb_mcclosure_Jet80_data[i]);
@@ -1235,7 +1247,7 @@ void RAA_calo_pf_JetCorrelation_v2(int startfile = 0, int endfile = 9, int radiu
     
   }
 
-
+#endif
   hEvents->Write();
 
   timer.Stop();

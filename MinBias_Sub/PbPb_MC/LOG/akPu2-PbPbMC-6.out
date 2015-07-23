@@ -1,0 +1,50 @@
+
+----------------------------------------------------
+Job started on Fri Jul  3 12:34:43 EDT 2015 at WN: t2bat0238.cmsaf.mit.edu 
+Job is running on Linux t2bat0238.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G   46G  828G   6% /export/data1
+/dev/sdb1             1.8T  1.6T  215G  89% /export/00b
+/dev/sdc1             1.8T  1.7T  194G  90% /export/00c
+/dev/sdd1             1.8T  1.6T  200G  90% /export/00d
+/dev/sde1             1.8T  1.6T  200G  90% /export/00e
+/dev/sdf1             1.8T  1.6T  204G  89% /export/00f
+fuse_dfs              4.9P  4.4P  508T  90% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   44G   55G  45% /cvmfs/cms.cern.ch
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+filename: /mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat220_Track9_Jet30_matchEqR_merged_forest_0.root
+pthat = 220
+Total number of events loaded in HiForest = 181018
+0/181018
+10000/181018
+20000/181018
+30000/181018
+40000/181018
+50000/181018
+60000/181018
+70000/181018
+80000/181018
+90000/181018
+100000/181018
+110000/181018
+120000/181018
+130000/181018
+140000/181018
+150000/181018
+160000/181018
+170000/181018
+180000/181018
+Macro finished: 
+CPU time (min)  = 2.32383
+Real time (min) = 2.93669
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

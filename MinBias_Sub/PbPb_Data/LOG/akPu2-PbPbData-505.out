@@ -1,0 +1,45 @@
+
+----------------------------------------------------
+Job started on Mon Jun 29 21:59:52 EDT 2015 at WN: t2bat0306.cmsaf.mit.edu 
+Job is running on Linux t2bat0306.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  2.9G   16G  16% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   65G  351G  16% /export/data1
+fuse_dfs              4.9P  4.4P  527T  90% /mnt/hadoop
+/dev/sdb1             3.6T  3.2T  404G  90% /export/00b
+/dev/sdc1             3.6T  3.2T  423G  89% /export/00c
+/dev/sdd1             3.6T  3.2T  408G  89% /export/00d
+/dev/sde1             3.6T  3.3T  389G  90% /export/00e
+/dev/sdf1             3.6T  3.3T  391G  90% /export/00f
+/dev/sdg1             3.6T  3.3T  389G  90% /export/00g
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   52G   46G  54% /cvmfs/cms.cern.ch
+cvmfs2                 98G   52G   46G  54% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   52G   46G  54% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   52G   46G  54% /cvmfs/cdfcfs.fnal.gov
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/128477
+10000/128477
+20000/128477
+30000/128477
+40000/128477
+50000/128477
+60000/128477
+70000/128477
+80000/128477
+90000/128477
+100000/128477
+110000/128477
+120000/128477
+Macro finished: 
+CPU time (min)  = 1.30617
+Real time (min) = 1.77121
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

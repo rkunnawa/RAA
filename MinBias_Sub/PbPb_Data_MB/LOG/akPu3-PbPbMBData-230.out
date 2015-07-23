@@ -1,0 +1,117 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 16:46:00 EDT 2015 at WN: t2bat0248.cmsaf.mit.edu 
+Job is running on Linux t2bat0248.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G   74G  800G   9% /export/data1
+/dev/sdb1             1.8T  1.7T  172G  91% /export/00b
+/dev/sdc1             1.8T  1.7T  161G  92% /export/00c
+/dev/sdd1             1.8T  1.7T  171G  91% /export/00d
+/dev/sde1             1.8T  1.7T  160G  92% /export/00e
+/dev/sdf1             1.8T  1.7T  166G  91% /export/00f
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   73G   26G  74% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   73G   26G  74% /cvmfs/cms.cern.ch
+cvmfs2                 98G   73G   26G  74% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   73G   26G  74% /cvmfs/cdfcfs.fnal.gov
+cvmfs2                 98G   73G   26G  74% /cvmfs/icecube.opensciencegrid.org
+cvmfs2                 98G   73G   26G  74% /cvmfs/atlas.cern.ch
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/836124
+10000/836124
+20000/836124
+30000/836124
+40000/836124
+50000/836124
+60000/836124
+70000/836124
+80000/836124
+90000/836124
+100000/836124
+110000/836124
+120000/836124
+130000/836124
+140000/836124
+150000/836124
+160000/836124
+170000/836124
+180000/836124
+190000/836124
+200000/836124
+210000/836124
+220000/836124
+230000/836124
+240000/836124
+250000/836124
+260000/836124
+270000/836124
+280000/836124
+290000/836124
+300000/836124
+310000/836124
+320000/836124
+330000/836124
+340000/836124
+350000/836124
+360000/836124
+370000/836124
+380000/836124
+390000/836124
+400000/836124
+410000/836124
+420000/836124
+430000/836124
+440000/836124
+450000/836124
+460000/836124
+470000/836124
+480000/836124
+490000/836124
+500000/836124
+510000/836124
+520000/836124
+530000/836124
+540000/836124
+550000/836124
+560000/836124
+570000/836124
+580000/836124
+590000/836124
+600000/836124
+610000/836124
+620000/836124
+630000/836124
+640000/836124
+650000/836124
+660000/836124
+670000/836124
+680000/836124
+690000/836124
+700000/836124
+710000/836124
+720000/836124
+730000/836124
+740000/836124
+750000/836124
+760000/836124
+770000/836124
+780000/836124
+790000/836124
+800000/836124
+810000/836124
+820000/836124
+830000/836124
+Macro finished: 
+CPU time (min)  = 6.49233
+Real time (min) = 7.70158
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

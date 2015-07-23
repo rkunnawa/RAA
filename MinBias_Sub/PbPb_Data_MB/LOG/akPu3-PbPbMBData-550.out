@@ -1,0 +1,73 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 16:55:16 EDT 2015 at WN: t2bat0260.cmsaf.mit.edu 
+Job is running on Linux t2bat0260.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G   91G  783G  11% /export/data1
+/dev/sdb1             1.8T  1.7T  176G  91% /export/00b
+/dev/sdc1             1.8T  1.7T  155G  92% /export/00c
+/dev/sdd1             1.8T  1.7T  154G  92% /export/00d
+/dev/sde1             1.8T  1.7T  179G  91% /export/00e
+/dev/sdf1             1.8T  1.7T  159G  92% /export/00f
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+cvmfs2                 98G   90G  8.0G  92% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/448157
+10000/448157
+20000/448157
+30000/448157
+40000/448157
+50000/448157
+60000/448157
+70000/448157
+80000/448157
+90000/448157
+100000/448157
+110000/448157
+120000/448157
+130000/448157
+140000/448157
+150000/448157
+160000/448157
+170000/448157
+180000/448157
+190000/448157
+200000/448157
+210000/448157
+220000/448157
+230000/448157
+240000/448157
+250000/448157
+260000/448157
+270000/448157
+280000/448157
+290000/448157
+300000/448157
+310000/448157
+320000/448157
+330000/448157
+340000/448157
+350000/448157
+360000/448157
+370000/448157
+380000/448157
+390000/448157
+400000/448157
+410000/448157
+420000/448157
+430000/448157
+440000/448157
+Macro finished: 
+CPU time (min)  = 3.55767
+Real time (min) = 4.02294
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

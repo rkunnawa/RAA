@@ -1,0 +1,77 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 12:02:16 EDT 2015 at WN: t2bat0293.cmsaf.mit.edu 
+Job is running on Linux t2bat0293.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G   14G  5.0G  74% /
+tmpfs                  32G     0   32G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             416G   85G  331G  21% /export/data1
+fuse_dfs              4.9P  4.5P  449T  91% /mnt/hadoop
+/dev/sdb1             2.7T  2.5T  269G  91% /export/00b
+/dev/sdc1             2.7T  2.5T  247G  92% /export/00c
+/dev/sdd1             2.7T  2.5T  282G  90% /export/00d
+/dev/sde1             2.7T  2.5T  272G  91% /export/00e
+/dev/sdf1             2.7T  2.5T  277G  90% /export/00f
+/dev/sdg1             2.7T  2.5T  278G  90% /export/00g
+/dev/sdh1             2.7T  2.5T  289G  90% /export/00h
+/dev/sdi1             2.7T  2.5T  289G  90% /export/00i
+/dev/sdj1             2.7T  2.5T  255G  91% /export/00j
+/dev/sdk1             2.7T  2.5T  279G  90% /export/00k
+/dev/sdl1             2.7T  2.5T  273G  91% /export/00l
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   84G   15G  86% /cvmfs/cms.cern.ch
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+filename: /mnt/hadoop/cms/store/user/dgulhan/PYTHIA_HYDJET_Track9_Jet30_Pyquen_DiJet_TuneZ2_Unquenched_Hydjet1p8_2760GeV_merged/HiForest_PYTHIA_HYDJET_pthat170_Track9_Jet30_matchEqR_merged_forest_0.root
+pthat = 170
+Total number of events loaded in HiForest = 392206
+0/392206
+10000/392206
+20000/392206
+30000/392206
+40000/392206
+50000/392206
+60000/392206
+70000/392206
+80000/392206
+90000/392206
+100000/392206
+110000/392206
+120000/392206
+130000/392206
+140000/392206
+150000/392206
+160000/392206
+170000/392206
+180000/392206
+190000/392206
+200000/392206
+210000/392206
+220000/392206
+230000/392206
+240000/392206
+250000/392206
+260000/392206
+270000/392206
+280000/392206
+290000/392206
+300000/392206
+310000/392206
+320000/392206
+330000/392206
+340000/392206
+350000/392206
+360000/392206
+370000/392206
+380000/392206
+390000/392206
+Macro finished: 
+CPU time (min)  = 5.748
+Real time (min) = 8.74424
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

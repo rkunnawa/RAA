@@ -1,0 +1,93 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 16:55:17 EDT 2015 at WN: hibat0092.cmsaf.mit.edu 
+Job is running on Linux hibat0092.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.4G   16G  19% /
+tmpfs                  24G     0   24G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             873G   75G  799G   9% /export/data1
+/dev/sdb1             2.7T  2.7T   34G  99% /export/00b
+/dev/sdc1             2.7T  2.7T   30G  99% /export/00c
+/dev/sdd1             2.7T  2.7T   34G  99% /export/00d
+/dev/sde1             2.7T  2.7T   31G  99% /export/00e
+/dev/sdf1             2.7T  2.7T   30G  99% /export/00f
+/dev/sdg1             3.6T  3.2T  488G  87% /export/00g
+/dev/sdh1             3.6T  3.2T  470G  88% /export/00h
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+cvmfs2                 98G   65G   33G  67% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   65G   33G  67% /cvmfs/cvmfs.cmsaf.mit.edu
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/611656
+10000/611656
+20000/611656
+30000/611656
+40000/611656
+50000/611656
+60000/611656
+70000/611656
+80000/611656
+90000/611656
+100000/611656
+110000/611656
+120000/611656
+130000/611656
+140000/611656
+150000/611656
+160000/611656
+170000/611656
+180000/611656
+190000/611656
+200000/611656
+210000/611656
+220000/611656
+230000/611656
+240000/611656
+250000/611656
+260000/611656
+270000/611656
+280000/611656
+290000/611656
+300000/611656
+310000/611656
+320000/611656
+330000/611656
+340000/611656
+350000/611656
+360000/611656
+370000/611656
+380000/611656
+390000/611656
+400000/611656
+410000/611656
+420000/611656
+430000/611656
+440000/611656
+450000/611656
+460000/611656
+470000/611656
+480000/611656
+490000/611656
+500000/611656
+510000/611656
+520000/611656
+530000/611656
+540000/611656
+550000/611656
+560000/611656
+570000/611656
+580000/611656
+590000/611656
+600000/611656
+610000/611656
+Macro finished: 
+CPU time (min)  = 5.69083
+Real time (min) = 6.54434
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

@@ -1,0 +1,45 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 16:55:17 EDT 2015 at WN: t2bat0096.cmsaf.mit.edu 
+Job is running on Linux t2bat0096.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                 7.8G     0  7.8G   0% /dev/shm
+/dev/sda1              97M   33M   60M  36% /boot
+/dev/sda4             644G   51G  594G   8% /export/data1
+/dev/sdb1             1.8T  1.7T  173G  91% /export/00b
+/dev/sdc1             1.8T  1.7T  153G  92% /export/00c
+/dev/sdd1             1.8T  1.7T  175G  91% /export/00d
+/dev/sde1             1.8T  1.7T  163G  92% /export/00e
+/dev/sdf1             1.8T  1.7T  163G  92% /export/00f
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   50G   49G  51% /cvmfs/cms.cern.ch
+cvmfs2                 98G   50G   49G  51% /cvmfs/cvmfs.cmsaf.mit.edu
+cvmfs2                 98G   50G   49G  51% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   50G   49G  51% /cvmfs/icecube.opensciencegrid.org
+cvmfs2                 98G   50G   49G  51% /cvmfs/atlas.cern.ch
+cvmfs2                 98G   50G   49G  51% /cvmfs/atlas-nightlies.cern.ch
+cvmfs2                 98G   50G   49G  51% /cvmfs/atlas-condb.cern.ch
+cvmfs2                 98G   50G   49G  51% /cvmfs/sft.cern.ch
+cvmfs2                 98G   50G   49G  51% /cvmfs/cdfcfs.fnal.gov
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/163150
+10000/163150
+20000/163150
+30000/163150
+40000/163150
+50000/163150
+60000/163150
+70000/163150
+80000/163150
+90000/163150
+100000/163150
+110000/163150
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

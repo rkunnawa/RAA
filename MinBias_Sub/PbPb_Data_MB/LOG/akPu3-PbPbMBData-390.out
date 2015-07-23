@@ -1,0 +1,59 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 16:50:50 EDT 2015 at WN: t2bat0174.cmsaf.mit.edu 
+Job is running on Linux t2bat0174.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G   85G  789G  10% /export/data1
+/dev/sdb1             1.8T  1.7T  160G  92% /export/00b
+/dev/sdc1             1.8T  1.7T  180G  91% /export/00c
+/dev/sdd1             1.8T  1.7T  172G  91% /export/00d
+/dev/sde1             1.8T  1.7T  154G  92% /export/00e
+/dev/sdf1             1.8T  1.7T  163G  92% /export/00f
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   77G   21G  79% /cvmfs/cms.cern.ch
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/302047
+10000/302047
+20000/302047
+30000/302047
+40000/302047
+50000/302047
+60000/302047
+70000/302047
+80000/302047
+90000/302047
+100000/302047
+110000/302047
+120000/302047
+130000/302047
+140000/302047
+150000/302047
+160000/302047
+170000/302047
+180000/302047
+190000/302047
+200000/302047
+210000/302047
+220000/302047
+230000/302047
+240000/302047
+250000/302047
+260000/302047
+270000/302047
+280000/302047
+290000/302047
+300000/302047
+Macro finished: 
+CPU time (min)  = 2.18233
+Real time (min) = 2.72847
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

@@ -1,0 +1,113 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 16:45:49 EDT 2015 at WN: t2bat0236.cmsaf.mit.edu 
+Job is running on Linux t2bat0236.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G   99G  775G  12% /export/data1
+/dev/sdb1             1.8T  1.7T  172G  91% /export/00b
+/dev/sdc1             1.8T  1.7T  146G  93% /export/00c
+/dev/sdd1             1.8T  1.7T  169G  91% /export/00d
+/dev/sde1             1.8T  1.7T  175G  91% /export/00e
+/dev/sdf1             1.8T  1.7T  167G  91% /export/00f
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   98G  246M 100% /cvmfs/cms.cern.ch
+cvmfs2                 98G   98G  246M 100% /cvmfs/oasis.opensciencegrid.org
+cvmfs2                 98G   98G  246M 100% /cvmfs/grid.cern.ch
+cvmfs2                 98G   98G  246M 100% /cvmfs/fermilab.opensciencegrid.org
+cvmfs2                 98G   98G  246M 100% /cvmfs/mu2e.opensciencegrid.org
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/802588
+10000/802588
+20000/802588
+30000/802588
+40000/802588
+50000/802588
+60000/802588
+70000/802588
+80000/802588
+90000/802588
+100000/802588
+110000/802588
+120000/802588
+130000/802588
+140000/802588
+150000/802588
+160000/802588
+170000/802588
+180000/802588
+190000/802588
+200000/802588
+210000/802588
+220000/802588
+230000/802588
+240000/802588
+250000/802588
+260000/802588
+270000/802588
+280000/802588
+290000/802588
+300000/802588
+310000/802588
+320000/802588
+330000/802588
+340000/802588
+350000/802588
+360000/802588
+370000/802588
+380000/802588
+390000/802588
+400000/802588
+410000/802588
+420000/802588
+430000/802588
+440000/802588
+450000/802588
+460000/802588
+470000/802588
+480000/802588
+490000/802588
+500000/802588
+510000/802588
+520000/802588
+530000/802588
+540000/802588
+550000/802588
+560000/802588
+570000/802588
+580000/802588
+590000/802588
+600000/802588
+610000/802588
+620000/802588
+630000/802588
+640000/802588
+650000/802588
+660000/802588
+670000/802588
+680000/802588
+690000/802588
+700000/802588
+710000/802588
+720000/802588
+730000/802588
+740000/802588
+750000/802588
+760000/802588
+770000/802588
+780000/802588
+790000/802588
+800000/802588
+Macro finished: 
+CPU time (min)  = 6.22583
+Real time (min) = 7.37764
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

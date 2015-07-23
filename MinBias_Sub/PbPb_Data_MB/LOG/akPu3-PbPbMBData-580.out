@@ -1,0 +1,85 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 16:55:44 EDT 2015 at WN: t2bat0170.cmsaf.mit.edu 
+Job is running on Linux t2bat0170.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G   68G  806G   8% /export/data1
+/dev/sdb1             1.8T  1.7T  156G  92% /export/00b
+/dev/sdc1             1.8T  1.7T  165G  92% /export/00c
+/dev/sdd1             1.8T  1.7T  154G  92% /export/00d
+/dev/sde1             1.8T  1.7T  174G  91% /export/00e
+/dev/sdf1             1.8T  1.7T  178G  91% /export/00f
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+cvmfs2                 98G   67G   32G  68% /cvmfs/cms.cern.ch
+cvmfs2                 98G   67G   32G  68% /cvmfs/cvmfs.cmsaf.mit.edu
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/555298
+10000/555298
+20000/555298
+30000/555298
+40000/555298
+50000/555298
+60000/555298
+70000/555298
+80000/555298
+90000/555298
+100000/555298
+110000/555298
+120000/555298
+130000/555298
+140000/555298
+150000/555298
+160000/555298
+170000/555298
+180000/555298
+190000/555298
+200000/555298
+210000/555298
+220000/555298
+230000/555298
+240000/555298
+250000/555298
+260000/555298
+270000/555298
+280000/555298
+290000/555298
+300000/555298
+310000/555298
+320000/555298
+330000/555298
+340000/555298
+350000/555298
+360000/555298
+370000/555298
+380000/555298
+390000/555298
+400000/555298
+410000/555298
+420000/555298
+430000/555298
+440000/555298
+450000/555298
+460000/555298
+470000/555298
+480000/555298
+490000/555298
+500000/555298
+510000/555298
+520000/555298
+530000/555298
+540000/555298
+550000/555298
+Macro finished: 
+CPU time (min)  = 3.88867
+Real time (min) = 4.36885
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22

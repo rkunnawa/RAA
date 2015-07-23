@@ -1,0 +1,81 @@
+
+----------------------------------------------------
+Job started on Fri Jul 10 16:51:22 EDT 2015 at WN: t2bat0181.cmsaf.mit.edu 
+Job is running on Linux t2bat0181.cmsaf.mit.edu 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 20:37:17 CST 2013 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda3              20G  3.0G   16G  16% /
+tmpfs                  12G     0   12G   0% /dev/shm
+/dev/sda1              97M   32M   61M  35% /boot
+/dev/sda4             874G  4.4G  870G   1% /export/data1
+/dev/sdb1             1.8T  1.7T  175G  91% /export/00b
+/dev/sdc1             1.8T  1.7T  154G  92% /export/00c
+/dev/sdd1             1.8T  1.7T  151G  92% /export/00d
+/dev/sde1             1.8T  1.7T  184G  91% /export/00e
+/dev/sdf1             1.8T  1.7T  162G  92% /export/00f
+fuse_dfs              4.9P  4.5P  447T  92% /mnt/hadoop
+cvmfs2                 98G  2.8G   95G   3% /cvmfs/cms.cern.ch
+t2srv0004:/export/db  135G  187M  135G   1% /net/t2srv0004/db
+gcc (GCC) 4.4.7 20120313 (Red Hat 4.4.7-3)
+Copyright (C) 2010 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Processing...
+0/529741
+10000/529741
+20000/529741
+30000/529741
+40000/529741
+50000/529741
+60000/529741
+70000/529741
+80000/529741
+90000/529741
+100000/529741
+110000/529741
+120000/529741
+130000/529741
+140000/529741
+150000/529741
+160000/529741
+170000/529741
+180000/529741
+190000/529741
+200000/529741
+210000/529741
+220000/529741
+230000/529741
+240000/529741
+250000/529741
+260000/529741
+270000/529741
+280000/529741
+290000/529741
+300000/529741
+310000/529741
+320000/529741
+330000/529741
+340000/529741
+350000/529741
+360000/529741
+370000/529741
+380000/529741
+390000/529741
+400000/529741
+410000/529741
+420000/529741
+430000/529741
+440000/529741
+450000/529741
+460000/529741
+470000/529741
+480000/529741
+490000/529741
+500000/529741
+510000/529741
+520000/529741
+Macro finished: 
+CPU time (min)  = 3.67283
+Real time (min) = 4.28462
+Done!
+Copied output files to hadoop rootfiles/JetRAA/June22
