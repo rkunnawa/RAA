@@ -6,22 +6,23 @@
 #
 
 # compile the macros
-echo "Running Data driven corrections"
-root -b -l <<EOF
-.L RAA_dataDrivenUnfoldingErrorCheck_new.C+
-int rad = 2
-bool t = true
-bool f = false
-RAA_dataDrivenUnfoldingErrorCheck_new(rad, t)
-RAA_dataDrivenUnfoldingErrorCheck_new(rad, f)
-rad = 3
-RAA_dataDrivenUnfoldingErrorCheck_new(rad, t)
-RAA_dataDrivenUnfoldingErrorCheck_new(rad, f)
-rad = 4
-RAA_dataDrivenUnfoldingErrorCheck_new(rad, t)
-RAA_dataDrivenUnfoldingErrorCheck_new(rad, f)
-.q 
-EOF
+#echo "Running Data driven corrections"
+#root -b -l <<EOF
+#.L RAA_dataDrivenUnfoldingErrorCheck_new.C+
+#int rad = 2
+#bool t = true
+#bool f = false
+#RAA_dataDrivenUnfoldingErrorCheck_new(rad, t)
+#RAA_dataDrivenUnfoldingErrorCheck_new(rad, f)
+#rad = 3
+#RAA_dataDrivenUnfoldingErrorCheck_new(rad, t)
+#RAA_dataDrivenUnfoldingErrorCheck_new(rad, f)
+#rad = 4
+#RAA_dataDrivenUnfoldingErrorCheck_new(rad, t)
+#RAA_dataDrivenUnfoldingErrorCheck_new(rad, f)
+#.q 
+#EOF
+#
 
 echo "Running the unfolding for different radii"
 root -b -l <<EOF
@@ -29,22 +30,46 @@ root -b -l <<EOF
 bool t = true 
 bool f = false
 int rad = 2
-RAA_analyze(rad,t,t)
-RAA_analyze(rad,f,t)
-RAA_analyze(rad,t,f)
-RAA_analyze(rad,f,f)
+int val = 1
+RAA_analyze(rad,f,f,val)
+val = 2
+RAA_analyze(rad,f,f,val)
+val = 3
+RAA_analyze(rad,f,f,val)
+val = 4
+RAA_analyze(rad,f,f,val)
 rad = 3
-RAA_analyze(rad,t,t)
-RAA_analyze(rad,f,t)
-RAA_analyze(rad,t,f)
-RAA_analyze(rad,f,f)
+val = 1
+RAA_analyze(rad,f,f,val)
+val = 2
+RAA_analyze(rad,f,f,val)
+val = 3
+RAA_analyze(rad,f,f,val)
+val = 4
+RAA_analyze(rad,f,f,val)
 rad = 4
-RAA_analyze(rad,t,t)
-RAA_analyze(rad,f,t)
-RAA_analyze(rad,t,f)
-RAA_analyze(rad,f,f)
+val = 1
+RAA_analyze(rad,f,f,val)
+val = 2
+RAA_analyze(rad,f,f,val)
+val = 3
+RAA_analyze(rad,f,f,val)
+val = 4
+RAA_analyze(rad,f,f,val)
 .q
 EOF
+
+#rad = 3
+#RAA_analyze(rad,t,t)
+#RAA_analyze(rad,f,t)
+#RAA_analyze(rad,t,f)
+#RAA_analyze(rad,f,f)
+#rad = 4
+#RAA_analyze(rad,t,t)
+#RAA_analyze(rad,f,t)
+#RAA_analyze(rad,t,f)
+#RAA_analyze(rad,f,f)
+#
 #
 #echo "Running RAA_plot.C"
 #cd ..

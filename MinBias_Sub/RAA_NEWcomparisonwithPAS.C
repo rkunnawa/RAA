@@ -109,22 +109,30 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
   
   // load in the necessary files:
-  TFile *f_unfold_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150528.root",2,etaWidth,30,jet_type));
-  TFile *f_unfold_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150528.root",3,etaWidth,40,jet_type));
-  TFile *f_unfold_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_pp_calopfpt_ppNoJetidcut_R0p%d_SevilFakeMBnoJet80Cut_unfold_mcclosure_oppside_trgMC_noSmear_%s_%dGeVCut_ak%s_20150528.root",4,etaWidth,50,jet_type));
+  // TFile *f_unfold_R2 = TFile::Open(Form("July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p2_MCCloSameSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, 20150721));
+  // TFile *f_unfold_R3 = TFile::Open(Form("July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p3_MCCloSameSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, 20150721));
+  // TFile *f_unfold_R4 = TFile::Open(Form("July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p4_MCCloSameSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, 20150721));
 
-  TFile *fPbPb_data_R2 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,2));
-  TFile *fPP_data_R2 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, 2));
+  TFile *f_unfold_R2 = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/Jun29/PbPb_Data_histograms_FromForest_akPu2_20_eta_20.root");
+  TFile *f_unfold_R3 = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/Jun29/PbPb_Data_histograms_FromForest_akPu3_20_eta_20.root");
+  TFile *f_unfold_R4 = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/Jun29/PbPb_Data_histograms_FromForest_akPu4_20_eta_20.root");
 
-  TFile *fPbPb_data_R3 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,3));
-  TFile *fPP_data_R3 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, 3));
+  TFile * fPP_R2 = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/Jun29/pp_Data_histograms_FromForest_ak2_20_eta_20.root");
+  TFile * fPP_R3 = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/Jun29/pp_Data_histograms_FromForest_ak3_20_eta_20.root");
+  TFile * fPP_R4 = TFile::Open("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/Jun29/pp_Data_histograms_FromForest_ak4_20_eta_20.root");
 
-  TFile *fPbPb_data_R4 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,4));
-  TFile *fPP_data_R4 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, 4));
+  // TFile *fPbPb_data_R2 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,2));
+  // TFile *fPP_data_R2 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, 2));
 
-  TFile * fMinBias_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,2)); //MinBias File
-  TFile * fMinBias_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,3)); //MinBias File
-  TFile * fMinBias_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,4)); //MinBias File 
+  // TFile *fPbPb_data_R3 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,3));
+  // TFile *fPP_data_R3 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, 3));
+
+  // TFile *fPbPb_data_R4 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PbPb_data_MC_subid0_spectra_JetID_CutA_finebins_%s_R0p%d.root",etaWidth,4));
+  // TFile *fPP_data_R4 = TFile::Open(Form("/export/d00/scratch/rkunnawa/rootfiles/RAA/Pawan_ntuple_PP_data_MC_spectra_residualFactor_finebins_%s_R0p%d.root",etaWidth, 4));
+
+  // TFile * fMinBias_R2 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,2)); //MinBias File
+  // TFile * fMinBias_R3 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,3)); //MinBias File
+  // TFile * fMinBias_R4 = TFile::Open(Form("Pawan_ntuple_PbPb_MinBiasData_spectra_JetID_CutA_finebins_CentralityWeightedMBwithoutHLT80_%s_R0p%d.root",etaWidth,4)); //MinBias File 
 
   cout<<"loaded the files "<<endl;
 
@@ -154,123 +162,137 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   float cutarray_R4[nbins_cent] = {75,70,60,50,50,50};
 
   
+  // flaot scaleFactor[nbins_cent+1] = {{},
+  // 				     {},
+  // 				     {},
+  // 				     {},
+  // 				     {},
+  // 				     {},
+  // 				     {}};
+
   for(int i = 0;i<nbins_cent;i++){
 
     cout<<i<<endl;
 
-    PbPb_MBSub[0][i]    = (TH1F*)fMinBias_R2->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",2,etaWidth,i));
-    PbPb_MBSub[1][i]    = (TH1F*)fMinBias_R3->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",3,etaWidth,i));
-    PbPb_MBSub[2][i]    = (TH1F*)fMinBias_R4->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",4,etaWidth,i));
+    //PbPb_MBSub[0][i]    = (TH1F*)fMinBias_R2->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",2,etaWidth,i));
+    //PbPb_MBSub[1][i]    = (TH1F*)fMinBias_R3->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",3,etaWidth,i));
+    //PbPb_MBSub[2][i]    = (TH1F*)fMinBias_R4->Get(Form("hpbpb_HLTComb_R%d_%s_cent%d",4,etaWidth,i));
     
-    PbPb_bayesian[0][i] = (TH1F*)f_unfold_R2->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
-    PbPb_measured[0][i] = (TH1F*)f_unfold_R2->Get(Form("PbPb_measured_spectra_combined_cent%d",i));
-    PbPb_binbybin[0][i] = (TH1F*)f_unfold_R2->Get(Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i));
-    PbPb_bayesian[1][i] = (TH1F*)f_unfold_R3->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
-    PbPb_measured[1][i] = (TH1F*)f_unfold_R3->Get(Form("PbPb_measured_spectra_combined_cent%d",i));
-    PbPb_binbybin[1][i] = (TH1F*)f_unfold_R3->Get(Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i));
+    //PbPb_bayesian[0][i] = (TH1F*)f_unfold_R2->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
+    PbPb_measured[0][i] = (TH1F*)f_unfold_R2->Get(Form("hpbpb_HLTComb_R2_20_eta_20_cent%d",i));
+    PbPb_measured[0][i] = (TH1F*)PbPb_measured[0][i]->Rebin(10);
+    //divideBinWidth(PbPb_measured[0][i]);
+    //PbPb_binbybin[0][i] = (TH1F*)f_unfold_R2->Get(Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i));
+    //PbPb_bayesian[1][i] = (TH1F*)f_unfold_R3->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
+    PbPb_measured[1][i] = (TH1F*)f_unfold_R3->Get(Form("hpbpb_HLTComb_R3_20_eta_20_cent%d",i));
+    PbPb_measured[1][i] = (TH1F*)PbPb_measured[1][i]->Rebin(10);
+    //divideBinWidth(PbPb_measured[1][i]);
+    //PbPb_binbybin[1][i] = (TH1F*)f_unfold_R3->Get(Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i));
 
-    PbPb_bayesian[2][i] = (TH1F*)f_unfold_R4->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
-    PbPb_measured[2][i] = (TH1F*)f_unfold_R4->Get(Form("PbPb_measured_spectra_combined_cent%d",i));
-    PbPb_binbybin[2][i] = (TH1F*)f_unfold_R4->Get(Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i));
+    //PbPb_bayesian[2][i] = (TH1F*)f_unfold_R4->Get(Form("PbPb_bayesian_unfolded_spectra_combined_cent%d",i));
+    PbPb_measured[2][i] = (TH1F*)f_unfold_R4->Get(Form("hpbpb_HLTComb_R4_20_eta_20_cent%d",i));
+    PbPb_measured[2][i] = (TH1F*)PbPb_measured[2][i]->Rebin(10);
+    //divideBinWidth(PbPb_measured[2][i]);
+    //PbPb_binbybin[2][i] = (TH1F*)f_unfold_R4->Get(Form("PbPb_BinByBin_unfolded_spectra_combined_cent%d",i));
 
     // this can be HLT80 or HLTComb, check with both: 
-    PbPb_measured_fine[0][i] = (TH1F*)fPbPb_data_R2->Get(Form("hpbpb_HLTComb_R2_20_eta_20_cent%d",i));
+    //PbPb_measured_fine[0][i] = (TH1F*)fPbPb_data_R2->Get(Form("hpbpb_HLTComb_R2_20_eta_20_cent%d",i));
     //divideBinWidth(PbPb_measured_fine[0][i]);
-    PbPb_measured_fine[1][i] = (TH1F*)fPbPb_data_R3->Get(Form("hpbpb_HLTComb_R3_20_eta_20_cent%d",i));
+    //PbPb_measured_fine[1][i] = (TH1F*)fPbPb_data_R3->Get(Form("hpbpb_HLTComb_R3_20_eta_20_cent%d",i));
     //divideBinWidth(PbPb_measured_fine[1][i]);
-    PbPb_measured_fine[2][i] = (TH1F*)fPbPb_data_R4->Get(Form("hpbpb_HLTComb_R4_20_eta_20_cent%d",i));
+    //PbPb_measured_fine[2][i] = (TH1F*)fPbPb_data_R4->Get(Form("hpbpb_HLTComb_R4_20_eta_20_cent%d",i));
     //divideBinWidth(PbPb_measured_fine[2][i]);
 
-    Float_t bincon_R2=cutarray_R2[i]; 
-    Int_t bincut_R2= PbPb_MBSub[0][i]->FindBin(bincon_R2); 
+    // Float_t bincon_R2=cutarray_R2[i]; 
+    // Int_t bincut_R2= PbPb_MBSub[0][i]->FindBin(bincon_R2); 
     
-    for(int k = bincut_R2;k<=400;k++) 
-      { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
-	PbPb_MBSub[0][i]->SetBinContent(k,0); 
-	PbPb_MBSub[0][i]->SetBinError(k,0);
-      } 
+    // for(int k = bincut_R2;k<=400;k++) 
+    //   { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+    // 	PbPb_MBSub[0][i]->SetBinContent(k,0); 
+    // 	PbPb_MBSub[0][i]->SetBinError(k,0);
+    //   } 
     
-    for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
-      PbPb_MBSub[0][i]->SetBinContent(k,0); 
-      PbPb_MBSub[0][i]->SetBinError(k,0);
-    }
+    // for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+    //   PbPb_MBSub[0][i]->SetBinContent(k,0); 
+    //   PbPb_MBSub[0][i]->SetBinError(k,0);
+    // }
 
-    Float_t bincon_R3=cutarray_R3[i]; 
-    Int_t bincut_R3= PbPb_MBSub[2][i]->FindBin(bincon_R3); 
+    // Float_t bincon_R3=cutarray_R3[i]; 
+    // Int_t bincut_R3= PbPb_MBSub[2][i]->FindBin(bincon_R3); 
     
-    for(int k = bincut_R3;k<=400;k++) 
-      { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
-	PbPb_MBSub[1][i]->SetBinContent(k,0); 
-	PbPb_MBSub[1][i]->SetBinError(k,0);
-      } 
+    // for(int k = bincut_R3;k<=400;k++) 
+    //   { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+    // 	PbPb_MBSub[1][i]->SetBinContent(k,0); 
+    // 	PbPb_MBSub[1][i]->SetBinError(k,0);
+    //   } 
     
-    for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
-      PbPb_MBSub[1][i]->SetBinContent(k,0); 
-      PbPb_MBSub[1][i]->SetBinError(k,0);
-    }
+    // for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+    //   PbPb_MBSub[1][i]->SetBinContent(k,0); 
+    //   PbPb_MBSub[1][i]->SetBinError(k,0);
+    // }
 
-    Float_t bincon_R4=cutarray_R4[i]; 
-    Int_t bincut_R4= PbPb_MBSub[2][i]->FindBin(bincon_R4); 
+    // Float_t bincon_R4=cutarray_R4[i]; 
+    // Int_t bincut_R4= PbPb_MBSub[2][i]->FindBin(bincon_R4); 
     
-    for(int k = bincut_R4;k<=400;k++) 
-      { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
-	PbPb_MBSub[2][i]->SetBinContent(k,0); 
-	PbPb_MBSub[2][i]->SetBinError(k,0);
-      } 
+    // for(int k = bincut_R4;k<=400;k++) 
+    //   { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+    // 	PbPb_MBSub[2][i]->SetBinContent(k,0); 
+    // 	PbPb_MBSub[2][i]->SetBinError(k,0);
+    //   } 
     
-    for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
-      PbPb_MBSub[2][i]->SetBinContent(k,0); 
-      PbPb_MBSub[2][i]->SetBinError(k,0);
-    }
+    // for(int k = 1;k<=15;k++) { // cout<<"cent_ "<<i<<" pt "<< PbPb_MBSub[0][i]->FindBin(k)<<" bincontent "<<bincontent<<endl; 
+    //   PbPb_MBSub[2][i]->SetBinContent(k,0); 
+    //   PbPb_MBSub[2][i]->SetBinError(k,0);
+    // }
     
-    bin_no    = PbPb_measured_fine[0][i]->FindBin(15);
-    bin_end   = PbPb_measured_fine[0][i]->FindBin(25);
+    // bin_no    = PbPb_measured_fine[0][i]->FindBin(15);
+    // bin_end   = PbPb_measured_fine[0][i]->FindBin(25);
     
-    bin_nomb  = PbPb_MBSub[0][i]->FindBin(15);
-    bin_endmb = PbPb_MBSub[0][i]->FindBin(25);
+    // bin_nomb  = PbPb_MBSub[0][i]->FindBin(15);
+    // bin_endmb = PbPb_MBSub[0][i]->FindBin(25);
     
-    scalerangeweight = PbPb_measured_fine[0][i]->Integral(bin_no,bin_end)/PbPb_MBSub[0][i]->Integral(bin_nomb,bin_endmb);
-    PbPb_MBSub[0][i]->Scale(scalerangeweight);
-    PbPb_measured_fine[0][i]->Add(PbPb_MBSub[0][i], -1);
+    // scalerangeweight = PbPb_measured_fine[0][i]->Integral(bin_no,bin_end)/PbPb_MBSub[0][i]->Integral(bin_nomb,bin_endmb);
+    // PbPb_MBSub[0][i]->Scale(scalerangeweight);
+    // PbPb_measured_fine[0][i]->Add(PbPb_MBSub[0][i], -1);
 
-    bin_no    = PbPb_measured_fine[1][i]->FindBin(15);
-    bin_end   = PbPb_measured_fine[1][i]->FindBin(25);
+    // bin_no    = PbPb_measured_fine[1][i]->FindBin(15);
+    // bin_end   = PbPb_measured_fine[1][i]->FindBin(25);
     
-    bin_nomb  = PbPb_MBSub[1][i]->FindBin(15);
-    bin_endmb = PbPb_MBSub[0][i]->FindBin(25);
+    // bin_nomb  = PbPb_MBSub[1][i]->FindBin(15);
+    // bin_endmb = PbPb_MBSub[0][i]->FindBin(25);
     
-    scalerangeweight = PbPb_measured_fine[1][i]->Integral(bin_no,bin_end)/PbPb_MBSub[1][i]->Integral(bin_nomb,bin_endmb);
-    PbPb_MBSub[1][i]->Scale(scalerangeweight);
-    PbPb_measured_fine[1][i]->Add(PbPb_MBSub[1][i], -1);
+    // scalerangeweight = PbPb_measured_fine[1][i]->Integral(bin_no,bin_end)/PbPb_MBSub[1][i]->Integral(bin_nomb,bin_endmb);
+    // PbPb_MBSub[1][i]->Scale(scalerangeweight);
+    // PbPb_measured_fine[1][i]->Add(PbPb_MBSub[1][i], -1);
 
-    bin_no    = PbPb_measured_fine[2][i]->FindBin(15);
-    bin_end   = PbPb_measured_fine[2][i]->FindBin(25);
+    // bin_no    = PbPb_measured_fine[2][i]->FindBin(15);
+    // bin_end   = PbPb_measured_fine[2][i]->FindBin(25);
     
-    bin_nomb  = PbPb_MBSub[2][i]->FindBin(15);
-    bin_endmb = PbPb_MBSub[0][i]->FindBin(25);
+    // bin_nomb  = PbPb_MBSub[2][i]->FindBin(15);
+    // bin_endmb = PbPb_MBSub[0][i]->FindBin(25);
     
-    scalerangeweight = PbPb_measured_fine[2][i]->Integral(bin_no,bin_end)/PbPb_MBSub[2][i]->Integral(bin_nomb,bin_endmb);
-    PbPb_MBSub[2][i]->Scale(scalerangeweight);
-    PbPb_measured_fine[2][i]->Add(PbPb_MBSub[2][i], -1);
+    // scalerangeweight = PbPb_measured_fine[2][i]->Integral(bin_no,bin_end)/PbPb_MBSub[2][i]->Integral(bin_nomb,bin_endmb);
+    // PbPb_MBSub[2][i]->Scale(scalerangeweight);
+    // PbPb_measured_fine[2][i]->Add(PbPb_MBSub[2][i], -1);
 
-    PbPb_measured_fine[0][i] = (TH1F*)PbPb_measured_fine[0][i]->Rebin(37,Form("PbPb_measured_rebin_R2",i),xAxis1);
-    PbPb_measured_fine[1][i] = (TH1F*)PbPb_measured_fine[1][i]->Rebin(37,Form("PbPb_measured_rebin_R3",i),xAxis1);
-    PbPb_measured_fine[2][i] = (TH1F*)PbPb_measured_fine[2][i]->Rebin(37,Form("PbPb_measured_rebin_R4",i),xAxis1);
+    // PbPb_measured_fine[0][i] = (TH1F*)PbPb_measured_fine[0][i]->Rebin(37,Form("PbPb_measured_rebin_R2",i),xAxis1);
+    // PbPb_measured_fine[1][i] = (TH1F*)PbPb_measured_fine[1][i]->Rebin(37,Form("PbPb_measured_rebin_R3",i),xAxis1);
+    // PbPb_measured_fine[2][i] = (TH1F*)PbPb_measured_fine[2][i]->Rebin(37,Form("PbPb_measured_rebin_R4",i),xAxis1);
 
     
-    RAA_bayesian[0][i] = (TH1F*)f_unfold_R2->Get(Form("RAA_bayesian_cent%d",i));
-    RAA_measured[0][i] = (TH1F*)f_unfold_R2->Get(Form("RAA_measured_cent%d",i));
-    RAA_binbybin[0][i] = (TH1F*)f_unfold_R2->Get(Form("RAA_binbybin_cent%d",i));
+    // RAA_bayesian[0][i] = (TH1F*)f_unfold_R2->Get(Form("RAA_bayesian_cent%d",i));
+    // RAA_measured[0][i] = (TH1F*)f_unfold_R2->Get(Form("RAA_measured_cent%d",i));
+    // RAA_binbybin[0][i] = (TH1F*)f_unfold_R2->Get(Form("RAA_binbybin_cent%d",i));
     
-    RAA_bayesian[1][i] = (TH1F*)f_unfold_R3->Get(Form("RAA_bayesian_cent%d",i));
-    RAA_measured[1][i] = (TH1F*)f_unfold_R3->Get(Form("RAA_measured_cent%d",i));
-    RAA_binbybin[1][i] = (TH1F*)f_unfold_R3->Get(Form("RAA_binbybin_cent%d",i));
+    // RAA_bayesian[1][i] = (TH1F*)f_unfold_R3->Get(Form("RAA_bayesian_cent%d",i));
+    // RAA_measured[1][i] = (TH1F*)f_unfold_R3->Get(Form("RAA_measured_cent%d",i));
+    // RAA_binbybin[1][i] = (TH1F*)f_unfold_R3->Get(Form("RAA_binbybin_cent%d",i));
     
-    RAA_bayesian[2][i] = (TH1F*)f_unfold_R4->Get(Form("RAA_bayesian_cent%d",i));
-    RAA_measured[2][i] = (TH1F*)f_unfold_R4->Get(Form("RAA_measured_cent%d",i));
-    RAA_binbybin[2][i] = (TH1F*)f_unfold_R4->Get(Form("RAA_binbybin_cent%d",i));
+    // RAA_bayesian[2][i] = (TH1F*)f_unfold_R4->Get(Form("RAA_bayesian_cent%d",i));
+    // RAA_measured[2][i] = (TH1F*)f_unfold_R4->Get(Form("RAA_measured_cent%d",i));
+    // RAA_binbybin[2][i] = (TH1F*)f_unfold_R4->Get(Form("RAA_binbybin_cent%d",i));
     
-    // for(int j = 1; j<=RAA_bayesian[0][i]->GetNbinsX(); ++j){
+    // // for(int j = 1; j<=RAA_bayesian[0][i]->GetNbinsX(); ++j){
       
     //   cout<<j<<endl;
     //   RAA_bayesian[0][i]->SetBinError(j, RAA_measured[0][i]->GetBinError(j));
@@ -283,27 +305,30 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   
   cout<<"loaded PbPb histograms "<<endl;
   
-  PP_bayesian[0] = (TH1F*)f_unfold_R2->Get("PP_bayesian_unfolded_spectra");
-  PP_measured[0] = (TH1F*)f_unfold_R2->Get("PP_measured_unfolded_spectra");
-  PP_binbybin[0] = (TH1F*)f_unfold_R2->Get("PP_binbybin_unfolded_spectra");
+  //PP_bayesian[0] = (TH1F*)f_unfold_R2->Get("PP_bayesian_unfolded_spectra");
+  PP_measured[0] = (TH1F*)fPP_R2->Get("hpp_HLTComb_R2_20_eta_20");
+  PP_measured[0] = (TH1F*)PP_measured[0]->Rebin(10);
+  //PP_binbybin[0] = (TH1F*)f_unfold_R2->Get("PP_binbybin_unfolded_spectra");
   
-  PP_bayesian[1] = (TH1F*)f_unfold_R3->Get("PP_bayesian_unfolded_spectra");
-  PP_measured[1] = (TH1F*)f_unfold_R3->Get("PP_measured_unfolded_spectra");
-  PP_binbybin[1] = (TH1F*)f_unfold_R3->Get("PP_binbybin_unfolded_spectra");
+  //PP_bayesian[1] = (TH1F*)f_unfold_R3->Get("PP_bayesian_unfolded_spectra");
+  PP_measured[1] = (TH1F*)fPP_R3->Get("hpp_HLTComb_R3_20_eta_20");
+  PP_measured[1] = (TH1F*)PP_measured[1]->Rebin(10);
+  //PP_binbybin[1] = (TH1F*)f_unfold_R3->Get("PP_binbybin_unfolded_spectra");
   
-  PP_bayesian[2] = (TH1F*)f_unfold_R4->Get("PP_bayesian_unfolded_spectra");
-  PP_measured[2] = (TH1F*)f_unfold_R4->Get("PP_measured_unfolded_spectra");
-  PP_binbybin[2] = (TH1F*)f_unfold_R4->Get("PP_binbybin_unfolded_spectra");
+  //PP_bayesian[2] = (TH1F*)f_unfold_R4->Get("PP_bayesian_unfolded_spectra");
+  PP_measured[2] = (TH1F*)fPP_R4->Get("hpp_HLTComb_R4_20_eta_20");
+  PP_measured[2] = (TH1F*)PP_measured[2]->Rebin(10);
+  //PP_binbybin[2] = (TH1F*)f_unfold_R4->Get("PP_binbybin_unfolded_spectra");
   
-  PP_measured_fine[0] = (TH1F*)fPP_data_R2->Get("hpp_HLTComb_R2_20_eta_20");
-  PP_measured_fine[0] = (TH1F*)PP_measured_fine[0]->Rebin(37,"PP_measured_rebin_R2",xAxis1);
-  //divideBinWidth(PP_measured_fine[0]);
-  PP_measured_fine[1] = (TH1F*)fPP_data_R3->Get("hpp_HLTComb_R3_20_eta_20");
-  PP_measured_fine[1] = (TH1F*)PP_measured_fine[1]->Rebin(37,"PP_measured_rebin_R3",xAxis1);
-  //divideBinWidth(PP_measured_fine[1]);
-  PP_measured_fine[2] = (TH1F*)fPP_data_R4->Get("hpp_HLTComb_R4_20_eta_20");
-  PP_measured_fine[2] = (TH1F*)PP_measured_fine[2]->Rebin(37,"PP_measured_rebin_R4",xAxis1);
-  //divideBinWidth(PP_measured_fine[2]);
+  // PP_measured_fine[0] = (TH1F*)fPP_data_R2->Get("hpp_HLTComb_R2_20_eta_20");
+  // PP_measured_fine[0] = (TH1F*)PP_measured_fine[0]->Rebin(37,"PP_measured_rebin_R2",xAxis1);
+  // //divideBinWidth(PP_measured_fine[0]);
+  // PP_measured_fine[1] = (TH1F*)fPP_data_R3->Get("hpp_HLTComb_R3_20_eta_20");
+  // PP_measured_fine[1] = (TH1F*)PP_measured_fine[1]->Rebin(37,"PP_measured_rebin_R3",xAxis1);
+  // //divideBinWidth(PP_measured_fine[1]);
+  // PP_measured_fine[2] = (TH1F*)fPP_data_R4->Get("hpp_HLTComb_R4_20_eta_20");
+  // PP_measured_fine[2] = (TH1F*)PP_measured_fine[2]->Rebin(37,"PP_measured_rebin_R4",xAxis1);
+  // //divideBinWidth(PP_measured_fine[2]);
   
   cout<<"loaded pp histograms "<<endl;
   
@@ -838,905 +863,6 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   PASPP_measured->SetEntries(61535);
 
   
-  TH1F *PASRAA_measured[3][nbins_cent];
-  TH1F *PASRAA_bayesian[3][nbins_cent];
-  TH1F *PASRAA_binbybin[3][nbins_cent];
-
-  Double_t xAxis2[12] = {100, 110, 120, 130, 140, 150, 160, 170, 180, 200, 240, 300}; 
-
-  PASRAA_bayesian[1][5] = new TH1F("PASRAA_bayesian_R3_cent5","",11,xAxis2);
-  PASRAA_bayesian[1][5]->SetBinContent(0,0.7225377);
-  PASRAA_bayesian[1][5]->SetBinContent(1,0.8600517);
-  PASRAA_bayesian[1][5]->SetBinContent(2,0.8100158);
-  PASRAA_bayesian[1][5]->SetBinContent(3,0.749716);
-  PASRAA_bayesian[1][5]->SetBinContent(4,0.728152);
-  PASRAA_bayesian[1][5]->SetBinContent(5,0.8079244);
-  PASRAA_bayesian[1][5]->SetBinContent(6,1.045846);
-  PASRAA_bayesian[1][5]->SetBinContent(7,0.99492);
-  PASRAA_bayesian[1][5]->SetBinContent(8,0.8501027);
-  PASRAA_bayesian[1][5]->SetBinContent(9,0.7283186);
-  PASRAA_bayesian[1][5]->SetBinContent(10,0.8501291);
-  PASRAA_bayesian[1][5]->SetBinContent(11,0.8562201);
-  PASRAA_bayesian[1][5]->SetBinContent(12,2.485746);
-
-  PASRAA_bayesian[1][5]->SetBinError(0,0.006807087);
-  PASRAA_bayesian[1][5]->SetBinError(1,0.03660645);
-  PASRAA_bayesian[1][5]->SetBinError(2,0.04424438);
-  PASRAA_bayesian[1][5]->SetBinError(3,0.05483107);
-  PASRAA_bayesian[1][5]->SetBinError(4,0.06882145);
-  PASRAA_bayesian[1][5]->SetBinError(5,0.100899);
-  PASRAA_bayesian[1][5]->SetBinError(6,0.1601293);
-  PASRAA_bayesian[1][5]->SetBinError(7,0.181309);
-  PASRAA_bayesian[1][5]->SetBinError(8,0.1830885);
-  PASRAA_bayesian[1][5]->SetBinError(9,0.1512963);
-  PASRAA_bayesian[1][5]->SetBinError(10,0.1969083);
-  PASRAA_bayesian[1][5]->SetBinError(11,0.3481827);
-  PASRAA_bayesian[1][5]->SetBinError(12,0.7989296);
-   
-  // PASRAA_bayesian[1][5]->SetBinError(0,0.006807087);
-  // PASRAA_bayesian[1][5]->SetBinError(1,0.01931266);
-  // PASRAA_bayesian[1][5]->SetBinError(2,0.02226945);
-  // PASRAA_bayesian[1][5]->SetBinError(3,0.02646403);
-  // PASRAA_bayesian[1][5]->SetBinError(4,0.03199702);
-  // PASRAA_bayesian[1][5]->SetBinError(5,0.04537526);
-  // PASRAA_bayesian[1][5]->SetBinError(6,0.06991723);
-  // PASRAA_bayesian[1][5]->SetBinError(7,0.07712956);
-  // PASRAA_bayesian[1][5]->SetBinError(8,0.07612922);
-  // PASRAA_bayesian[1][5]->SetBinError(9,0.06113506);
-  // PASRAA_bayesian[1][5]->SetBinError(10,0.07653623);
-  // PASRAA_bayesian[1][5]->SetBinError(11,0.1332746);
-  // PASRAA_bayesian[1][5]->SetBinError(12,0.7989296);
-  PASRAA_bayesian[1][5]->SetMinimum(0);
-  PASRAA_bayesian[1][5]->SetMaximum(2);
-  PASRAA_bayesian[1][5]->SetEntries(1770.971);
-  
-  PASRAA_bayesian[1][4] = new TH1F("PASRAA_bayesian_R3_cent4","",11,xAxis2);
-  PASRAA_bayesian[1][4]->SetBinContent(0,0.7299647);
-  PASRAA_bayesian[1][4]->SetBinContent(1,0.7481229);
-  PASRAA_bayesian[1][4]->SetBinContent(2,0.7609972);
-  PASRAA_bayesian[1][4]->SetBinContent(3,0.7759888);
-  PASRAA_bayesian[1][4]->SetBinContent(4,0.7765765);
-  PASRAA_bayesian[1][4]->SetBinContent(5,0.7793122);
-  PASRAA_bayesian[1][4]->SetBinContent(6,0.7750514);
-  PASRAA_bayesian[1][4]->SetBinContent(7,0.8105651);
-  PASRAA_bayesian[1][4]->SetBinContent(8,0.778167);
-  PASRAA_bayesian[1][4]->SetBinContent(9,0.6663016);
-  PASRAA_bayesian[1][4]->SetBinContent(10,0.736169);
-  PASRAA_bayesian[1][4]->SetBinContent(11,0.8040183);
-  PASRAA_bayesian[1][4]->SetBinContent(12,0.9631981);
-
-  PASRAA_bayesian[1][4]->SetBinError(0,0.003463908);
-  PASRAA_bayesian[1][4]->SetBinError(1,0.01638808);
-  PASRAA_bayesian[1][4]->SetBinError(2,0.02150757);
-  PASRAA_bayesian[1][4]->SetBinError(3,0.02926648);
-  PASRAA_bayesian[1][4]->SetBinError(4,0.0388617);
-  PASRAA_bayesian[1][4]->SetBinError(5,0.05095474);
-  PASRAA_bayesian[1][4]->SetBinError(6,0.0616764);
-  PASRAA_bayesian[1][4]->SetBinError(7,0.07817987);
-  PASRAA_bayesian[1][4]->SetBinError(8,0.09560783);
-  PASRAA_bayesian[1][4]->SetBinError(9,0.07394511);
-  PASRAA_bayesian[1][4]->SetBinError(10,0.09310688);
-  PASRAA_bayesian[1][4]->SetBinError(11,0.1812772);
-  PASRAA_bayesian[1][4]->SetBinError(12,0.2031483);
-   
-  // PASRAA_bayesian[1][4]->SetBinError(0,0.003463908);
-  // PASRAA_bayesian[1][4]->SetBinError(1,0.008645942);
-  // PASRAA_bayesian[1][4]->SetBinError(2,0.01082537);
-  // PASRAA_bayesian[1][4]->SetBinError(3,0.01412537);
-  // PASRAA_bayesian[1][4]->SetBinError(4,0.01806789);
-  // PASRAA_bayesian[1][4]->SetBinError(5,0.02291484);
-  // PASRAA_bayesian[1][4]->SetBinError(6,0.02692976);
-  // PASRAA_bayesian[1][4]->SetBinError(7,0.03325802);
-  // PASRAA_bayesian[1][4]->SetBinError(8,0.03975427);
-  // PASRAA_bayesian[1][4]->SetBinError(9,0.02987937);
-  // PASRAA_bayesian[1][4]->SetBinError(10,0.03618969);
-  // PASRAA_bayesian[1][4]->SetBinError(11,0.06938782);
-  // PASRAA_bayesian[1][4]->SetBinError(12,0.2031483);
-  PASRAA_bayesian[1][4]->SetMinimum(0);
-  PASRAA_bayesian[1][4]->SetMaximum(2);
-  PASRAA_bayesian[1][4]->SetEntries(6061.544);
-
-  PASRAA_bayesian[1][3] = new TH1F("PASRAA_bayesian_R3_cent3","",11,xAxis2);
-  PASRAA_bayesian[1][3]->SetBinContent(0,0.7279794);
-  PASRAA_bayesian[1][3]->SetBinContent(1,0.6681795);
-  PASRAA_bayesian[1][3]->SetBinContent(2,0.6799733);
-  PASRAA_bayesian[1][3]->SetBinContent(3,0.6649472);
-  PASRAA_bayesian[1][3]->SetBinContent(4,0.6252716);
-  PASRAA_bayesian[1][3]->SetBinContent(5,0.6117619);
-  PASRAA_bayesian[1][3]->SetBinContent(6,0.6540294);
-  PASRAA_bayesian[1][3]->SetBinContent(7,0.7157548);
-  PASRAA_bayesian[1][3]->SetBinContent(8,0.6989863);
-  PASRAA_bayesian[1][3]->SetBinContent(9,0.5692854);
-  PASRAA_bayesian[1][3]->SetBinContent(10,0.6007913);
-  PASRAA_bayesian[1][3]->SetBinContent(11,0.8094043);
-  PASRAA_bayesian[1][3]->SetBinContent(12,2.021915);
-
-  PASRAA_bayesian[1][3]->SetBinError(0,0.002593759);
-  PASRAA_bayesian[1][3]->SetBinError(1,0.01113931);
-  PASRAA_bayesian[1][3]->SetBinError(2,0.01478439);
-  PASRAA_bayesian[1][3]->SetBinError(3,0.0194451);
-  PASRAA_bayesian[1][3]->SetBinError(4,0.02369379);
-  PASRAA_bayesian[1][3]->SetBinError(5,0.03078356);
-  PASRAA_bayesian[1][3]->SetBinError(6,0.03982553);
-  PASRAA_bayesian[1][3]->SetBinError(7,0.05365841);
-  PASRAA_bayesian[1][3]->SetBinError(8,0.0640314);
-  PASRAA_bayesian[1][3]->SetBinError(9,0.04796186);
-  PASRAA_bayesian[1][3]->SetBinError(10,0.05829843);
-  PASRAA_bayesian[1][3]->SetBinError(11,0.1392753);
-  PASRAA_bayesian[1][3]->SetBinError(12,0.2970788);
-
-  // PASRAA_bayesian[1][3]->SetBinError(0,0.002593759);
-  // PASRAA_bayesian[1][3]->SetBinError(1,0.005876821);
-  // PASRAA_bayesian[1][3]->SetBinError(2,0.007441405);
-  // PASRAA_bayesian[1][3]->SetBinError(3,0.009385111);
-  // PASRAA_bayesian[1][3]->SetBinError(4,0.01101591);
-  // PASRAA_bayesian[1][3]->SetBinError(5,0.01384366);
-  // PASRAA_bayesian[1][3]->SetBinError(6,0.01738902);
-  // PASRAA_bayesian[1][3]->SetBinError(7,0.0228265);
-  // PASRAA_bayesian[1][3]->SetBinError(8,0.02662461);
-  // PASRAA_bayesian[1][3]->SetBinError(9,0.01938019);
-  // PASRAA_bayesian[1][3]->SetBinError(10,0.02266);
-  // PASRAA_bayesian[1][3]->SetBinError(11,0.05331068);
-  // PASRAA_bayesian[1][3]->SetBinError(12,0.2970788);
-  PASRAA_bayesian[1][3]->SetMinimum(0);
-  PASRAA_bayesian[1][3]->SetMaximum(2);
-  PASRAA_bayesian[1][3]->SetEntries(9256.671);
-
-  PASRAA_bayesian[1][2] = new TH1F("PASRAA_bayesian_R3_cent2","",11,xAxis2);
-  PASRAA_bayesian[1][2]->SetBinContent(0,0.8238835);
-  PASRAA_bayesian[1][2]->SetBinContent(1,0.5604139);
-  PASRAA_bayesian[1][2]->SetBinContent(2,0.5365105);
-  PASRAA_bayesian[1][2]->SetBinContent(3,0.5556849);
-  PASRAA_bayesian[1][2]->SetBinContent(4,0.5274078);
-  PASRAA_bayesian[1][2]->SetBinContent(5,0.5573406);
-  PASRAA_bayesian[1][2]->SetBinContent(6,0.6040812);
-  PASRAA_bayesian[1][2]->SetBinContent(7,0.6451674);
-  PASRAA_bayesian[1][2]->SetBinContent(8,0.5992499);
-  PASRAA_bayesian[1][2]->SetBinContent(9,0.4717564);
-  PASRAA_bayesian[1][2]->SetBinContent(10,0.4812902);
-  PASRAA_bayesian[1][2]->SetBinContent(11,0.6858578);
-  PASRAA_bayesian[1][2]->SetBinContent(12,1.051401);
-
-  PASRAA_bayesian[1][2]->SetBinError(0,0.002676996);
-  PASRAA_bayesian[1][2]->SetBinError(1,0.008546944);
-  PASRAA_bayesian[1][2]->SetBinError(2,0.01060751);
-  PASRAA_bayesian[1][2]->SetBinError(3,0.01473257);
-  PASRAA_bayesian[1][2]->SetBinError(4,0.01825233);
-  PASRAA_bayesian[1][2]->SetBinError(5,0.02542376);
-  PASRAA_bayesian[1][2]->SetBinError(6,0.03367376);
-  PASRAA_bayesian[1][2]->SetBinError(7,0.04421273);
-  PASRAA_bayesian[1][2]->SetBinError(8,0.04964768);
-  PASRAA_bayesian[1][2]->SetBinError(9,0.03594492);
-  PASRAA_bayesian[1][2]->SetBinError(10,0.04249006);
-  PASRAA_bayesian[1][2]->SetBinError(11,0.1093235);
-  PASRAA_bayesian[1][2]->SetBinError(12,0.1496494);
-  
-  // PASRAA_bayesian[1][2]->SetBinError(0,0.002676996);
-  // PASRAA_bayesian[1][2]->SetBinError(1,0.004509155);
-  // PASRAA_bayesian[1][2]->SetBinError(2,0.005339063);
-  // PASRAA_bayesian[1][2]->SetBinError(3,0.007110624);
-  // PASRAA_bayesian[1][2]->SetBinError(4,0.008486022);
-  // PASRAA_bayesian[1][2]->SetBinError(5,0.01143331);
-  // PASRAA_bayesian[1][2]->SetBinError(6,0.01470297);
-  // PASRAA_bayesian[1][2]->SetBinError(7,0.01880827);
-  // PASRAA_bayesian[1][2]->SetBinError(8,0.02064378);
-  // PASRAA_bayesian[1][2]->SetBinError(9,0.01452445);
-  // PASRAA_bayesian[1][2]->SetBinError(10,0.01651545);
-  // PASRAA_bayesian[1][2]->SetBinError(11,0.04184596);
-  // PASRAA_bayesian[1][2]->SetBinError(12,0.1496494);
-  PASRAA_bayesian[1][2]->SetMinimum(0);
-  PASRAA_bayesian[1][2]->SetMaximum(2);
-  PASRAA_bayesian[1][2]->SetEntries(10967.25);
-
-  PASRAA_bayesian[1][1] = new TH1F("PASRAA_bayesian_R3_cent1","",11,xAxis2);
-  PASRAA_bayesian[1][1]->SetBinContent(0,1.031868);
-  PASRAA_bayesian[1][1]->SetBinContent(1,0.4557194);
-  PASRAA_bayesian[1][1]->SetBinContent(2,0.480005);
-  PASRAA_bayesian[1][1]->SetBinContent(3,0.4997296);
-  PASRAA_bayesian[1][1]->SetBinContent(4,0.444041);
-  PASRAA_bayesian[1][1]->SetBinContent(5,0.4247413);
-  PASRAA_bayesian[1][1]->SetBinContent(6,0.4454679);
-  PASRAA_bayesian[1][1]->SetBinContent(7,0.4785669);
-  PASRAA_bayesian[1][1]->SetBinContent(8,0.4834603);
-  PASRAA_bayesian[1][1]->SetBinContent(9,0.4274004);
-  PASRAA_bayesian[1][1]->SetBinContent(10,0.4192492);
-  PASRAA_bayesian[1][1]->SetBinContent(11,0.5767608);
-  PASRAA_bayesian[1][1]->SetBinContent(12,1.223037);
-
-  PASRAA_bayesian[1][1]->SetBinError(0,0.003550127);
-  PASRAA_bayesian[1][1]->SetBinError(1,0.007539356);
-  PASRAA_bayesian[1][1]->SetBinError(2,0.01035939);
-  PASRAA_bayesian[1][1]->SetBinError(3,0.01458809);
-  PASRAA_bayesian[1][1]->SetBinError(4,0.01679069);
-  PASRAA_bayesian[1][1]->SetBinError(5,0.02080943);
-  PASRAA_bayesian[1][1]->SetBinError(6,0.02718877);
-  PASRAA_bayesian[1][1]->SetBinError(7,0.03569299);
-  PASRAA_bayesian[1][1]->SetBinError(8,0.04427906);
-  PASRAA_bayesian[1][1]->SetBinError(9,0.03604142);
-  PASRAA_bayesian[1][1]->SetBinError(10,0.0406791);
-  PASRAA_bayesian[1][1]->SetBinError(11,0.09958546);
-  PASRAA_bayesian[1][1]->SetBinError(12,0.1827313);
-  
-  // PASRAA_bayesian[1][1]->SetBinError(0,0.003550127);
-  // PASRAA_bayesian[1][1]->SetBinError(1,0.003977577);
-  // PASRAA_bayesian[1][1]->SetBinError(2,0.005214178);
-  // PASRAA_bayesian[1][1]->SetBinError(3,0.00704089);
-  // PASRAA_bayesian[1][1]->SetBinError(4,0.007806462);
-  // PASRAA_bayesian[1][1]->SetBinError(5,0.0093582);
-  // PASRAA_bayesian[1][1]->SetBinError(6,0.01187143);
-  // PASRAA_bayesian[1][1]->SetBinError(7,0.01518394);
-  // PASRAA_bayesian[1][1]->SetBinError(8,0.01841148);
-  // PASRAA_bayesian[1][1]->SetBinError(9,0.01456344);
-  // PASRAA_bayesian[1][1]->SetBinError(10,0.01581155);
-  // PASRAA_bayesian[1][1]->SetBinError(11,0.03811852);
-  // PASRAA_bayesian[1][1]->SetBinError(12,0.1827313);
-  PASRAA_bayesian[1][1]->SetMinimum(0);
-  PASRAA_bayesian[1][1]->SetMaximum(2);
-  PASRAA_bayesian[1][1]->SetEntries(9198.666);
-
-  PASRAA_bayesian[1][0] = new TH1F("PASRAA_bayesian_R3_cent0","",11,xAxis2);
-  PASRAA_bayesian[1][0]->SetBinContent(0,1.418427);
-  PASRAA_bayesian[1][0]->SetBinContent(1,0.4702078);
-  PASRAA_bayesian[1][0]->SetBinContent(2,0.4736779);
-  PASRAA_bayesian[1][0]->SetBinContent(3,0.4640111);
-  PASRAA_bayesian[1][0]->SetBinContent(4,0.4361698);
-  PASRAA_bayesian[1][0]->SetBinContent(5,0.4342382);
-  PASRAA_bayesian[1][0]->SetBinContent(6,0.4725478);
-  PASRAA_bayesian[1][0]->SetBinContent(7,0.5191602);
-  PASRAA_bayesian[1][0]->SetBinContent(8,0.5139099);
-  PASRAA_bayesian[1][0]->SetBinContent(9,0.4391448);
-  PASRAA_bayesian[1][0]->SetBinContent(10,0.4229113);
-  PASRAA_bayesian[1][0]->SetBinContent(11,0.5843745);
-  PASRAA_bayesian[1][0]->SetBinContent(12,0.7831888);
-
-  PASRAA_bayesian[1][0]->SetBinError(0,0.004730243);
-  PASRAA_bayesian[1][0]->SetBinError(1,0.007550343);
-  PASRAA_bayesian[1][0]->SetBinError(2,0.009840934);
-  PASRAA_bayesian[1][0]->SetBinError(3,0.01303877);
-  PASRAA_bayesian[1][0]->SetBinError(4,0.01589791);
-  PASRAA_bayesian[1][0]->SetBinError(5,0.02094939);
-  PASRAA_bayesian[1][0]->SetBinError(6,0.02765753);
-  PASRAA_bayesian[1][0]->SetBinError(7,0.03752524);
-  PASRAA_bayesian[1][0]->SetBinError(8,0.04478431);
-  PASRAA_bayesian[1][0]->SetBinError(9,0.03525832);
-  PASRAA_bayesian[1][0]->SetBinError(10,0.03945337);
-  PASRAA_bayesian[1][0]->SetBinError(11,0.09843785);
-  PASRAA_bayesian[1][0]->SetBinError(12,0.1174314);
-  
-  // PASRAA_bayesian[1][0]->SetBinError(0,0.004730243);
-  // PASRAA_bayesian[1][0]->SetBinError(1,0.003983373);
-  // PASRAA_bayesian[1][0]->SetBinError(2,0.004953222);
-  // PASRAA_bayesian[1][0]->SetBinError(3,0.006293119);
-  // PASRAA_bayesian[1][0]->SetBinError(4,0.007391385);
-  // PASRAA_bayesian[1][0]->SetBinError(5,0.009421142);
-  // PASRAA_bayesian[1][0]->SetBinError(6,0.0120761);
-  // PASRAA_bayesian[1][0]->SetBinError(7,0.01596338);
-  // PASRAA_bayesian[1][0]->SetBinError(8,0.01862156);
-  // PASRAA_bayesian[1][0]->SetBinError(9,0.01424701);
-  // PASRAA_bayesian[1][0]->SetBinError(10,0.01533512);
-  // PASRAA_bayesian[1][0]->SetBinError(11,0.03767925);
-  // PASRAA_bayesian[1][0]->SetBinError(12,0.1174314);
-  PASRAA_bayesian[1][0]->SetMinimum(0);
-  PASRAA_bayesian[1][0]->SetMaximum(2);
-  PASRAA_bayesian[1][0]->SetEntries(9671.122);
-
-  //now that we have taken the necessary histogram, lets start to make plots:
-
-#if 0
-  //plot1 - 6 panel plot of RAA, at R=0.3, in the old PAS and now.
-  TCanvas *cRAA = new TCanvas("cRAA","RAA",1200,800);
-  makeMultiPanelCanvasWithGap(cRAA,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
-
-  TLegend *tRAA = myLegend(0.15,0.75,0.85,0.9);
-  TLine *lineRAA = new TLine(100,1,299,1);
-  lineRAA->SetLineStyle(2);
-  lineRAA->SetLineWidth(2);
-
-  int ci;
-  TBox *box;
-  for(int i = 0;i<nbins_cent;i++){
-
-    cRAA->cd(nbins_cent-i);
-
-    RAA_bayesian[1][i]->SetMarkerColor(kBlack);
-    RAA_bayesian[1][i]->SetMarkerStyle(20);
-    makeHistTitle(RAA_bayesian[1][i],"","Jet p_{T} (GeV/c)","R_{AA}");
-    RAA_bayesian[1][i]->SetAxisRange(60,299,"X");
-    RAA_bayesian[1][i]->SetAxisRange(0,2,"Y");
-    RAA_bayesian[1][i]->Draw("E0");
-
-    PASRAA_bayesian[1][i]->SetMarkerColor(kGreen);
-    PASRAA_bayesian[1][i]->SetMarkerStyle(33);
-    PASRAA_bayesian[1][i]->Draw("same E0");
-
-    //RAA_binbybin[1][i]->SetMarkerStyle(29);
-    //RAA_binbybin[1][i]->SetMarkerColor(kBlue);
-    //RAA_binbybin[1][i]->Draw("same");
-
-    lineRAA->Draw();
-    drawText(Form("%2.0f-%2.0f%%",2.5*boundaries_cent[i],2.5*boundaries_cent[i+1]),0.8,0.9,20);
-
-    switch ( i ) {
-	
-    case 0:
-      box = new TBox(100,0.3992887,110,0.5411268);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(110,0.4004558,120,0.5469);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(120,0.3797207,130,0.5483015);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(130,0.3460133,140,0.5263263);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(140,0.3479742,150,0.5205022);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(150,0.3878594,160,0.5572361);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(160,0.4375477,170,0.6007726);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(170,0.432544,180,0.5952758);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(180,0.3688692,200,0.5094203);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(200,0.3537775,240,0.492045);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(240,0.485418,300,0.6833309);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-	
-      break;
-
-    case 1:
-      box = new TBox(100,0.3922236,110,0.5192152);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(110,0.4114913,120,0.5485187);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(120,0.4142097,130,0.5852495);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(130,0.3565539,140,0.5315281);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(140,0.3448709,150,0.5046117);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(150,0.3711734,160,0.5197624);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(160,0.4105411,170,0.5465928);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(170,0.4144865,180,0.5524341);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(180,0.3660878,200,0.4887129);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(200,0.3584384,240,0.4800599);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(240,0.4915343,300,0.6619874);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      break;
-
-    case 2:
-      box = new TBox(100,0.4885437,110,0.6322841);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(110,0.4659843,120,0.6070368);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(120,0.4659718,130,0.6453979);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(130,0.4280813,140,0.6267344);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(140,0.4578278,150,0.6568533);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(150,0.5101032,160,0.6980592);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(160,0.5623943,170,0.7279404);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(170,0.5223327,180,0.6761671);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(180,0.4111619,200,0.5323508);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(200,0.4193837,240,0.5431968);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(240,0.5974073,300,0.7743082);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-
-      break;
-
-    case 3:
-
-      box = new TBox(100,0.5888569,110,0.7475021);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(110,0.5972088,120,0.7627378);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(120,0.5630347,130,0.7668597);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(130,0.5120569,140,0.7384863);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(140,0.507423,150,0.7161008);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(150,0.5585642,160,0.7494945);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(160,0.6327194,170,0.7987902);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(170,0.6181627,180,0.7798098);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(180,0.5037794,200,0.6347914);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(200,0.532314,240,0.6692686);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(240,0.7185097,300,0.9002989);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-	
-      break;
-
-    case 4:
-      box = new TBox(100,0.6653466,110,0.8308992);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(110,0.6746653,120,0.8473291);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(120,0.662311,130,0.8896665);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(130,0.6405509,140,0.9126022);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(140,0.651443,150,0.9071814);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(150,0.6679778,160,0.882125);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(160,0.7248008,170,0.8963293);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(170,0.6962772,180,0.8600568);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(180,0.596691,200,0.7359122);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(200,0.6601083,240,0.8122298);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(240,0.7215662,300,0.8864704);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-
-      break;
-
-    case 5:
-      box = new TBox(100,0.7705583,110,0.9495451);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(110,0.7227901,120,0.8972415);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(120,0.6428426,130,0.8565895);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(130,0.602727,140,0.853577);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(140,0.6775657,150,0.9382831);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(150,0.9043127,160,1.187379);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(160,0.8928045,170,1.097036);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(170,0.762919,180,0.9372863);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(180,0.6536744,200,0.8029628);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(200,0.762955,240,0.9373031);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-      box = new TBox(240,0.7678421,300,0.9445981);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetFillColor(ci);
-
-      ci = TColor::GetColor("#cccccc");
-      box->SetLineColor(ci);
-      box->Draw();
-		
-      break;
-	
-    }// switch
-
-    RAA_bayesian[1][i]->Draw("same E1");
-    PASRAA_bayesian[1][i]->Draw("same E1");
-
-  }// centrality loop
-
-  tRAA->AddEntry(RAA_bayesian[1][0],"13-005, New JetID Cut,","pl");
-  tRAA->AddEntry(PASRAA_bayesian[1][0],"12-004, trkMax/jtpt > 0.01","pl");
-  tRAA->SetTextSize(0.04);
-
-  cRAA->cd(1);
-  tRAA->Draw();
-  drawText("Bayesian Unfolding, 4 iterations",0.2,0.7,16);
-  cRAA->cd(1);
-  putCMSPrel();
-  drawText(Form("Anti-k_{T} %s %s Jets R=0.3",algo,jet_type),0.2,0.23,16);
-  //drawText("|#eta|<2, |vz|<15",0.65,0.31,16);
-  cRAA->cd(2);
-  drawText("|#eta|<2",0.1,0.3,16);
-  drawText("|vz|<15, HBHEfilter, pCES",0.1,0.2,16);
-  cRAA->cd(3);
-  drawText("Trig Combined with MinBias&&!Jet80 subtracted",0.06,0.2,16);
-
-  cRAA->SaveAs(Form("May28_MBnoJet80Cut/RAA_newComparingwithPAS_ak%s3%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
-#endif
-  
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1750,12 +876,12 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
     cPbPb_sigma->cd(nbins_cent-i)->SetLogy();
     cPbPb_sigma->cd(nbins_cent-i)->SetLogx();
 
-    makeHistTitle(PbPb_measured_fine[1][i]," ","Jet p_{T} (GeV/c)","arbitrary units");
-    PbPb_measured_fine[1][i]->SetMarkerStyle(20);
-    PbPb_measured_fine[1][i]->SetMarkerColor(kBlack);
-    PbPb_measured_fine[1][i]->SetAxisRange(1e-1,1e7,"Y");
-    PbPb_measured_fine[1][i]->SetAxisRange(60,300,"X");
-    PbPb_measured_fine[1][i]->Draw();
+    makeHistTitle(PbPb_measured[1][i]," ","Jet p_{T} (GeV/c)","arbitrary units");
+    PbPb_measured[1][i]->SetMarkerStyle(20);
+    PbPb_measured[1][i]->SetMarkerColor(kBlack);
+    PbPb_measured[1][i]->SetAxisRange(1e-1,1e7,"Y");
+    PbPb_measured[1][i]->SetAxisRange(60,300,"X");
+    PbPb_measured[1][i]->Draw();
     
     //PASPbPb_measured[i]->Scale(1./4);
     PASPbPb_measured[i]->SetMarkerStyle(33);
@@ -1768,7 +894,7 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   cPbPb_sigma->cd(1);
   TLegend *PbPb_sigma = myLegend(0.25,0.7,0.5,0.9);
   PbPb_sigma->AddEntry(PbPb_measured[1][0],"13-005 Letest Jet ID cut","pl");
-  PbPb_sigma->AddEntry(PASPbPb_measured[0],"12-004 (trkMax/jtpt > 0.01) *(145/129)","pl");
+  PbPb_sigma->AddEntry(PASPbPb_measured[0],"12-004 (trkMax/jtpt > 0.01)","pl");
   PbPb_sigma->SetTextSize(0.04);
   PbPb_sigma->Draw();
 
@@ -1784,11 +910,11 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   drawText("|vz|<15, pCES, HBHE",0.15,0.25,16);
   //drawText("hiNpix_1 > 38000 - 500*NJet",0.15,0.15,16);
   //cPbPb_sigma->cd(3);
-  drawText("Trig Combined with MinBias subtracted",0.11,0.15,16);
+  //drawText("Trig Combined with MinBias subtracted",0.11,0.15,16);
 
-  cPbPb_sigma->SaveAs(Form("May28_MBnoJet80Cut/PbPb_spectra_newComparingwithPAS_ak%s3%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
-  cPbPb_sigma->SaveAs(Form("May28_MBnoJet80Cut/PbPb_spectra_newComparingwithPAS_ak%s3%s_%d.C",algo,jet_type,date.GetDate()),"RECREATE");
-  cPbPb_sigma->SaveAs(Form("May28_MBnoJet80Cut/PbPb_spectra_newComparingwithPAS_ak%s3%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
+  cPbPb_sigma->SaveAs(Form("July22/PbPb_spectra_newComparingwithPAS_ak%s3%s_%d.pdf",algo,jet_type,date.GetDate()),"RECREATE");
+  cPbPb_sigma->SaveAs(Form("July22/PbPb_spectra_newComparingwithPAS_ak%s3%s_%d.C",algo,jet_type,date.GetDate()),"RECREATE");
+  cPbPb_sigma->SaveAs(Form("July22/PbPb_spectra_newComparingwithPAS_ak%s3%s_%d.root",algo,jet_type,date.GetDate()),"RECREATE");
   
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1797,14 +923,14 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   cPP_sigma->SetLogy();
   cPP_sigma->SetLogx();
 
-  PP_measured_fine[1]->SetMarkerStyle(20);
-  PP_measured_fine[1]->SetMarkerColor(kBlack);
-  PP_measured_fine[1]->SetTitle(" ");
-  PP_measured_fine[1]->SetXTitle("Jet p_{T} (GeV/c)");
-  PP_measured_fine[1]->SetYTitle("arbitrary units");
-  PP_measured_fine[1]->SetAxisRange(50,400,"X");
-  PP_measured_fine[1]->SetAxisRange(1,1e9,"Y");
-  PP_measured_fine[1]->Draw();
+  PP_measured[1]->SetMarkerStyle(20);
+  PP_measured[1]->SetMarkerColor(kBlack);
+  PP_measured[1]->SetTitle(" ");
+  PP_measured[1]->SetXTitle("Jet p_{T} (GeV/c)");
+  PP_measured[1]->SetYTitle("arbitrary units");
+  PP_measured[1]->SetAxisRange(50,400,"X");
+  PP_measured[1]->SetAxisRange(1,1e9,"Y");
+  PP_measured[1]->Draw();
 
   PASPP_measured->Scale(5300./212.);
   PASPP_measured->SetMarkerColor(kRed);
@@ -1812,8 +938,8 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   PASPP_measured->Draw("same");
 
   TLegend *PP_sigma = myLegend(0.4,0.7,0.75,0.9);
-  PP_sigma->AddEntry(PP_measured_fine[1]," latest pp 2013","pl");
-  PP_sigma->AddEntry(PASPP_measured,"2012 PAS (trxMax/jtpt > 0.01)* (5300/212)","pl");
+  PP_sigma->AddEntry(PP_measured[1]," latest pp 2013","pl");
+  PP_sigma->AddEntry(PASPP_measured,"2012 PAS (trxMax/jtpt > 0.01) * (5300/212)","pl");
   PP_sigma->SetTextSize(0.03);
   PP_sigma->Draw();
 
@@ -1823,9 +949,9 @@ void RAA_NEWcomparisonwithPAS(char *algo = "Pu", char *jet_type = "PF", char * e
   drawText("|#eta|<2, |vz|<15",0.2,0.30,16);
   drawText("measured spectra",0.2,0.16,16);
   
-  cPP_sigma->SaveAs(Form("May28_MBnoJet80Cut/PP_spectra_newComparingwithPAS_ak3%s_%d.pdf",jet_type,date.GetDate()),"RECREATE");
-  cPP_sigma->SaveAs(Form("May28_MBnoJet80Cut/PP_spectra_newComparingwithPAS_ak3%s_%d.C",jet_type,date.GetDate()),"RECREATE");
-  cPP_sigma->SaveAs(Form("May28_MBnoJet80Cut/PP_spectra_newComparingwithPAS_ak3%s_%d.root",jet_type,date.GetDate()),"RECREATE");
+  cPP_sigma->SaveAs(Form("July22/PP_spectra_newComparingwithPAS_ak3%s_%d.pdf",jet_type,date.GetDate()),"RECREATE");
+  cPP_sigma->SaveAs(Form("July22/PP_spectra_newComparingwithPAS_ak3%s_%d.C",jet_type,date.GetDate()),"RECREATE");
+  cPP_sigma->SaveAs(Form("July22/PP_spectra_newComparingwithPAS_ak3%s_%d.root",jet_type,date.GetDate()),"RECREATE");
 
   //
   timer.Stop();

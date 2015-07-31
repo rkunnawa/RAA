@@ -14,7 +14,7 @@
 
 // all the pt bins are declared in the utilities.h header file to make things easier. 
 
-void RAA_plot_Systematics(bool isATLASCut = true, bool drawSystematics = true)
+void RAA_plot_Systematics(bool isATLASCut = false, bool drawSystematics = true)
 {
   
   TStopwatch timer;
@@ -98,9 +98,9 @@ void RAA_plot_Systematics(bool isATLASCut = true, bool drawSystematics = true)
   divideBinWidth(uPP_R3_SVD);
   uPP_R4_SVD = (TH1F*)fSVD_R4->Get("hpp_Unfolded_mcclosure_spectra_SVD_R4_20_eta_20_cent6");
   uPP_R4_SVD->Print("base");
-  multiplyBinWidth(uPP_R4_SVD);
-  uPP_R4_SVD = (TH1F*)uPP_R4_SVD->Rebin(nbins_ana, "uPP_R4_SVD", ptbins_ana);
-  divideBinWidth(uPP_R4_SVD);
+  //multiplyBinWidth(uPP_R4_SVD);
+  //uPP_R4_SVD = (TH1F*)uPP_R4_SVD->Rebin(nbins_ana, "uPP_R4_SVD", ptbins_ana);
+  //divideBinWidth(uPP_R4_SVD);
   
   uPP_R2_Bayes = (TH1F*)fin_R2->Get("PP_bayesian_unfolded_spectra");
   uPP_R2_Bayes->Print("base");
@@ -6250,6 +6250,7 @@ void RAA_plot_Systematics(bool isATLASCut = true, bool drawSystematics = true)
   p8719_d2x1y1->Draw("ap");
   uPP_R4_SVD->SetMarkerStyle(24);
   uPP_R4_SVD->SetMarkerColor(kBlue);
+  uPP_R4_SVD->SetAxisRange(60, 450, "X");
   uPP_R4_SVD->Draw("same E1");
   if(drawSystematics) sys_SVD_PP_R4.calcTotalSys(6);
   if(drawSystematics) sys_SVD_PP_R4.Draw(uPP_R4_SVD,6,2);

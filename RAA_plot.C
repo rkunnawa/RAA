@@ -51,7 +51,7 @@
 
 using namespace std;
 
-void RAA_plot(int radius = 3, bool isATLASCut = true)
+void RAA_plot(int radius = 2, bool isATLASCut = false)
 {
 
   TStopwatch timer;
@@ -64,9 +64,10 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
   char * trkMaxCut = (char*)"_";
   if(isATLASCut) trkMaxCut = (char*)"_trkMax7OrNeMax8GeVCut_";
   
-  char * outLocation = (char*) "MinBias_Sub/July20/";
-  if(isATLASCut) outLocation = (char*)"MinBias_Sub/July20/ATLASCut/";
-
+  char * outLocation = (char*) "MinBias_Sub/July23/";
+  if(isATLASCut) outLocation = (char*)"MinBias_Sub/July23/ATLASCut/";
+  
+  bool makeCanvasFiles = true; 
 
   TDatime date;
 
@@ -81,24 +82,25 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
   bool makeRootFile = false;
 
   //Boolean Variables for the several plots: 
+  bool doMinBiasSub = false;
+  bool doPbPbMCClosure = false;
+  bool doPPMCClosure = false;
+  bool doPbPbsigma = true;
+  bool doPPsigma = true;
+  bool doPbPbTrgComb = false;
+  bool doPPTrgComb = false;
+  bool doPbPbNormRes = false;
+  bool doPPNormRes = false;
+  
   bool doSpectra = false;
-
   bool doPbPbIterSys = false;
   bool doPPIterSys = false;
   bool doRAA = false;
-  bool doMinBiasSub = true;
-  bool doPbPbMCClosure = true;
-  bool doPPMCClosure = true;
   bool doPbPbDatavsMC = false;
   bool doPPDatavsMC = false;
-  bool doPbPbNormRes = false;
-  bool doPPNormRes = false;
-  bool doPbPbsigma = true;
-  bool doPPsigma = true;
+
   bool doGenSpectra = false;
-  bool doPbPbTrgComb = true;
   bool doPbPb12003TrgComb = false;
-  bool doPPTrgComb = true;
   bool doPPTrgContribution = false;
 
   bool doRandomCone = false;
@@ -120,12 +122,32 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
   bool do2DCut5 = false;
 
   
-  TFile *fin;
+  TFile *fin, * fin_svd;
 
   char * etaWidth = (char*)"20_eta_20";
   Float_t etaBoundary = 2.0; 
-  
-  fin = TFile::Open(Form("MinBias_Sub/July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p%d_MCCloOppSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root",isATLASCut,radius,  date.GetDate())); 
+  cout<<"hi"<<endl;
+  fin = TFile::Open(Form("MinBias_Sub/July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p%d_MCCloSameSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, radius, 20150721));
+  //fin = TFile::Open(Form("MinBias_Sub/July20/HiForest_JetComb_noSmear_JetRAA_%disATLASCut_R0p%d_MCCloOppSide_1trigcorAfterUnfo_SevilFakeMBnoLJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, radius, date.GetDate()));
+  cout<<"hi"<<endl;
+
+  fin_svd = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/July22/PbPb_Uncorr_noSmear%sNeqScale_MBLjSLjSub_1doFakeRemove_pp_JetComb_Data_akPu%d_20_eta_20_doToy1_0Bayes4_0doSVDCorr_1SVD6_6_6_6_6_6_PP6_1trigcorAfterUnfo_RecopTCut50GeV_OnUncorrSpectra.root", trkMaxCut, radius));
+  cout<<"hi"<<endl;
+
+  TH1F * uPbPb_SVD[nbins_cent];
+  cout<<"hi"<<endl;
+  for(int i = 0; i<nbins_cent; ++i) {
+    cout<<"hi"<<endl;
+    uPbPb_SVD[i] = (TH1F*)fin_svd->Get(Form("hpbpb_Unfolded_mcclosure_spectra_SVD_R%d_20_eta_20_cent%d",radius, i));
+    multiplyBinWidth(uPbPb_SVD[i]);
+    uPbPb_SVD[i] = (TH1F*)uPbPb_SVD[i]->Rebin(nbins_ana, Form("uPbPb_R%d_SVD_cent%d",radius, i), ptbins_ana);
+    divideBinWidth(uPbPb_SVD[i]);
+  }
+  TH1F * uPP_SVD = (TH1F*)fin_svd->Get(Form("hpp_Unfolded_mcclosure_spectra_SVD_R%d_20_eta_20_cent%d",radius, 6));
+  multiplyBinWidth(uPP_SVD);
+  uPP_SVD = (TH1F*)uPP_SVD->Rebin(nbins_ana, "uPP_SVD", ptbins_ana);
+  divideBinWidth(uPP_SVD);
+
 
   TH1F *dPbPb_TrgComb[nbins_cent+1], *dPbPb_Comb[nbins_cent+1], *dPbPb_Trg80[nbins_cent+1], *dPbPb_Trg65[nbins_cent+1], *dPbPb_Trg55[nbins_cent+1], *dPbPb_1[nbins_cent+1], *dPbPb_2[nbins_cent+1], *dPbPb_3[nbins_cent+1], *dPbPb_80[nbins_cent+1], *dPbPb_65[nbins_cent+1], *dPbPb_55[nbins_cent+1], *dPbPb_MinBias[nbins_cent+1];
   
@@ -382,7 +404,7 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
 
   if(doMinBiasSub){
 
-    TCanvas *cMinBiasSub = new TCanvas("cMinBiasSub","PbPb Iteration systematics",1200,800);
+    TCanvas *cMinBiasSub = new TCanvas("cMinBiasSub","PbPb MB sub",1200,800);
     makeMultiPanelCanvasWithGap(cMinBiasSub,3,2,0.01,0.01,0.16,0.2,0.04,0.04);
 
     // line at 1
@@ -397,7 +419,7 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
       cMinBiasSub->cd(nbins_cent-i)->SetLogy();
       //cMinBiasSub->cd(nbins_cent-i)->SetLogx();
       
-      makeHistTitle(hDataBeforeSub[i]," ","dN/dp_{T}","Jet p_{T} (GeV/c)");
+      makeHistTitle(hDataBeforeSub[i]," ","Jet p_{T} (GeV/c)","dN/dp_{T}");
       hDataBeforeSub[i]->SetMarkerStyle(24);
       hDataBeforeSub[i]->SetMarkerColor(kBlack);
       hDataBeforeSub[i]->SetAxisRange(15, 350, "X");
@@ -417,7 +439,7 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
     }
 
     PbPb_mbsub->AddEntry(hDataBeforeSub[0],"Before Subtraction","pl");
-    PbPb_mbsub->AddEntry(hMinBias[0],"MinBias, without LJ and SbJ","pl");
+    PbPb_mbsub->AddEntry(hMinBias[0],"MinBias, without LJ ","pl");
     PbPb_mbsub->AddEntry(hDataAfterSub[0],"After Subtraction","pl");
     PbPb_mbsub->SetTextSize(0.04);
     PbPb_mbsub->Draw();
@@ -710,56 +732,66 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
   }
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-  if(!isATLASCut)TFile * fSVDin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/July20/PbPb_MBLjSLjSub_1doFakeRemove_pp_JetComb_MC_akPu%d_20_eta_20_doToy1_0Bayes4_1SVD6_6_6_6_6_6_PP6_1trigcorAfterUnfo_Reco50GenpTCut0GeV_OnUncorrSpectra.root", radius));
-  if(isATLASCut)TFile * fSVDin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/July20/PbPb_trkMax7OrNeMax8GeVCut_MBLjSLjSub_10GeVBins_1doFakeRemove_pp_JetComb_MC_akPu%d_20_eta_20_doToy1_0Bayes4_1SVD6_6_6_6_6_6_PP6_1trigcorAfterUnfo_RecopTCut50GeV_OnUncorrSpectra.root", radius));
-  
-  char dataset [7][256] = {"pbpb","pbpb","pbpb","pbpb","pbpb","pbpb","pp"};
-  
-  TH1F * hSVD_Closure[nbins_cent+1];
-  TH1F * hSVD_Closure_check[nbins_cent+1];
-  TH1F * hBayes_OffClosure[nbins_cent+1];
-  TH1F * hBayes_OffClosure_check[nbins_cent+1];
-  TH1F * hMCClosurePbPb_Bayesian[nbins_cent+1];
-  TH1F * hMCClosurePbPb_BinByBin[nbins_cent+1];
-  TH1F * hMCClosurePbPb_Bayesian_sameSide[nbins_cent+1];
-  TH1F * hMCClosurePbPb_BinByBin_sameSide[nbins_cent+1];
 
-  TFile * fOppSide = TFile::Open(Form("MinBias_Sub/July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p%d_MCCloOppSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, radius, date.GetDate()));
-  TFile * fSameSide = TFile::Open(Form("MinBias_Sub/July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p%d_MCCloSameSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, radius, date.GetDate()));
 
-  for(int i = 0; i<nbins_cent+1; ++i){
-    cout<<i<<endl;
-    // hBayes_OffClosure[i] = (TH1F*)fSVDin->Get(Form("MCClosure_test_%s_oppside_Bayes_R%d_20_eta_20_cent%d", dataset[i], radius, i));
-    // hBayes_OffClosure_check[i] = (TH1F*)fSVDin->Get(Form("MCClosure_test_%s_sameside_Bayes_R%d_20_eta_20_cent%d", dataset[i], radius, i));
-    hSVD_Closure[i] = (TH1F*)fSVDin->Get(Form("MCClosure_test_%s_oppside_SVD_R%d_20_eta_20_cent%d",dataset[i], radius, i));
-    hSVD_Closure[i]->Print("base");
-    hSVD_Closure_check[i] = (TH1F*)fSVDin->Get(Form("MCClosure_test_%s_sameside_SVD_R%d_20_eta_20_cent%d", dataset[i], radius, i));
-    hSVD_Closure_check[i]->Print("base");
-    if(i!=nbins_cent){
+  if(doPbPbMCClosure || doPPMCClosure){
 
-      hMCClosurePbPb_Bayesian[i] = (TH1F*)fOppSide->Get(Form("hRatio_MC_Bayes_cent%d",i));
-      hMCClosurePbPb_Bayesian[i]->Print("base");
-      hMCClosurePbPb_BinByBin[i] = (TH1F*)fOppSide->Get(Form("hRatio_MC_BinByBin_cent%d",i));
-      hMCClosurePbPb_BinByBin[i]->Print("base");
-      hMCClosurePbPb_Bayesian_sameSide[i] = (TH1F*)fSameSide->Get(Form("hRatio_MC_Bayes_cent%d",i));
-      hMCClosurePbPb_Bayesian_sameSide[i]->Print("base");
-      hMCClosurePbPb_BinByBin_sameSide[i] = (TH1F*)fSameSide->Get(Form("hRatio_MC_BinByBin_cent%d",i));
-      hMCClosurePbPb_BinByBin_sameSide[i]->Print("base");
+    // if(!isATLASCut)TFile * fSVDin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/July20/PbPb_MBLjSLjSub_1doFakeRemove_pp_JetComb_MC_akPu%d_20_eta_20_doToy1_0Bayes4_1SVD6_6_6_6_6_6_PP6_1trigcorAfterUnfo_Reco50GenpTCut0GeV_OnUncorrSpectra.root", radius));
+    // if(isATLASCut)TFile * fSVDin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/July20/PbPb_trkMax7OrNeMax8GeVCut_MBLjSLjSub_10GeVBins_1doFakeRemove_pp_JetComb_MC_akPu%d_20_eta_20_doToy1_0Bayes4_1SVD6_6_6_6_6_6_PP6_1trigcorAfterUnfo_RecopTCut50GeV_OnUncorrSpectra.root", radius));
+
+
+    if(isATLASCut) TFile * fSVDin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/July22/PbPb%sMBLjSLjSub_10GeVBins_1doFakeRemove_pp_JetComb_MC_akPu%d_20_eta_20_doToy1_0Bayes4_1SVD%d_%d_%d_%d_%d_%d_PP%d_1trigcorAfterUnfo_RecopTCut50GeV_OnUncorrSpectra.root", trkMaxCut, radius, 6, 6, 6, 6, 6, 6, 6));
+    if(!isATLASCut) TFile * fSVDin = TFile::Open(Form("/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_20/src/July22/PbPb%sMBLjSLjSub_1doFakeRemove_pp_JetComb_MC_akPu%d_20_eta_20_doToy1_0Bayes4_1SVD%d_%d_%d_%d_%d_%d_PP%d_1trigcorAfterUnfo_Reco50GenpTCut0GeV_OnUncorrSpectra.root", trkMaxCut, radius, 6, 6, 6, 6, 6, 6, 6));
+
+  
+    char dataset [7][256] = {"pbpb","pbpb","pbpb","pbpb","pbpb","pbpb","pp"};
+  
+    TH1F * hSVD_Closure[nbins_cent+1];
+    TH1F * hSVD_Closure_check[nbins_cent+1];
+    TH1F * hBayes_OffClosure[nbins_cent+1];
+    TH1F * hBayes_OffClosure_check[nbins_cent+1];
+    TH1F * hMCClosurePbPb_Bayesian[nbins_cent+1];
+    TH1F * hMCClosurePbPb_BinByBin[nbins_cent+1];
+    TH1F * hMCClosurePbPb_Bayesian_sameSide[nbins_cent+1];
+    TH1F * hMCClosurePbPb_BinByBin_sameSide[nbins_cent+1];
+    fin = TFile::Open(Form("MinBias_Sub/July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p%d_MCCloSameSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, radius, 20150721));
+
+    TFile * fOppSide = TFile::Open(Form("MinBias_Sub/July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p%d_MCCloOppSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, radius, 20150721));
+    TFile * fSameSide = TFile::Open(Form("MinBias_Sub/July20/HiForest_JetComb_JetRAA_%disATLASCut_R0p%d_MCCloSameSide_1trigcorAfterUnfo_SevilFakeMBnoLJSbJCut_RecopTCut50GeV_matrixRecoCut_%d.root", isATLASCut, radius, 20150721));
+
+    for(int i = 0; i<nbins_cent+1; ++i){
+      cout<<i<<endl;
+      // hBayes_OffClosure[i] = (TH1F*)fSVDin->Get(Form("MCClosure_test_%s_oppside_Bayes_R%d_20_eta_20_cent%d", dataset[i], radius, i));
+      // hBayes_OffClosure_check[i] = (TH1F*)fSVDin->Get(Form("MCClosure_test_%s_sameside_Bayes_R%d_20_eta_20_cent%d", dataset[i], radius, i));
+      hSVD_Closure[i] = (TH1F*)fSVDin->Get(Form("MCClosure_test_%s_oppside_SVD_R%d_20_eta_20_cent%d",dataset[i], radius, i));
+      hSVD_Closure[i]->Print("base");
+      hSVD_Closure_check[i] = (TH1F*)fSVDin->Get(Form("MCClosure_test_%s_sameside_SVD_R%d_20_eta_20_cent%d", dataset[i], radius, i));
+      hSVD_Closure_check[i]->Print("base");
+      if(i!=nbins_cent){
+
+	hMCClosurePbPb_Bayesian[i] = (TH1F*)fOppSide->Get(Form("hRatio_MC_Bayes_cent%d",i));
+	hMCClosurePbPb_Bayesian[i]->Print("base");
+	hMCClosurePbPb_BinByBin[i] = (TH1F*)fOppSide->Get(Form("hRatio_MC_BinByBin_cent%d",i));
+	hMCClosurePbPb_BinByBin[i]->Print("base");
+	hMCClosurePbPb_Bayesian_sameSide[i] = (TH1F*)fSameSide->Get(Form("hRatio_MC_Bayes_cent%d",i));
+	hMCClosurePbPb_Bayesian_sameSide[i]->Print("base");
+	hMCClosurePbPb_BinByBin_sameSide[i] = (TH1F*)fSameSide->Get(Form("hRatio_MC_BinByBin_cent%d",i));
+	hMCClosurePbPb_BinByBin_sameSide[i]->Print("base");
+      }
+
+      if(i == nbins_cent){
+
+	hMCClosurePbPb_Bayesian[i] = (TH1F*)fOppSide->Get("hRatio_MC_Bayes_PP");
+	hMCClosurePbPb_Bayesian[i]->Print("base");
+	hMCClosurePbPb_BinByBin[i] = (TH1F*)fOppSide->Get("hRatio_MC_BinByBin_PP");
+	hMCClosurePbPb_BinByBin[i]->Print("base");
+	hMCClosurePbPb_Bayesian_sameSide[i] = (TH1F*)fSameSide->Get("hRatio_MC_Bayes_PP");
+	hMCClosurePbPb_Bayesian_sameSide[i]->Print("base");
+	hMCClosurePbPb_BinByBin_sameSide[i] = (TH1F*)fSameSide->Get("hRatio_MC_BinByBin_PP");
+	hMCClosurePbPb_BinByBin_sameSide[i]->Print("base");
+      }
+
     }
-
-    if(i == nbins_cent){
-
-      hMCClosurePbPb_Bayesian[i] = (TH1F*)fOppSide->Get("hRatio_MC_Bayes_PP");
-      hMCClosurePbPb_Bayesian[i]->Print("base");
-      hMCClosurePbPb_BinByBin[i] = (TH1F*)fOppSide->Get("hRatio_MC_BinByBin_PP");
-      hMCClosurePbPb_BinByBin[i]->Print("base");
-      hMCClosurePbPb_Bayesian_sameSide[i] = (TH1F*)fSameSide->Get("hRatio_MC_Bayes_PP");
-      hMCClosurePbPb_Bayesian_sameSide[i]->Print("base");
-      hMCClosurePbPb_BinByBin_sameSide[i] = (TH1F*)fSameSide->Get("hRatio_MC_BinByBin_PP");
-      hMCClosurePbPb_BinByBin_sameSide[i]->Print("base");
-    }
-
   }
 
   if(doPbPbMCClosure){
@@ -1150,15 +1182,21 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
       dPbPb_TrgComb[i]->SetAxisRange(40,500,"X");
       dPbPb_TrgComb[i]->Draw();
     
-      uPbPb_Bayes[i]->SetMarkerStyle(20);
-      uPbPb_Bayes[i]->SetMarkerColor(kBlack);
+      uPbPb_Bayes[i]->SetMarkerStyle(27);
+      uPbPb_Bayes[i]->SetMarkerColor(kRed);
       //uPbPb_Bayes[i] = (TH1F*)uPbPb_Bayes[i]->Rebin(nbins_pt,Form("rebin_bayes_cent%d",i),boundaries_pt);
       //divideBinWidth(uPbPb_Bayes[i]);
       uPbPb_Bayes[i]->Draw("same");
 
+      uPbPb_SVD[i]->SetMarkerStyle(20);
+      uPbPb_SVD[i]->SetMarkerColor(kBlue);
+      //uPbPb_SVD[i] = (TH1F*)uPbPb_SVD[i]->Rebin(nbins_pt,Form("rebin_bayes_cent%d",i),boundaries_pt);
+      //divideBinWidth(uPbPb_SVD[i]);
+      uPbPb_SVD[i]->Draw("same");
+
       //uPbPb_BinByBin[i]->Scale(1e-6);
       uPbPb_BinByBin[i]->SetMarkerStyle(33);
-      uPbPb_BinByBin[i]->SetMarkerColor(kRed);
+      uPbPb_BinByBin[i]->SetMarkerColor(kGreen);
       //uPbPb_BinByBin[i] = (TH1F*)uPbPb_BinByBin[i]->Rebin(nbins_pt,Form("rebin_binbybin_cent%d",i),boundaries_pt);
       //divideBinWidth(uPbPb_BinByBin[i]);
       uPbPb_BinByBin[i]->Draw("same");
@@ -1170,12 +1208,15 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
     TLegend *PbPb_sigma = myLegend(0.33,0.3,0.5,0.5);
     PbPb_sigma->AddEntry(dPbPb_TrgComb[0],"No Unfolding","pl");
     PbPb_sigma->AddEntry(uPbPb_Bayes[0],"Bayesian 4 Iter","pl");
+    PbPb_sigma->AddEntry(uPbPb_SVD[0],"SVD, kReg = 6","pl");
     PbPb_sigma->AddEntry(uPbPb_BinByBin[0],"BinByBin","pl");
     PbPb_sigma->SetTextSize(0.04);
     PbPb_sigma->Draw();
 
     putCMSPrel();
+    cPbPb_sigma->cd(2);
     putPbPbLumi();
+    cPbPb_sigma->cd(1);
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.3,0.2,16);
     //drawText("Spectra with NJet(p_{T}>50) < 7",0.55,0.55,16);
 
@@ -1210,25 +1251,31 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
     dPP_Comb->SetAxisRange(40,500,"X");
     dPP_Comb->Draw();
 
-    uPP_Bayes->SetMarkerColor(kBlack);
-    uPP_Bayes->SetMarkerStyle(20);
+    uPP_Bayes->SetMarkerColor(kRed);
+    uPP_Bayes->SetMarkerStyle(27);
     //uPP_Bayes->Scale(1./1e3);
     uPP_Bayes->Draw("same");
 
+    uPP_SVD->SetMarkerStyle(20);
+    uPP_SVD->SetMarkerColor(kBlue);
+    //uPP_BinByBin->Scale(1./1e3);
+    uPP_SVD->Draw("same");
+
     uPP_BinByBin->SetMarkerStyle(33);
-    uPP_BinByBin->SetMarkerColor(kRed);
+    uPP_BinByBin->SetMarkerColor(kGreen);
     //uPP_BinByBin->Scale(1./1e3);
     uPP_BinByBin->Draw("same");
 
     TLegend *PP_sigma = myLegend(0.53,0.65,0.85,0.9);
     PP_sigma->AddEntry(dPP_Comb,"No Unfolding","pl");
     PP_sigma->AddEntry(uPP_Bayes,"Bayesian 4 Iter","pl");
+    PP_sigma->AddEntry(uPP_SVD,"SVD, kReg = 6","pl");
     PP_sigma->AddEntry(uPP_BinByBin,"BinByBin","pl");
     PP_sigma->SetTextSize(0.04);
     PP_sigma->Draw();
 
     putCMSPrel();
-    putPPLumi();
+    putPPLumi(0.5);
     drawText(Form("Anti-k_{T} %s Jets R=0.%d",jet_type,radius),0.15,0.23,16);
     drawText("|#eta|<2, |vz|<15",0.15,0.33,16);
     cPP_sigma->SaveAs(Form("%sPP_%disATLASCut_invariant_cross_section_ak%d%s_%d.pdf",outLocation, isATLASCut, radius,jet_type,date.GetDate()),"RECREATE");
@@ -1393,7 +1440,9 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
     PbPb_dataMerge->Draw();
 
     putCMSPrel();
+    cDataMerge->cd(2);
     putPbPbLumi();
+    cDataMerge->cd(1);
     drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.25,0.21,16);
     drawText("pCES, HBHE",0.25,0.11,16);
     cDataMerge->cd(2);
@@ -1526,7 +1575,7 @@ void RAA_plot(int radius = 3, bool isATLASCut = true)
     PP_dataMerge->Draw();
 
     putCMSPrel();
-    putPPLumi();
+    putPPLumi(0.5);
     drawText(Form("|#eta|<%2.0f, |vz|<15",etaBoundary),0.15,0.26,16);
     drawText("pCES, HBHE",0.15,0.21,16);
     drawText(Form("Anti-k_{T} %s %s Jets R=0.%d",algo,jet_type,radius),0.15,0.15,16);

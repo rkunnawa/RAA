@@ -37,12 +37,12 @@
 #include <TCut.h>
 #include <cstdlib>
 #include <cmath>
-/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldResponse.h" */
-/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBayes.h" */
-/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldSvd.h" */
-/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBinByBin.h" */
-/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/prior.h" */
-/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/bayesianUnfold.h" */
+/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldResponse.h"  */
+/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBayes.h"  */
+/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldSvd.h"  */
+/* #include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/RooUnfold-1.1.1/src/RooUnfoldBinByBin.h"  */
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/prior.h" 
+#include "/afs/cern.ch/work/r/rkunnawa/WORK/RAA/CMSSW_5_3_18/src/Headers/bayesianUnfold.h" 
 
 using namespace std;
 
@@ -55,10 +55,8 @@ TGraphErrors *tTAAerrNpart=0;
 const int nbins_cent = 6;
 double boundaries_cent[nbins_cent+1] = {0,2,4,12,20,28,36};
 
-
-
 double ncoll[nbins_cent+1] = {1660,1310,745,251,62.8,10.8,362.24};
-double npart[nbins_cent+1] = {389.84, 307.65, 223.95, 107.5, 41.65, 11.55, 112.9};
+double npart[nbins_cent+1] = {381.829, 329.41, 224.28, 108.12, 42.04, 11.43, 112.9};
 
 /* const int nbins_pt = 30; */
 /* const double boundaries_pt[nbins_pt+1] = {  3, 4, 5, 7, 9, 12,   15, 18, 21, 24, 28,  32, 37, 43, 49, 56,  64, 74, 84, 97, 114,  133, 153, 174, 196,  220, 245, 300,   330, 362, 395 }; */
@@ -68,7 +66,6 @@ const char *jet_type = (char*) "PF";
 char* etaWidth = (char*) "20_eta_20";
 double deltaEta = 4.0;
 const char * ptbins = (char*)"finebins"; /* finebins, atlaspTbins, atlasRcpbins */
-const char * smear = (char*)"noSmear";/* noSmear, 10TrigIneff_Smear, 5TrigIneff_Smear*/
 
 const int unfoldingCut_R2 = 55;
 const int unfoldingCut_R3 = 55;
@@ -138,8 +135,6 @@ const double boundaries_pt_good[nbins_pt_good+1] = { 15, 18, 21, 24, 28,  32, 37
 // this is the atlas pT binning for the Rcp plots. 
 /* static const int nbins_pt = 12;   */
 /* static const double boundaries_pt[nbins_pt+1] = {38.36, 44.21, 50.94, 58.7, 67.64 , 77.94 , 89.81, 103.5, 119.3, 137.4 , 158.3, 182.5,  210.3};   */
-
-<<<<<<< HEAD
 
 void doTrigCorr(TH1F *h1, TH1F *h2)
 {
@@ -224,7 +219,8 @@ void multiplyBinWidth(TH1 *h)
     }
   h->GetXaxis()->CenterTitle();
   h->GetYaxis()->CenterTitle();
-=======
+}
+
 TH1 *Truncate1D(TH1 * hInput, Int_t nbins, Int_t xLow, Int_t xHigh){
 
   TH1F * hOutput = new TH1F("hOutput","",nbins,xLow, xHigh);
@@ -250,7 +246,7 @@ TH2 *Truncate2D(TH2 * hInput, Int_t nbins_X, Int_t xLow, Int_t xHigh, Int_t nbin
   }
 
   return hOutput; 
->>>>>>> a65ad396b5a30e4496cbc43988f26032230ad04b
+
 }
 
 
@@ -586,6 +582,7 @@ void prepareNcollUnc(int nbins_ana, float maxpt=299.){
 void DrawNpartTAABand(){
   double xvalueNpart[6];
   double yerrorNpart[6];
+
   xvalueNpart[0] = 381.29; xvalueNpart[1] = 329.41; xvalueNpart[2] = 224.28;
   xvalueNpart[3] = 108.12; xvalueNpart[4] = 42.04;  xvalueNpart[5] = 11.43;
   yerrorNpart[0]=0.0409, yerrorNpart[1]=0.0459, yerrorNpart[2]=0.0578, yerrorNpart[3]=0.0944, yerrorNpart[4]=0.143, yerrorNpart[5]=0.176;
